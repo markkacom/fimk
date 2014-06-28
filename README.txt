@@ -61,7 +61,7 @@ behind a router or a firewall and want to have your node accept incoming peer
 connections, you should setup port forwarding. The server will still work though
 even if only outgoing connections are allowed, so opening this port is optional.
 
-The user interface is available on port 6886. This port also accepts http API
+The user interface is available on port 7886. This port also accepts http API
 requests which other FIM client applications could use.
 
 The blockchain is stored on disk using the H2 embedded database, inside the
