@@ -278,6 +278,7 @@ public final class Account {
 
     }
 
+    /* XXX - Disable account leasing */
     private long getLessorsGuaranteedBalanceNQT() {
         // long lessorsGuaranteedBalanceNQT = 0;
         // for (Long accountId : lessorIds) {
