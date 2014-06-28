@@ -1,3 +1,19 @@
+FIM Origins:
+
+FIM is open source software and based on NXT 
+(https://bitbucket.org/JeanLucPicard/nxt/overview). 
+FIM is different from NXT in the following ways:
+
+* 30 second block time (instead of 60 seconds)
+* Lower transaction fees (0.1 instead of 1)
+* Block rewards are paid to the block forger
+* Different web client theme (less colors)
+
+This README is based of the original NXT README.
+
+This is FIM version 0.2.0 which is based on NXT 1.1.5.
+
+
 Running the FIM software:
 
 Dependencies: Java 7 or later needs to be installed first. Only the Oracle JVM
@@ -7,9 +23,10 @@ There is no installation needed. Unpack the fim.zip package and open a
 shell in the resulting fim directory. Execute the run.sh script if using Linux,
 or run.bat if using Windows. This will start a java server process, which will
 begin logging its activities to the console. The initialization takes a few
-seconds. When it is ready, you should see the message "FIM server 1.0.0 started
-successfully". Open a browser, without stopping the java process, and go to
-http://localhost:6886 , where the FIM UI should now be available. To stop the
+seconds. When it is ready, you should see the message 
+"FIM server 0.2.0 (based on NXT 1.1.5) started successfully". 
+Open a browser, without stopping the java process, and go to
+http://localhost:7886 , where the FIM UI should now be available. To stop the
 application, type Ctrl-C inside the console window.
 
 
@@ -66,20 +83,20 @@ which you see in the console window, but also to a file fim.log, which gets
 overwritten at restart. In case of an error, the fim.log file may contain
 helpful information, so include its contents when submitting a bug report.
 
-In addition to the default user interface at http://localhost:6886 , the
+In addition to the default user interface at http://localhost:7886 , the
 following urls are available:
 
-http://localhost:6886/test - a list of all available http API requests, very
+http://localhost:7886/test - a list of all available http API requests, very
 useful for client developers and for anyone who wants to execute commands
 directly using the http interface without going through the browser UI.
 
-http://localhost:6886/test?requestType=<specificRequestType> - same as above,
+http://localhost:7886/test?requestType=<specificRequestType> - same as above,
 but only shows the form for the request type specified.
 
-http://localhost:6866/doc - a javadoc documentation for client developers who
+http://localhost:7866/doc - a javadoc documentation for client developers who
 want to use the Java API directly instead of going through the http interface.
 
-http://localhost:6886/admin.html - some more commonly used commands, using the
+http://localhost:7886/admin.html - some more commonly used commands, using the
 http interface.
 
 

@@ -155,7 +155,7 @@ public final class Nxt {
         TransactionProcessorImpl.getInstance().shutdown();
         ThreadPool.shutdown();
         Db.shutdown();
-        Logger.logMessage("FIM server " + VERSION + " stopped.");
+        Logger.logMessage("FIM server " + FIM_VERSION + " (based on NXT "+ VERSION +" ) stopped.");
         Logger.shutdown();
     }
 
@@ -178,7 +178,7 @@ public final class Nxt {
 
             long currentTime = System.currentTimeMillis();
             Logger.logDebugMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
-            Logger.logMessage("FIM server " + VERSION + " started successfully.");
+            Logger.logMessage("FIM server " + FIM_VERSION + " (based on NXT "+ VERSION +" ) started successfully.");
             if (Constants.isTestnet) {
                 Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
             }
