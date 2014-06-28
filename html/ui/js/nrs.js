@@ -144,7 +144,7 @@ var NRS = (function(NRS, $, undefined) {
 					//first time...
 					NRS.state = response;
 
-					$("#nrs_version").html(NRS.state.fimVersion).removeClass("loading_dots");
+					$("#nrs_version").html(NRS.state.fim_version).removeClass("loading_dots");
 
 					NRS.getBlock(NRS.state.lastBlock, NRS.handleInitialBlocks);
 				} else if (NRS.state.isScanning) {

@@ -30,7 +30,7 @@ public final class GetState extends APIServlet.APIRequestHandler {
         JSONObject response = new JSONObject();
 
         response.put("version", Nxt.VERSION);
-        response.put("fimVersion", Nxt.FIM_VERSION);
+        response.put("fim_version", Nxt.FIM_VERSION);
         response.put("time", Convert.getEpochTime());
         response.put("lastBlock", Nxt.getBlockchain().getLastBlock().getStringId());
         response.put("cumulativeDifficulty", Nxt.getBlockchain().getLastBlock().getCumulativeDifficulty().toString());
