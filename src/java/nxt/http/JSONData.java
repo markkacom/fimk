@@ -167,6 +167,7 @@ final class JSONData {
         json.put("uploadedVolume", peer.getUploadedVolume());
         json.put("application", peer.getApplication());
         json.put("version", peer.getVersion());
+        json.put("fim_version", peer.getFimVersion());
         json.put("platform", peer.getPlatform());
         json.put("blacklisted", peer.isBlacklisted());
         return json;

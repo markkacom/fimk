@@ -33,6 +33,12 @@ final class GetInfo extends PeerServlet.PeerRequestHandler {
         }
         peerImpl.setVersion(version.trim());
 
+        String fim_version = (String)request.get("fim_version");
+        if (fim_version == null) {
+          fim_version = "?";
+        }
+        peerImpl.setFimVersion(fim_version.trim());
+
         String platform = (String)request.get("platform");
         if (platform == null) {
             platform = "?";

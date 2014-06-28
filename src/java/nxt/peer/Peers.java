@@ -139,8 +139,9 @@ public final class Peers {
         if (Peers.myHallmark != null && Peers.myHallmark.length() > 0) {
             json.put("hallmark", Peers.myHallmark);
         }
-        json.put("application", "NRS");
+        json.put("application", "FIMK");
         json.put("version", Nxt.VERSION);
+        json.put("fim_version", Nxt.FIM_VERSION);
         json.put("platform", Peers.myPlatform);
         json.put("shareAddress", Peers.shareMyAddress);
         Logger.logDebugMessage("My peer info:\n" + json.toJSONString());
