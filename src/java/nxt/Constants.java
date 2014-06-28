@@ -4,14 +4,34 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public final class Constants {
+  
+    public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
+  
+    public static final long ONE_NXT = 100000000;
+    
+    /* XXX - MINIMUM FEE IS 0.1 FIM */
+    public static final long MIN_FEE_NQT = ONE_NXT / 10;
 
     public static final int BLOCK_HEADER_LENGTH = 232;
-    public static final int MAX_NUMBER_OF_TRANSACTIONS = 255;
+    
+    /* XXX - max transactions is 512 */
+    public static final int MAX_NUMBER_OF_TRANSACTIONS = 512;
     public static final int MAX_PAYLOAD_LENGTH = MAX_NUMBER_OF_TRANSACTIONS * 160;
-    public static final long MAX_BALANCE_NXT = 1000000000;
-    public static final long ONE_NXT = 100000000;
+    
+    /* XXX - number of seconds between blocks */
+    public static final int SECONDS_BETWEEN_BLOCKS = 30;
+    
+    /* XXX - POS reward amounts and halving */
+    public static final long FORGER_FEE_STAGE_CHANGE_AT_BLOCK = 889920;
+    public static final long[] FORGER_FEE_AMOUNT_NQT_STAGES = { 200 * ONE_NXT, 100 * ONE_NXT, 50 * ONE_NXT, 25 * ONE_NXT };
+    
+    /* XXX - max balance is calculated from */
+    public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
-    public static final long INITIAL_BASE_TARGET = 153722867;
+    
+    /* XXX - adjust base target for MAX_BALANCE_NXT (192153584) */
+    public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
+    
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
 
     public static final int MAX_ALIAS_URI_LENGTH = 1000;
@@ -44,27 +64,40 @@ public final class Constants {
     public static final int MAX_HUB_ANNOUNCEMENT_URIS = 100;
     public static final int MAX_HUB_ANNOUNCEMENT_URI_LENGTH = 1000;
     public static final long MIN_HUB_EFFECTIVE_BALANCE = 100000;
+    
+    public static final int SECOND_BIRTH_BLOCK = 1;
 
-    public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
+    public static final int ALIAS_SYSTEM_BLOCK = SECOND_BIRTH_BLOCK;
+    public static final int TRANSPARENT_FORGING_BLOCK = SECOND_BIRTH_BLOCK;
+    public static final int ARBITRARY_MESSAGES_BLOCK = SECOND_BIRTH_BLOCK;
+    public static final int TRANSPARENT_FORGING_BLOCK_2 = SECOND_BIRTH_BLOCK;
+    public static final int TRANSPARENT_FORGING_BLOCK_3 = SECOND_BIRTH_BLOCK;
+    public static final int TRANSPARENT_FORGING_BLOCK_4 = SECOND_BIRTH_BLOCK;
+    public static final int TRANSPARENT_FORGING_BLOCK_5 = SECOND_BIRTH_BLOCK;
+    public static final int TRANSPARENT_FORGING_BLOCK_6 = SECOND_BIRTH_BLOCK;
+    
+    /* XXX - Disable HUB_ANNOUNCEMENT for now */
+    public static final int TRANSPARENT_FORGING_BLOCK_7 = Integer.MAX_VALUE;
+    
+    public static final int NQT_BLOCK = SECOND_BIRTH_BLOCK;
+    public static final int FRACTIONAL_BLOCK = SECOND_BIRTH_BLOCK;
+    public static final int ASSET_EXCHANGE_BLOCK = SECOND_BIRTH_BLOCK;
+    public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK = 0;
+    
+    /* XXX - Set REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP to 0 */    
+    public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP = 0;
+    
+    /* XXX - Disable VOTING for now */
+    public static final int VOTING_SYSTEM_BLOCK = Integer.MAX_VALUE;
+    
+    /* XXX - Disable Digital Goods Store for now */
+    public static final int DIGITAL_GOODS_STORE_BLOCK = Integer.MAX_VALUE;
 
-    public static final int ALIAS_SYSTEM_BLOCK = 22000;
-    public static final int TRANSPARENT_FORGING_BLOCK = 30000;
-    public static final int ARBITRARY_MESSAGES_BLOCK = 40000;
-    public static final int TRANSPARENT_FORGING_BLOCK_2 = 47000;
-    public static final int TRANSPARENT_FORGING_BLOCK_3 = 51000;
-    public static final int TRANSPARENT_FORGING_BLOCK_4 = 64000;
-    public static final int TRANSPARENT_FORGING_BLOCK_5 = 67000;
-    public static final int TRANSPARENT_FORGING_BLOCK_6 = isTestnet ? 75000 : 130000;
-    public static final int TRANSPARENT_FORGING_BLOCK_7 = isTestnet ? 75000 : Integer.MAX_VALUE;
-    public static final int NQT_BLOCK = isTestnet ? 76500 : 132000;
-    public static final int FRACTIONAL_BLOCK = isTestnet ? NQT_BLOCK : 134000;
-    public static final int ASSET_EXCHANGE_BLOCK = isTestnet ? NQT_BLOCK : 135000;
-    public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK = isTestnet ? 78000 : 140000;
-    public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP = isTestnet ? 13031352 : 15134204;
-    public static final int VOTING_SYSTEM_BLOCK = isTestnet ? 0 : Integer.MAX_VALUE;
-    public static final int DIGITAL_GOODS_STORE_BLOCK = isTestnet ? 0 : Integer.MAX_VALUE;
-
-    static final long UNCONFIRMED_POOL_DEPOSIT_NQT = (isTestnet ? 50 : 100) * ONE_NXT;
+    /* XXX - Make UNCONFIRMED_POOL_DEPOSIT_NQT same on testnet as main net */
+    public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;
+    
+    /* XXX - FORGER_FEE_BLOCK, FORGER_FEE_AMOUNT_NQT */
+    public static final int FORGER_FEE_BLOCK = SECOND_BIRTH_BLOCK + 1;
 
     public static final long EPOCH_BEGINNING;
     static {

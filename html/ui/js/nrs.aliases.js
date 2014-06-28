@@ -190,7 +190,7 @@ var NRS = (function(NRS, $, undefined) {
 			} else {
 				$("#register_alias_uri").val("");
 			}
-			$("#register_alias_help").html("The alias will reference the account number entered and can be used to send Nxt to, messages, etc..").show();
+			$("#register_alias_help").html("The alias will reference the account number entered and can be used to send FIM to, messages, etc..").show();
 		} else {
 			$("#register_alias_uri_label").html("Data");
 			$("#register_alias_uri").prop("placeholder", "Data");

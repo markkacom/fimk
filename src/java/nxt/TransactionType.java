@@ -1,10 +1,5 @@
 package nxt;
 
-import nxt.crypto.XoredData;
-import nxt.util.Convert;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -12,6 +7,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import nxt.crypto.XoredData;
+import nxt.util.Convert;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public abstract class TransactionType {
 
@@ -115,7 +116,9 @@ public abstract class TransactionType {
             case TYPE_ACCOUNT_CONTROL:
                 switch (subtype) {
                     case SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING:
-                        return AccountControl.EFFECTIVE_BALANCE_LEASING;
+
+                        /* XXX - Disable Effective Balance Leasing */    
+                        return null; // AccountControl.EFFECTIVE_BALANCE_LEASING;
                     default:
                         return null;
                 }
@@ -973,6 +976,7 @@ public abstract class TransactionType {
                 return TransactionType.SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT;
             }
 
+            @Override
             final Attachment.ColoredCoinsOrderPlacement makeAttachment(Long assetId, long quantityQNT, long priceNQT) {
                 return new Attachment.ColoredCoinsAskOrderPlacement(assetId, quantityQNT, priceNQT);
             }
@@ -1040,6 +1044,7 @@ public abstract class TransactionType {
                 return TransactionType.SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT;
             }
 
+            @Override
             final Attachment.ColoredCoinsOrderPlacement makeAttachment(Long assetId, long quantityQNT, long priceNQT) {
                 return new Attachment.ColoredCoinsBidOrderPlacement(assetId, quantityQNT, priceNQT);
             }

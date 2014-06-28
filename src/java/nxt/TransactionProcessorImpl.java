@@ -228,9 +228,10 @@ final class TransactionProcessorImpl implements TransactionProcessor {
         byte subtype = buffer.get();
         int timestamp = buffer.getInt();
         short deadline = buffer.getShort();
+        Long recipientId = buffer.getLong();   /* XXX - prevent transaction replay */
         byte[] senderPublicKey = new byte[32];
         buffer.get(senderPublicKey);
-        Long recipientId = buffer.getLong();
+        //Long recipientId = buffer.getLong(); /* XXX - prevent transaction replay */
         long amountNQT = buffer.getLong();
         long feeNQT = buffer.getLong();
         String referencedTransactionFullHash = null;

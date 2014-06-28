@@ -367,7 +367,7 @@ var NRS = (function(NRS, $, undefined) {
 
 		var data = {
 			"recipient": $.trim($("#inline_message_recipient").val()),
-			"feeNXT": "1",
+			"feeNXT": ""+NRS.MIN_FEE_NXT,
 			"deadline": "1440",
 			"secretPhrase": $.trim($("#inline_message_password").val())
 		};

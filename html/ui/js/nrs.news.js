@@ -16,7 +16,7 @@ var NRS = (function(NRS, $, undefined) {
 		if (currentTime - NRS.newsRefresh > 60 * 60 * 10) { //10 minutes before refreshing..
 			NRS.newsRefresh = currentTime;
 
-			$(".rss_news").empty().addClass("data-loading").html("<img src='img/loading_indicator.gif' width='32' height='32' />");
+			//$(".rss_news").empty().addClass("data-loading").html("<img src='img/loading_indicator.gif' width='32' height='32' />");
 
 			var settings = {
 				"limit": 5,
@@ -39,13 +39,14 @@ var NRS = (function(NRS, $, undefined) {
 				}
 			};
 
-			$("#nxtforum_news").rss("https://nxtforum.org/index.php?type=rss;action=.xml;sa=news;", settings, NRS.newsLoaded);
-			$("#nxtcrypto_news").rss("http://info.nxtcrypto.org/feed/", settings, NRS.newsLoaded);
+      /* XXX - disable nxt centric rss news feeds */
+			$("#fimkforum_news").rss("http://forum.fimk.fi/index.php?type=rss;action=.xml", settings, NRS.newsLoaded);
+			/*$("#nxtcrypto_news").rss("http://info.nxtcrypto.org/feed/", settings, NRS.newsLoaded);
 			$("#reddit_news").rss("http://www.reddit.com/r/NXT/.rss", settingsReddit, NRS.newsLoaded);
 			$("#nxtcoin_blogspot_news").rss("http://nxtcoin.blogspot.com/feeds/posts/default", settings, NRS.newsLoaded);
 			$("#nextcoin_forums_news").rss("https://nextcoin.org/index.php?type=rss;action=.xml;sa=news;", settings, NRS.newsLoaded);
 			$("#nxter_news").rss("http://nxter.org/feed/", settings, NRS.newsLoaded);
-			$("#nxtcommunity_news").rss("http://www.nxtcommunity.org/rss.xml", settings, NRS.newsLoaded);
+			$("#nxtcommunity_news").rss("http://www.nxtcommunity.org/rss.xml", settings, NRS.newsLoaded);*/
 		}
 	}
 

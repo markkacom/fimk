@@ -1,11 +1,5 @@
 package nxt;
 
-import nxt.crypto.Crypto;
-import nxt.util.Convert;
-import nxt.util.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -14,6 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import nxt.crypto.Crypto;
+import nxt.util.Convert;
+import nxt.util.Logger;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 final class BlockImpl implements Block {
 
@@ -44,12 +45,21 @@ final class BlockImpl implements Block {
               byte[] generatorPublicKey, byte[] generationSignature, byte[] blockSignature, byte[] previousBlockHash, List<TransactionImpl> transactions)
             throws NxtException.ValidationException {
 
-        if (transactions.size() > Constants.MAX_NUMBER_OF_TRANSACTIONS) {
-            throw new NxtException.ValidationException("attempted to create a block with " + transactions.size() + " transactions");
+        /* XXX - Allow Genesis block to have more transactions than normal block */
+        if (timestamp == 0) {
+            if (transactions.size() > Genesis.GENESIS_RECIPIENTS.length) {
+                // really stupid check but it shows what we're doing
+                throw new NxtException.ValidationException("attempted to create GENESIS block with " + transactions.size() + " transactions");
+            }
         }
-
+        else {
+            if (transactions.size() > Constants.MAX_NUMBER_OF_TRANSACTIONS) {
+                throw new NxtException.ValidationException("attempted to create a block with " + transactions.size() + " transactions");
+            }
+      
         if (payloadLength > Constants.MAX_PAYLOAD_LENGTH || payloadLength < 0) {
-            throw new NxtException.ValidationException("attempted to create a block with payloadLength " + payloadLength);
+                throw new NxtException.ValidationException("attempted to create a block with payloadLength " + payloadLength);
+            }
         }
 
         this.version = version;
@@ -90,6 +100,11 @@ final class BlockImpl implements Block {
         this.nextBlockId = nextBlockId;
         this.height = height;
         this.id = id;
+        
+        /* XXX do not allow transactions before SECOND_BIRTH_BLOCK */
+        if (height != 0 && height <= Constants.SECOND_BIRTH_BLOCK && ! this.blockTransactions.isEmpty() ) {
+            throw new NxtException.ValidationException("Attempted to create a block with transactions before SECOND_BIRTH_BLOCK");
+        }
     }
 
     @Override
@@ -349,17 +364,24 @@ final class BlockImpl implements Block {
     }
 
     void apply() {
+        /* XXX - Add the POS reward to the block forger */
+        long augmentedFeeNQT = RewardsImpl.augmentFee(this, totalFeeNQT);
+      
         Account generatorAccount = Account.addOrGetAccount(getGeneratorId());
-        generatorAccount.apply(generatorPublicKey, this.height);
-        generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(totalFeeNQT);
-        generatorAccount.addToForgedBalanceNQT(totalFeeNQT);
+        generatorAccount.apply(generatorPublicKey, this.height);        
+        
+        generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(augmentedFeeNQT);
+        generatorAccount.addToForgedBalanceNQT(augmentedFeeNQT);
     }
 
     void undo() {
+        /* XXX - Add the POS reward to the block forger */
+        long augmentedFeeNQT = RewardsImpl.augmentFee(this, totalFeeNQT);      
+      
         Account generatorAccount = Account.getAccount(getGeneratorId());
         generatorAccount.undo(getHeight());
-        generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(-totalFeeNQT);
-        generatorAccount.addToForgedBalanceNQT(-totalFeeNQT);
+        generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(-augmentedFeeNQT);
+        generatorAccount.addToForgedBalanceNQT(-augmentedFeeNQT);
     }
 
     void setPrevious(BlockImpl previousBlock) {
@@ -385,9 +407,11 @@ final class BlockImpl implements Block {
             cumulativeDifficulty = BigInteger.ZERO;
         } else {
             long curBaseTarget = previousBlock.baseTarget;
+            
+            /* XXX - Replaced hardcoded 60 with Constants.SECONDS_BETWEEN_BLOCKS */
             long newBaseTarget = BigInteger.valueOf(curBaseTarget)
                     .multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
-                    .divide(BigInteger.valueOf(60)).longValue();
+                    .divide(BigInteger.valueOf(Constants.SECONDS_BETWEEN_BLOCKS)).longValue();
             if (newBaseTarget < 0 || newBaseTarget > Constants.MAX_BASE_TARGET) {
                 newBaseTarget = Constants.MAX_BASE_TARGET;
             }

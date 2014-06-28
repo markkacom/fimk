@@ -134,16 +134,17 @@ public final class GetConstants extends APIServlet.APIRequestHandler {
         subtypes.add(subtype);
         transactionType.put("subtypes", subtypes);
         transactionTypes.add(transactionType);
-        transactionType = new JSONObject();
-        transactionType.put("value", TransactionType.AccountControl.EFFECTIVE_BALANCE_LEASING.getType());
-        transactionType.put("description", "Account Control");
-        subtypes = new JSONArray();
-        subtype = new JSONObject();
-        subtype.put("value", TransactionType.AccountControl.EFFECTIVE_BALANCE_LEASING.getSubtype());
-        subtype.put("description", "Effective balance leasing");
-        subtypes.add(subtype);
-        transactionType.put("subtypes", subtypes);
-        transactionTypes.add(transactionType);
+        /* XXX - Disable Effective Balance Leasing */    
+//        transactionType = new JSONObject();
+//        transactionType.put("value", TransactionType.AccountControl.EFFECTIVE_BALANCE_LEASING.getType());
+//        transactionType.put("description", "Account Control");
+//        subtypes = new JSONArray();
+//        subtype = new JSONObject();
+//        subtype.put("value", TransactionType.AccountControl.EFFECTIVE_BALANCE_LEASING.getSubtype());
+//        subtype.put("description", "Effective balance leasing");
+//        subtypes.add(subtype);
+//        transactionType.put("subtypes", subtypes);
+//        transactionTypes.add(transactionType);
         response.put("transactionTypes", transactionTypes);
 
         JSONArray peerStates = new JSONArray();

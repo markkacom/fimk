@@ -1,11 +1,11 @@
 package nxt.util;
 
-import nxt.Constants;
-import nxt.crypto.Crypto;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
+
+import nxt.Constants;
+import nxt.crypto.Crypto;
 
 public final class Convert {
 
@@ -68,7 +68,7 @@ public final class Convert {
             return null;
         }
         account = account.toUpperCase();
-        if (account.startsWith("NXT-")) {
+        if (account.startsWith("FIM-")) {
             return zeroToNull(Crypto.rsDecode(account.substring(4)));
         } else {
             return parseUnsignedLong(account);
@@ -76,7 +76,7 @@ public final class Convert {
     }
 
     public static String rsAccount(Long accountId) {
-        return "NXT-" + Crypto.rsEncode(nullToZero(accountId));
+    return "FIM-" + Crypto.rsEncode(nullToZero(accountId));
     }
 
     public static Long fullHashToId(byte[] hash) {

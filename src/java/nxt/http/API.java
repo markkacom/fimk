@@ -4,15 +4,19 @@ import nxt.Constants;
 import nxt.Nxt;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
+
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
@@ -27,7 +31,7 @@ import java.util.Set;
 
 public final class API {
 
-    private static final int TESTNET_API_PORT = 6876;
+    private static final int TESTNET_API_PORT = 6886;
 
     static final Set<String> allowedBotHosts;
 
@@ -103,8 +107,22 @@ public final class API {
                 filterHolder.setInitParameter("allowedHeaders", "*");
                 filterHolder.setAsyncSupported(true);
             }
-
+            
             apiHandlers.addHandler(apiHandler);
+            
+            /* XXX - add nxt.enableAPIServerRequestLog */
+            if (Nxt.getBooleanProperty("nxt.enableAPIServerRequestLog")) {
+              RequestLogHandler requestLogHandler = new RequestLogHandler();
+              apiHandlers.addHandler(requestLogHandler);
+               
+              NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-api-yyyy_mm_dd.request.log");
+              requestLog.setRetainDays(90);
+              requestLog.setAppend(true);
+              requestLog.setExtended(false);
+              requestLog.setLogTimeZone("GMT");
+              requestLogHandler.setRequestLog(requestLog);                  
+            }
+
             apiHandlers.addHandler(new DefaultHandler());
 
             apiServer.setHandler(apiHandlers);

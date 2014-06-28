@@ -5,6 +5,51 @@ var NRS = (function(NRS, $, undefined) {
 	NRS.assetSearch = false;
 	NRS.lastIssuerCheck = false;
 	NRS.viewingAsset = false; //viewing non-bookmarked asset
+	
+	NRS.allAssets = {}; // key is asset id
+	
+	/* XXX - Populate Asset name list in add asset dialog */
+  $('#add_asset_bookmark_modal').on('shown.bs.modal', function (e) {
+    $('#add_asset_dialog_asset_quantity').html("");
+    $('#add_asset_dialog_asset_decimals').html("");
+    $('#add_asset_dialog_asset_description').html("");    
+    loadAssetsFromBlockchain();
+  });
+  
+  /* XXX - Hook change listener to asset name selection list */
+  $('#select_asset_bookmark_id').change(function () {
+    var text = $('#select_asset_bookmark_id option:selected').val();
+    $('#add_asset_bookmark_id').val(text);
+    
+    var asset = NRS.allAssets[text];
+    $('#add_asset_dialog_asset_quantity').html(NRS.formatQuantity(asset.quantityQNT, asset.decimals));
+    $('#add_asset_dialog_asset_decimals').html(asset.decimals);
+    $('#add_asset_dialog_asset_description').html(asset.description);
+  });
+  
+  /* XXX - Load all assets into memory */
+  function loadAssetsFromBlockchain() {    
+    NRS.sendRequest("getAllAssets", {}, function(response) {
+      console.log("getAllAssets");
+      console.log(response);
+      if (response.assets && response.assets.length) {
+        var changed = false;
+        $.each(response.assets, function(key, asset) {
+          if (!(asset.asset in NRS.allAssets)) {
+            NRS.allAssets[asset.asset] = asset;
+            changed = true;            
+          }
+        });
+        if (changed) {
+          var options = ['<option value=""></option>'];
+          $.each(NRS.allAssets, function (id, asset) {
+            options.push('<option value="'+id+'">#'+asset.asset + ' | issuer: ' + asset.accountRS + ' | ' + asset.name.toUpperCase()+'</option>');
+          });
+          $('#select_asset_bookmark_id').html(options.join(''));               
+        }
+      }
+    });
+  }
 
 	NRS.pages.asset_exchange = function(callback) {
 		NRS.pageLoading();
@@ -13,6 +58,9 @@ var NRS = (function(NRS, $, undefined) {
 
 		NRS.assets = [];
 		NRS.assetIds = [];
+		
+    /* XXX - Load all assets in the blockchain */
+    window.setTimeout(function () { loadAssetsFromBlockchain() }, 3 * 1000);		
 
 		if (NRS.databaseSupport) {
 			NRS.database.select("assets", null, function(error, assets) {
@@ -173,13 +221,13 @@ var NRS = (function(NRS, $, undefined) {
 			};
 		}
 
-		if (!/^\d+$/.test(data.id) && !/^NXT\-/i.test(data.id)) {
+		if (!/^\d+$/.test(data.id) && !/^FIM\-/i.test(data.id)) {
 			return {
 				"error": "Asset or account ID is invalid."
 			};
 		}
 
-		if (/^NXT\-/i.test(data.id)) {
+		if (/^FIM\-/i.test(data.id)) {
 			NRS.sendRequest("getAssetsByIssuer", {
 				"account": data.id
 			}, function(response) {
@@ -257,7 +305,7 @@ var NRS = (function(NRS, $, undefined) {
 
 	/*
 	NRS.saveAssetIssuer = function(issuer) {
-		if (!/^NXT\-/i.test(issuer)) {
+		if (!/^FIM\-/i.test(issuer)) {
 			var address = new NxtAddress();
 
 			if (address.set(issuer)) {
@@ -838,7 +886,7 @@ var NRS = (function(NRS, $, undefined) {
 		} else {
 			NRS.assetSearch = [];
 
-			if (/NXT\-/i.test(input)) {
+			if (/FIM\-/i.test(input)) {
 				$.each(NRS.assets, function(key, asset) {
 					if (asset.accountRS.toLowerCase() == input || asset.accountRS.toLowerCase().indexOf(input) !== -1) {
 						NRS.assetSearch.push(asset.asset);
@@ -1119,22 +1167,23 @@ var NRS = (function(NRS, $, undefined) {
 		}
 
 		if (feeNQT.toString() == "0") {
-			feeNQT = new BigInteger("100000000");
+		  /* XXX - Minimum fee in HTML UI is 0.1 FIM */
+			feeNQT = new BigInteger(""+NRS.MIN_FEE_NQT);
 		}
 
 		var priceNQTPerWholeQNT = priceNQT.multiply(new BigInteger("" + Math.pow(10, NRS.currentAsset.decimals)));
 
 		if (orderType == "buy") {
-			var description = "Buy <strong>" + NRS.formatQuantity(quantityQNT, NRS.currentAsset.decimals, true) + " " + $("#asset_name").html() + "</strong> assets at <strong>" + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " NXT</strong> each.";
-			var tooltipTitle = "Per whole asset bought you will pay " + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " NXT, making a total of " + totalNXT + " NXT once everything have been bought.";
+			var description = "Buy <strong>" + NRS.formatQuantity(quantityQNT, NRS.currentAsset.decimals, true) + " " + $("#asset_name").html() + "</strong> assets at <strong>" + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " FIM</strong> each.";
+			var tooltipTitle = "Per whole asset bought you will pay " + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " FIM, making a total of " + totalNXT + " FIM once everything have been bought.";
 		} else {
-			var description = "Sell <strong>" + NRS.formatQuantity(quantityQNT, NRS.currentAsset.decimals, true) + " " + $("#asset_name").html() + "</strong> assets at <strong>" + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " NXT</strong> each.";
-			var tooltipTitle = "Per whole asset sold you will receive " + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " NXT, making a total of " + totalNXT + " NXT once everything has been sold.";
+			var description = "Sell <strong>" + NRS.formatQuantity(quantityQNT, NRS.currentAsset.decimals, true) + " " + $("#asset_name").html() + "</strong> assets at <strong>" + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " FIM</strong> each.";
+			var tooltipTitle = "Per whole asset sold you will receive " + NRS.formatAmount(priceNQTPerWholeQNT, false, true) + " FIM, making a total of " + totalNXT + " FIM once everything has been sold.";
 		}
 
 		$("#asset_order_description").html(description);
-		$("#asset_order_total").html(totalNXT + " NXT");
-		$("#asset_order_fee_paid").html(NRS.formatAmount(feeNQT) + " NXT");
+		$("#asset_order_total").html(totalNXT + " FIM");
+		$("#asset_order_fee_paid").html(NRS.formatAmount(feeNQT) + " FIM");
 
 		if (quantity != "1") {
 			$("#asset_order_total_tooltip").show();

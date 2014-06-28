@@ -5,6 +5,7 @@ var NRS = (function(NRS, $, undefined) {
 	NRS.state = {};
 	NRS.blocks = [];
 	NRS.genesis = "1739068987193023818";
+	NRS.initialBaseTarget = 0; // XXX - set in NRS.init
 
 	NRS.account = "";
 	NRS.accountRS = ""
@@ -35,13 +36,24 @@ var NRS = (function(NRS, $, undefined) {
 	NRS.inApp = false;
 	NRS.assetTableKeys = [];
 
+  NRS.ONE_NXT = 100000000;
+  
+  /* XXX - Minimum fee in HTML UI is 0.1 FIM */
+  NRS.MIN_FEE_NQT = NRS.ONE_NXT / 10;
+  NRS.MIN_FEE_NXT = 0.1;
+
 	NRS.init = function() {
-		if (location.port && location.port != "6876") {
+		if (location.port && location.port != "6886") {
 			$(".testnet_only").hide();
+			$(".header > .logo > strong").html("FIMKRYPTO");
 		} else {
 			NRS.isTestNet = true;
 			$(".testnet_only, #testnet_login, #testnet_warning").show();
+			$(".header > .logo > strong").html("FIMK TEST");
 		}
+		
+		/* XXX - Adjust initial base target */
+		NRS.initialBaseTarget = NRS.isTestNet ? 307456352 : 307613193;
 
 		if (!NRS.server) {
 			var hostName = window.location.hostname.toLowerCase();
@@ -81,7 +93,7 @@ var NRS = (function(NRS, $, undefined) {
 		//every 30 seconds check for new block..
 		setInterval(function() {
 			NRS.getState();
-		}, 1000 * 30);
+		}, 1000 * 15);
 
 		if (!NRS.isTestNet) {
 			setInterval(NRS.checkAliasVersions, 1000 * 60 * 60);
@@ -132,7 +144,7 @@ var NRS = (function(NRS, $, undefined) {
 					//first time...
 					NRS.state = response;
 
-					$("#nrs_version").html(NRS.state.version).removeClass("loading_dots");
+					$("#nrs_version").html(NRS.state.fimVersion).removeClass("loading_dots");
 
 					NRS.getBlock(NRS.state.lastBlock, NRS.handleInitialBlocks);
 				} else if (NRS.state.isScanning) {
@@ -392,7 +404,6 @@ var NRS = (function(NRS, $, undefined) {
 				} else if (NRS.state && NRS.state.isScanning) {
 					$("#dashboard_message").addClass("alert-danger").removeClass("alert-success").html("The blockchain is currently rescanning. Please wait until that has completed.").show();
 				} else if (!NRS.accountInfo.publicKey) {
-					$("#dashboard_message").addClass("alert-danger").removeClass("alert-success").html("<b>Warning!</b>: Your account does not have a public key! This means it's not as protected as other accounts. You must make an outgoing transaction to fix this issue. (<a href='#' data-toggle='modal' data-target='#send_message_modal'>send a message</a>, <a href='#' data-toggle='modal' data-target='#register_alias_modal'>buy an alias</a>, <a href='#' data-toggle='modal' data-target='#send_money_modal'>send Nxt</a>, ...)").show();
 				} else {
 					$("#dashboard_message").hide();
 				}
@@ -685,7 +696,7 @@ var NRS = (function(NRS, $, undefined) {
 
 		var id = $.trim($("#id_search input[name=q]").val());
 
-		if (/NXT\-/i.test(id)) {
+		if (/FIM\-/i.test(id)) {
 			NRS.sendRequest("getAccount", {
 				"account": id
 			}, function(response, input) {

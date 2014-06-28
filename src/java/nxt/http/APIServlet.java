@@ -1,16 +1,9 @@
 package nxt.http;
 
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.util.JSON;
-import nxt.util.Logger;
-import org.json.simple.JSONStreamAware;
+import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
+import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
+import static nxt.http.JSONResponses.POST_REQUIRED;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
@@ -19,9 +12,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
-import static nxt.http.JSONResponses.POST_REQUIRED;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import nxt.Constants;
+import nxt.Nxt;
+import nxt.NxtException;
+import nxt.util.JSON;
+import nxt.util.Logger;
+
+import org.json.simple.JSONStreamAware;
 
 public final class APIServlet extends HttpServlet {
 
@@ -77,6 +79,7 @@ public final class APIServlet extends HttpServlet {
         map.put("getBalance", GetBalance.instance);
         map.put("getBlock", GetBlock.instance);
         map.put("getBlockchainStatus", GetBlockchainStatus.instance);
+        map.put("getBlocksIdsFromHeight", GetBlocksIdsFromHeight.instance);        
         map.put("getConstants", GetConstants.instance);
         map.put("getGuaranteedBalance", GetGuaranteedBalance.instance);
         map.put("getMyInfo", GetMyInfo.instance);
@@ -105,7 +108,9 @@ public final class APIServlet extends HttpServlet {
         map.put("getBidOrderIds", GetBidOrderIds.instance);
         map.put("getBidOrders", GetBidOrders.instance);
         map.put("issueAsset", IssueAsset.instance);
-        map.put("leaseBalance", LeaseBalance.instance);
+        
+        /* XXX - DISABLE BALANCE LEASING */
+        //map.put("leaseBalance", LeaseBalance.instance);
         map.put("markHost", MarkHost.instance);
         map.put("parseTransaction", ParseTransaction.instance);
         map.put("placeAskOrder", PlaceAskOrder.instance);

@@ -130,9 +130,9 @@ var NRS = (function(NRS, $, undefined) {
 
 		if (data.recipient) {
 			data.recipient = $.trim(data.recipient);
-			if (!/^\d+$/.test(data.recipient) && !/^NXT\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(data.recipient)) {
+			if (!/^\d+$/.test(data.recipient) && !/^FIM\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(data.recipient)) {
 				var convertedAccountId = $modal.find("input[name=converted_account_id]").val();
-				if (!convertedAccountId || (!/^\d+$/.test(convertedAccountId) && !/^NXT\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(convertedAccountId))) {
+				if (!convertedAccountId || (!/^\d+$/.test(convertedAccountId) && !/^FIM\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(convertedAccountId))) {
 					$modal.find(".error_message").html("Invalid account ID.").show();
 					NRS.unlockForm($modal, $btn);
 					return;
@@ -152,6 +152,28 @@ var NRS = (function(NRS, $, undefined) {
 		}
 
 		if (!NRS.showedFormWarning) {
+		  if ("amountNXT" in data) {
+		    try {
+		      NRS.convertToNQT(data.amountNXT)
+		    } catch (e) {
+		      NRS.showedFormWarning = true;
+		      $modal.find(".error_message").html("Invalid amount").show();
+		      NRS.unlockForm($modal, $btn);
+		      return;
+		    }
+		  }
+		  
+      if ("feeNXT" in data) {
+        try {
+          NRS.convertToNQT(data.feeNXT)
+        } catch (e) {
+          NRS.showedFormWarning = true;
+          $modal.find(".error_message").html("Invalid fee").show();
+          NRS.unlockForm($modal, $btn);
+          return;
+        }
+      }
+
 			if ("amountNXT" in data && NRS.settings["amount_warning"] && NRS.settings["amount_warning"] != "0") {
 				if (new BigInteger(NRS.convertToNQT(data.amountNXT)).compareTo(new BigInteger(NRS.settings["amount_warning"])) > 0) {
 					NRS.showedFormWarning = true;

@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class NxtProperties {
 
-  static File propertiesFile = new File(System.getProperty("user.home") + "/git/fimk/conf/nxt.properties");
+  static File propertiesFile = new File(System.getProperty("user.home") + "/temp.nxt.properties");
 
   static void setup() {
     if (propertiesFile.exists()) {

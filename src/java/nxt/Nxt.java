@@ -1,11 +1,5 @@
 package nxt;
 
-import nxt.http.API;
-import nxt.peer.Peers;
-import nxt.user.Users;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +8,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import nxt.http.API;
+import nxt.peer.Peers;
+import nxt.user.Users;
+import nxt.util.Logger;
+import nxt.util.ThreadPool;
+
 public final class Nxt {
 
     public static final String VERSION = "1.1.5";
+    
+    /* XXX - This tracks the FIM version */
+    public static final String FIM_VERSION = "0.2.0";
 
     private static final Properties defaultProperties = new Properties();
     static {
-        System.out.println("Initializing Nxt server version " + Nxt.VERSION);
+        System.out.println("Initializing FIM server version " + Nxt.VERSION);
         try (InputStream is = ClassLoader.getSystemResourceAsStream("nxt-default.properties")) {
             if (is != null) {
                 Nxt.defaultProperties.load(is);
@@ -51,13 +54,22 @@ public final class Nxt {
         }
     }
 
+    private static int displayProperties = 0;
+    private static boolean getDisplayProperties() {
+      if (displayProperties == 0) {
+        String value = properties.getProperty("nxt.debug");
+        displayProperties = Boolean.TRUE.toString().equals(value) ? 1 : 2;
+      }
+      return displayProperties == 1;
+    }
+    
     public static int getIntProperty(String name) {
         try {
             int result = Integer.parseInt(properties.getProperty(name));
-            Logger.logMessage(name + " = \"" + result + "\"");
+            if (getDisplayProperties()) Logger.logMessage(name + " = \"" + result + "\"");
             return result;
         } catch (NumberFormatException e) {
-            Logger.logMessage(name + " not defined, assuming 0");
+            if (getDisplayProperties()) Logger.logMessage(name + " not defined, assuming 0");
             return 0;
         }
     }
@@ -69,10 +81,10 @@ public final class Nxt {
     public static String getStringProperty(String name, String defaultValue) {
         String value = properties.getProperty(name);
         if (value != null && ! "".equals(value)) {
-            Logger.logMessage(name + " = \"" + value + "\"");
+            if (getDisplayProperties()) Logger.logMessage(name + " = \"" + value + "\"");
             return value;
         } else {
-            Logger.logMessage(name + " not defined");
+            if (getDisplayProperties()) Logger.logMessage(name + " not defined");
             return defaultValue;
         }
     }
@@ -95,13 +107,13 @@ public final class Nxt {
     public static Boolean getBooleanProperty(String name) {
         String value = properties.getProperty(name);
         if (Boolean.TRUE.toString().equals(value)) {
-            Logger.logMessage(name + " = \"true\"");
+            if (getDisplayProperties()) Logger.logMessage(name + " = \"true\"");
             return true;
         } else if (Boolean.FALSE.toString().equals(value)) {
-            Logger.logMessage(name + " = \"false\"");
+            if (getDisplayProperties()) Logger.logMessage(name + " = \"false\"");
             return false;
         }
-        Logger.logMessage(name + " not defined, assuming false");
+        if (getDisplayProperties()) Logger.logMessage(name + " not defined, assuming false");
         return false;
     }
 
@@ -143,7 +155,7 @@ public final class Nxt {
         TransactionProcessorImpl.getInstance().shutdown();
         ThreadPool.shutdown();
         Db.shutdown();
-        Logger.logMessage("Nxt server " + VERSION + " stopped.");
+        Logger.logMessage("FIM server " + VERSION + " stopped.");
         Logger.shutdown();
     }
 
@@ -166,7 +178,7 @@ public final class Nxt {
 
             long currentTime = System.currentTimeMillis();
             Logger.logDebugMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
-            Logger.logMessage("Nxt server " + VERSION + " started successfully.");
+            Logger.logMessage("FIM server " + VERSION + " started successfully.");
             if (Constants.isTestnet) {
                 Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
             }

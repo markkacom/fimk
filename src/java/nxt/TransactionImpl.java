@@ -1,9 +1,5 @@
 package nxt;
 
-import nxt.crypto.Crypto;
-import nxt.util.Convert;
-import org.json.simple.JSONObject;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,6 +7,11 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+
+import nxt.crypto.Crypto;
+import nxt.util.Convert;
+
+import org.json.simple.JSONObject;
 
 final class TransactionImpl implements Transaction {
 
@@ -39,7 +40,7 @@ final class TransactionImpl implements Transaction {
 
         if ((timestamp == 0 && Arrays.equals(senderPublicKey, Genesis.CREATOR_PUBLIC_KEY))
                 ? (deadline != 0 || feeNQT != 0)
-                : (deadline < 1 || feeNQT < Constants.ONE_NXT)
+                : (deadline < 1 || feeNQT < Constants.MIN_FEE_NQT)
                 || feeNQT > Constants.MAX_BALANCE_NQT
                 || amountNQT < 0
                 || amountNQT > Constants.MAX_BALANCE_NQT
@@ -248,15 +249,17 @@ final class TransactionImpl implements Transaction {
 
     @Override
     public byte[] getBytes() {
-
+        
         ByteBuffer buffer = ByteBuffer.allocate(getSize());
         buffer.order(ByteOrder.LITTLE_ENDIAN);
+        
         buffer.put(type.getType());
         buffer.put(type.getSubtype());
         buffer.putInt(timestamp);
         buffer.putShort(deadline);
+        buffer.putLong(Convert.nullToZero(recipientId)); /* XXX - prevent transaction replay */
         buffer.put(senderPublicKey);
-        buffer.putLong(Convert.nullToZero(recipientId));
+        //buffer.putLong(Convert.nullToZero(recipientId));
         if (useNQT()) {
             buffer.putLong(amountNQT);
             buffer.putLong(feeNQT);
@@ -337,6 +340,7 @@ final class TransactionImpl implements Transaction {
         return getId().hashCode();
     }
 
+    @Override
     public boolean verify() {
         Account account = Account.getAccount(getSenderId());
         if (account == null) {

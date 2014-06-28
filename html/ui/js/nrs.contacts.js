@@ -48,7 +48,7 @@ var NRS = (function(NRS, $, undefined) {
 						contactDescription = "-";
 					}
 
-					rows += "<tr><td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + contact.name.escapeHTML() + "</a></td><td><a href='#' data-user='" + NRS.getAccountFormatted(contact, "account") + "' class='user_info'>" + NRS.getAccountFormatted(contact, "account") + "</a></td><td>" + (contact.email ? contact.email.escapeHTML() : "-") + "</td><td>" + contactDescription.escapeHTML() + "</td><td style='white-space:nowrap'><a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='" + String(contact.name).escapeHTML() + "'>Send Nxt</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='" + String(contact.name).escapeHTML() + "'>Message</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>Delete</a></td></tr>";
+					rows += "<tr><td><a href='#' data-toggle='modal' data-target='#update_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>" + contact.name.escapeHTML() + "</a></td><td><a href='#' data-user='" + NRS.getAccountFormatted(contact, "account") + "' class='user_info'>" + NRS.getAccountFormatted(contact, "account") + "</a></td><td>" + (contact.email ? contact.email.escapeHTML() : "-") + "</td><td>" + contactDescription.escapeHTML() + "</td><td style='white-space:nowrap'><a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_money_modal' data-contact='" + String(contact.name).escapeHTML() + "'>Send FIM</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#send_message_modal' data-contact='" + String(contact.name).escapeHTML() + "'>Message</a> <a class='btn btn-xs btn-default' href='#' data-toggle='modal' data-target='#delete_contact_modal' data-contact='" + String(contact.id).escapeHTML() + "'>Delete</a></td></tr>";
 				});
 
 				$("#contacts_table tbody").empty().append(rows);
@@ -79,7 +79,7 @@ var NRS = (function(NRS, $, undefined) {
 			};
 		}
 
-		if (/^\d+$/.test(data.name) || /^NXT\-/i.test(data.name)) {
+		if (/^\d+$/.test(data.name) || /^FIM\-/i.test(data.name)) {
 			return {
 				"error": "Contact name must contain alphabetic characters."
 			};
@@ -102,7 +102,7 @@ var NRS = (function(NRS, $, undefined) {
 			}
 		}
 
-		if (/^NXT\-/i.test(data.account_id)) {
+		if (/^FIM\-/i.test(data.account_id)) {
 			data.account_rs = data.account_id;
 
 			var address = new NxtAddress();
@@ -200,7 +200,7 @@ var NRS = (function(NRS, $, undefined) {
 		if (!contactId && NRS.selectedContext) {
 			var accountId = NRS.selectedContext.data("account");
 
-			var dbKey = (/^NXT\-/i.test(accountId) ? "accountRS" : "account");
+			var dbKey = (/^FIM\-/i.test(accountId) ? "accountRS" : "account");
 
 			var dbQuery = {};
 			dbQuery[dbKey] = accountId;
@@ -272,7 +272,7 @@ var NRS = (function(NRS, $, undefined) {
 			};
 		}
 
-		if (/^NXT\-/i.test(data.account_id)) {
+		if (/^FIM\-/i.test(data.account_id)) {
 			data.account_rs = data.account_id;
 
 			var address = new NxtAddress();

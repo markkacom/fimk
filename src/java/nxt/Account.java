@@ -1,11 +1,5 @@
 package nxt;
 
-import nxt.crypto.Crypto;
-import nxt.util.Convert;
-import nxt.util.Listener;
-import nxt.util.Listeners;
-import nxt.util.Logger;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +11,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import nxt.crypto.Crypto;
+import nxt.util.Convert;
+import nxt.util.Listener;
+import nxt.util.Listeners;
+import nxt.util.Logger;
 
 public final class Account {
 
@@ -117,6 +117,7 @@ public final class Account {
     private static final int maxTrackedBalanceConfirmations = 2881;
     private static final ConcurrentMap<Long, Account> accounts = new ConcurrentHashMap<>();
     private static final Collection<Account> allAccounts = Collections.unmodifiableCollection(accounts.values());
+    
     private static final ConcurrentMap<Long, Account> leasingAccounts = new ConcurrentHashMap<>();
 
     private static final Listeners<Account,Event> listeners = new Listeners<>();
@@ -197,14 +198,14 @@ public final class Account {
     private volatile int nextLeasingHeightFrom;
     private volatile int nextLeasingHeightTo;
     private volatile Long nextLesseeId;
-    private Set<Long> lessorIds = Collections.newSetFromMap(new ConcurrentHashMap<Long,Boolean>());
+    private final Set<Long> lessorIds = Collections.newSetFromMap(new ConcurrentHashMap<Long,Boolean>());
 
     private final Map<Long, Long> assetBalances = new HashMap<>();
     private final Map<Long, Long> unconfirmedAssetBalances = new HashMap<>();
 
     private volatile String name;
     private volatile String description;
-
+    
     private Account(Long id) {
         if (! id.equals(Crypto.rsDecode(Crypto.rsEncode(id)))) {
             Logger.logMessage("CRITICAL ERROR: Reed-Solomon encoding fails for " + id);
@@ -253,32 +254,24 @@ public final class Account {
     public long getEffectiveBalanceNXT() {
 
         Block lastBlock = Nxt.getBlockchain().getLastBlock();
-
+        
+        /* XXX - Allow Stakeholders to generate the first 2880 blocks.
+                 Stakeholders have a chance to make an outgoing txn during first 1440 blocks */
+        if (this.height == 0) {
+          if (lastBlock.getHeight() < 2880) {
+            return getBalanceNQT() / Constants.ONE_NXT;
+          }
+        }   
+        
         if (lastBlock.getHeight() >= Constants.TRANSPARENT_FORGING_BLOCK_6
                 && (publicKey == null || keyHeight == -1 || lastBlock.getHeight() - keyHeight <= 1440)) {
             return 0; // cfb: Accounts with the public key revealed less than 1440 blocks ago are not allowed to generate blocks
         }
 
-        if (lastBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_3
-                && this.height < Constants.TRANSPARENT_FORGING_BLOCK_2) {
-
-            if (this.height == 0) {
-                return getBalanceNQT() / Constants.ONE_NXT;
-            }
-            if (lastBlock.getHeight() - this.height < 1440) {
-                return 0;
-            }
-            long receivedInlastBlock = 0;
-            for (Transaction transaction : lastBlock.getTransactions()) {
-                if (transaction.getRecipientId().equals(id)) {
-                    receivedInlastBlock += transaction.getAmountNQT();
-                }
-            }
-            return (getBalanceNQT() - receivedInlastBlock) / Constants.ONE_NXT;
-        }
+        /* XXX- Remove attack measure since no longer applicable */
 
         if (lastBlock.getHeight() < currentLeasingHeightFrom) {
-                return (getGuaranteedBalanceNQT(1440) + getLessorsGuaranteedBalanceNQT()) / Constants.ONE_NXT;
+            return (getGuaranteedBalanceNQT(1440) + getLessorsGuaranteedBalanceNQT()) / Constants.ONE_NXT;
         }
 
         return getLessorsGuaranteedBalanceNQT() / Constants.ONE_NXT;
@@ -286,11 +279,12 @@ public final class Account {
     }
 
     private long getLessorsGuaranteedBalanceNQT() {
-        long lessorsGuaranteedBalanceNQT = 0;
-        for (Long accountId : lessorIds) {
-            lessorsGuaranteedBalanceNQT += Account.getAccount(accountId).getGuaranteedBalanceNQT(1440);
-        }
-        return lessorsGuaranteedBalanceNQT;
+        // long lessorsGuaranteedBalanceNQT = 0;
+        // for (Long accountId : lessorIds) {
+        //     lessorsGuaranteedBalanceNQT += Account.getAccount(accountId).getGuaranteedBalanceNQT(1440);
+        // }
+        // return lessorsGuaranteedBalanceNQT;
+        return 0;
     }
 
     public synchronized long getGuaranteedBalanceNQT(final int numberOfConfirmations) {
@@ -635,5 +629,4 @@ public final class Account {
             return "height: " + height + ", guaranteed: " + balance;
         }
     }
-
 }

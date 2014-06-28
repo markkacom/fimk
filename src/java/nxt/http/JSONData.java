@@ -8,6 +8,7 @@ import nxt.Block;
 import nxt.Nxt;
 import nxt.Order;
 import nxt.Poll;
+import nxt.RewardsImpl;
 import nxt.Token;
 import nxt.Trade;
 import nxt.Transaction;
@@ -15,9 +16,11 @@ import nxt.crypto.Crypto;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
 import nxt.util.Convert;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.math.BigInteger;
 import java.util.Collections;
 
 final class JSONData {
@@ -119,6 +122,12 @@ final class JSONData {
             transactions.add(Convert.toUnsignedLong(transactionId));
         }
         json.put("transactions", transactions);
+        
+        /* XXX - Include POS reward for block */
+        json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
+        
+        /* XXX - Include cumulative difficulty */
+        json.put("cumulativeDifficulty", block.getCumulativeDifficulty().toString());
         return json;
     }
 

@@ -34,6 +34,7 @@ public final class Generator {
         public void run() {
 
             try {
+                /* XXX - Enable forging below Constants.TRANSPARENT_FORGING_BLOCK */
                 try {
                     for (Generator generator : generators.values()) {
                         generator.forge();
@@ -116,9 +117,10 @@ public final class Generator {
     }
 
     private static BigInteger getHit(byte[] publicKey, Block block) {
-        if (block.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK) {
-            throw new IllegalArgumentException("Not supported below Transparent Forging Block");
-        }
+        /* XXX - Enable forging below TRANSPARENT_FORGING_BLOCK */ 
+        //if (block.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK) {
+        //    throw new IllegalArgumentException("Not supported below Transparent Forging Block");
+        //}
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
         byte[] generationSignatureHash = digest.digest(publicKey);
@@ -174,10 +176,10 @@ public final class Generator {
 
         Block lastBlock = Nxt.getBlockchain().getLastBlock();
 
-        if (lastBlock.getHeight() < Constants.ASSET_EXCHANGE_BLOCK) {
-            return;
-        }
-
+        /* XXX - re-enable forging below  Constants.ASSET_EXCHANGE_BLOCK */
+        /* XXX - re-enable forging below  Constants.TRANSPARENT_FORGING_BLOCK */
+        
+        
         if (! lastBlock.equals(lastBlocks.get(accountId))) {
 
             BigInteger hit = getHit(publicKey, lastBlock);

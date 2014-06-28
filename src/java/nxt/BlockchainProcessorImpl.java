@@ -1,19 +1,5 @@
 package nxt;
 
-import nxt.crypto.Crypto;
-import nxt.peer.Peer;
-import nxt.peer.Peers;
-import nxt.util.Convert;
-import nxt.util.DbIterator;
-import nxt.util.JSON;
-import nxt.util.Listener;
-import nxt.util.Listeners;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONStreamAware;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -31,12 +17,24 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import nxt.crypto.Crypto;
+import nxt.peer.Peer;
+import nxt.peer.Peers;
+import nxt.util.Convert;
+import nxt.util.DbIterator;
+import nxt.util.JSON;
+import nxt.util.Listener;
+import nxt.util.Listeners;
+import nxt.util.Logger;
+import nxt.util.ThreadPool;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
+
 final class BlockchainProcessorImpl implements BlockchainProcessor {
 
-    private static final byte[] CHECKSUM_TRANSPARENT_FORGING = new byte[]{27, -54, -59, -98, 49, -42, 48, -68, -112, 49, 41, 94, -41, 78, -84, 27, -87, -22, -28, 36, -34, -90, 112, -50, -9, 5, 89, -35, 80, -121, -128, 112};
-    private static final byte[] CHECKSUM_NQT_BLOCK = Constants.isTestnet ? new byte[]{-126, -117, -94, -16, 125, -94, 38, 10, 11, 37, -33, 4, -70, -8, -40, -80, 18, -21, -54, -126, 109, -73, 63, -56, 67, 59, -30, 83, -6, -91, -24, 34}
-            : new byte[]{-125, 17, 63, -20, 90, -98, 52, 114, 7, -100, -20, -103, -50, 76, 46, -38, -29, -43, -43, 45, 81, 12, -30, 100, -67, -50, -112, -15, 22, -57, 84, -106};
-
+    /* XXX - Remove CHECKSUM_TRANSPARENT_FORGING check */
     private static final BlockchainProcessorImpl instance = new BlockchainProcessorImpl();
 
     static BlockchainProcessorImpl getInstance() {
@@ -437,7 +435,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 digest.update(transaction.getBytes());
             }
 
-            BlockImpl genesisBlock = new BlockImpl(-1, 0, null, Constants.MAX_BALANCE_NQT, 0, transactionsMap.size() * 128, digest.digest(),
+            /* XXX - Genesis block amount is Genesis.TOTAL_GENESIS_AMOUNT_NQT */
+            BlockImpl genesisBlock = new BlockImpl(-1, 0, null, Genesis.TOTAL_GENESIS_AMOUNT_NQT /*Constants.MAX_BALANCE_NQT*/, 0, transactionsMap.size() * 128, digest.digest(),
                     Genesis.CREATOR_PUBLIC_KEY, new byte[64], Genesis.GENESIS_BLOCK_SIGNATURE, null, new ArrayList<>(transactionsMap.values()));
 
             genesisBlock.setPrevious(null);
@@ -450,6 +449,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         }
     }
 
+    /* XXX - Remove CHECKSUM_TRANSPARENT_FORGING check */
     private byte[] calculateTransactionsChecksum() {
         MessageDigest digest = Crypto.sha256();
         try (Connection con = Db.getConnection();
@@ -482,29 +482,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     throw new BlockNotAcceptedException("Invalid version " + block.getVersion());
                 }
 
-                if (previousLastBlock.getHeight() == Constants.TRANSPARENT_FORGING_BLOCK) {
-                    byte[] checksum = calculateTransactionsChecksum();
-                    if (CHECKSUM_TRANSPARENT_FORGING == null) {
-                        Logger.logMessage("Checksum calculated:\n" + Arrays.toString(checksum));
-                    } else if (!Arrays.equals(checksum, CHECKSUM_TRANSPARENT_FORGING)) {
-                        Logger.logMessage("Checksum failed at block " + Constants.TRANSPARENT_FORGING_BLOCK);
-                        throw new BlockNotAcceptedException("Checksum failed");
-                    } else {
-                        Logger.logMessage("Checksum passed at block " + Constants.TRANSPARENT_FORGING_BLOCK);
-                    }
-                }
-
-                if (previousLastBlock.getHeight() == Constants.NQT_BLOCK) {
-                    byte[] checksum = calculateTransactionsChecksum();
-                    if (CHECKSUM_NQT_BLOCK == null) {
-                        Logger.logMessage("Checksum calculated:\n" + Arrays.toString(checksum));
-                    } else if (!Arrays.equals(checksum, CHECKSUM_NQT_BLOCK)) {
-                        Logger.logMessage("Checksum failed at block " + Constants.NQT_BLOCK);
-                        throw new BlockNotAcceptedException("Checksum failed");
-                    } else {
-                        Logger.logMessage("Checksum passed at block " + Constants.NQT_BLOCK);
-                    }
-                }
+                /* XXX - Remove CHECKSUM_TRANSPARENT_FORGING check */
+                /* XXX - Remove CHECKSUM_NQT_BLOCK check */
 
                 if (block.getVersion() != 1 && ! Arrays.equals(Crypto.sha256().digest(previousLastBlock.getBytes()), block.getPreviousBlockHash())) {
                     throw new BlockNotAcceptedException("Previous block hash doesn't match");
@@ -532,9 +511,10 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
                 for (TransactionImpl transaction : block.getTransactions()) {
 
+                    /* XXX - Remove check for block 303 in NXT chain */
                     // cfb: Block 303 contains a transaction which expired before the block timestamp
                     if (transaction.getTimestamp() > curTime + 15 || transaction.getTimestamp() > block.getTimestamp() + 15
-                            || (transaction.getExpiration() < block.getTimestamp() && previousLastBlock.getHeight() != 303)) {
+                            || transaction.getExpiration() < block.getTimestamp() ) {
                         throw new TransactionNotAcceptedException("Invalid transaction timestamp " + transaction.getTimestamp()
                                 + " for transaction " + transaction.getStringId() + ", current time is " + curTime
                                 + ", block timestamp is " + block.getTimestamp(), transaction);
@@ -734,15 +714,16 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         byte[] payloadHash = digest.digest();
 
         BlockImpl previousBlock = blockchain.getLastBlock();
-        if (previousBlock.getHeight() < Constants.ASSET_EXCHANGE_BLOCK) {
-            return;
-        }
+        
+        /* XXX - Enable forging below  Constants.TRANSPARENT_FORGING_BLOCK */
 
         digest.update(previousBlock.getGenerationSignature());
         byte[] generationSignature = digest.digest(publicKey);
 
         BlockImpl block;
-        int version = previousBlock.getHeight() < Constants.NQT_BLOCK ? 2 : 3;
+        //int version = previousBlock.getHeight() < Constants.NQT_BLOCK ? 2 : 3;
+        /* XXX - All new blocks are version 3 */
+        int version = 3;
         byte[] previousBlockHash = Crypto.sha256().digest(previousBlock.getBytes());
 
         try {
@@ -806,10 +787,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     }
 
     private boolean verifyVersion(Block block, int currentHeight) {
-        return block.getVersion() ==
-                (currentHeight < Constants.TRANSPARENT_FORGING_BLOCK ? 1
-                        : currentHeight < Constants.NQT_BLOCK ? 2
-                        : 3);
+        /* XXX - All new blocks are at version 3. */ 
+        return block.getVersion() == 3;
     }
 
     private boolean hasAllReferencedTransactions(Transaction transaction, int timestamp, int count) {
@@ -843,6 +822,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             DigitalGoodsStore.clear();
             transactionProcessor.clear();
             Generator.clear();
+            
             try (Connection con = Db.getConnection(); PreparedStatement pstmt = con.prepareStatement("SELECT * FROM block ORDER BY db_id ASC")) {
                 Long currentBlockId = Genesis.GENESIS_BLOCK_ID;
                 BlockImpl currentBlock;

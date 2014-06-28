@@ -2,7 +2,7 @@
 <html class="lockscreen">
     <head>
         <meta charset="UTF-8">
-        <title>NXT Wallet</title>
+        <title>FIM Wallet</title>
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -10,6 +10,7 @@
         <link href="css/ionicons.min.css" rel="stylesheet" type="text/css" />
         <link href="css/bootstrap-colorpicker.css" rel="stylesheet" type="text/css" />
         <link href="css/app.css" rel="stylesheet" type="text/css" />
+        <link href="css/fim.css" rel="stylesheet" type="text/css" />
         <style id="user_header_style" type="text/css"></style>
         <style id="user_sidebar_style" type="text/css"></style>
         <style id="user_background_style" type="text/css"></style>
@@ -20,7 +21,8 @@
     <body class="lockscreen fixed">
         <header class="header">
             <a href="#" class="logo" id="logo" data-page="dashboard">
-                <img src="img/nxt_logo_small.png" style="opacity:0.95" />
+              <img align="right" src="img/finland_round_64.png">
+              <strong>FIMKRYPTO</strong>
             </a>
             <nav class="navbar navbar-static-top" role="navigation">
                 <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
@@ -31,7 +33,7 @@
                 </a>
                 <div class="navbar-right">
                     <ul class="nav navbar-nav">
-                    	<li class="dropdown"><a href="#" style="font-weight:bold;" data-toggle="modal" data-target="#send_money_modal">Send NXT</a></li>
+                    	<li class="dropdown"><a href="#" style="font-weight:bold;" data-toggle="modal" data-target="#send_money_modal">Send FIM</a></li>
                     	<li class="dropdown"><a href="#" style="font-weight:bold;" data-toggle="modal" data-target="#send_message_modal">Send Message</a></li>
 	                    <li class="dropdown"><a href="#" style="font-weight:bold;" data-toggle="modal" data-target="#generate_token_modal">Generate Token</a></li>
 						<li class="dropdown"><a href="#" style="font-weight:bold;" class="goto-page" data-page="settings">Settings</a></li>
@@ -40,11 +42,7 @@
                                 <i class="fa fa-question-circle"></i>
                             </a>
                             <ul class="dropdown-menu" role="menu">
-                            	<li><a role="menuitem" tabindex="-1" href="http://nxt.org/" target="_blank">Nxt.org</a></li>
-								<li><a role="menuitem" tabindex="-1" href="https://nxtforum.org/" target="_blank">Nxt Forum</a></li>
-								<li><a role="menuitem" tabindex="-1" href="https://wiki.nxtcrypto.org/" target="_blank">Nxt Wiki</a></li>
-								<li><a role="menuitem" tabindex="-1" href="https://wiki.nxtcrypto.org/wiki/Nxt_client_interface" target="_blank">Interface Tutorial</a></li>
-								<li><a role="menuitem" tabindex="-1" href="https://wiki.nxtcrypto.org/wiki/Asset_Exchange" target="_blank">Asset Exchange Tutorial</a></li>
+                            	<li><a role="menuitem" tabindex="-1" href="http://fimk.fi/" target="_blank">Fimk.fi</a></li>
 							</ul>
 						</li>
                         <li class="dropdown" id="logout_button_container">
@@ -73,7 +71,7 @@
 										<li role="presentation" class="copy_link"><a role="menuitem" tabindex="-1" href="#" data-type="account_rs">Copy Account ID</a></li>
 										<li role="presentation" class="copy_link"><a role="menuitem" tabindex="-1" href="#" data-type="account_id">Copy Numeric Account	ID</a></li>
 										<li role="presentation" class="remote_only copy_link"><a role="menuitem" tabindex="-1" href="#" data-type="message_link">Copy 'Send Message' Link</a></li>
-										<li role="presentation" class="remote_only copy_link"><a role="menuitem" tabindex="-1" href="#" data-type="send_link">Copy 'Send Nxt' Link</a></li>
+										<li role="presentation" class="remote_only copy_link"><a role="menuitem" tabindex="-1" href="#" data-type="send_link">Copy 'Send FIM' Link</a></li>
 									</ul>
 								</div>
 	                            <a href="#" id="forging_indicator" class="forging" style="display:none;font-size:13px;"><i class="fa fa-circle" style="font-size:12px;"></i> <span>Forging</span></a>
@@ -115,11 +113,11 @@
 	                <section class="content-header"><h1>Dashboard</h1></section>
 	                
 	                <section class="content">
-	                	<div class="alert-danger alert alert-no-icon" id="dashboard_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;"><b>Warning!</b>: Your account does not have a public key! This means it's not as protected as other accounts. You must make an outgoing transaction to fix this issue (<a href="#" data-toggle="modal" data-target="#send_message_modal">send a message</a>, <a href="#" data-toggle="modal" data-target="#register_alias_modal">buy an alias</a>, <a href="#" data-toggle="modal" data-target="#send_money_modal">send Nxt</a>, ...)</div>
+	                	<div class="alert-danger alert alert-no-icon" id="dashboard_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;"><b>Warning!</b>: Your account does not have a public key! This means it's not as protected as other accounts. You must make an outgoing transaction to fix this issue (<a href="#" data-toggle="modal" data-target="#send_message_modal">send a message</a>, <a href="#" data-toggle="modal" data-target="#register_alias_modal">buy an alias</a>, <a href="#" data-toggle="modal" data-target="#send_money_modal">send FIM</a>, ...)</div>
 	               
 	                    <div class="row">
 	                        <div class="col-lg-3 col-xs-6">
-	                            <div class="small-box bg-aqua">
+	                            <div class="small-box bg-gray">
 	                                <div class="inner">
 	                                    <h3><span id="account_balance" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 	                                    <p>Account Balance <span class="label" id="account_leasing" style="display:none;background-color:#1990B1"></span></p>
@@ -129,7 +127,7 @@
 	                            </div>
 	                        </div>
 	                        <div class="col-lg-3 col-xs-6">
-	                            <div class="small-box bg-green">
+	                            <div class="small-box bg-gray">
 	                                <div class="inner">
 	                                    <h3><span id="account_forged_balance" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 	                                    <p>Forged Balance</p>
@@ -139,7 +137,7 @@
 	                            </div>
 	                        </div>
 	                        <div class="col-lg-3 col-xs-6">
-	                            <div class="small-box bg-yellow">
+	                            <div class="small-box bg-gray">
 	                                <div class="inner">
 	                                    <h3><span id="account_nr_assets" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 	                                    <p>Assets Owned</p>
@@ -149,10 +147,10 @@
 	                            </div>
 	                        </div>
 	                        <div class="col-lg-3 col-xs-6">
-	                            <div class="small-box bg-red">
+	                            <div class="small-box bg-gray">
 	                                <div class="inner">
 	                                    <h3><span id="nrs_version" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
-	                                    <p><span id="nrs_version_info">NRS Version</span> <span class="label label-danger" id="nrs_update" style="display:none;"></span></p>
+	                                    <p><span id="nrs_version_info">FIM Version</span> <span class="label label-danger" id="nrs_update" style="display:none;"></span></p>
 	                                </div>
 	                                <div class="icon"><i class="fa fa-code"></i></div>
 	                                <a href="#" class="small-box-footer" data-toggle="modal" data-target="#nrs_modal">More info <i class="fa fa-arrow-circle-right"></i></a>
@@ -304,7 +302,7 @@
 							           			<div class="col-xs-10 col-sm-10 col-md-10">
 							           				<div class="form-group">
 							           					<input type="password" class="form-control secret_phrase" id="inline_message_password" name="inline_message_password" placeholder="Secret Phrase" style="display:inline;width:50%">
-							           					<span style="display:none"><label for="inline_message_encrypt" style="font-weight:normal;color:#666"><input type="checkbox" name="inline_message_encrypt" id="inline_message_encrypt" value="1" /> Encrypt</label></span>
+							           					<span style="display:block"><label for="inline_message_encrypt" style="font-weight:normal;color:#666"><input checked="true" type="checkbox" name="inline_message_encrypt" id="inline_message_encrypt" value="1" /> Encrypt</label></span>
 							           				</div>
 							           			</div>
 							           			<div class="col-xs-2-col-sm-2 col-md-2">
@@ -401,7 +399,7 @@
                 	<section class="content">
                 		<div class="row">
     	                    <div class="col-lg-3 col-xs-6">
-    	                        <div class="small-box bg-aqua">
+    	                        <div class="small-box bg-gray">
     	                            <div class="inner inner-smaller">
     	                                <h3><span id="alias_count" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
     	                                <p>Aliases Owned</p>
@@ -411,7 +409,7 @@
     	                        </div>
     	                    </div>
     	                    <div class="col-lg-3 col-xs-6">
-    	                        <div class="small-box bg-green">
+    	                        <div class="small-box bg-gray">
     	                            <div class="inner inner-smaller">
     	                                <h3><span id="empty_alias_count" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
     	                                <p>Empty Aliases</p>
@@ -421,7 +419,7 @@
     	                        </div>
     	                    </div>
     	                    <div class="col-lg-3 col-xs-6">
-    	                        <div class="small-box bg-yellow">
+    	                        <div class="small-box bg-gray">
     	                            <div class="inner inner-smaller">
     	                                <h3><span id="alias_uri_count" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
     	                                <p>Aliases to URI</p>
@@ -431,7 +429,7 @@
     	                        </div>
     	                    </div>
     	                    <div class="col-lg-3 col-xs-6">
-    	                        <div class="small-box bg-red">
+    	                        <div class="small-box bg-gray">
     	                            <div class="inner inner-smaller">
     	                                <h3><span id="alias_account_count" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
     	                                <p>Aliases to Account ID</p>
@@ -532,7 +530,7 @@
 							        <th>Percentage</th>
 							        <th>Lowest Ask</th>
 							        <th>Highest Bid</th>
-							        <th>Value in NXT</th>
+							        <th>Value in FIM</th>
 							        <th>Transfer</th>
 							    </tr>
 							    </thead>
@@ -610,13 +608,13 @@
 							                	<div class="col-md-6">
 								                	<div class="box box-solid box-info collapsed-box" id="buy_asset_box">
 								                		<div class="box-header" style="background-color:#DFF0D9;color: #48AB6C;">
-								                	   	<h3 class="box-title">Buy <span class="asset_name"></span> with NXT</h3>
+								                	   	<h3 class="box-title">Buy <span class="asset_name"></span> with FIM</h3>
 								                	       <div class="box-tools pull-right">
 								                	       	<button class="btn btn-info btn-sm" style="background-color: #48AB6C"><i class="fa fa-plus"></i></button>
 								                	        </div>
 								                	    </div>
 								                	    <div class="box-body no-padding" style="display:none">
-								                	    	<div style="background-color:#DFF0D9;color: #666;padding-left:10px;padding-right: 10px;padding-top: 0px;padding-bottom:3px;" id="buy_automatic_price"><strong>Balance</strong>: <span id="your_nxt_balance"></span> NXT</div>
+								                	    	<div style="background-color:#DFF0D9;color: #666;padding-left:10px;padding-right: 10px;padding-top: 0px;padding-bottom:3px;" id="buy_automatic_price"><strong>Balance</strong>: <span id="your_nxt_balance"></span> FIM</div>
 								                	    
 									                	    <form role="form" class="form-horizontal" style="padding: 10px;;max-width:350px;margin-left:auto;margin-right:auto;">
 									                	    	<div style="margin-left:-20px">
@@ -634,7 +632,7 @@
 										                	    		<div class="col-sm-9">
 										                	    			<div class="input-group">
 										                	    				<input id="buy_asset_price" type="text" value="0" name="buy_asset_price" class="form-control" data-type="buy" />
-										                	    				<span class="input-group-addon">NXT / <span class="asset_name"></span></span>
+										                	    				<span class="input-group-addon">FIM / <span class="asset_name"></span></span>
 										                	    			</div>
 										                	    		</div>
 										                	    	</div>
@@ -643,7 +641,7 @@
 										                	    		<div class="col-sm-9">
 										                	    			<div class="input-group">
 										                	    				<input type="text" name="buy_asset_total" id="buy_asset_total" readonly value="0" class="form-control disabled" />
-										                	    				<span class="input-group-addon">NXT</span>
+										                	    				<span class="input-group-addon">FIM</span>
 										                	    			</div>
 										                	    		</div>
 										                	    	</div>
@@ -651,15 +649,16 @@
 										                	    		<label for="buy_asset_fee" class="col-sm-3 control-label">Fee</label>
 										                	    		<div class="col-sm-9">
 										                	    			<div class="input-group">
-										                	    				<input type="text" id="buy_asset_fee" name="buy_asset_fee" value="1" class="form-control" />
-										                	    				<span class="input-group-addon">NXT</span>
+										                	    			  <!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										                	    				<input type="text" id="buy_asset_fee" name="buy_asset_fee" value="0.1" class="form-control" />
+										                	    				<span class="input-group-addon">FIM</span>
 										                	    			</div>
 										                	    		</div>
 										                	    	</div>
 										                	    	<div class="form-group form-group-last">
 										                	    		<div class="col-sm-3"></div>
 										                	    		<div class="col-sm-9">
-										                	    			<button type="button" class="btn btn-primary btn-lg btn-block" id="buy_asset_button" data-toggle="modal" data-target="#asset_order_modal" data-asset="" data-type="Buy">Buy (NXT → <span class="asset_name"></span>)</button>
+										                	    			<button type="button" class="btn btn-primary btn-lg btn-block" id="buy_asset_button" data-toggle="modal" data-target="#asset_order_modal" data-asset="" data-type="Buy">Buy (FIM → <span class="asset_name"></span>)</button>
 										                	    		</div>
 										                	    	</div>
 									                	    	</div>
@@ -694,7 +693,7 @@
 							                    <div class="col-md-6">
 								                    <div class="box box-solid box-info collapsed-box" id="sell_asset_box">
 								                        <div class="box-header" style="background:#F2DEDE;color:#ED4348;">
-								                            <h3 class="box-title">Sell <span class="asset_name"></span> for NXT</h3>
+								                            <h3 class="box-title">Sell <span class="asset_name"></span> for FIM</h3>
 								                            <div class="box-tools pull-right">
 								                                <button class="btn btn-info btn-sm" style="background-color: #ED4348"> <i class="fa fa-plus"></i></button>
 								                            </div>
@@ -718,7 +717,7 @@
 										                        		<div class="col-sm-9">
 										                        			<div class="input-group">
 										                        				<input id="sell_asset_price" type="text" value="0" name="sell_asset_price" class="form-control" data-type="sell" />
-										                        				<span class="input-group-addon">NXT / <span class="asset_name"></span></span>
+										                        				<span class="input-group-addon">FIM / <span class="asset_name"></span></span>
 										                        			</div>
 										                        		</div>
 										                        	</div>
@@ -727,7 +726,7 @@
 										                        		<div class="col-sm-9">
 										                        			<div class="input-group">
 										                        				<input type="text" name="sell_asset_total" id="sell_asset_total" readonly value="0" class="form-control disabled" />
-										                        				<span class="input-group-addon">NXT</span>
+										                        				<span class="input-group-addon">FIM</span>
 										                        			</div>
 										                        		</div>
 										                        	</div>
@@ -735,15 +734,16 @@
 										                        		<label for="sell_asset_fee" class="col-sm-3 control-label">Fee</label>
 										                        		<div class="col-sm-9">
 										                        			<div class="input-group">
-										                        				<input type="text" id="sell_asset_fee" name="sell_asset_fee" value="1" class="form-control" />
-										                        				<span class="input-group-addon">NXT</span>
+										                        			  <!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										                        				<input type="text" id="sell_asset_fee" name="sell_asset_fee" value="0.1" class="form-control" />
+										                        				<span class="input-group-addon">FIM</span>
 										                        			</div>
 										                        		</div>
 										                        	</div>
 										                        	<div class="form-group form-group-last">
 										                        		<div class="col-sm-3"></div>
 										                        		<div class="col-sm-9">
-										                        			<button type="button" class="btn btn-primary btn-lg btn-block" id="sell_asset_button" data-toggle="modal" data-target="#asset_order_modal" data-asset="" data-type="Sell">Sell (<span class="asset_name"></span> → NXT)</button>
+										                        			<button type="button" class="btn btn-primary btn-lg btn-block" id="sell_asset_button" data-toggle="modal" data-target="#asset_order_modal" data-asset="" data-type="Sell">Sell (<span class="asset_name"></span> → FIM)</button>
 										                        		</div>
 										                        	</div>
 										                        </div>
@@ -878,14 +878,14 @@
 							            <label for="settings_amount_warning">Max Amount Warning</label>
 	                        			<div class="input-group" style="width:150px">
 							          		<input type="text" name="amount_warning" id="settings_amount_warning" class="form-control" />
-	                        				<span class="input-group-addon">NXT</span>
+	                        				<span class="input-group-addon">FIM</span>
 	                        			</div>
 							        </div>
 							        <div class="form-group">
 							            <label for="settings_fee_warning">Max Fee Warning</label>
 	                        			<div class="input-group" style="width:150px">
 							          		<input type="text" name="fee_warning" id="settings_fee_warning" class="form-control" />
-	                        				<span class="input-group-addon">NXT</span>
+	                        				<span class="input-group-addon">FIM</span>
 	                        			</div>
 							        </div>
 							        <div class="form-group">
@@ -1029,7 +1029,7 @@
 	                <section class="content">
 		                <div class="row">
 		                    <div class="col-lg-3 col-xs-6">
-		                        <div class="small-box bg-aqua">
+		                        <div class="small-box bg-gray">
 		                            <div class="inner inner-smaller">
 		                                <h3><span id="peers_uploaded_volume" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 		                                <p>Uploaded Volume</p>
@@ -1039,7 +1039,7 @@
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-3 col-xs-6">
-		                        <div class="small-box bg-green">
+		                        <div class="small-box bg-gray">
 		                            <div class="inner inner-smaller">
 		                            	<h3><span id="peers_downloaded_volume" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 		                                <p>Downloaded Volume</p>
@@ -1049,7 +1049,7 @@
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-3 col-xs-6">
-		                        <div class="small-box bg-yellow">
+		                        <div class="small-box bg-gray">
 		                            <div class="inner inner-smaller">
 		                                <h3><span id="peers_connected" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 		                                <p>Connected Peers</p>
@@ -1059,7 +1059,7 @@
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-3 col-xs-6">
-		                        <div class="small-box bg-red">
+		                        <div class="small-box bg-gray">
 		                            <div class="inner inner-smaller">
 		                                <h3><span id="peers_up_to_date" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 		                                <p>Up-to-date Peers</p>
@@ -1095,63 +1095,74 @@
 	            <div id="news_page" class="page">
 	                <section class="content-header"><h1>News</h1></section>
 	                <section class="content">
-		                <div class="row" id="rss_news_container">
-		                    <div class="col-md-6">
-		                    	<div class="box box-success">
-					                <div class="box-header"><h3 class="box-title">NxtForum.org</h3></div>
-					                <div class="box-body">
-					            		<div id="nxtforum_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-					                </div>
-					            </div>
+                    <div class="row" id="rss_news_container">
 
-					            <div class="box box-primary">
-				                    <div class="box-header"><h3 class="box-title">NxtCommunity.org</h3></div>
-				                    <div class="box-body">
-				                		<div id="nxtcommunity_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-				                    </div>
-				                </div>
-
-				                <div class="box box-warning">
-				                    <div class="box-header"><h3 class="box-title">NxtCrypto.org</h3></div>
-				                    <div class="box-body">
-				                		<div id="nxtcrypto_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-				                    </div>
-				                </div>
-
-				                <div class="box box-success">
-				                    <div class="box-header"><h3 class="box-title">NxtCoin.Blogspot.com</h3></div>
-				                    <div class="box-body">
-				                		<div id="nxtcoin_blogspot_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-				                    </div>
-				                </div>
-		                	</div>
-		            	    <div class="col-md-6">
-		            	        <div class="box box-warning">
-				                    <div class="box-header"><h3 class="box-title">Reddit.com/r/Nxt</h3></div>
-				                    <div class="box-body">
-				                		<div id="reddit_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-				                    </div>
-				                </div>
-
-								<div class="box box-success">
-				                    <div class="box-header"><h3 class="box-title">Nxter.org</h3></div>
-				                    <div class="box-body">
-				                		<div id="nxter_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-				                    </div>
-				                </div>
-				                
-					            <div class="box box-primary">
-					                <div class="box-header"><h3 class="box-title">NextCoin.org Forums</h3></div>
-					                <div class="box-body">
-					            		<div id="nextcoin_forums_news" class="rss_news data-loading"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
-					                </div>
-					            </div>
-
-				            </div>
-						</div>
-						<div id="rss_news_disabled" style="padding-top: 150px;text-align:center;">The news section is currently disabled. <a href="#" id="rss_news_enable">Click here</a> to enable it.</div>
-					</section>
-				</div>
+                      <div class="col-md-6">
+                        <div class="box box-success">
+                          <div class="box-header">
+                            <h3 class="box-title">forum.fimk.fi</h3>
+                          </div>
+                          <div class="box-body">
+                            <div id="fimkforum_news" class="rss_news data-loading">
+                              <img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
+                            </div>
+                          </div>
+                        </div>
+        
+                        <div class="box box-primary">
+                          <div class="box-header">
+                            <h3 class="box-title"><!-- Title here --></h3>
+                          </div>
+                          <div class="box-body">
+                            <div id="nxtcommunity_news" class="rss_news data-loading">
+                              <!-- <img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /> -->
+                            </div>
+                          </div>
+                        </div>
+        
+                        
+                      </div>
+                      <div class="col-md-6">
+                        <div class="box box-warning">
+                          <div class="box-header">
+                            <h3 class="box-title"><!-- Title here --></h3>
+                          </div>
+                          <div class="box-body">
+                            <div id="reddit_news" class="rss_news data-loading">
+                              <!-- <img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /> -->
+                            </div>
+                          </div>
+                        </div>
+        
+                        <div class="box box-success">
+                          <div class="box-header">
+                            <h3 class="box-title"><!-- Title here --></h3>
+                          </div>
+                          <div class="box-body">
+                            <div id="nxter_news" class="rss_news data-loading">
+                              <!-- <img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /> -->
+                            </div>
+                          </div>
+                        </div>
+        
+                        <div class="box box-primary">
+                          <div class="box-header">
+                            <h3 class="box-title"><!-- Title here --></h3>
+                          </div>
+                          <div class="box-body">
+                            <div id="nextcoin_forums_news" class="rss_news data-loading">
+                              <!-- <img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /> -->
+                            </div>
+                          </div>
+                        </div>
+        
+                      </div>
+                    </div>
+                    <div id="rss_news_disabled" style="padding-top: 150px;text-align:center;">
+                      The news section is currently disabled. <a href="#" id="rss_news_enable">Click here</a> to enable it.
+                    </div>
+					        </section>
+				        </div>
                 
                 <div id="blocks_page" class="page">
                		<section class="content-header">
@@ -1170,7 +1181,7 @@
 	                <section class="content">
 						<div class="row">
 						    <div class="col-lg-3 col-xs-6">
-						        <div class="small-box bg-aqua">
+						        <div class="small-box bg-gray">
 						            <div class="inner inner-smaller">
 						                <h3><span id="blocks_average_amount" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 						                <p>Avg. Amount Per Block</p>
@@ -1180,7 +1191,7 @@
 						        </div>
 						    </div>
 						    <div class="col-lg-3 col-xs-6">
-						        <div class="small-box bg-green">
+						        <div class="small-box bg-gray">
 						            <div class="inner inner-smaller">
 						                <h3><span id="blocks_average_fee" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 						                <p>Avg. Fee Per Block</p>
@@ -1190,7 +1201,7 @@
 						        </div>
 						    </div>
 						    <div class="col-lg-3 col-xs-6" id="blocks_transactions_per_hour_box">
-						        <div class="small-box bg-yellow">
+						        <div class="small-box bg-gray">
 						            <div class="inner inner-smaller">
 						                <h3><span id="blocks_transactions_per_hour" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 						                <p>Transactions Per Hour</p>
@@ -1200,7 +1211,7 @@
 						        </div>
 						    </div>
 						    <div class="col-lg-3 col-xs-6" id="blocks_generation_time_box">
-						        <div class="small-box bg-red">
+						        <div class="small-box bg-gray">
 						            <div class="inner inner-smaller">
 						                <h3><span id="blocks_average_generation_time" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 						                <p>Block Generation Time</p>
@@ -1210,7 +1221,7 @@
 						        </div>
 						    </div>
 						    <div class="col-lg-3 col-xs-6" id="forged_blocks_total_box">
-						        <div class="small-box bg-yellow">
+						        <div class="small-box bg-gray">
 						            <div class="inner inner-smaller">
 						                <h3><span id="forged_blocks_total" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
 						                <p># Forged Blocks</p>
@@ -1220,10 +1231,10 @@
 						        </div>
 						    </div>
 						    <div class="col-lg-3 col-xs-6" id="forged_fees_total_box">
-						        <div class="small-box bg-red">
+						        <div class="small-box bg-gray">
 						            <div class="inner inner-smaller">
 						                <h3><span id="forged_fees_total" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
-						                <p>Forged Fees Total</p>
+						                <p><strong>POS Rewards</strong> & Forged Fees Total</p>
 						            </div>
 						            <div class="icon-smaller"><i class="fa fa-briefcase"></i></div>
     	                            <div class="small-box-footer"></div>
@@ -1257,7 +1268,7 @@
             </aside>
         </div>
 	
-		<div id="testnet_warning" style="display:none;position:fixed;bottom:0;left:0;padding:5px;background:red;color:white;border-top-right-radius:5px;"><strong>Warning</strong>: You are connected to the TestNet. Do not use your real password!</div>
+		<div id="testnet_warning" style="display:none;position:fixed;bottom:0;left:0;padding:5px;background:red;color:white;border-top-right-radius:5px;"><strong>Warning</strong>: You are connected to the TestNet. Note that your live FIMK account will have the same password as your TestNet account.</div>
 
 		<div id="lockscreen">
 			<div id="old_browser_warning" style="display:none;margin-left:auto;margin-right:auto;margin-top:200px;background:white;color:black;padding:20px;width:300px;">You are using an old browser which this application does not support.</div>
@@ -1278,7 +1289,7 @@
 			
 			<table id="center" style="display:none;width:100%;height:100%;">
 	        	<tr><td style="text-align:center;vertical-align:middle">
-		        	 <center><img src="img/nxt_logo.png" alt="Nxt" width="320" height="88" style="margin-bottom:40px;opacity: 0.5;;" /></center>
+		        	 <center><img src="img/nxt_logo.png" alt="Nxt" width="200" height="200" style="margin-bottom:20px;" /></center>
 		            	 
 		            <div id="login_panel">   
 		            	<div class="callout callout-danger" id="testnet_login" style="max-width:400px;min-width:400px;display:none;">Log in with your <strong>TestNet</strong> account - not your real one!</div>
@@ -1304,7 +1315,7 @@
 		            </div>
 		            
 					<div class="panel panel-default" id="welcome_panel" style="display:none;max-width:500px;">
-		                <div class="panel-heading"><span class="glyphicon glyphicon-lock"></span> Welcome to Nxt</div>
+	                <div class="panel-heading"><span class="glyphicon glyphicon-lock"></span> Welcome to FIM</div>
 		                <div class="panel-body">
 		               		<button class="btn btn-primary" id="registration_cancel" onclick="NRS.showLoginScreen();return false;">Returning User?</button>
 					   		&nbsp;&nbsp;
@@ -1372,7 +1383,7 @@
 			        					
 			        					<textarea style="width:100%;height:50px;margin-bottom:10px;" rows="2"></textarea>
 		        					
-			        					<p>Please write down or memorize these 12 words (their order and capitalization matters - always lowercase). This secret phrase is needed in order to access your Nxt account.</p>
+			        					<p>Please write down or memorize these 12 words (their order and capitalization matters - always lowercase). This secret phrase is needed in order to access your FIM account.</p>
 			        						        					
 			        					<div class="callout callout-danger"><strong>Attention</strong>: Don't ever disclose your secret phrase. If you lose it you lose access to your account!</div>
 			        				
@@ -1433,7 +1444,9 @@
 								<div class="col-xs-4 col-sm-4 col-md-4">
 									<div class="form-group">
 										<label for="lease_balance_fee">FEE</label>
-										<input type="number" name="feeNXT" id="lease_balance_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="4">
+										
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="lease_balance_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="4">
 									</div>
 								</div>
 								<div class="col-xs-4 col-sm-4 col-md-4">
@@ -1536,7 +1549,8 @@
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
 										<label for="cancel_order_fee">FEE</label>
-										<input type="number" name="feeNXT" id="cancel_order_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="2">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="cancel_order_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="2">
 									</div>
 								</div>
 								<div class="col-xs-6 col-sm-6 col-md-6">
@@ -1648,7 +1662,8 @@
 								<div class="col-xs-3 col-sm-3 col-md-3">
 									<div class="form-group">
 										<label for="transfer_asset_fee">FEE</label>
-										<input type="number" name="feeNXT" id="transfer_asset_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="4">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="transfer_asset_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="4">
 									</div>
 								</div>
 								<div class="col-xs-3 col-sm-3 col-md-3">
@@ -1688,8 +1703,21 @@
 						<form role="form">
 							<div class="callout callout-danger error_message" style="display:none"></div>
 							<div class="form-group">
-								<label for="add_asset_bookmark_id">ASSET OR ACCOUNT ID</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Find the ID on the issuer's website or announcement page." data-container="body"></i></label>
+                <label for="select_asset_bookmark_id">ASSET BY NAME</label>
+                <select class="form-control" id="select_asset_bookmark_id">
+                  <option value="1234567890">Asset 1</option>
+                </select>							  
+                <br/>
+                <label for="add_asset_bookmark_id">ASSET OR ACCOUNT ID</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Find the ID on the issuer's website or announcement page. Or use the list above." data-container="body"></i></label>
 								<input type="text" class="form-control" name="id" id="add_asset_bookmark_id" placeholder="ID" autofocus tabindex="1" />
+								<br/>
+								<div>
+                  <div style="color:#838383;margin-bottom:5px">
+                    <strong>Quantity</strong>: <span id="add_asset_dialog_asset_quantity">5'000'000</span>
+                    <strong>Asset Decimals</strong>: <span id="add_asset_dialog_asset_decimals">2</span>
+                  </div>
+                  <div id="add_asset_dialog_asset_description"></div>                  								  
+								</div>
 							</div>
 						</form>
 			    	</div>
@@ -1721,7 +1749,7 @@
 							</div>
 							<div class="form-group">
 								<label for="add_contact_account_id">ACCOUNT ID</label>
-								<input type="text" class="form-control" name="account_id" id="add_contact_account_id" placeholder="NXT Account ID" tabindex="2" />
+								<input type="text" class="form-control" name="account_id" id="add_contact_account_id" placeholder="FIM Account ID" tabindex="2" />
 							</div>
 							<div class="form-group">
 								<label for="add_contact_email">EMAIL ADDRESS</label>
@@ -1762,7 +1790,7 @@
 							</div>
 							<div class="form-group">
 								<label for="update_contact_account_id">ACCOUNT ID</label>
-								<input type="text" class="form-control" name="account_id" id="update_contact_account_id" placeholder="NXT Account ID" tabindex="2" />
+								<input type="text" class="form-control" name="account_id" id="update_contact_account_id" placeholder="FIM Account ID" tabindex="2" />
 							</div>
 							<div class="form-group">
 								<label for="update_contact_email">EMAIL ADDRESS</label>
@@ -1852,7 +1880,7 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 							<div class="row">
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
-										<label for="issue_asset_fee">FEE <i class="fa fa-exclamation-circle show_popover" data-content="The minimum fee to issue an asset is 1,000 Nxt" data-container="body" style="color:red"></i></label>
+										<label for="issue_asset_fee">FEE <i class="fa fa-exclamation-circle show_popover" data-content="The minimum fee to issue an asset is 1,000 FIM" data-container="body" style="color:red"></i></label>
 																				
 										<input type="number" name="feeNXT" id="issue_asset_fee" class="form-control" placeholder="Fee" step="any" min="1000" data-default="1000" value="1000" tabindex="6">
 									</div>
@@ -1942,7 +1970,8 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
 										<label for="create_poll_fee">FEE</label>
-										<input type="number" name="feeNXT" id="create_poll_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="3">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="create_poll_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="3">
 									</div>
 								</div>
 								<div class="col-xs-6 col-sm-6 col-md-6">
@@ -2034,7 +2063,7 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 		    	<div class="modal-content">
 		      		<div class="modal-header">
 		        		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		        		<h4 class="modal-title">Send NXT</h4>
+		        		<h4 class="modal-title">Send FIM</h4>
 		      		</div>
 			      	<div class="modal-body">			
 						<form role="form">
@@ -2058,7 +2087,8 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 								<div class="col-xs-3 col-sm-3 col-md-3">
 									<div class="form-group">
 										<label for="send_money_fee">FEE</label>
-										<input type="number" name="feeNXT" id="send_money_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="3">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="send_money_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="3">
 									</div>
 								</div>
 								<div class="col-xs-3 col-sm-3 col-md-3">
@@ -2076,11 +2106,11 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 						<div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
 					</div>
 		      		<div class="modal-footer" style="margin-top:0;">
-		      			<input type="hidden" name="failure_message" value="An unknown error occured! NXT may or may not be sent." />
+		      			<input type="hidden" name="failure_message" value="An unknown error occured! FIM may or may not be sent." />
 		      			<input type="hidden" name="request_type" value="sendMoney" />
 		      			<input type="hidden" name="converted_account_id" value="" />
 				        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				        <button type="button" class="btn btn-primary" data-loading-text="Submitting...">Send NXT</button>
+				        <button type="button" class="btn btn-primary" data-loading-text="Submitting...">Send FIM</button>
 		      		</div>
 		    	</div>
 		  	</div>
@@ -2108,13 +2138,14 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 							<div class="form-group">
 								<label for="send_message_message">MESSAGE</label>
 								<textarea class="form-control" id="send_message_message" name="message" rows="4" tabindex="2"></textarea>
-								<div style="display:none"><label for="send_message_encrypt" style="font-weight:normal;"><input type="checkbox" name="encrypt" id="send_message_encrypt" /> Encrypt Message</label></div>
+								<label for="send_message_encrypt" style="font-weight:normal;"><input type="checkbox" name="encrypt" id="send_message_encrypt" checked="true"/> Encrypt Message</label>
 							</div>
 							<div class="row">
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
 										<label for="send_message_fee">FEE</label>
-										<input type="number" name="feeNXT" id="send_message_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="3">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="send_message_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="3">
 									</div>
 								</div>
 								<div class="col-xs-6 col-sm-6 col-md-6">
@@ -2164,7 +2195,8 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
 										<label for="account_info_fee">FEE</label>
-										<input type="number" name="feeNXT" id="account_info_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="3">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="account_info_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="3">
 									</div>
 								</div>
 								<div class="col-xs-6 col-sm-6 col-md-6">
@@ -2222,7 +2254,8 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
 										<label for="register_alias_fee">FEE</label>
-										<input type="number" name="feeNXT" id="register_alias_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="3">
+										<!-- XXX - Minimum fee in HTML UI is 0.1 FIM -->
+										<input type="number" name="feeNXT" id="register_alias_fee" class="form-control" step="any" min="0.1" placeholder="Fee" data-default="0.1" value="0.1" tabindex="3">
 									</div>
 								</div>
 								<div class="col-xs-6 col-sm-6 col-md-6">
@@ -2470,7 +2503,7 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 						<div class="user_info_modal_content data-never-loading" id="user_info_modal_actions" style="display:none;">
 							<div class="row">
 								<div class="col-xs-6 col-md-6" style="margin-left:auto;margin-right:auto;float:none;">
-									<button type="button" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#send_money_modal" data-account="">Send NXT</button>
+									<button type="button" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#send_money_modal" data-account="">Send FIM</button>
 									<button type="button" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#send_message_modal" data-account="">Send a Message</button>
 									<button type="button" id="user_info_modal_add_as_contact" class="btn btn-default btn-lg btn-block" data-toggle="modal" data-target="#add_contact_modal" data-account="">Add as Contact</button>
 								</div>
@@ -2535,9 +2568,13 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 							<table class="table table-striped" id="nrs_node_state_table" style="margin-bottom:0;">
 							    <tbody>
 							    	<tr>
-							    		<td style="font-weight: bold">Version:</td><td><span id="nrs_node_state_version"></span></td>
-							    		<td style="font-weight: bold"># Blocks:</td><td><span id="nrs_node_state_numberOfBlocks"></span></td>
+							    		<td style="font-weight: bold">Version:</td><td><span id="nrs_node_state_fimVersion"></span></td>
+                      <td style="font-weight: bold">&nbsp;</td><td>&nbsp;</td>
 							    	</tr>
+                    <tr>
+                      <td style="font-weight: bold">Based on NXT Version:</td><td><span id="nrs_node_state_version"></span></td>
+                      <td style="font-weight: bold"># Blocks:</td><td><span id="nrs_node_state_numberOfBlocks"></span></td>
+                    </tr>
 							    	<tr>
 							    		<td style="font-weight: bold">Last Block:</td><td><span id="nrs_node_state_lastBlock"></span></td>
 							    		<td style="font-weight: bold"># Accounts:</td><td><span id="nrs_node_state_numberOfAccounts"></span></td>
@@ -2604,7 +2641,7 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 			      	<div class="modal-body">	
 			      		<ul class="nav nav-pills nav-justified" style="margin-bottom:10px">
 							<li class="active" id="account_details_balance_nav" data-tab="balance"><a href="#">Account Details</a></li>
-							<li data-tab="leasing"><a href="#">Account Leasing</a></li>
+							<li data-tab="leasing" style="display:none;"><a href="#">Account Leasing</a></li>
 						</ul>
 
 						<div id="account_details_modal_balance" class="account_details_modal_content" style="display:none">
@@ -2748,7 +2785,7 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
 		    <ul class="dropdown-menu" data-container="body" role="menu" style="display:block;position:static;margin-bottom:5px;">
 		    	<li><a tabindex="-1" href="#" data-option="account_info">Account Info</a></li>
 		        <li><a tabindex="-1" href="#" data-option="add_contact">Add Contact</a></li>
-				<li><a tabindex="-1" href="#" data-option="send_nxt">Send Nxt</a></li>
+				<li><a tabindex="-1" href="#" data-option="send_nxt">Send FIM</a></li>
 		    </ul>
 		</div>
 		

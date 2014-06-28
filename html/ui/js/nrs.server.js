@@ -210,7 +210,7 @@ var NRS = (function(NRS, $, undefined) {
 			}
 
 			if (typeof data == "object" && "recipient" in data) {
-				if (/^NXT\-/i.test(data.recipient)) {
+				if (/^FIM\-/i.test(data.recipient)) { /* XXX - Rename address from NXT to FIM */
 					data.recipientRS = data.recipient;
 
 					var address = new NxtAddress();
@@ -319,8 +319,9 @@ var NRS = (function(NRS, $, undefined) {
 		transaction.subtype = byteArray[1];
 		transaction.timestamp = String(converters.byteArrayToSignedInt32(byteArray, 2));
 		transaction.deadline = String(converters.byteArrayToSignedShort(byteArray, 6));
-		transaction.senderPublicKey = converters.byteArrayToHexString(byteArray.slice(8, 40));
-		transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 40));
+		transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 8)); /* XXX - prevent transaction replay */
+		transaction.senderPublicKey = converters.byteArrayToHexString(byteArray.slice(16, 48));
+		//transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 40)); /* XXX - prevent transaction replay */
 		transaction.amountNQT = String(converters.byteArrayToBigInteger(byteArray, 48));
 		transaction.feeNQT = String(converters.byteArrayToBigInteger(byteArray, 56));
 
@@ -337,9 +338,10 @@ var NRS = (function(NRS, $, undefined) {
 		}
 
 		if (!("recipient" in data)) {
+		  /* XXX - Adjust UI for FIM Genesis */
 			//recipient == genesis
 			data.recipient = "1739068987193023818";
-			data.recipientRS = "NXT-MRCC-2YLS-8M54-3CMAJ";
+			data.recipientRS = "FIM-MRCC-2YLS-8M54-3CMAJ";
 		}
 
 		if (transaction.senderPublicKey != NRS.accountInfo.publicKey) {

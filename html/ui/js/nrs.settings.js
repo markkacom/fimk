@@ -1,11 +1,14 @@
 var NRS = (function(NRS, $, undefined) {
+  
+  /* XXX - Default warning level for FEE 100 FIM */
+  /* XXX - Default warning level for AMOUNT 10000 FIM */
 	NRS.defaultSettings = {
 		"submit_on_enter": 0,
 		"reed_solomon": 1,
 		"animate_forging": 1,
 		"news": -1,
-		"fee_warning": "100000000000",
-		"amount_warning": "10000000000000",
+		"fee_warning": "10000000000", // 100.00000000
+		"amount_warning": "1000000000000", // 10000.00000000
 		"asset_transfer_warning": "10000"
 	};
 

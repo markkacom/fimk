@@ -28,7 +28,9 @@ var NRS = (function(NRS, $, undefined) {
 
 	$("#send_money_amount").on("input", function(e) {
 		var amount = parseInt($(this).val(), 10);
-		$("#send_money_fee").val(isNaN(amount) ? "1" : (amount < 500 ? 1 : Math.round(amount / 1000)));
+		
+		/* XXX - Set UI to always use the 0.1 fee */
+		$("#send_money_fee").val(""+NRS.MIN_FEE_NXT);
 	});
 
 	//todo later: http://twitter.github.io/typeahead.js/
@@ -56,11 +58,11 @@ var NRS = (function(NRS, $, undefined) {
 
 	NRS.forms.sendMoneyComplete = function(response, data) {
 		if (!(data["_extra"] && data["_extra"].convertedAccount) && !(data.recipient in NRS.contacts)) {
-			$.growl("NXT has been sent! <a href='#' data-account='" + NRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>Add recipient to contacts?</a>", {
+			$.growl("FIM has been sent! <a href='#' data-account='" + NRS.getAccountFormatted(data, "recipient") + "' data-toggle='modal' data-target='#add_contact_modal' style='text-decoration:underline'>Add recipient to contacts?</a>", {
 				"type": "success"
 			});
 		} else {
-			$.growl("NXT has been sent!", {
+			$.growl("FIM has been sent!", {
 				"type": "success"
 			});
 		}
@@ -84,7 +86,7 @@ var NRS = (function(NRS, $, undefined) {
 			if (response.publicKey) {
 				callback({
 					"type": "info",
-					"message": "The recipient account has a public key and a balance of " + NRS.formatAmount(response.unconfirmedBalanceNQT, false, true) + "NXT.",
+					"message": "The recipient account has a public key and a balance of " + NRS.formatAmount(response.unconfirmedBalanceNQT, false, true) + "FIM.",
 					"account": response
 				});
 			} else {
@@ -92,7 +94,10 @@ var NRS = (function(NRS, $, undefined) {
 					if (response.errorCode == 4) {
 						callback({
 							"type": "danger",
-							"message": "The recipient account is malformed, please adjust." + (!/^(NXT\-)/i.test(accountId) ? " If you want to type an alias, prepend it with the @ character." : ""),
+							
+							/* XXX - Rename address to FIM */
+							
+							"message": "The recipient account is malformed, please adjust." + (!/^(FIM\-)/i.test(accountId) ? " If you want to type an alias, prepend it with the @ character." : ""),
 							"account": null
 						});
 					} else if (response.errorCode == 5) {
@@ -111,7 +116,7 @@ var NRS = (function(NRS, $, undefined) {
 				} else {
 					callback({
 						"type": "warning",
-						"message": "The recipient account does not have a public key, meaning it has never had an outgoing transaction. The account has a balance of " + NRS.formatAmount(response.unconfirmedBalanceNQT, false, true) + " NXT. Please double check your recipient address before submitting.",
+						"message": "The recipient account does not have a public key, meaning it has never had an outgoing transaction. The account has a balance of " + NRS.formatAmount(response.unconfirmedBalanceNQT, false, true) + " FIM. Please double check your recipient address before submitting.",
 						"account": response
 					});
 				}
@@ -133,8 +138,9 @@ var NRS = (function(NRS, $, undefined) {
 
 		account = $.trim(account);
 
+    /* XXX - FIM specific Solomon reed regexp */
 		//solomon reed. Btw, this regex can be shortened..
-		if (/^(NXT\-)?[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(account)) {
+		if (/^(FIM\-)?[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(account)) {
 			var address = new NxtAddress();
 
 			if (address.set(account)) {
@@ -218,7 +224,9 @@ var NRS = (function(NRS, $, undefined) {
 					var alias = String(response.aliasURI);
 					var timestamp = response.timestamp;
 
-					var regex_1 = /acct:(\d+)@nxt/;
+          /* XXX - FIM specific alias substitution */
+         
+					var regex_1 = /acct:(\d+)@fim/;
 					var regex_2 = /nacc:(\d+)/;
 
 					var match = alias.match(regex_1);

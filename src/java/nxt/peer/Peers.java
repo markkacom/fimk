@@ -1,25 +1,5 @@
 package nxt.peer;
 
-import nxt.Account;
-import nxt.Block;
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.Transaction;
-import nxt.util.JSON;
-import nxt.util.Listener;
-import nxt.util.Listeners;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlets.DoSFilter;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONStreamAware;
-
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,6 +18,27 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
+
+import nxt.Account;
+import nxt.Block;
+import nxt.Constants;
+import nxt.Nxt;
+import nxt.Transaction;
+import nxt.util.JSON;
+import nxt.util.Listener;
+import nxt.util.Listeners;
+import nxt.util.Logger;
+import nxt.util.ThreadPool;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.FilterMapping;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlets.DoSFilter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
 
 public final class Peers {
 
@@ -60,8 +61,8 @@ public final class Peers {
     static final int readTimeout;
     static final int blacklistingPeriod;
 
-    static final int DEFAULT_PEER_PORT = 7874;
-    static final int TESTNET_PEER_PORT = 6874;
+    static final int DEFAULT_PEER_PORT = 7884;
+    static final int TESTNET_PEER_PORT = 6884;
     private static final String myPlatform;
     private static final String myAddress;
     private static final int myPeerServerPort;
@@ -212,9 +213,10 @@ public final class Peers {
                 connector.setHost(host);
                 connector.setIdleTimeout(Nxt.getIntProperty("nxt.peerServerIdleTimeout"));
                 peerServer.addConnector(connector);
-
+                
                 ServletHandler peerHandler = new ServletHandler();
                 peerHandler.addServletWithMapping(PeerServlet.class, "/*");
+                
                 if (Nxt.getBooleanProperty("nxt.enablePeerServerDoSFilter")) {
                     FilterHolder filterHolder = peerHandler.addFilterWithMapping(DoSFilter.class, "/*", FilterMapping.DEFAULT);
                     filterHolder.setInitParameter("maxRequestsPerSec", Nxt.getStringProperty("nxt.peerServerDoSFilter.maxRequestsPerSec"));
@@ -223,7 +225,7 @@ public final class Peers {
                     filterHolder.setInitParameter("trackSessions", "false");
                     filterHolder.setAsyncSupported(true);
                 }
-
+                
                 peerServer.setHandler(peerHandler);
                 peerServer.setStopAtShutdown(true);
                 ThreadPool.runBeforeStart(new Runnable() {
