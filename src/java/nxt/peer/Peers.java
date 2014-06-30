@@ -141,7 +141,7 @@ public final class Peers {
         }
         json.put("application", "FIMK");
         json.put("version", Nxt.VERSION);
-        json.put("fim_version", Nxt.FIM_VERSION);
+        json.put("nxtversion", Nxt.NXT_VERSION);
         json.put("platform", Peers.myPlatform);
         json.put("shareAddress", Peers.shareMyAddress);
         Logger.logDebugMessage("My peer info:\n" + json.toJSONString());
