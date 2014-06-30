@@ -24,4 +24,5 @@
 /logs/*
 /accounts.csv
 /*.zip
-/announcements/
+/announcements/donations_correct_rs.csv
+*.csv
