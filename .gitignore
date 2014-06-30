@@ -6,7 +6,6 @@
 /html/doc/*
 /keystore
 /fim.jar
-/fim.zip
 /fim_test_db/
 /fim_db/
 *.trace
@@ -24,3 +23,5 @@
 /test_net_keys.csv
 /logs/*
 /accounts.csv
+/*.zip
+/announcements/
