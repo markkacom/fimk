@@ -1,0 +1,13 @@
+Initial public release.
+
+FIMK 0.2.0 is based on NXT 1.1.5.
+
+Notable changes in this release..
+
+* 30 second block time 
+* POW-like block reward for the block forger (200 FIM per block)
+* Minimum transaction fee 0.1 FIM
+* Maximum of 512 transactions per block
+* Option to see all available assets on the blockchain when adding an asset from
+  the html client
+* Encrypted on-blockchain messaging
