@@ -20,7 +20,7 @@ public final class GetBlockchainStatus extends APIServlet.APIRequestHandler {
     JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         response.put("version", Nxt.VERSION);
-        response.put("fimversion", Nxt.NXT_VERSION);
+        response.put("nxtversion", Nxt.NXT_VERSION);
         response.put("time", Convert.getEpochTime());
         Block lastBlock = Nxt.getBlockchain().getLastBlock();
         response.put("lastBlock", lastBlock.getStringId());
