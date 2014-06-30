@@ -44,7 +44,7 @@ final class PeerImpl implements Peer {
     private volatile String platform;
     private volatile String application;
     private volatile String version;
-    private volatile String fim_version;    
+    private volatile String nxt_version;    
     private volatile long adjustedWeight;
     private volatile long blacklistingTime;
     private volatile State state;
@@ -118,12 +118,12 @@ final class PeerImpl implements Peer {
     }
 
     @Override
-    public String getFimVersion() {
-        return fim_version;
+    public String getNXTVersion() {
+        return nxt_version;
     }
 
-    void setFimVersion(String version) {
-        this.fim_version = version;
+    void setNXTVersion(String version) {
+        this.nxt_version = version;
     }
     
     @Override

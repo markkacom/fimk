@@ -17,7 +17,7 @@ public interface Peer extends Comparable<Peer> {
 
     String getVersion();
     
-    String getFimVersion();
+    String getNXTVersion();
 
     String getApplication();
 
