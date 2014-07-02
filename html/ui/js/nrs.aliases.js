@@ -97,7 +97,7 @@ var NRS = (function(NRS, $, undefined) {
 			}, function(response) {
 				if (/http:\/\//i.test(response.aliasURI)) {
 					NRS.forms.setAliasType("uri");
-				} else if (/acct:(\d+)@nxt/.test(response.aliasURI) || /nacc:(\d+)/.test(response.aliasURI)) {
+				} else if (/acct:(\d+)@fim/.test(response.aliasURI) || /nacc:(\d+)/.test(response.aliasURI)) {
 					NRS.forms.setAliasType("account");
 				} else {
 					NRS.forms.setAliasType("general");
@@ -129,13 +129,16 @@ var NRS = (function(NRS, $, undefined) {
 	NRS.forms.setAlias = function($modal) {
 		var data = NRS.getFormData($modal.find("form:first"));
 
-		data.uri = $.trim(data.uri);
+		data.aliasURI = $.trim(data.aliasURI);
 
 		if (data.type == "account") {
-			if (!(/acct:(\d+)@nxt/.test(data.uri)) && !(/nacc:(\d+)/.test(data.uri))) {
-				if (/^\d+$/.test(data.uri)) {
-					data.uri = "acct:" + data.uri + "@nxt";
-				} else {
+			if (!(/acct:(\d+)@fim/.test(data.aliasURI)) && !(/nacc:(\d+)/.test(data.aliasURI))) {
+				if (/^\d+$/.test(data.aliasURI)) {
+					data.aliasURI = "acct:" + data.aliasURI + "@fim";
+			  } /*else if (/^FIM-.+$/.test(data.aliasURI)) {
+			    
+			  
+				}*/ else {
 					return {
 						"error": "Invalid account ID."
 					};
@@ -178,9 +181,9 @@ var NRS = (function(NRS, $, undefined) {
 			$("#register_alias_uri").prop("placeholder", "Account ID");
 			$("#register_alias_uri").val("");
 			if (uri) {
-				if (!(/acct:(\d+)@nxt/.test(uri)) && !(/nacc:(\d+)/.test(uri))) {
+				if (!(/acct:(\d+)@fim/.test(uri)) && !(/nacc:(\d+)/.test(uri))) {
 					if (/^\d+$/.test(uri)) {
-						$("#register_alias_uri").val("acct:" + uri + "@nxt");
+						$("#register_alias_uri").val("acct:" + uri + "@fim");
 					} else {
 						$("#register_alias_uri").val("");
 					}
