@@ -16,3 +16,8 @@ Notable changes in this release..
 * Added API method GetBlocksIdsFromHeight, this expects a @fromHeight and 
   @toHeight argument and returns an array of block ids and a property
   fromHeight that indicates the height of the first block id in the array.
+  
+Stakeholders must make an outgoing transaction before block 2880 or they'll 
+have to wait 1440 blocks before they can forge. Non-stakeholder accounts must
+always wait 1440 blocks after their first transaction out going transaction
+before they can forge.  
