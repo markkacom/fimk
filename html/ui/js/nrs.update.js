@@ -231,8 +231,11 @@ var NRS = (function(NRS, $, undefined) {
 		} else {
 		
 		  /* XXX - TODO - Setup client download site  */
+		  function getDownloadURL(version) {
+		    return "https://github.com/fimkrypto/fimk/releases/download/v"+version+"/fim-"+version+".zip"
+		  }		 
 		
-			$("#nrs_update_iframe").attr("src", "http://download.kimk.fi/fim-client-" + NRS.downloadedVersion.versionNr + ".zip");
+			$("#nrs_update_iframe").attr("src", getDownloadURL(NRS.downloadedVersion.versionNr));
 			$("#nrs_update_explanation").hide();
 			$("#nrs_update_drop_zone").show();
 
