@@ -129,8 +129,16 @@
 	                        <div class="col-lg-3 col-xs-6">
 	                            <div class="small-box bg-gray">
 	                                <div class="inner">
-	                                    <h3><span id="account_forged_balance" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
-	                                    <p>Forged Balance</p>
+	                                   <div>
+	                                       <h3><span id="account_forged_balance" class="loading_dots"><span>.</span><span>.</span><span>.</span></span></h3>
+	                                       <h4 style="float: right; margin-top: -30px;">
+	                                         <!--XXX - Introduce the forging countdown -->   
+	                                         <img id="account_start_forging_button" style="cursor: pointer;" src="img/help.png" 
+	                                         title="The average time for you to forge a new block.<br>Your average time changes after each new block.<br><br>Click this button to refresh.<br>Refreshing does not influence your forging chances.<br><br><img src='img/error.png'><b>Your secret phrase will be send to the FIM server!</b>"
+	                                          data-toggle="tooltip" data-placement="bottom" data-html="true">  <span id="account_forge_time">not forging</span>
+	                                       </h4>
+	                                   </div>
+	                                   <p>Forged Balance</p>
 	                                </div>
 	                                <div class="icon"><i class="ion ion-hammer"></i></div>
 	                                <a href="#" id="goto_forged_blocks" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
@@ -1537,6 +1545,35 @@
 			</div>
 		</div>
 		
+		<!-- XXX - Introduce the refresh forging dialog -->
+    <div class="modal fade" id="refresh_forging_modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-wide">
+          <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Confirm Forging Refresh</h4>
+              </div>
+              <div class="modal-body">      
+            <form role="form">
+              <p class="show_secret_phrase">If you want to refresh forging, type your secret phrase to confirm.</p>
+              <p class="hide_secret_phrase" style="display:none">If you you want to refresh forging, click the button below to confirm.</p>
+              <div class="callout callout-danger remote_warning" style="display:none"><strong>Warning</strong>: Your secret phrase will be sent to the server!</div>
+              <div class="callout callout-danger error_message" style="display:none"></div>
+              <div class="form-group secret_phrase">
+                <label for="start_forging_password">SECRET PHRASE</label>
+                <input type="password" name="secretPhrase" id="refresh_forging_password" class="form-control" placeholder="" tabindex="1">
+              </div>
+            </form>
+              </div>
+              <div class="modal-footer" style="margin-top:0;">
+                <input type="hidden" name="request_type" value="startForging" />
+                <input type="hidden" name="success_message" value="Forging has been refreshed." />
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="refresh_forging_button" data-loading-text="Submitting...">Refresh Forging</button>
+              </div>
+          </div>
+      </div>
+    </div>		
 		
 		<div class="modal fade" id="cancel_order_modal" tabindex="-1" role="dialog" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-wide">
@@ -2874,5 +2911,6 @@ quantity decimal point." data-container="body" style="color:#4CAA6E" ></i></labe
         <script src="js/nrs.modals.balanceleasing.js" type="text/javascript"></script>
         <script src="js/nrs.console.js" type="text/javascript"></script>
         <script src="js/nrs.util.js" type="text/javascript"></script>
+        <script src="js/fim.forging.js" type="text/javascript"></script>
     </body>
 </html>
