@@ -135,10 +135,17 @@ var NRS = (function(NRS, $, undefined) {
 			if (!(/acct:(\d+)@fim/.test(data.aliasURI)) && !(/nacc:(\d+)/.test(data.aliasURI))) {
 				if (/^\d+$/.test(data.aliasURI)) {
 					data.aliasURI = "acct:" + data.aliasURI + "@fim";
-			  } /*else if (/^FIM-.+$/.test(data.aliasURI)) {
-			    
-			  
-				}*/ else {
+			  } else if (/^FIM-.+$/.test(data.aliasURI)) {
+			    /* XXX - Allow the use of RS accounts for account aliases registration */			   
+          var address = new NxtAddress();
+          if (address.set(data.aliasURI)) {
+            data.aliasURI = "acct:" + address.account_id() + "@fim";
+          } else {
+            return {
+              "error": "Invalid account ID."
+            };
+          }	
+				} else {
 					return {
 						"error": "Invalid account ID."
 					};
