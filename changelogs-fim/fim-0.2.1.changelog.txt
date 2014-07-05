@@ -1,0 +1,9 @@
+FIMK 0.2.1 is based on NXT 1.1.5.
+
+Some bug fixes in the html client.
+
+* Renamed some occurences of NXT where it should say FIM
+* Fixed a bug where you cannot create an account alias. In this release you can 
+  create an account alias using a numeric account. This will be fixed in a next
+  release it will be possible to create account aliases with Reed Solomon 
+  addresses to.
