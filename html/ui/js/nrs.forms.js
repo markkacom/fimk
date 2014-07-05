@@ -152,7 +152,11 @@ var NRS = (function(NRS, $, undefined) {
 		}
 
 		if (!NRS.showedFormWarning) {
+		  
 		  if ("amountNXT" in data) {
+        /* XXX - Fix amounts that contain commas, commas are translated to a dots */
+        data.amountNXT = String(data.amountNXT).replace(/,/g,'.');
+
 		    try {
 		      NRS.convertToNQT(data.amountNXT)
 		    } catch (e) {
@@ -164,6 +168,9 @@ var NRS = (function(NRS, $, undefined) {
 		  }
 		  
       if ("feeNXT" in data) {
+        /* XXX - Fix amounts that contain commas, commas are translated to a dot */
+        data.feeNXT = String(data.feeNXT).replace(/,/g,'.');
+        
         try {
           NRS.convertToNQT(data.feeNXT)
         } catch (e) {
@@ -177,7 +184,7 @@ var NRS = (function(NRS, $, undefined) {
 			if ("amountNXT" in data && NRS.settings["amount_warning"] && NRS.settings["amount_warning"] != "0") {
 				if (new BigInteger(NRS.convertToNQT(data.amountNXT)).compareTo(new BigInteger(NRS.settings["amount_warning"])) > 0) {
 					NRS.showedFormWarning = true;
-					$modal.find(".error_message").html("You amount is higher than " + NRS.formatAmount(NRS.settings["amount_warning"]) + " FIM. Are you sure you want to continue? Click the submit button again to confirm.").show();
+					$modal.find(".error_message").html("You are going to send more than " + NRS.formatAmount(NRS.settings["amount_warning"]) + " FIM. Please click on Send FIM button again to confirm that you want to send the high amount.").show();
 					NRS.unlockForm($modal, $btn);
 					return;
 				}
