@@ -30,4 +30,4 @@
 /announcements/
 *.csv
 dist
-/html/beta/*
+/html/ui/beta/*
