@@ -4,3 +4,4 @@ dist
 .sass-cache
 .zip
 app.dgex.base
+deploy.rb

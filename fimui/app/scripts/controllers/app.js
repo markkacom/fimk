@@ -1,5 +1,7 @@
 (function () {
 'use strict';
+
+var uriParser = null;
 var module = angular.module('dgex.base');
 
 module.controller('appController', function($rootScope, $scope, $modal, $q, $log,  $timeout, modals, $window, serverService) {
@@ -21,8 +23,8 @@ module.controller('appController', function($rootScope, $scope, $modal, $q, $log
     return (w.width() > 800) ? { height: ((w.height() - 100) + 'px') } : {};
   }
 
-  var uriParser = document.createElement('a');
   function parseURI(uri) {
+    uriParser = uriParser || document.createElement('a');
     uriParser.href = uri;
     return uriParser;
   }

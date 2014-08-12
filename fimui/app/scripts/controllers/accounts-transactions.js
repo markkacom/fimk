@@ -4,27 +4,6 @@ var module = angular.module('dgex.base');
 
 module.controller('accountsTransactionsController', function($scope, accountsService, serverService) {
 
-// amountNQT: "0"
-// attachment: Object
-// block: "8907867696688766317"
-// blockTimestamp: 20995448
-// confirmations: 107
-// deadline: 1440
-// feeNQT: "10000000"
-// fullHash: "ab18ab2743aa2e4c40346bcb501d4f299ea2a3cf70624d5dc9f0791c70fcd3a4"
-// height: 38461
-// recipient: "1739068987193023818"
-// recipientRS: "FIM-MRCC-2YLS-8M54-3CMAJ"
-// sender: "756646320599846211"
-// senderPublicKey: "173ed87fd932cb4bb45f7792540b227ea5e1d96c75d66b02fe50b74997fc2d58"
-// senderRS: "FIM-DMC5-U9DZ-384Y-2732P"
-// signature: "a75dcd5d06b07bbdeccb5711e67218681509575ee08f2cb1a78c90afd6583a0a0747576ffaa38ff8d30df0b3531ad5a2284ea0befd4596920d828f0422f6b091"
-// signatureHash: "f2a22cdc86bfcfc624f18223ceafb1880b3e94c8c8d9857eaf92c24c181bef30"
-// subtype: 3
-// timestamp: 20995430
-// transaction: "5489512201216268459"
-// type: 2
-
 $scope.transactions = [];
 $scope.selectedTransactions = [];
 
