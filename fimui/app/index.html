@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" ng-app="dgex.base" ng-controller="appController">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <!-- build:css({.tmp,app}) styles/main.css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css" />
+    <link rel="stylesheet" href="bower_components/ng-grid/ng-grid.min.css" />
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+    <!--[if lt IE 9]>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <!--<script src="scripts/lib/underscore-min.js"></script>-->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="scripts/lib/highstock.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/ng-grid/ng-grid-2.0.11.min.js"></script>
+    
+    <script src="scripts/lib/jsbn.js"></script>
+    <script src="scripts/lib/jsbn2.js"></script>
+    <script src="scripts/lib/nrs.util.js"></script>    
+    <script src="scripts/lib/ngStorage.js"></script>
+    
+    <script src="scripts/utils.js"></script>
+    
+    <script src="scripts/app.js"></script>
+    <script src="scripts/static.js"></script>
+    <script src="scripts/config/i18n.js"></script>
+    <script src="scripts/config/routes.js"></script>
+
+    <script src="scripts/directives/money.js"></script>
+    <script src="scripts/directives/resizable.js"></script>
+    <script src="scripts/services/exchange-service.js"></script>
+    <script src="scripts/services/exchange-nxtae.js"></script>
+    <script src="scripts/services/accounts-service.js"></script>
+    <script src="scripts/services/server-service.js"></script>
+    <script src="scripts/services/modals.js"></script>
+
+    <script src="scripts/controllers/app.js"></script>
+    <script src="scripts/controllers/home.js"></script>
+    <script src="scripts/controllers/accounts.js"></script>
+    <script src="scripts/controllers/accounts-tab.js"></script>
+    <script src="scripts/controllers/accounts-list.js"></script>
+    <script src="scripts/controllers/accounts-transactions.js"></script>
+    <script src="scripts/controllers/accounts-add-modal.js"></script>
+    <script src="scripts/controllers/warn.js"></script>
+    <script src="scripts/controllers/secretphrase-modal.js"></script>
+    <script src="scripts/controllers/asks.js"></script>
+    <script src="scripts/controllers/bids.js"></script>
+    <script src="scripts/controllers/chart.js"></script>
+    <script src="scripts/controllers/confirm-order.js"></script>
+    <script src="scripts/controllers/exchange.js"></script>
+    <script src="scripts/controllers/markets.js"></script>
+    <script src="scripts/controllers/order-buy.js"></script>
+    <script src="scripts/controllers/order-sell.js"></script>
+    <script src="scripts/controllers/overview.js"></script>
+    <script src="scripts/controllers/trades.js"></script>
+    <script src="scripts/controllers/server.js"></script>
+    <!--<script src="scripts/controllers/login.js"></script>
+    <script src="scripts/controllers/logout.js"></script>
+    -->
+    <!-- endbuild -->
+
+  </head>
+  <body>
+
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" ui-sref="home"><strong>FIMK</strong> BETA</a>
+        </div>
+        <div class="navbar-collapse collapse" style="z-index: 1">
+          <ul class="nav navbar-nav">
+            <!--<li ui-sref-active="active" ui-sref="home"><a>Home</a></li>-->
+            <li ui-sref-active="active" ui-sref="accounts"><a>Accounts</a></li>
+            <li ui-sref-active="active" ui-sref="contacts"><a>Contacts</a></li>
+            <li ui-sref-active="active" ui-sref="exchange"><a>Asset Exchange</a></li>
+            <li ui-sref-active="active" ui-sref="store"><a>Digital Goods Store</a></li>
+            <li ng-show="isNodeJS"><a ng-click="openDevTools()">Dev Tools</a></li>
+          </ul>
+          <ul class="nav navbar-nav pull-right">
+            
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div><!--/.container-fluid -->
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container-fluid" ng-style="getOuterContainerStyle()">
+      <div style="position: absolute; z-index: 99999; top: 80px; right: 10px; background-color: transparent; ">
+        <alert ng-repeat="a in alerts" type="{{a.type}}" style="max-width: 500px; min-width: 500px;">
+          <strong ng-bind="a.msg.split('|')[0]"></strong>
+          <div ng-show="a.url">{{alert.url}} says <b>{{a.msg.split('|')[1]}}</b></div>
+          <div ng-show="a.retry"><a href ng-click="a.retry(); closeAlert($index)" class="alert-link">Click to retry..</a></div>
+        </alert>
+      </div>      
+      <div ui-view></div>
+    </div>
+
+  </body> 
+</html>

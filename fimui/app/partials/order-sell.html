@@ -1,0 +1,111 @@
+<div class="panel panel-default" ng-controller="confirmOrderController">
+  <div class="panel-heading">
+    <h3 class="panel-title">Place Sell Order</h3>
+  </div>
+  <div class="panel-body">
+    <div class="text-center" ng-show="currentUser == null">
+      <div class="alert alert-danger"><strong>You must login before you can place a sell order</strong></div>
+    </div>
+    <div ng-show="currentUser != null">
+      <form class="form-horizontal" name="sellForm" novalidate>
+
+        <!-- highest bid -->
+        <div class="form-group">
+          <div class="col-xs-3">
+            <label class="control-label">Highest bid</label>
+          </div>
+          <div class="col-xs-6">
+            <label class="control-label">
+              <a href ng-click="highestBidClick();">{{items.buyOrders[0].price | money : items.selectedPair.base.decimals}}</a>
+            </label>
+          </div>
+          <div class="col-xs-3">
+            <label class="control-label">{{items.selectedPair.base.symbol+'/'+items.selectedPair.quote.symbol}}</label>
+          </div>
+        </div>
+
+        <!-- your balance -->
+        <div class="form-group">
+          <div class="col-xs-3">
+            <label class="control-label"><strong>Available</strong></label>
+          </div>
+          <div class="col-xs-6">
+            <label class="control-label">
+              <a href ng-click="availableClick()">{{items.balance.quote | money : items.selectedPair.quote.decimals}}</a>
+            </label>
+          </div>
+          <div class="col-xs-3">
+            <label class="control-label"><strong>{{items.selectedPair.quote.symbol}}</strong></label>
+          </div>
+        </div>
+
+        <!-- price -->
+        <div class="form-group">
+          <div class="col-xs-3">
+            <label class="control-label">Min price</label>
+          </div>
+          <div class="col-xs-6">
+            <input money precision="{{items.selectedPair.base.decimals}}" name="price" class="form-control" type="text" ng-model="items.price" ng-change="priceChanged()" placeholder="price">
+          </div>
+          <div class="col-xs-3">
+            <label class="control-label">{{items.selectedPair.base.symbol+'/'+items.selectedPair.quote.symbol}}</label>            
+          </div>
+        </div>
+
+        <!-- amount -->
+        <div class="form-group">
+          <div class="col-xs-3">
+            <label class="control-label">Amount</label>
+          </div>
+          <div class="col-xs-6">
+            <input money precision="{{items.selectedPair.quote.decimals}}" name="amount" class="form-control" type="text" ng-model="items.amount" ng-change="amountChanged()" placeholder="amount">
+          </div>
+          <div class="col-xs-3">
+            <label class="control-label">{{items.selectedPair.quote.symbol}}</label>
+          </div>
+        </div>
+
+        <!-- total -->
+        <div class="form-group">
+          <div class="col-xs-3">
+            <label class="control-label">Total</label>
+          </div>
+          <div class="col-xs-6">
+            <input money precision="{{items.selectedPair.base.decimals}}" name="total" class="form-control" type="text" ng-model="items.total" ng-change="totalChanged()" placeholder="total">
+          </div>
+          <div class="col-xs-3">
+            <label class="control-label">{{items.selectedPair.base.symbol}}</label>
+          </div>
+        </div>
+
+        <!-- fee -->
+        <div class="form-group">
+          <div class="col-xs-3">
+            <label class="control-label">Fee</label>
+          </div>
+          <div class="col-xs-6">
+            <label class="control-label">{{items.fee | money : items.selectedPair.base.decimals}}</label>
+          </div>
+          <div class="col-xs-3">
+            <label class="control-label">{{items.selectedPair.base.symbol}}(0.15%)</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-xs-6">
+            <button ng-click="close()" type="button" class="btn btn-block btn-success">Sell {{items.selectedPair.quote.symbol}} for {{items.selectedPair.base.symbol}}</button>              
+          </div>
+          <div class="col-xs-6">
+            <button ng-click="dismiss()" type="button" class="btn btn-block btn-warn">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="panel-heading">
+    <h3 class="panel-title">Latest Buy Orders</h3>
+  </div>  
+  <div class="panel-body no-padding">
+    <div class="gridStyle" ng-grid="gridOptions"></div>
+  </div>    
+</div>

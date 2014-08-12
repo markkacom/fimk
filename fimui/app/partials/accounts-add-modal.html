@@ -1,0 +1,25 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Add Account</h3>
+  </div>
+  <div class="panel-body">
+    <form accept-charset="UTF-8" role="form" name="accountAddForm">
+      <fieldset>
+        <div class="form-group">
+          <input class="form-control" placeholder="Name" name="name" type="text" ng-model="items.name">
+        </div>
+        <div class="form-group">
+          <input class="form-control" placeholder="Account ID RS" name="account_id_rs" type="text" ng-model="items.account_id_rs">
+        </div>
+        <div class="form-group">
+          <div class="col-xs-6">
+            <button class="btn btn-block btn-success" ng-click="close()">Create Account</button>
+          </div>
+          <div class="col-xs-6">
+            <button ng-click="dismiss()" type="button" class="btn btn-block btn-warn">Cancel</button>
+          </div>
+        </div>  
+      </fieldset>
+    </form>
+  </div>
+</div>
