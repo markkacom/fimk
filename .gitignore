@@ -8,6 +8,9 @@
 /fim.jar
 /fim_test_db/
 /fim_db/
+/fim.linux/
+/fim.mac/
+/fim.win/
 *.trace
 /fim-trace.csv
 /README_win.txt
