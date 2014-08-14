@@ -47,7 +47,7 @@
   </ul>
   </li>
   <li><a href="#focus_on_strength">Focus on strength</a></li>
-  <li><a href="#getting_started">Geting started</a></li>
+  <li><a href="#getting_started">Getting started</a></li>
   <li><a href="#client_architecture">Client architecture</a>
   <ul>
     <li><a href="#the_html">Where is the HTML</a></li>
@@ -65,7 +65,7 @@
 <h2 id="intro">Welcome to FIM Community Client project.</h2>
 
 <p>
-We've succesfully launched FIMKrypto server, a crypto currency based on NXT but with 30 second block times and block rewards.
+We've succesfully launched FIMKrypto, a crypto currency based on NXT but with 30 second block times and block rewards.
 </p><p>
 In this project we'll be making the Omni-Platform <strong>FIM Community Client</strong>.
 </p><p>
@@ -81,7 +81,7 @@ The goal is to make a stable and easy to use multi device crypto wallet.
 </p><p>
 Accross all supported platforms we want to enable FIM to random contact (no account holder) transactions. This means that a FIM Account Holder (on any device/platform) can send FIM through a link to any contact (the contact does not need a FIM account).
 </p><p>
-Many if not most textbased forms of communication support sending a link to a contact.
+Many if not most text based forms of communication support sending a link to a contact.
 </p><p>
 <ul>
   <li>Email</li>
@@ -97,7 +97,7 @@ The contact who receives that link can either add that FIM to his/her account us
 </p><p>
 <h2 id="how_to_get_this_done">How to get this done</h2>
 <p>
-Not to long ago if you wanted to make an application using a single language (javascript) and a single codebase that would:
+Not too long ago if you wanted to make an application using a single language (javascript) and a single code base that would:
 </p><p>
 <ul>
   <li>Run as a native app on Windows, MacOS and Linux</li>
@@ -177,7 +177,7 @@ $ sudo apt-get install npm
 $ npm install
 </code></pre>
 </p><p>
-It could be neccesary to use sudo (sudo npm install). When you run npm and you get an error, it's almost certainly a missing dependency. Copy the error message to google and you'll see what you need to install.
+It could be necessary to use sudo (sudo npm install). When you run npm and you get an error, it's almost certainly a missing dependency. Copy the error message to google and you'll see what you need to install.
 </p><p>
 <h3>Install bower components (bootstrap, angular, jquery ..)</h3>
 </p><p>
@@ -206,11 +206,11 @@ $ sh compile_nodewebkit.sh</code></pre>
 </p>
 <h2 id="client_architecture">Client architecture</h2>
 <p>
-Since the client is an Angular application you can expect the architecture to match that of an Angular app. In an angular app you'll find the usual suspects like Javascript files, HTML files, stylesheets and images. Angular however dictates where these files go and more importantly what goes in them.
+Since the client is an Angular application you can expect the architecture to match that of an Angular app. In an angular app you'll find the usual suspects like Javascript files, HTML files, style sheets and images. Angular however dictates where these files go and more importantly what goes in them.
 </p>
 <h3 id="the_html">Where is the HTML</h3>
 <p>
-Like any web application there is the <a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/index.html">index.html</a> file. It is the starting point of the application, all scripts and stylesheets are referenced/imported through index.html. 
+Like any web application there is the <a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/index.html">index.html</a> file. It is the starting point of the application, all scripts and style sheets are referenced/imported through index.html. 
 </p><p>
 But if you look closer at index.html you'll notice that there is almost nothing in the <code>&lt;body&gt;</code> of that HTML file. Thats because all HTML goes in so-called partials/templates. You can find all partials in the <a target="_blank" href="https://github.com/fimkrypto/fimk/tree/master/fimui/app/partials">app/partials</a> folder.
 </p><p>
@@ -236,7 +236,7 @@ Pretty obvious pattern right? The Javascript in the controllers is isolated from
 </p>
 <h3 id="dependency_injection">Dependency injection</h3>
 <p>
-Angular supports dependency injection. This means that you declare what services will be initialized and passed to your controllers. When you create a new controler Angular will look at the names of the parameters to the controller function and will inject the objects that belong to those names. Injecting is passing an argument to the controller contruction function.
+Angular supports dependency injection. This means that you declare what services will be initialized and passed to your controllers. When you create a new controller Angular will look at the names of the parameters to the controller function and will inject the objects that belong to those names. Injecting is passing an argument to the controller construction function.
 </p><p>
 There are two kinds of parameters that are injected. Those that start with $ ($scope, $http, $timeout) and those that not start with an $. The ones starting with $ are built-in services, they come with Angular. The other ones, you guessed it are not from Angular. Sometimes it are 3rd party services but it could also be our services.
 </p><p>
@@ -275,7 +275,7 @@ Access point to the FIM server. Does the JSON over HTTP communication with FIM s
 </tr>
 </table>
 <p>
-As you can see a service starts with <code>module.factory('serverService', function ($modal, $http, $q, modals) {}</code> this tells Angular to register the service with the name 'serverService'. Now you can use that service from your controller simply by declaring a paramter named 'serverService'. As you can see in the sample Factories and Services support dependency injection to.
+As you can see a service starts with <code>module.factory('serverService', function ($modal, $http, $q, modals) {}</code> this tells Angular to register the service with the name 'serverService'. Now you can use that service from your controller simply by declaring a parameter named 'serverService'. As you can see in the sample Factories and Services support dependency injection to.
 </p>
 <h3 id="routing">Routing (load controllers based on location)</h3>
 <p>
