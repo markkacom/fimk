@@ -18,61 +18,335 @@
 
   </head>
   <body>
-      <div id="header">
+<!--       <div id="header">
         <nav>
           <li class="fork"><a href="https://github.com/fimkrypto/fimk">View On GitHub</a></li>
           <li class="downloads"><a href="https://github.com/fimkrypto/fimk/zipball/master">ZIP</a></li>
           <li class="downloads"><a href="https://github.com/fimkrypto/fimk/tarball/master">TAR</a></li>
           <li class="title">DOWNLOADS</li>
         </nav>
-      </div><!-- end header -->
+      </div> --><!-- end header -->
 
     <div class="wrapper">
 
       <section>
         <div id="title">
-          <h1>Fimk</h1>
-          <p>FIMKrypto: NXT spinoff 30s blocks, POW-like rewards</p>
+          <h1>FIM Community Client</h1>
+          <p>Child project of <i>FIMKrypto: NXT spinoff 30s blocks, POW-like rewards</i></p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/fimkrypto">fimkrypto</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
+<ol>
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#how_to_get_this_done">How to get this done</a></li>
+  <li><a href="#the_technology_stack">The technology stack</a>
+  <ul>
+    <li><a href="#build_tools">Build/development tools</a></li>
+    <li><a href="#software_components">Software components</a></li>
+  </ul>
+  </li>
+  <li><a href="#focus_on_strength">Focus on strength</a></li>
+  <li><a href="#getting_started">Geting started</a></li>
+  <li><a href="#client_architecture">Client architecture</a>
+  <ul>
+    <li><a href="#the_html">Where is the HTML</a></li>
+    <li><a href="#the_javascript">Where is the Javascript</a></li>
+    <li><a href="#dependency_injection">Dependency injection</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#routing">Routing (load controllers based on location)</a></li>
+    <li><a href="#templates">Templates</a></li>
+  </ul>
+  </li>
+  <li><a href="#start_contributing">Start contributing</a></li>
+  <li><a href="#external_links">External links</a></li>  
+</ol>
 
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<h2 id="intro">Welcome to FIM Community Client project.</h2>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>
+We've succesfully launched FIMKrypto server, a crypto currency based on NXT but with 30 second block times and block rewards.
+</p><p>
+In this project we'll be making the Omni-Platform <strong>FIM Community Client</strong>.
+</p><p>
+The goal is to make a stable and easy to use multi device crypto wallet.
+</p><p>
+<ul>
+  <li>Installable Application (Windows, Linux, Mac)</li>
+  <li>Mobile App (Android, IPhone, Windows)</li>
+  <li>Hosted/Web (Chrome, Firefox, IE)</li>
+</ul>
+</p><p>
+<center><img height="230" src="images/fim_all_platforms.png"></center>
+</p><p>
+Accross all supported platforms we want to enable FIM to random contact (no account holder) transactions. This means that a FIM Account Holder (on any device/platform) can send FIM through a link to any contact (the contact does not need a FIM account).
+</p><p>
+Many if not most textbased forms of communication support sending a link to a contact.
+</p><p>
+<ul>
+  <li>Email</li>
+  <li>SMS</li>
+  <li>WhatsApp</li>
+  <li>Facebook</li>
+  <li>Forums (private message)</li>
+</ul>
+</p><p>
+The contact who receives that link can either add that FIM to his/her account using one of the available clients or install a client (or use the hosted version) to create a new FIM account.
+</p><p>
+<center><img height="230" src="images/social.png"></center>
+</p><p>
+<h2 id="how_to_get_this_done">How to get this done</h2>
+<p>
+Not to long ago if you wanted to make an application using a single language (javascript) and a single codebase that would:
+</p><p>
+<ul>
+  <li>Run as a native app on Windows, MacOS and Linux</li>
+  <li>Run as a native installable app on Android, IPhone and Windows Mobile</li>
+  <li>Is fully functional when you simply put the code on a server (hosted/web based)</li>
+</ul>
+</p><p>
+If that was your plan then you would have to do a whole lot of preparation to only make the basic parts possible. But <s>luckily</s> thanks to the creators of some great open source projects this now becomes a possibility.
+</p><p>
+But even with all these open source projects available. There remains a (sometimes) steep learning curve before you can even begin to use them effectively. 
+</p><p>
+That is not something that is good for FIMKrypto. FIMKrypto needs developers who want to contribute to get up and running as fast as possible so they can focus on their skills instead of setting things up or learning un-important required bits.
+</p><p>
+The initial setup of this project will be to lay down a basic working client framework (the source code) and include the various tools to turn that source code into applications (compilers to exe, so, iphone, android etc). With this we'll also be setting up a development environment that allows you to edit your code and immediately see it run live in your browser or on a mobile device emulator.
+</p>
+<h2 id="the_technology_stack">The technology stack</h2>
+<p>
+The tech we'll be using can be split in two categories:
+</p><p>
+<ol>
+  <li>Build/development tools</li>
+  <li>Software components (angular, bootstrap etc)</li>
+</ol>
+</p><p>
+Some of the build/development tools are absolutely required because otherwise we'll not be able to do this project while others are not so much required but do allow us to develop much faster or better or both.
+</p><p>
+<h3 id="build_tools">Build/development tools</h3>
+</p><p>
+<ul>
+  <li><a target="_blank" href="http://nodejs.org/">Node.js</a></li>
+  <li><a target="_blank" href="http://bootswatch.com/">Bootstrap less compiler (allows you to edit variables.less and compile bootstrap)</a></li>
+  <li><a target="_blank" href="http://gruntjs.com/">Grunt (the javascript task runner)</a></li>
+  <li><a target="_blank" href="https://github.com/rogerwang/node-webkit">Nodewebkit (node-webkit app runtime based on Chromium and node.js)</a></li>
+  <li><a target="_blank" href="https://software.intel.com/en-us/html5/tools">Intel XDK (used for mobile emulators and mobile builds)</a></li>
+</ul>
+</p><p>
+<h3 id="software_components">Software components</h3>
+</p><p>
+<ul>
+  <li><a target="_blank" href="https://angularjs.org/">Angular (Google)</a></li>  
+  <li><a target="_blank" href="http://getbootstrap.com/">Bootstrap (Twitter)</a></li>  
+  <li><a target="_blank" href="http://nodejs.org/">Node.js</a></li>
+  <li><a target="_blank" href="http://cordova.apache.org/">Apache Cordova (native mobile applications)</a></li>
+</ul>
+</p><p>
+Part of this projects mission is to make it easy for developers/contributors to install and configure all required build/dev software. Through a series of instructions you'll be taken step by step through the process of setting everything up to the point where you have the FIM Community Client running live in your browser. Now if you edit the source code and hit Save your browser will automatically reload and show you a freshly compiled version of your copy of the FIM Community Client.
+</p>
+<h2 id="focus_on_strength">Focus on strength</h2>
+<p>
+By making it possible for anyone to easily setup an efficient development pipe line we're enabling people to focus on their strengths and their strengths only. 
+</p><p>
+The <i>right tools</i> combined with the right framework can allow for any (web) developer (Javascript, JQuery, Angular, CSS, Less, Bootsrap, HTML ...) to make valuable contributions to this project. By choosing <a target="_blank" href="https://angularjs.org/">Angular</a> as the core framework we are able to perfectly separate HTML, Code (JS) and styling (CSS). Anyone looking at that will immediately understand how that works.
+</p>
+<h2 id="getting_started">Getting started</h2>
+<p>
+The instructions to setup the development environment are written on an Ubuntu 12.04 desktop but should work on any debian distro and probably on all MaxOSX versions. The folks over at Grunt say Grunt, NodeJS and NPM should work on Windows.
+</p><p>
+Windows users should look here: <a target="_blank" href="http://gruntjs.com/frequently-asked-questions#does-grunt-work-on-windows">http://gruntjs.com/frequently-asked-questions#does-grunt-work-on-windows</a> and at the part about Windows for bower here <a target="_blank" href="https://www.npmjs.org/package/bower">https://www.npmjs.org/package/bower</a>
+</p><p>
+<h3>Clone the fimk repo</h3>
+</p><p>
+<pre><code>$ mkdir ~/git
+$ cd ~/git
+$ git clone https://github.com/fimkrypto/fimk.git</code></pre>
+</p><p>
+</p><p>
+<h3>Install nodejs and npm</h3>
+</p><p>
+<pre><code>$ sudo apt-get update
+$ sudo apt-get install nodejs
+$ sudo apt-get install npm
 </code></pre>
+</p><p>
+<h3>Install all nodejs modules in package.json</h3>
+</p><p>
+<pre><code>$ cd ~/git/fimk/fimui
+$ npm install
+</code></pre>
+</p><p>
+It could be neccesary to use sudo (sudo npm install). When you run npm and you get an error, it's almost certainly a missing dependency. Copy the error message to google and you'll see what you need to install.
+</p><p>
+<h3>Install bower components (bootstrap, angular, jquery ..)</h3>
+</p><p>
+<pre><code>$ bower install</code></pre>
+<h3>Clone bootswatch repo + install dependencies</h3>
+</p><p>
+This is an optional step if you want to work on bootstrap (the css framework) by changing the variables in <a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/styles/variables.less">https://github.com/fimkrypto/fimk/blob/master/fimui/app/styles/variables.less</a> using bootswatch you can create your own custom bootstrap version. After running bootswatch you can copy the resulting bootstrap.min.css file to the FIM Community Client directory and it will look the way you describe in variables.less.
+</p><p>
+There is a <a href="https://github.com/fimkrypto/fimk/blob/master/fimui/bootswatch.rb">ruby script</a> in the fimk repository that enables live reload for when you edit the variables.less file. It will detect that you edited that file and will kick off bootswatch to re-compile and replace the current bootstrap.min.css in your copy of the source code. You need ruby installed for this (quick and irty install: 'sudo apt-get install ruby')
+</p><p>
+<pre><code>$ cd ~/git
+$ git clone https://github.com/thomaspark/bootswatch.git
+$ cd bootswatch
+$ npm install</code></pre>
+</p>
+<h3>Compile to native app for Windows, Linux, Mac</h3>
+<p>
+You can compile the FIM Community Client into a native desktop application. It will turn the client into a standalone program instead of one that runs in a browser.
+</p><p>
+Currently the compiler script supports Windows and Linux. Mac will be added later, for Mac we'll likely create an .img that the Mac user can drag to his/her program folder.
+</p><p>
+To compile for desktop follow these steps:
+</p><p>
+<pre><code>$ cd ~/git/fimk
+$ sh compile_nodewebkit.sh</code></pre>
+</p>
+<h2 id="client_architecture">Client architecture</h2>
+<p>
+Since the client is an Angular application you can expect the architecture to match that of an Angular app. In an angular app you'll find the usual suspects like Javascript files, HTML files, stylesheets and images. Angular however dictates where these files go and more importantly what goes in them.
+</p>
+<h3 id="the_html">Where is the HTML</h3>
+<p>
+Like any web application there is the <a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/index.html">index.html</a> file. It is the starting point of the application, all scripts and stylesheets are referenced/imported through index.html. 
+</p><p>
+But if you look closer at index.html you'll notice that there is almost nothing in the <code>&lt;body&gt;</code> of that HTML file. Thats because all HTML goes in so-called partials/templates. You can find all partials in the <a target="_blank" href="https://github.com/fimkrypto/fimk/tree/master/fimui/app/partials">app/partials</a> folder.
+</p><p>
+Angular follows the MVC pattern (Model View Controller) and the partials are the view in MVC. Partials contain HTML mixed with template references that Angular will (almost) automatically replace with data from your model (normal Javascript variables), these model variables are usually defined in a Controller (registered Javascript functions).
+</p>
+<h3 id="the_javascript">Where is the Javascript</h3>
+<p>
+In the FIM Community client, for every partial/template (read for every View) there is a matching Controller. The pattern is pretty straight forward as you'll see from the table below.
+</p>
+<table>
+<tr><th>View</th><th>Controller</th></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/accounts-add-modal.html">accounts-add-modal.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/accounts-add-modal.js">accounts-add-modal.js</a></td></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/accounts.html">accounts.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/accounts.js">accounts.js</a></td></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/accounts-list.html">accounts-list.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/accounts-list.js">accounts-list.js</a></td></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/accounts-tab.html">accounts-tab.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/accounts-tab.js">accounts-tab.js</a></td></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/accounts-transactions.html">accounts-transactions.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/accounts-transactions.js">accounts-transactions.js</a></td></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/asks.html">asks.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/asks.js">asks.js</a></td></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/partials/bids.html">bids.html</a></td><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/controllers/bids.js">bids.js</a></td></tr>
+<tr><td>... (etc)</td><td></td></tr>
+</table>
+<p>
+Pretty obvious pattern right? The Javascript in the controllers is isolated from the rest of the application because they run in a closure. Controllers should not declare or reference global variables (with some exceptions) instead a controller only references the outside world through it's parameters.
+</p>
+<h3 id="dependency_injection">Dependency injection</h3>
+<p>
+Angular supports dependency injection. This means that you declare what services will be initialized and passed to your controllers. When you create a new controler Angular will look at the names of the parameters to the controller function and will inject the objects that belong to those names. Injecting is passing an argument to the controller contruction function.
+</p><p>
+There are two kinds of parameters that are injected. Those that start with $ ($scope, $http, $timeout) and those that not start with an $. The ones starting with $ are built-in services, they come with Angular. The other ones, you guessed it are not from Angular. Sometimes it are 3rd party services but it could also be our services.
+</p><p>
+After all this talk of Controllers you might wonder where you would put your generic non-controller related functions, objects and such. For this Angular provides Factories and Services, the difference is not important for now.
+</p>
+<h3 id="services">Services</h3>
+<p>
+Much of the core functionality of the FIM Community Client is defined in services. Currently there are the following services but more must be created in the future.
+</p>
+<table>
+<tr><th>Service</th><th>Description</th></tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/services/accounts-service.js">accountsService</a></td>
+<td>
+Add, remove, create accounts. Loads accounts and saves them to persistent storage.
+</td>
+</tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/services/exchange-service.js">exchangeService</a></td>
+<td>
+Defines exchange API. Stores list of registered exchange implementations.
+</td>
+</tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/services/exchange-nxtae.js">nxtAEExchange</a></td>
+<td>
+Exchange implementation for the FIM Asset Exchange.
+</td>
+</tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/services/modals.js">modals</a></td>
+<td>
+Registers modal windows, manages link between modal HTML (partial) and controller. Open and close modals.
+</td>
+</tr>
+<tr><td><a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/services/server-service.js">serverService</a></td>
+<td>
+Access point to the FIM server. Does the JSON over HTTP communication with FIM server.
+</td>
+</tr>
+</table>
+<p>
+As you can see a service starts with <code>module.factory('serverService', function ($modal, $http, $q, modals) {}</code> this tells Angular to register the service with the name 'serverService'. Now you can use that service from your controller simply by declaring a paramter named 'serverService'. As you can see in the sample Factories and Services support dependency injection to.
+</p>
+<h3 id="routing">Routing (load controllers based on location)</h3>
+<p>
+FIM Community Client uses the <a target="_blank" href="https://github.com/angular-ui/ui-router">angular-ui/ui-router</a> framework to organize it's views and how views are nested. If you check out <a target="_blank" href="https://github.com/fimkrypto/fimk/blob/master/fimui/app/scripts/config/routes.js">app/scripts/config/routes.js</a> you can see how all the views and controllers are linked together and what controller is loaded for what URL.
+</p><p>
+By using the <a target="_blank" href="https://github.com/angular-ui/ui-router">angular-ui/ui-router</a> framework we can do things like opening an outside link like 'index.html#/accounts/FIM-JWHE-EGEV-EJ87-JHE83' and make ui-router load the accounts controller and open it at account FIM-JWHE-EGEV-EJ87-JHE83. Most of this is declared in routes.js.
+</p>
+<h3 id="templates">Templates</h3>
+<p>
+If you look in the HTML files in the partials folder you'll see a lot of use of templates. With templates you can declare a reference to some part of your model. Templates not only inject text into your HTML, they can also be used to repeat a section of HTML based on some model data in an Object or Array.
+</p><p>
+In most controllers you'll see the $scope parameter, the controller uses the $scope object to declare properties on it. Now if something is a property of $scope it becomes available in your HTML. You can put values on the $scope or functions. 
+</p>
+<h2 id="start_contributing">Start contributing</h2>
+<p>
+Hopefully all of the above can get you started. If you have questions or need help please turn to the <a target="_blank" href="http://forum.fimk.fi">FIMKrypto Forum</a>. As stated before we are looking for developers, whether you want to do HTML only, work on CSS/bootstrap or get down and dirty coding controllers and services. 
+</p><p>
+This is a live project that is in it's planning stage. This page is a part of that planning.
+</p><p>
+Other step(s) in this project (not in that particular order):
+</p><p>
+<ul>
+  <li>Explain Intel XDK setup for mobile development
+    <ul>
+      <li>Live preview/emulator</li>
+      <li>App store settings (Google play, App Store etc)</li>
+      <li>Compile and test on mobile device (Android, Iphone, etc)</li>
+    </ul>
+  </li>
+  <li>Send FIM to any contact
+    <ul>
+      <li>Describe hosted service (the web app your FIM link points to)</li>
+      <li>Mobile integration (send FIM through WhatsApp/Facebook/SMS) using cordova</li>
+      <li>Create Angular services (creates the link)</li>
+    </ul>
+  </li>
+  <li>Switch persistence layer to <a target="_blank" href="http://www.w3.org/TR/IndexedDB/">Indexed DB</a></li>
+  <li>Translate NXT javascript code to Angular services</li>
+  <li>Introduce theme switcher (switch between pre-built bootstrap versions from the UI)</li>
+  <li>Explain installer options for desktop versions (NSIS, apple img)</li>
+  <li>Many more services, controllers, views
+    <ul>
+      <li>Encrypted Messaging (blockchain based and p2p)</li>
+      <li>Software update</li>
+      <li>Fork detection</li>
+      <li>Peer/connections explorer</li>
+      <li>Block explorer</li>
+    </ul>
+  </li>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+</ul>
+</p>
+<br/>
+<center><strong>To be continued ..</strong></center>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<h2 id="external_links">External Links</h2>
+<hr/>
+<ul>
+<li><a target="_blank" href="http://fimk.fi">http://fimk.fi</a></li>
+<li><a target="_blank" href="http://forum.fimk.fi">http://forum.fimk.fi</a></li>
+<li><a target="_blank" href="https://github.com/fimkrypto/fimk">https://github.com/fimkrypto/fimk</a></li>
+<li><a target="_blank" href="https://bitcointalk.org/index.php?topic=633304.0">Bitcointalk FIMKrypto</a></li>
+<li><a target="_blank" href="https://angularjs.org/">https://angularjs.org/</a></li>
+<li><a target="_blank" href="http://campus.codeschool.com/courses/shaping-up-with-angular-js/intro">Excellent interactive Angular tutorial (with a catchy song)</a></li>
+</ul>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
       </section>
 
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+
+
   </body>
 </html>
