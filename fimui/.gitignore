@@ -3,5 +3,5 @@ dist
 .tmp
 .sass-cache
 .zip
-app.dgex.base
 deploy.rb
+app/bower_components
