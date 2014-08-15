@@ -116,8 +116,8 @@ public abstract class TransactionType {
                 switch (subtype) {
                     case SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING:
 
-                        /* XXX - Disable Effective Balance Leasing */    
-                        return null; // AccountControl.EFFECTIVE_BALANCE_LEASING;
+                        /* XXX - Enable Effective Balance Leasing */    
+                        return AccountControl.EFFECTIVE_BALANCE_LEASING;
                     default:
                         return null;
                 }

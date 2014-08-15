@@ -5,7 +5,7 @@ import java.util.TimeZone;
 
 public final class Constants {
   
-    public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
+    public static final boolean isTestnet = true; /* Nxt.getBooleanProperty("nxt.isTestnet"); */
   
     public static final long ONE_NXT = 100000000;
     

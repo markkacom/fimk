@@ -286,14 +286,13 @@ public final class Account {
 
     }
 
-    /* XXX - Disable account leasing */
+    /* XXX - Enable account leasing */
     private long getLessorsGuaranteedBalanceNQT() {
-        // long lessorsGuaranteedBalanceNQT = 0;
-        // for (Long accountId : lessorIds) {
-        //     lessorsGuaranteedBalanceNQT += Account.getAccount(accountId).getGuaranteedBalanceNQT(1440);
-        // }
-        // return lessorsGuaranteedBalanceNQT;
-        return 0;
+       long lessorsGuaranteedBalanceNQT = 0;
+       for (Long accountId : lessorIds) {
+           lessorsGuaranteedBalanceNQT += Account.getAccount(accountId).getGuaranteedBalanceNQT(1440);
+       }
+       return lessorsGuaranteedBalanceNQT;
     }
 
     public synchronized long getGuaranteedBalanceNQT(final int numberOfConfirmations) {

@@ -23,7 +23,7 @@ public final class LeaseBalance extends CreateTransaction {
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
       
-      /* XXX - Effective Balance Leasing Disabled in APIServlet.java */    
+      /* XXX - Effective Balance Leasing Enabled in APIServlet.java */    
       String periodString = Convert.emptyToNull(req.getParameter("period"));
       if (periodString == null) {
           return MISSING_PERIOD;

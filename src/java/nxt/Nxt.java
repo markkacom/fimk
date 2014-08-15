@@ -23,7 +23,7 @@ public final class Nxt {
 
     private static final Properties defaultProperties = new Properties();
     static {
-        System.out.println("Initializing FIM server version " + Nxt.VERSION + " (based on NXT " + VERSION + ")");
+        System.out.println("Initializing FIM server version " + Nxt.VERSION + " (based on NXT " + NXT_VERSION + ")");
         try (InputStream is = ClassLoader.getSystemResourceAsStream("nxt-default.properties")) {
             if (is != null) {
                 Nxt.defaultProperties.load(is);
