@@ -1,0 +1,10 @@
+ <div class="panel panel-default">
+  <div class="panel-body no-padding" style="overflow:auto">
+    <div class="list-group">
+      <a class="list-group-item" ui-sref="exchange({ base: pair.base.symbol, quote: pair.quote.symbol })" class="list-group-item active" ng-class="{ active: (pair == selectedPair) }" ng-repeat="pair in pairs">
+        <!--<span class="badge"><span class="glyphicon glyphicon-arrow-up"></span>&nbsp;14</span>-->
+        {{pair.base.symbol + '/' + pair.quote.symbol}}
+      </a>
+    </div>
+  </div>
+</div>

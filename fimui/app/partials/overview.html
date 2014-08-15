@@ -1,0 +1,27 @@
+ <div class="panel panel-default">
+  <div class="panel-body">
+    <div ng-show="currentUser != null">
+      <tabset justified="true">
+        <tab heading="Holdings">
+          <table class="table table-hover">
+            <thead>
+              <tr><th>Asset</th><th>Balance</th><th>Estimated Value</th><th>Withdraw</th></tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="b in balances">
+                <td>{{b.asset}}</td>
+                <td>{{b.balance}}</td>
+                <td>{{b.value}}</td>
+                <td><a href class="btn btn-success btn-sm">withdraw</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </tab>
+        <tab heading="Orders">Pending orderd</tab>
+        <tab heading="History">Some histroy for you</tab>
+        <tab heading="Referals">What up referals</tab>
+      </tabset>
+    </div>
+  </div>
+</div>
+

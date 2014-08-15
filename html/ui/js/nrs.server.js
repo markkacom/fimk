@@ -186,7 +186,7 @@ var NRS = (function(NRS, $, undefined) {
 		} else {
 			var ajaxCall = $.ajax;
 		}
-
+		
 		//workaround for 1 specific case.. ugly
 		if (data.querystring) {
 			data = data.querystring;
@@ -208,6 +208,14 @@ var NRS = (function(NRS, $, undefined) {
 			if (NRS.console) {
 				NRS.addToConsole(this.url, this.type, this.data, response);
 			}
+
+      /* XXX - Update the forging timer */
+      if (requestType == "startForging") {
+        NRS.fim.setForgingDeadline(parseInt(String(response["deadline"])));          
+      }
+      else if (requestType == "stopForging") {
+        NRS.fim.setForgingDeadline(null);          
+      }
 
 			if (typeof data == "object" && "recipient" in data) {
 				if (/^FIM\-/i.test(data.recipient)) { /* XXX - Rename address from NXT to FIM */
@@ -286,6 +294,11 @@ var NRS = (function(NRS, $, undefined) {
 			if (NRS.console) {
 				NRS.addToConsole(this.url, this.type, this.data, error, true);
 			}
+
+      /* XXX - Update the forging timer */
+      if (requestType == "startForging" || requestType == "stopForging") {
+        NRS.fim.setForgingDeadline(null);          
+      }
 
 			if ((error == "error" || textStatus == "error") && (xhr.status == 404 || xhr.status == 0)) {
 				if (type == "POST") {

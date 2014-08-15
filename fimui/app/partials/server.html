@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-md-3 col-100">
+    <div class="panel panel-default" ng-show="isNodeJS">
+      <div class="panel-heading">Settings</div>      
+      <div class="panel-body no-padding">
+        <div class="list-group">
+          <li class="list-group-item" ng-show="serverRunning == false">
+            <button ng-click="serverService.startServer()" class="btn btn-primary btn-block">Start Server</button>
+          </li>
+          <li class="list-group-item" ng-show="serverRunning == true">
+            <button ng-click="serverService.stopServer()" class="btn btn-danger btn-block">Stop Server</button>
+          </li>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9 col-100">
+    <div class="panel panel-default" ng-show="isNodeJS">
+      <div class="panel-heading">Console</div>      
+      <div class="panel-body" style="overflow: auto">
+        <p ng-repeat="message in messages"><code>{{message}}</code></p>
+      </div>
+    </div>
+  </div>  
+</div>

@@ -1,0 +1,15 @@
+{
+  "name": "fimkrypto",
+  "description": "FIMK Community Client | desktop version",
+  "version": "0.0.1",
+  "main": "index.html",
+  "window": {
+    "toolbar": false,
+    "position": "center",
+    "title": "FIMK Community Client",
+    "width": 800,
+    "height": 600,
+    "min-width": 800,
+    "min-height": 600    
+  }
+}

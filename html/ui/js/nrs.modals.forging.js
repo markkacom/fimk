@@ -7,10 +7,18 @@ var NRS = (function(NRS, $, undefined) {
 		if ("deadline" in response) {
 			$("#forging_indicator").addClass("forging");
 			$("#forging_indicator span").html("Forging");
+			if (NRS.isForging) {
+        $.growl("Forging refreshed successfully.", {
+          type: "success"
+        });			  
+			}
+			else {
+        $.growl("Forging started successfully.", {
+          type: "success"
+        });			  
+			}			
 			NRS.isForging = true;
-			$.growl("Forging started successfully.", {
-				type: "success"
-			});
+
 		} else {
 			NRS.isForging = false;
 			$.growl("Couldn't start forging, unknown error.", {
@@ -69,7 +77,7 @@ var NRS = (function(NRS, $, undefined) {
 		} else if ($(this).hasClass("forging")) {
 			$("#stop_forging_modal").modal("show");
 		} else {
-			$("#start_forging_modal").modal("show");
+       $("#start_forging_modal").modal("show");
 		}
 	});
 

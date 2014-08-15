@@ -464,7 +464,7 @@ var NRS = (function(NRS, $, undefined) {
 
 	NRS.convertToQNT = function(quantity, decimals) {
 		quantity = String(quantity);
-
+		
 		var parts = quantity.split(".");
 
 		var qnt = parts[0];
