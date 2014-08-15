@@ -11,12 +11,11 @@ jar cf fim.jar -C classes . || exit 1
 
 echo "fim.jar generated successfully"
 
-# Without FIM Community Client
+cd fimui && grunt build
+cd ..
 
-#cd fimui && grunt build
-#cd ..
-#/bin/rm -r html/ui/beta
-#mkdir html/ui/beta/ && cp -r fimui/dist/* html/ui/beta/
+/bin/rm -r html/ui/beta
+mkdir html/ui/beta/ && cp -r fimui/dist/* html/ui/beta/
 
 /bin/rm -f fim.zip
 zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar MIT-license.txt README.txt run.bat run.sh
