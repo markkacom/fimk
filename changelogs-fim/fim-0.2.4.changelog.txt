@@ -1,7 +1,10 @@
 FIMK 0.2.4 is based on NXT 1.1.6.
 
-This release will run on test-net only. To prevent any bugs in this version 
-from messing up the main-net, the nxt.isTestNet property will not work.
+This release will run on test-net only. 
+
+To prevent any bugs in this version from messing up the main-net, nxt.isTestNet 
+property in nxt-default.properties will not work.
+
 Test net is enabled at the source code level. 
 
 * Upgrade to use NXT 1.1.6
