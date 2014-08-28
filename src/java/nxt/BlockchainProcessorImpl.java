@@ -652,9 +652,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     }
 
     int getBlockVersion(int previousBlockHeight) {
-        return previousBlockHeight < Constants.TRANSPARENT_FORGING_BLOCK ? 1
-                : previousBlockHeight < Constants.NQT_BLOCK ? 2
-                : 3;
+        return 3;
     }
 
     boolean generateBlock(String secretPhrase, int blockTimestamp) {

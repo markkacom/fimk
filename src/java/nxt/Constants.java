@@ -66,6 +66,7 @@ public final class Constants {
     public static final long MIN_HUB_EFFECTIVE_BALANCE = 100000;
     
     public static final int SECOND_BIRTH_BLOCK = 1;
+    public static final int THIRD_BIRTH_BLOCK_TEST = 19214;
 
     //public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
     public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
@@ -78,10 +79,10 @@ public final class Constants {
     public static final int TRANSPARENT_FORGING_BLOCK_4 = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK_5 = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK_6 = SECOND_BIRTH_BLOCK;
-    public static final int TRANSPARENT_FORGING_BLOCK_7 = isTestnet ? Integer.MAX_VALUE : Integer.MAX_VALUE;     /* XXX - Disable HUB_ANNOUNCEMENT for now */
-    public static final int TRANSPARENT_FORGING_BLOCK_8 = isTestnet ? Integer.MAX_VALUE : Integer.MAX_VALUE;
+    public static final int TRANSPARENT_FORGING_BLOCK_7 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;     /* XXX - Disable HUB_ANNOUNCEMENT for now */
+    public static final int TRANSPARENT_FORGING_BLOCK_8 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
 
-    public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? Integer.MAX_VALUE : Integer.MAX_VALUE;
+    public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
     
     public static final int NQT_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int FRACTIONAL_BLOCK = SECOND_BIRTH_BLOCK;
@@ -92,10 +93,10 @@ public final class Constants {
     public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP = 0;
     
     /* XXX - Disable VOTING for now */
-    public static final int VOTING_SYSTEM_BLOCK = Integer.MAX_VALUE;
+    public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
     
     /* XXX - Disable Digital Goods Store for now */
-    public static final int DIGITAL_GOODS_STORE_BLOCK = Integer.MAX_VALUE;
+    public static final int DIGITAL_GOODS_STORE_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
 
     /* XXX - Make UNCONFIRMED_POOL_DEPOSIT_NQT same on testnet as main net */
     public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;

@@ -64,11 +64,11 @@ var NRS = (function(NRS, $, undefined) {
 
 		$.each($inputFields, function() {
 			if ($(this).hasClass("noMask")) {
-				$(this).mask("NXT-****-****-****-*****", {
+				$(this).mask("FIM-****-****-****-*****", {
 					"noMask": true
 				}).removeClass("noMask");
 			} else {
-				$(this).mask("NXT-****-****-****-*****");
+				$(this).mask("FIM-****-****-****-*****");
 			}
 		});
 
@@ -153,7 +153,7 @@ var NRS = (function(NRS, $, undefined) {
 				defaultFee = 1;
 			}
 
-			$(this).find(".advanced_fee").html(NRS.formatAmount(NRS.convertToNQT(defaultFee)) + " NXT");
+			$(this).find(".advanced_fee").html(NRS.formatAmount(NRS.convertToNQT(defaultFee)) + " FIM");
 		}
 
 		NRS.showedFormWarning = false;
@@ -189,7 +189,7 @@ var NRS = (function(NRS, $, undefined) {
 		var $feeInfo = $modal.find(".advanced_fee");
 
 		if ($feeInfo.length) {
-			$feeInfo.html(NRS.formatAmount(NRS.convertToNQT($(this).val())) + " NXT");
+			$feeInfo.html(NRS.formatAmount(NRS.convertToNQT($(this).val())) + " FIM");
 		}
 	});
 

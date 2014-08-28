@@ -67,7 +67,7 @@ var NRS = (function(NRS, $, undefined) {
 						}
 					}
 				});
-			} else {
+			} /* else {
 				//user uses an old version which does not supply the platform / version
 				var noticeDate = new Date(2014, 8, 20);
 
@@ -80,7 +80,7 @@ var NRS = (function(NRS, $, undefined) {
 						"link": downloadUrl
 					})).show();
 				}
-			}
+			} */
 		}
 	}
 
