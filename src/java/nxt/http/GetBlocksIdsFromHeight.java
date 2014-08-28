@@ -16,7 +16,7 @@ public final class GetBlocksIdsFromHeight extends APIServlet.APIRequestHandler {
     static final GetBlocksIdsFromHeight instance = new GetBlocksIdsFromHeight();
 
     private GetBlocksIdsFromHeight() {
-    super("fromHeight", "toHeight");
+      super(new APITag[] {APITag.BLOCKS}, "fromHeight", "toHeight");
     }
 
     @Override

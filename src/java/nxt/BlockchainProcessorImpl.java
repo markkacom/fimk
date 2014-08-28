@@ -445,7 +445,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
             /* XXX - Genesis block amount is Genesis.TOTAL_GENESIS_AMOUNT_NQT */
             BlockImpl genesisBlock = new BlockImpl(-1, 0, null, Genesis.TOTAL_GENESIS_AMOUNT_NQT /*Constants.MAX_BALANCE_NQT*/, 0, transactionsMap.size() * 128, digest.digest(),
-
+                Genesis.CREATOR_PUBLIC_KEY, new byte[64], Genesis.GENESIS_BLOCK_SIGNATURE, null, new ArrayList<>(transactionsMap.values()));
             genesisBlock.setPrevious(null);
 
             addBlock(genesisBlock);
