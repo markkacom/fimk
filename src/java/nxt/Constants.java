@@ -16,7 +16,7 @@ public final class Constants {
     
     /* XXX - max transactions is 512 */
     public static final int MAX_NUMBER_OF_TRANSACTIONS = 512;
-    public static final int MAX_PAYLOAD_LENGTH = MAX_NUMBER_OF_TRANSACTIONS * 160;
+    public static final int MAX_PAYLOAD_LENGTH = MAX_NUMBER_OF_TRANSACTIONS * 176;
     
     /* XXX - number of seconds between blocks */
     public static final int SECONDS_BETWEEN_BLOCKS = 30;
@@ -38,6 +38,7 @@ public final class Constants {
     public static final int MAX_ALIAS_LENGTH = 100;
 
     public static final int MAX_ARBITRARY_MESSAGE_LENGTH = 1000;
+    public static final int MAX_ENCRYPTED_MESSAGE_LENGTH = 1000;
 
     public static final int MAX_ACCOUNT_NAME_LENGTH = 100;
     public static final int MAX_ACCOUNT_DESCRIPTION_LENGTH = 1000;
@@ -54,18 +55,20 @@ public final class Constants {
     public static final int MAX_POLL_OPTION_LENGTH = 100;
     public static final int MAX_POLL_OPTION_COUNT = 100;
 
-    public static final int MAX_DIGITAL_GOODS_QUANTITY = 1000000000;
-    public static final int MAX_DIGITAL_GOODS_LISTING_NAME_LENGTH = 100;
-    public static final int MAX_DIGITAL_GOODS_LISTING_DESCRIPTION_LENGTH = 1000;
-    public static final int MAX_DIGITAL_GOODS_LISTING_TAGS_LENGTH = 100;
-    public static final int MAX_DIGITAL_GOODS_NOTE_LENGTH = 1000;
-    public static final int MAX_DIGITAL_GOODS_LENGTH = 1000;
+    public static final int MAX_DGS_LISTING_QUANTITY = 1000000000;
+    public static final int MAX_DGS_LISTING_NAME_LENGTH = 100;
+    public static final int MAX_DGS_LISTING_DESCRIPTION_LENGTH = 1000;
+    public static final int MAX_DGS_LISTING_TAGS_LENGTH = 100;
+    public static final int MAX_DGS_GOODS_LENGTH = 10240;
 
     public static final int MAX_HUB_ANNOUNCEMENT_URIS = 100;
     public static final int MAX_HUB_ANNOUNCEMENT_URI_LENGTH = 1000;
     public static final long MIN_HUB_EFFECTIVE_BALANCE = 100000;
     
     public static final int SECOND_BIRTH_BLOCK = 1;
+
+    public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
+    public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
 
     public static final int ALIAS_SYSTEM_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK = SECOND_BIRTH_BLOCK;
@@ -75,9 +78,10 @@ public final class Constants {
     public static final int TRANSPARENT_FORGING_BLOCK_4 = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK_5 = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK_6 = SECOND_BIRTH_BLOCK;
-    
-    /* XXX - Disable HUB_ANNOUNCEMENT for now */
-    public static final int TRANSPARENT_FORGING_BLOCK_7 = Integer.MAX_VALUE;
+    public static final int TRANSPARENT_FORGING_BLOCK_7 = isTestnet ? Integer.MAX_VALUE : Integer.MAX_VALUE;     /* XXX - Disable HUB_ANNOUNCEMENT for now */
+    public static final int TRANSPARENT_FORGING_BLOCK_8 = isTestnet ? Integer.MAX_VALUE : Integer.MAX_VALUE;
+
+    public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? Integer.MAX_VALUE : Integer.MAX_VALUE;
     
     public static final int NQT_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int FRACTIONAL_BLOCK = SECOND_BIRTH_BLOCK;
@@ -113,6 +117,12 @@ public final class Constants {
     }
 
     public static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+    public static final int EC_RULE_TERMINATOR = 600; /* cfb: This constant defines a straight edge when "longest chain"
+                                                        rule is outweighed by "economic majority" rule; the terminator
+                                                        is set as number of seconds before the current time. */
+
+    public static final int EC_BLOCK_DISTANCE_LIMIT = 60;
 
     private Constants() {} // never
 

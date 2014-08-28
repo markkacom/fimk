@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 
 final class DbVersion {
 
@@ -45,9 +44,9 @@ final class DbVersion {
                     Logger.logDebugMessage("Will apply sql:\n" + sql);
                     stmt.executeUpdate(sql);
                 }
-                stmt.executeUpdate("UPDATE version SET next_update = (SELECT next_update + 1 FROM version)");
+                stmt.executeUpdate("UPDATE version SET next_update = next_update + 1");
                 con.commit();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 con.rollback();
                 throw e;
             }
@@ -103,7 +102,7 @@ final class DbVersion {
             case 16:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS block_timestamp INT");
             case 17:
-                apply("UPDATE transaction SET block_timestamp = (SELECT timestamp FROM block WHERE block.id = transaction.block_id)");
+                apply(null);
             case 18:
                 apply("ALTER TABLE transaction ALTER COLUMN block_timestamp SET NOT NULL");
             case 19:
@@ -125,13 +124,13 @@ final class DbVersion {
             case 27:
                 apply("ALTER TABLE transaction ALTER COLUMN fee BIGINT");
             case 28:
-                apply("UPDATE block SET total_amount = total_amount * " + Constants.ONE_NXT + " WHERE height <= " + Constants.NQT_BLOCK);
+                apply(null);
             case 29:
-                apply("UPDATE block SET total_fee = total_fee * " + Constants.ONE_NXT + " WHERE height <= " + Constants.NQT_BLOCK);
+                apply(null);
             case 30:
-                apply("UPDATE transaction SET amount = amount * " + Constants.ONE_NXT + " WHERE height <= " + Constants.NQT_BLOCK);
+                apply(null);
             case 31:
-                apply("UPDATE transaction SET fee = fee * " + Constants.ONE_NXT + " WHERE height <= " + Constants.NQT_BLOCK);
+                apply(null);
             case 32:
                 apply(null);
             case 33:
@@ -152,49 +151,28 @@ final class DbVersion {
                         "('107.170.123.54'), ('107.170.138.55'), ('107.170.149.231'), ('107.170.156.218'), " +
                         "('5.101.102.199'), ('5.101.102.200'), ('5.101.102.201'), ('5.101.102.202')");
                 } else {
-                    //apply("INSERT INTO peer (address) VALUES " + "('1.1.1.1')");
+                    apply("INSERT INTO peer (address) VALUES " + "('178.62.176.45'), ('178.62.176.46')");
                 }
             case 38:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS full_hash BINARY(32)");
             case 39:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS referenced_transaction_full_hash BINARY(32)");
             case 40:
-                BlockDb.deleteAll();
                 apply(null);
             case 41:
                 apply("ALTER TABLE transaction ALTER COLUMN full_hash SET NOT NULL");
             case 42:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS transaction_full_hash_idx ON transaction (full_hash)");
             case 43:
-                apply("UPDATE transaction a SET a.referenced_transaction_full_hash = "
-                        + "(SELECT full_hash FROM transaction b WHERE b.id = a.referenced_transaction_id)");
+                apply(null);
             case 44:
                 apply(null);
             case 45:
-                BlockchainProcessorImpl.getInstance().validateAtNextScan();
                 apply(null);
             case 46:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS attachment_bytes VARBINARY");
             case 47:
-                try (Connection con = Db.getConnection();
-                     PreparedStatement pstmt = con.prepareStatement("UPDATE transaction SET attachment_bytes = ? where db_id = ?");
-                     Statement stmt = con.createStatement()) {
-                    ResultSet rs = stmt.executeQuery("SELECT * FROM transaction");
-                    while (rs.next()) {
-                        long dbId = rs.getLong("db_id");
-                        Attachment attachment = (Attachment)rs.getObject("attachment");
-                        if (attachment != null) {
-                            pstmt.setBytes(1, attachment.getBytes());
-                        } else {
-                            pstmt.setNull(1, Types.VARBINARY);
-                        }
-                        pstmt.setLong(2, dbId);
-                        pstmt.executeUpdate();
-                    }
-                    con.commit();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e.toString(), e);
-                }
+                BlockDb.deleteAll();
                 apply(null);
             case 48:
                 apply("ALTER TABLE transaction DROP COLUMN attachment");
@@ -207,6 +185,68 @@ final class DbVersion {
             case 51:
                 apply("ALTER TABLE transaction DROP COLUMN hash");
             case 52:
+                if (Constants.isTestnet) {
+                    BlockchainProcessorImpl.getInstance().validateAtNextScan();
+                }
+                apply(null);
+            case 53:
+                apply("DROP INDEX transaction_recipient_id_idx");
+            case 54:
+                apply("ALTER TABLE transaction ALTER COLUMN recipient_id SET NULL");
+            case 55:
+                try (Connection con = Db.getConnection();
+                     Statement stmt = con.createStatement();
+                     PreparedStatement pstmt = con.prepareStatement("UPDATE transaction SET recipient_id = null WHERE type = ? AND subtype = ?")) {
+                    try {
+                        for (byte type = 0; type <= 4; type++) {
+                            for (byte subtype = 0; subtype <= 8; subtype++) {
+                                TransactionType transactionType = TransactionType.findTransactionType(type, subtype);
+                                if (transactionType == null) {
+                                    continue;
+                                }
+                                if (!transactionType.hasRecipient()) {
+                                    pstmt.setByte(1, type);
+                                    pstmt.setByte(2, subtype);
+                                    pstmt.executeUpdate();
+                                }
+                            }
+                        }
+                        stmt.executeUpdate("UPDATE version SET next_update = next_update + 1");
+                        con.commit();
+                    } catch (SQLException e) {
+                        con.rollback();
+                        throw e;
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            case 56:
+                apply("CREATE INDEX IF NOT EXISTS transaction_recipient_id_idx ON transaction (recipient_id)");
+            case 57:
+                apply("DROP INDEX transaction_timestamp_idx");
+            case 58:
+                apply("CREATE INDEX IF NOT EXISTS transaction_timestamp_idx ON transaction (timestamp DESC)");
+            case 59:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS version TINYINT");
+            case 60:
+                apply("UPDATE transaction SET version = 0");
+            case 61:
+                apply("ALTER TABLE transaction ALTER COLUMN version SET NOT NULL");
+            case 62:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS has_message BOOLEAN NOT NULL DEFAULT FALSE");
+            case 63:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS has_encrypted_message BOOLEAN NOT NULL DEFAULT FALSE");
+            case 64:
+                apply("UPDATE transaction SET has_message = TRUE WHERE type = 1 AND subtype = 0");
+            case 65:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS has_public_key_announcement BOOLEAN NOT NULL DEFAULT FALSE");
+            case 66:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS ec_block_height INT DEFAULT NULL");
+            case 67:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS ec_block_id BIGINT DEFAULT NULL");
+            case 68:
+                apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS has_encrypttoself_message BOOLEAN NOT NULL DEFAULT FALSE");
+            case 69:
                 return;
             default:
                 throw new RuntimeException("Database inconsistent with code, probably trying to run older code on newer database");

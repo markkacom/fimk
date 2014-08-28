@@ -1,5 +1,11 @@
 package nxt;
 
+import nxt.crypto.Crypto;
+import nxt.util.Convert;
+import nxt.util.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -8,13 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import nxt.crypto.Crypto;
-import nxt.util.Convert;
-import nxt.util.Logger;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 final class BlockImpl implements Block {
 
@@ -49,16 +50,16 @@ final class BlockImpl implements Block {
         if (timestamp == 0) {
             if (transactions.size() > Genesis.GENESIS_RECIPIENTS.length) {
                 // really stupid check but it shows what we're doing
-                throw new NxtException.ValidationException("attempted to create GENESIS block with " + transactions.size() + " transactions");
+                throw new NxtException.NotValidException("attempted to create GENESIS block with " + transactions.size() + " transactions");
             }
         }
         else {
             if (transactions.size() > Constants.MAX_NUMBER_OF_TRANSACTIONS) {
-                throw new NxtException.ValidationException("attempted to create a block with " + transactions.size() + " transactions");
+                throw new NxtException.NotValidException("attempted to create a block with " + transactions.size() + " transactions");
             }
-      
-        if (payloadLength > Constants.MAX_PAYLOAD_LENGTH || payloadLength < 0) {
-                throw new NxtException.ValidationException("attempted to create a block with payloadLength " + payloadLength);
+
+            if (payloadLength > Constants.MAX_PAYLOAD_LENGTH || payloadLength < 0) {
+                throw new NxtException.NotValidException("attempted to create a block with payloadLength " + payloadLength);
             }
         }
 
@@ -79,7 +80,7 @@ final class BlockImpl implements Block {
         Long previousId = Long.MIN_VALUE;
         for (Transaction transaction : this.blockTransactions) {
             if (transaction.getId() < previousId) {
-                throw new NxtException.ValidationException("Block transactions are not sorted!");
+                throw new NxtException.NotValidException("Block transactions are not sorted!");
             }
             transactionIds.add(transaction.getId());
             previousId = transaction.getId();
@@ -103,7 +104,7 @@ final class BlockImpl implements Block {
         
         /* XXX do not allow transactions before SECOND_BIRTH_BLOCK */
         if (height != 0 && height <= Constants.SECOND_BIRTH_BLOCK && ! this.blockTransactions.isEmpty() ) {
-            throw new NxtException.ValidationException("Attempted to create a block with transactions before SECOND_BIRTH_BLOCK");
+            throw new NxtException.NotValidException("Attempted to create a block with transactions before SECOND_BIRTH_BLOCK");
         }
     }
 
@@ -262,8 +263,31 @@ final class BlockImpl implements Block {
         return json;
     }
 
-    byte[] getBytes() {
+    static BlockImpl parseBlock(JSONObject blockData) throws NxtException.ValidationException {
+        int version = ((Long)blockData.get("version")).intValue();
+        int timestamp = ((Long)blockData.get("timestamp")).intValue();
+        Long previousBlock = Convert.parseUnsignedLong((String) blockData.get("previousBlock"));
+        long totalAmountNQT = Convert.parseLong(blockData.get("totalAmountNQT"));
+        long totalFeeNQT = Convert.parseLong(blockData.get("totalFeeNQT"));
+        int payloadLength = ((Long)blockData.get("payloadLength")).intValue();
+        byte[] payloadHash = Convert.parseHexString((String) blockData.get("payloadHash"));
+        byte[] generatorPublicKey = Convert.parseHexString((String) blockData.get("generatorPublicKey"));
+        byte[] generationSignature = Convert.parseHexString((String) blockData.get("generationSignature"));
+        byte[] blockSignature = Convert.parseHexString((String) blockData.get("blockSignature"));
+        byte[] previousBlockHash = version == 1 ? null : Convert.parseHexString((String) blockData.get("previousBlockHash"));
+        SortedMap<Long, TransactionImpl> blockTransactions = new TreeMap<>();
+        JSONArray transactionsData = (JSONArray)blockData.get("transactions");
+        for (Object transactionData : transactionsData) {
+            TransactionImpl transaction = TransactionImpl.parseTransaction((JSONObject) transactionData);
+            if (blockTransactions.put(transaction.getId(), transaction) != null) {
+                throw new NxtException.NotValidException("Block contains duplicate transactions: " + transaction.getStringId());
+            }
+        }
+        return new BlockImpl(version, timestamp, previousBlock, totalAmountNQT, totalFeeNQT, payloadLength, payloadHash, generatorPublicKey,
+                generationSignature, blockSignature, previousBlockHash, new ArrayList<>(blockTransactions.values()));
+    }
 
+    byte[] getBytes() {
         ByteBuffer buffer = ByteBuffer.allocate(4 + 4 + 8 + 4 + (version < 3 ? (4 + 4) : (8 + 8)) + 4 + 32 + 32 + (32 + 32) + 64);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
         buffer.putInt(version);
@@ -333,11 +357,6 @@ final class BlockImpl implements Block {
                 return false;
             }
 
-            int elapsedTime = timestamp - previousBlock.timestamp;
-            BigInteger target = BigInteger.valueOf(Nxt.getBlockchain().getLastBlock().getBaseTarget())
-                    .multiply(BigInteger.valueOf(effectiveBalance))
-                    .multiply(BigInteger.valueOf(elapsedTime));
-
             MessageDigest digest = Crypto.sha256();
             byte[] generationSignatureHash;
             if (version == 1) {
@@ -352,7 +371,7 @@ final class BlockImpl implements Block {
 
             BigInteger hit = new BigInteger(1, new byte[] {generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
 
-            return hit.compareTo(target) < 0;
+            return Generator.verifyHit(hit, effectiveBalance, previousBlock, timestamp);
 
         } catch (RuntimeException e) {
 

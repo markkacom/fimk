@@ -18,10 +18,12 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
-import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
+import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.Collections;
@@ -74,17 +76,22 @@ public final class API {
             connector.setPort(port);
             connector.setHost(host);
             connector.setIdleTimeout(Nxt.getIntProperty("nxt.apiServerIdleTimeout"));
+            connector.setReuseAddress(true);
             apiServer.addConnector(connector);
 
             HandlerList apiHandlers = new HandlerList();
 
+            ServletContextHandler apiHandler = new ServletContextHandler();
             String apiResourceBase = Nxt.getStringProperty("nxt.apiResourceBase");
             if (apiResourceBase != null) {
-                ResourceHandler apiFileHandler = new ResourceHandler();
-                apiFileHandler.setDirectoriesListed(true);
-                apiFileHandler.setWelcomeFiles(new String[]{"index.html"});
-                apiFileHandler.setResourceBase(apiResourceBase);
-                apiHandlers.addHandler(apiFileHandler);
+                ServletHolder defaultServletHolder = new ServletHolder(new DefaultServlet());
+                defaultServletHolder.setInitParameter("dirAllowed", "false");
+                defaultServletHolder.setInitParameter("resourceBase", apiResourceBase);
+                defaultServletHolder.setInitParameter("welcomeServlets", "true");
+                defaultServletHolder.setInitParameter("redirectWelcome", "true");
+                defaultServletHolder.setInitParameter("gzip", "true");
+                apiHandler.addServlet(defaultServletHolder, "/*");
+                apiHandler.setWelcomeFiles(new String[]{"index.html"});
             }
 
             String javadocResourceBase = Nxt.getStringProperty("nxt.javadocResourceBase");
@@ -98,12 +105,17 @@ public final class API {
                 apiHandlers.addHandler(contextHandler);
             }
 
-            ServletHandler apiHandler = new ServletHandler();
-            apiHandler.addServletWithMapping(APIServlet.class, "/nxt");
-            apiHandler.addServletWithMapping(APITestServlet.class, "/test");
+            apiHandler.addServlet(APIServlet.class, "/nxt");
+            if (Nxt.getBooleanProperty("nxt.enableAPIServerGZIPFilter")) {
+                FilterHolder gzipFilterHolder = apiHandler.addFilter(GzipFilter.class, "/nxt", null);
+                gzipFilterHolder.setInitParameter("methods", "GET,POST");
+                gzipFilterHolder.setAsyncSupported(true);
+            }
+
+            apiHandler.addServlet(APITestServlet.class, "/test");
 
             if (Nxt.getBooleanProperty("nxt.apiServerCORS")) {
-                FilterHolder filterHolder = apiHandler.addFilterWithMapping(CrossOriginFilter.class, "/*", FilterMapping.DEFAULT);
+                FilterHolder filterHolder = apiHandler.addFilter(CrossOriginFilter.class, "/*", null);
                 filterHolder.setInitParameter("allowedHeaders", "*");
                 filterHolder.setAsyncSupported(true);
             }
@@ -140,7 +152,7 @@ public final class API {
                     }
 
                 }
-            });
+            }, true);
 
         } else {
             apiServer = null;

@@ -1,3 +1,7 @@
+/**
+ * @depends {nrs.js}
+ * @depends {nrs.modals.js}
+ */
 var NRS = (function(NRS, $, undefined) {
 	
 	/* XXX - Show account info editor only if enough funds */
@@ -21,7 +25,7 @@ var NRS = (function(NRS, $, undefined) {
 		if (name) {
 			$("#account_name").html(name.escapeHTML());
 		} else {
-			$("#account_name").html("No name set");
+			$("#account_name").html($.t("no_name_set"));
 		}
 	}
 

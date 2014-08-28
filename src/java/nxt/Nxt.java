@@ -1,5 +1,11 @@
 package nxt;
 
+import nxt.http.API;
+import nxt.peer.Peers;
+import nxt.user.Users;
+import nxt.util.Logger;
+import nxt.util.ThreadPool;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,15 +14,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import nxt.http.API;
-import nxt.peer.Peers;
-import nxt.user.Users;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
-
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.1.6";
+    public static final String NXT_VERSION = "1.2.6";
+    public static final String APPLICATION = "FIM";
     
     /* XXX - This tracks the FIM version */
     public static final String VERSION = "0.2.4";
@@ -164,8 +165,7 @@ public final class Nxt {
         static {
 
             long startTime = System.currentTimeMillis();
-
-            Logger.logMessage("logging enabled");
+            Logger.init();
             Db.init();
             BlockchainProcessorImpl.getInstance();
             TransactionProcessorImpl.getInstance();
