@@ -93,6 +93,12 @@ var NRS = (function(NRS, $, undefined) {
 		/* XXX - Adjust initial base target */
 		NRS.initialBaseTarget = NRS.isTestNet ? 307456352 : 307613193;
 
+    /* XXX - Dynamic blockheights set here */
+    NRS.DIGITAL_GOODS_STORE_BLOCK          = Number.MAX_VALUE;
+    NRS.DIGITAL_GOODS_STORE_BLOCK_TEST     = 19530;
+    NRS.PUBLIC_KEY_ANNOUNCEMENT_BLOCK      = Number.MAX_VALUE;
+    NRS.PUBLIC_KEY_ANNOUNCEMENT_BLOCK_TEST = 19530;
+
 		if (!NRS.server) {
 			var hostName = window.location.hostname.toLowerCase();
 			NRS.isLocalHost = hostName == "localhost" || hostName == "127.0.0.1" || NRS.isPrivateIP(hostName);

@@ -66,7 +66,7 @@ public final class Constants {
     public static final long MIN_HUB_EFFECTIVE_BALANCE = 100000;
     
     public static final int SECOND_BIRTH_BLOCK = 1;
-    public static final int THIRD_BIRTH_BLOCK_TEST = 19214;
+    public static final int THIRD_BIRTH_BLOCK_TEST = 19530;
 
     //public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
     public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
