@@ -421,8 +421,8 @@ var NRS = (function(NRS, $, undefined) {
 
 		transaction.timestamp = String(converters.byteArrayToSignedInt32(byteArray, 2));
 		transaction.deadline = String(converters.byteArrayToSignedShort(byteArray, 6));
-		transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 40)); /* XXX - prevent transaction replay */
-		transaction.publicKey = converters.byteArrayToHexString(byteArray.slice(8, 40));
+		transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 8)); /* XXX - prevent transaction replay */
+		transaction.publicKey = converters.byteArrayToHexString(byteArray.slice(16, 48));
 		// transaction.recipient = String(converters.byteArrayToBigInteger(byteArray, 40)); /* XXX - prevent transaction replay */
 		transaction.amountNQT = String(converters.byteArrayToBigInteger(byteArray, 48));
 		transaction.feeNQT = String(converters.byteArrayToBigInteger(byteArray, 56));
