@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -88,6 +89,23 @@ public final class Generator {
         if (account == null) {
             return null;
         }
+        
+        /* XXX - Prevent or allow forging based on nxt.allowedToForge */
+        if (Constants.allowedToForge instanceof List) {
+          boolean found = false;
+          for (Long allowed : Constants.allowedToForge) {
+            if (account.getId().equals(allowed)) {
+              found = true;
+              break;
+            }
+          }
+          if (found == false) {
+            Logger.logDebugMessage("Account " + Convert.toUnsignedLong(account.getId()) + 
+                " is not allowed to forge. See nxt.allowedToForge property.");
+            return null;
+          }
+        }
+        
         Generator generator = new Generator(secretPhrase, publicKey, account);
         Generator old = generators.putIfAbsent(secretPhrase, generator);
         if (old != null) {

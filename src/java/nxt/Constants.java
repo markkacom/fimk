@@ -1,7 +1,12 @@
 package nxt;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 import java.util.TimeZone;
+
+import nxt.util.Convert;
 
 public final class Constants {
   
@@ -70,7 +75,7 @@ public final class Constants {
 
     //public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
     public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
-
+    
     public static final int ALIAS_SYSTEM_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int ARBITRARY_MESSAGES_BLOCK = SECOND_BIRTH_BLOCK;
@@ -124,7 +129,25 @@ public final class Constants {
                                                         is set as number of seconds before the current time. */
 
     public static final int EC_BLOCK_DISTANCE_LIMIT = 60;
-
+    
+    /* XXX - List of Account ID's that are allowed to forge (or null to allow all) */
+    public static final List<Long> allowedToForge; 
+    static {
+      List<String> allowed = Nxt.getStringListProperty("nxt.allowedToForge");
+      if (allowed.size() == 0) {
+        allowedToForge = Collections.emptyList();
+      }
+      else if (allowed.size() == 1 && "*".equals(allowed.get(0))) {
+        allowedToForge = null;
+      }
+      else {
+        allowedToForge = new ArrayList<Long>();
+        for (String account : allowed) {
+          allowedToForge.add(Convert.parseAccountId(account));
+        }
+      }
+    }
+    
     private Constants() {} // never
 
 }
