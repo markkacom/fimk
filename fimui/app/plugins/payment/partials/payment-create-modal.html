@@ -1,0 +1,66 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Send Payment</h3>
+  </div>
+  <div class="panel-body">
+    <form accept-charset="UTF-8" role="form" name="paymentCreateForm" class="form-horizontal">
+      <div class="form-group">
+        <label for="payment-sender-1" class="control-label col-xs-2">Sender</label>
+        <span class="form-control-static col-xs-10" id="payment-sender-1"><strong>{{items.senderRS}}</strong></span>
+      </div>
+      <div class="form-group">
+        <label for="payment-recipient-1" class="control-label col-xs-2">Recipient</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="payment-recipient-1" placeholder="Recipient" name="recipient" 
+            type="text" ng-model="items.recipientRS" ng-change="recipientChanged(this)">
+        </div>
+      </div>
+      <div class="form-group" ng-show="items.showPublicKey">
+        <label for="payment-publickey-1" class="control-label col-xs-2"></label>
+        <div class="col-xs-10">
+          <input class="form-control monospace" id="payment-publickey-1" placeholder="Recipient Publickey" name="publickey" 
+            type="text" ng-model="items.recipientPublickey">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="payment-amount-1" class="control-label col-xs-2">Amount</label>
+        <div class="col-xs-10">
+          <input money precision="8" class="form-control" id="payment-amount-1" placeholder="Amount" name="amount" type="text" 
+            ng-model="items.amountNXT">
+        </div>
+      </div>
+      <div class="form-group" ng-show="items.advanced">
+        <label for="payment-fee-1" class="control-label col-xs-2">Fee</label>
+        <div class="col-xs-4">
+          <input money precision="8" class="form-control" id="payment-fee-1" placeholder="Fee" name="fee" type="text" 
+              ng-model="items.feeNXT">
+        </div>
+        <label for="payment-deadline-1" class="control-label col-xs-2">Deadline</label>
+        <div class="col-xs-4">
+          <input class="form-control" id="payment-deadline-1" placeholder="Deadline" name="deadline" 
+                type="text" ng-model="items.deadline">
+        </div>
+      </div>
+      <div class="form-group" ng-show="!items.advanced || !items.showPublicKey">
+        <span class="form-control-static col-xs-12">
+          <a href ng-click="items.advanced = !items.advanced" ng-show="!items.advanced"><strong>Fee:</strong> {{items.feeNXT}} <strong>Deadline:</strong> {{items.deadline}}</a><a class="pull-right" href ng-click="items.showPublicKey = !items.showPublicKey" ng-show="!items.showPublicKey">Show Publickey</a>
+        </span>
+      </div>
+      <div class="form-group">
+        <div class="alert alert-{{items.recipientAlertLevel}}" role="alert" 
+              ng-show="items.recipientDescriptionHTML" ng-bind-html="to_trusted(items.recipientDescriptionHTML)"></div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-xs-12"></label>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-6">
+          <button class="btn btn-block btn-success" ng-click="close()" ng-disabled="!items.valid">Send Payment</button>
+        </div>
+        <div class="col-xs-6">
+          <button ng-click="dismiss()" type="button" class="btn btn-block btn-warn">Cancel</button>
+        </div>
+      </div>  
+    </form>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Add Account</h3>
+  </div>
+  <div class="panel-body">
+    <form accept-charset="UTF-8" role="form" name="accountAddForm" class="form-horizontal">
+      <div class="form-group">
+        <label for="account-name-1" class="control-label col-xs-2">Name</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-name-1" placeholder="Name" name="name" type="text" ng-model="items.name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="account-id-1" class="control-label col-xs-2">Account</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-id-1" placeholder="Account" name="account" type="text" ng-model="items.id_rs">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-xs-12"></label>
+      </div>
+      <div class="form-group">
+        <div class="col-xs-6">
+          <button class="btn btn-block btn-success" ng-click="close()">Create Account</button>
+        </div>
+        <div class="col-xs-6">
+          <button ng-click="dismiss()" type="button" class="btn btn-block btn-warn">Cancel</button>
+        </div>
+      </div>  
+    </form>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-md-12">
+    <ul class="nav nav-pills">
+      <li><button class="btn btn-xs btn-success btn-navbar" ng-click="addAccount()">Add</button></li>
+      <li><button class="btn btn-xs btn-info btn-navbar" ng-click="editAccount(selectedAccount)">Edit</button></li>
+      <li><button class="btn btn-xs btn-warning btn-navbar" ng-click="removeAccount(selectedAccount)">Remove</button></li>
+      <!-- Include the plugins here -->
+      <li ng-repeat="p in plugins.create">
+        <button class="btn btn-xs btn-navbar" ng-click="p.create({senderRS: selectedAccount.id_rs})">{{p.label}}</button>
+      </li>
+    </ul>
+    <br>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="account-select" class="control-label col-xs-2">Account</label>
+        <div class="col-xs-6">
+          <select id="account-select"
+                  class="form-control"
+                  ng-model="selectedAccount" 
+                  ng-options="a as a.name for a in accounts" 
+                  ng-change="updateSelection()"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="account-balance" class="control-label col-xs-2">Balance</label>
+        <span class="form-control-static col-xs-6" id="account-balance">{{selectedAccount.balanceNXT}}</span>
+      </div>
+      <div class="form-group">
+        <label for="account-id" class="control-label col-xs-2">ID</label>
+        <span class="form-control-static col-xs-6" id="account-id" popover="Numeric ID: {{selectedAccount.id}}">{{selectedAccount.id_rs}}</span>
+      </div>
+      <div class="form-group">
+        <label for="account-effective" class="control-label col-xs-2">Effective</label>
+        <span class="form-control-static col-xs-6" id="account-effective">{{selectedAccount.effectiveBalanceNXT}}</span>
+      </div>
+      <div class="form-group">
+        <label for="account-forged" class="control-label col-xs-2">Forged</label>
+        <span class="form-control-static col-xs-6" id="account-forged">{{selectedAccount.forgedBalanceNXT}}</span>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-6">
+    
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <tabset>
+      <tab>
+        <tab-heading>
+          <i class="glyphicon glyphicon-usd"></i> Transactions
+        </tab-heading>
+        <div ui-view="transactions"></div>
+      </tab>
+      <tab>
+        <tab-heading>
+          <i class="glyphicon glyphicon-flash"></i> Assets
+        </tab-heading>
+        Assets go here
+      </tab>
+      <tab>
+        <tab-heading>
+          <i class="glyphicon glyphicon-globe"></i> Aliases
+        </tab-heading>
+        Aliases go here
+      </tab>
+    </tabset>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+(function () {
+'use strict';
+var module = angular.module('fim.base');
+module.factory('Plugin', function(modals, $q) {
+  var Plugin = null;
+  return {
+    initialize: function (db) {
+      Plugin = db.plugins.defineClass({
+        id: String,
+        extends: String,
+        sref: String,
+        label: String,
+        exports: Object
+      });
+
+      Plugin.prototype.invoke = function (methodName, args) {
+        var deferred = $q.defer();
+        var config   = this.exports[methodName];
+        if (!config) {
+          deferred.reject('Method "'+methodName+'" is not exported by plugin ' + this.id);
+          return;
+        }
+
+        /* Test for missing arguments */
+        for (var argName in config.args) {
+          var argConfig = config.args[argName];
+          if (argConfig.required && !(argName in args)) {
+            deferred.reject("Missing required argument in "+methodName+" ["+argName+"]");
+            return;
+          }
+        }
+
+        /* Test argument type and unknown arguments */
+        for (var argName in args) {
+          var argValue = args[argName];
+          if (!(argName in config.args)) {
+            deferred.reject("Unexpected argument for "+methodName+" ["+argName+"]");
+            return;
+          }
+          if (!(new Object(argValue) instanceof config.args[argName].type)) {
+            deferred.reject("Argument for "+methodName+" ["+argName+"] of wrong type");
+            return;
+          }
+        }
+
+        /* Plugin is a modal */
+        if (config.type === 'modal') {
+          modals.open(config.id, {
+            resolve: {
+              items: function () {
+                return angular.copy(args);
+              }
+            },
+            close: function (items) {
+              deferred.resolve(true);
+            },
+            cancel: function () {
+              deferred.resolve(false);
+            }
+          });
+        }
+
+        return deferred.promise;
+      };
+
+      return Plugin;
+    },
+    get: function () {
+      return Plugin;
+    }
+  };
+});
+
+})();
