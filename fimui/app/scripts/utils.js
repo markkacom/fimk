@@ -69,6 +69,15 @@ UTILS.findFirst = function (array, func) {
   return null;
 };
 
+UTILS.findFirstPropIndex = function (array, source, propertySource, propertyArray)  {
+  for (var i=0; i<array.length; i++) {
+    if (source[propertySource] == array[i][propertyArray || propertySource]) {
+      return i;
+    }
+  }
+  return -1;
+};
+
 UTILS.removeFirst = function (array, func) {
   for (var i=0; i<array.length; i++) {
     if (func(array[i])) {

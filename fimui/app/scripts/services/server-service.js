@@ -1,7 +1,7 @@
 (function () {
 'use strict';
 
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.factory('serverService', function ($modal, $http, $q, modals) {
 
@@ -13,7 +13,8 @@ if (window.location.protocol.indexOf('https') == 0) {
   var host        = window.location.protocol + '//' + window.location.host;
 }
 else {
-  var host        = 'http://127.0.0.1:7886'
+  /*var host        = 'http://127.0.0.1:7886'*/
+  var host        = 'http://178.62.176.45:6886'; /* TEST NET develop-1.2.6 */
 }
 
 var requestTypes  = {
@@ -31,6 +32,7 @@ var requestTypes  = {
   getAccountId: { requirePost: true, requireSecret: true },
   getAccountPublicKey: {},
   getAccountTransactionIds: {},
+  getAccountTransactions: {},
   getAlias: {},
   getAliases: {},
   getAllAssets: {},

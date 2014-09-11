@@ -1,6 +1,6 @@
 (function () {
 'use strict';
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.controller('serverController', function ($scope, serverService, $timeout) {
   $scope.serverRunning  = false;

@@ -54,7 +54,10 @@ module.exports = function (grunt) {
         tasks: ['wiredep']
       },
       js: {
-        files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
+        files: [
+          '<%= yeoman.app %>/scripts/{,*/}*.js',
+          '<%= yeoman.app %>/plugins/{,*/}*.js'
+        ],
         tasks: ['newer:jshint:all'],
         options: {
           livereload: '<%= connect.options.livereload %>'
@@ -67,7 +70,8 @@ module.exports = function (grunt) {
       styles: {
         files: [
           '<%= yeoman.app %>/styles/{,*/}*.css',
-          '<%= yeoman.app %>/styles/variables.less'
+          '<%= yeoman.app %>/styles/variables.less',
+          '<%= yeoman.app %>/plugins/{,*/}*.css'
         ],
         tasks: ['newer:copy:styles', 'autoprefixer', 'exec:bootswatch']
       },
@@ -163,7 +167,10 @@ module.exports = function (grunt) {
         // custom options, see below
       },
       main: {
-        src: ['<%= yeoman.app %>/partials/{,*/}*.html'],
+        src: [
+          '<%= yeoman.app %>/partials/{,*/}*.html',
+          '<%= yeoman.app %>/plugins/{,*/}*.html'
+        ],
         dest: '.tmp/scripts/templates.js'
       },
     },
@@ -181,7 +188,8 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/scripts/controllers/*.js',
           '<%= yeoman.app %>/scripts/directives/*.js',
           '<%= yeoman.app %>/scripts/services/*.js',
-          '<%= yeoman.app %>/scripts/*.js'
+          '<%= yeoman.app %>/scripts/*.js',
+          '<%= yeoman.app %>/plugins/{,*/}*.js'
         ]
       },
       test: {
@@ -371,6 +379,7 @@ module.exports = function (grunt) {
             '*.html',
             'views/{,*/}*.html',
             'partials/{,*/}*.html',
+            'plugins/{,*/}*.html',
             'JSON/{,*/}*.json',
             'images/{,*/}*.{webp}',
             'fonts/*'
@@ -405,11 +414,13 @@ module.exports = function (grunt) {
             '*.html',
             'views/{,*/}*.html',
             'partials/{,*/}*.html',
+            'plugins/{,*/}*.html',
             'JSON/{,*/}*.json',
             'images/{,*/}*.{webp}',
             'fonts/*',
             'bower_components/**/*',
             'scripts/**/*',
+            'plugins/**/*',
             'styles/**/*'
           ]
         }, {

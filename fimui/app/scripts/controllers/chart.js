@@ -1,6 +1,6 @@
 (function () {
 'use strict';
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 var primary_color = null;
 function getBootstrapPrimaryColor() {

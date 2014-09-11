@@ -1,7 +1,7 @@
 (function () {
 'use strict';
 
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.config(function($stateProvider, $urlRouterProvider) {
     
@@ -26,27 +26,27 @@ module.config(function($stateProvider, $urlRouterProvider) {
       }
     }
   })  
-  .state('accounts', {
-    url: '/accounts/:account_id_rs',
-    views: {
-      '': { 
-        templateUrl: 'partials/accounts.html',
-        controller: 'accountsController'
-      },
-      'accounts-tab@accounts': {
-        templateUrl: 'partials/accounts-tab.html',
-        controller: 'accountsTabController'
-      },
-      'list@accounts': {
-        templateUrl: 'partials/accounts-list.html',
-        controller: 'accountsListController'
-      },
-      'transactions@accounts': {
-        templateUrl: 'partials/accounts-transactions.html',
-        controller: 'accountsTransactionsController'
-      }           
-    }
-  })
+  // .state('accounts', {
+  //   url: '/accounts/:id_rs',
+  //   views: {
+  //     '': { 
+  //       templateUrl: 'partials/accounts.html',
+  //       controller: 'accountsController'
+  //     },
+  //     'accounts-tab@accounts': {
+  //       templateUrl: 'partials/accounts-tab.html',
+  //       controller: 'accountsTabController'
+  //     },
+  //     'list@accounts': {
+  //       templateUrl: 'partials/accounts-list.html',
+  //       controller: 'accountsListController'
+  //     },
+  //     'transactions@accounts': {
+  //       templateUrl: 'partials/accounts-transactions.html',
+  //       controller: 'accountsTransactionsController'
+  //     }           
+  //   }
+  // })
   .state('contacts', {
     url: '/contacts',
     views: {

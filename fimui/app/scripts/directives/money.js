@@ -1,7 +1,7 @@
 (function () {
 'use strict';
 
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.filter('money', function () {
   return function (input, decimals) {

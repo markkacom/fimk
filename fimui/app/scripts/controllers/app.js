@@ -2,9 +2,17 @@
 'use strict';
 
 var uriParser = null;
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
-module.controller('appController', function($rootScope, $scope, $modal, $q, $log,  $timeout, modals, $window, serverService) {
+module.controller('appController', function($rootScope, $scope, $modal, $q, $log,  
+  $timeout, modals, $window, plugins, alerts, serverService) {
+
+  $scope.plugins = [];
+  plugins.install('app', function (plugin) {
+    console.log('install', plugin)
+    $scope.plugins.push(plugin);
+  });
+
   $scope.alerts   = [];
   $scope.balances = [];
   $scope.isNodeJS = serverService.isNodeJS();

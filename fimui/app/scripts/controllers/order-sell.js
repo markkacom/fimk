@@ -1,6 +1,6 @@
 (function () {
 'use strict';
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.controller('orderSellController', function (items, $modalInstance, $scope, $timeout) {
   $scope.items = items;

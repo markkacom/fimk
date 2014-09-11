@@ -1,7 +1,7 @@
 (function () {
 'use strict';
 
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.value('assets', {
   'NULL': { symbol: '.', name: '.', decimals: 0, max: 0 },  // null asset for empty views

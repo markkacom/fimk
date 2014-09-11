@@ -1,14 +1,13 @@
 (function () {
 'use strict';
 
-var module = angular.module('dgex.base');
+var module = angular.module('fim.base');
 
 module.factory('modals', function ($modal, $timeout) {
 
 var instance;
 
 function init() {
-  instance.register('accountsAdd', { templateUrl: 'partials/accounts-add-modal.html', controller: 'accountsAddModalController' });
   instance.register('warn', { templateUrl: 'partials/partial-warn.html', controller: 'warnController' });
   instance.register('secretPhrase', { templateUrl: 'partials/secretphrase-modal.html', controller: 'secretPhraseModalController' });
   instance.register('server', { templateUrl: 'partials/server-modal.html', controller: 'serverModalController' });  

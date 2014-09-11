@@ -2,60 +2,37 @@
   cursor: pointer;
 }
 
-html, body {
-  height: 100%;
+.form-group {
+  margin-bottom: 2px;
 }
 
-div[ui-view] {
-  height: 100%;
-}
-@media (max-width: 767px) {
-  div[ui-view] {
-    height: auto;
-  }
+.form-horizontal .control-label {
+  text-align: left;
 }
 
-.row, .row-half-height {
-  height: 100%;
-}
-@media (max-width: 767px) {
-  .row, .row-half-height {
-    height: auto;
-  }
-}
-.row .col-100, .row-half-height .col-100 {
-  height: 97%;
-}
-@media (max-width: 767px) {
-  .row .col-100, .row-half-height .col-100 {
-    height: auto;
-  }
+.ng-table {
+  border: 1px solid #e0e0e0;
 }
 
-.row-half-height {
-  height: 49%;
-}
-@media (max-width: 767px) {
-  .row-half-height {
-    height: auto;
-  }
+.ng-table th.text-right {
+  text-align: right;
 }
 
-.panel {
-  height: 100%;
+.ng-table th.text-left {
+  text-align: left;
 }
-@media (max-width: 767px) {
-  .panel {
-    height: auto;
-  }
+
+input.monospace {
+  font: 11px monospace;
 }
-.panel .panel-body {
-  height: 98%;
+
+.malformed_address {
+  font-weight: bold;
+  cursor: pointer;
 }
-@media (max-width: 767px) {
-  .panel .panel-body {
-    height: auto;
-  }
+.malformed_address b {
+  text-decoration: underline;
+  color: black;
 }
 
 .gridStyle {

@@ -1,7 +1,7 @@
 (function () {
 'use strict';
 
-var module = angular.module('dgex.base', [
+var module = angular.module('fim.base', [
   'ngAnimate',
   'ngCookies',
   'ngResource',
@@ -13,11 +13,11 @@ var module = angular.module('dgex.base', [
   'ngGrid',
   'ngCookies',
   'pascalprecht.translate',
-  'ngStorage'
+  'ngTable'
 ]);
 
-module.run(function ($log, accountsService, $rootScope, serverService) {
-  $log.log('dgex.base application started');
+module.run(function ($log, $rootScope, serverService) {
+  $log.log('fim.base application started');
 
   if (serverService.isNodeJS() && process) {
     process.on('exit', function () {

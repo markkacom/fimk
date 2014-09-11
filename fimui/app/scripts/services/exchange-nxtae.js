@@ -5,7 +5,7 @@
 // DGEX EXCHANGE
 // ///////////////////////////////////////////////////////////////////////////
 
-var module = angular.module('dgex.base');  
+var module = angular.module('fim.base');  
 
 module.factory('nxtAEExchange', function($rootScope, $http, $q, $log, exchangeService, assets, serverService) {
 
