@@ -14,7 +14,8 @@ module.factory('Account', function() {
         balanceNXT: String,
         effectiveBalanceNXT: String,
         unconfirmedBalanceNXT: String,
-        forgedBalanceNXT: String
+        forgedBalanceNXT: String,
+        publicKey: String
       });
 
       Account.prototype.save = function () {

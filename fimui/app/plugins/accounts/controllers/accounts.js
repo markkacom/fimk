@@ -9,6 +9,12 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
   $scope.accounts        = [];
   $scope.selectedAccount = null;
   $scope.plugins         = { create: [], open: [] };
+  $scope.errorCode       = null;
+  $scope.depositPublishAddress = null;
+
+  /* Poll for new transactions every 10 seconds */
+  var interval = setInterval(function interval() { $scope.refresh() }, 10 * 1000);
+  $scope.$on("$destroy", function() { clearInterval(interval) });
 
   /* Install plugins */
   plugins.install('accounts', function (plugin) {
@@ -26,18 +32,20 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
       $timeout(function () { 
         $scope.accounts = accounts;
         fixlocation();
-        refresh();
       });
     }
   ).catch(alerts.catch("Could not load accounts"));  
 
   /* Register CRUD observer for accounts */
-  db.accounts.addObserver(db.createObserver($scope, 'accounts', 'id_rs'), $scope, {
-    finally: function () {
-      fixlocation();
-    }
-  });
-
+  db.accounts.addObserver($scope, 
+    db.createObserver($scope, 'accounts', 'id_rs', {
+      finally: function () {
+        fixlocation(); /* if the selectedAccount is removed from the db this triggers a page reload */
+      }
+    })
+  );
+ 
+  /* account select ng-change */
   $scope.updateSelection = function () {
     $state.go('accounts', {id_rs: $scope.selectedAccount.id_rs});
   }
@@ -52,30 +60,12 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
   /* Show the add account modal dialog */
   $scope.addAccount = function () {
     var account = {};
-    function run() {
-      modals.open('accountsAdd', {
-        resolve: {
-          items: function () {
-            return account;
-          }
-        },
-        close: function (items) {
-          console.log('modal-add close', items);
-          db.accounts.add(items).then(
-            function () {
-              alerts.success("Account added");
-            }
-          ).catch(
-            function (error) {
-              account = items;
-              alerts.failed("Account add failed");
-              run();
-            }
-          );
-        }
-      });
-    }
-    run();
+    plugins.get('accounts').add(account).then(
+      function (items) {
+        console.log('accounts.addAccount', items);
+        $state.go('accounts', {id_rs: items.id_rs});
+      }
+    );
   };  
 
   /* Show the remove account modal dialog */
@@ -92,14 +82,7 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
       close: function (items) {
         account.delete().then(
           function () {
-            if ($scope.selectedAccount && account.id_rs === $scope.selectedAccount.id_rs) {
-              if ($scope.accounts.length > 0) {
-                $state.go('accounts', {id_rs: $scope.accounts[0].id_rs});
-              }
-              else {
-                $state.go('accounts');
-              }
-            }
+            $state.go('accounts');
           }
         );
       }
@@ -118,20 +101,43 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
         }
       },
       close: function (items) {
-        account.update(items);
+        $timeout(function () {
+          account.update(items);
+        });        
       }
     });
   };
 
+  $scope.publishAndFundAccount = function () {
+    plugins.get('payment').create(
+      {
+        recipientRS: $scope.selectedAccount.id_rs,
+        recipientPublicKey: $scope.selectedAccount.publicKey,
+        feeNXT: '0.1',
+        amountNXT: '1',
+        recipientReadonly: true,
+        skipSaveContact: true,
+        message: 'By sending FIM to your new address you will publish the publickey.'
+      }
+    ).then( 
+      function (items) {
+        if (items.transaction) {
+          alerts.success('Successfully published public key. Please wait for network to process.')
+        }
+      }
+    );
+  };
+
   /* Called once the database returned the accounts - selects account based on URI or fixes URI */
   function fixlocation() {
-    console.log('fixlocation', $scope.selectedAccount);
     /* URL contains account ID - make that account the selected account */
     var selected = $scope.accounts[UTILS.findFirstPropIndex($scope.accounts, $stateParams, 'id_rs', 'id_rs')];
     if (selected) {
-      // angular.forEach($scope.accounts, function (a) { a.active = false; });
-      // selected.active = true;
+      var changed = (selected !== $scope.selectedAccount);
       $scope.selectedAccount = selected;
+      if (changed) {
+        $scope.refresh();
+      }
     }
     /* URL is empty /#/accounts/ */
     else if (!$stateParams.id_rs || $stateParams.id_rs.trim().length == 0) {
@@ -149,26 +155,42 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
   }  
 
   /* Used as update interval and when selectedAccount changes - updates the database with info from the server */
-  function refresh() {
+  $scope.refresh = function () {
     if ($scope.selectedAccount === null) return;
     var selected = $scope.selectedAccount;
 
-    /* Fetch user balance */
-    nxt.getBalance({ account: selected.id_rs }).then(
+    /* Fetch account info */
+    nxt.getAccount({ account: selected.id_rs }).then(
       function (data) {
         $timeout(function () {
           selected.update({
-            guaranteedBalanceNXT: NRS.convertToNXT(data.guaranteedBalanceNQT),
-            balanceNXT: NRS.convertToNXT(data.balanceNQT),
-            effectiveBalanceNXT: data.effectiveBalanceNXT,
-            unconfirmedBalanceNXT: NRS.convertToNXT(data.unconfirmedBalanceNQT),
-            forgedBalanceNXT: NRS.convertToNXT(data.forgedBalanceNQT)
+            guaranteedBalanceNXT: nxt.util.convertToNXT(data.guaranteedBalanceNQT),
+            balanceNXT: nxt.util.convertToNXT(data.balanceNQT),
+            effectiveBalanceNXT: nxt.util.commaFormat(String(data.effectiveBalanceNXT)),
+            unconfirmedBalanceNXT: nxt.util.convertToNXT(data.unconfirmedBalanceNQT),
+            forgedBalanceNXT: nxt.util.convertToNXT(data.forgedBalanceNQT),
+            publicKey: data.publicKey,
+            id: data.account
           });
+          if (!data.publicKey) {
+            $scope.errorCode = 5;
+            $scope.depositPublishAddress = selected.id_rs+':'+selected.publicKey;            
+          }
         });
       },
-      alerts.catch("Could not get balance")
+      function (error) {
+        if (error.errorCode == 5) {
+          $timeout(function () {
+            $scope.errorCode = 5;
+            $scope.depositPublishAddress = selected.id_rs+':'+selected.publicKey;
+          });
+        }
+        else {
+          alerts.failed(error.errorDescription);
+        }
+      }
     );
-
+ 
     /* Fetch user transactions */
     nxt.getAccountTransactions({ account: selected.id_rs }).then(
       function (transactions) {
@@ -178,7 +200,11 @@ module.controller('AccountsPlugin', function($state, $q, $rootScope,
           });
         });
       },
-      alerts.catch("Could not get transactions")
+      function (error) {
+        if (error.errorCode != 5) {
+          alerts.failed("Could not get transactions");
+        }
+      }
     );
   }
 

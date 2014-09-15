@@ -13,7 +13,8 @@ var module = angular.module('fim.base', [
   'ngGrid',
   'ngCookies',
   'pascalprecht.translate',
-  'ngTable'
+  'ngTable',
+  'ui.validate'
 ]);
 
 module.run(function ($log, $rootScope, serverService) {

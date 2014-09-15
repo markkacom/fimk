@@ -2,36 +2,177 @@
 'use strict';
 var module = angular.module('fim.base');
 module.controller('PaymentPluginCreateModalController', function(items, $modalInstance, 
-  $scope, nxt, $timeout, $filter, i18n, alerts, $sce) {
+  $scope, nxt, $timeout, $filter, i18n, alerts, $sce, db, plugins) {
+
+  $scope.dialogName  = 'Send Payment';
+  $scope.dialogTitle = $scope.dialogName;
+  $scope.setTitle = function (text) {
+    $timeout(function () {
+      $scope.dialogTitle = $scope.dialogName + (text?(' | ' + text):'');
+    });
+  };  
 
   $scope.items = items;
   $scope.items.advanced = false;
-  $scope.items.showPublicKey = false;
+  $scope.items.showPublicKey = items.showPublicKey || false;
   $scope.items.recipientDescriptionHTML = null;
   $scope.items.recipientAlertLevel = 'info'; // success, info, warning, danger
-  $scope.items.amountNXT = $scope.items.amountNXT || '0';
-  $scope.items.feeNXT = $scope.items.feeNXT || '0.1';
-  $scope.items.deadline = $scope.items.deadline || '1440';
+  $scope.items.amountNXT = items.amountNXT || '0';
+  $scope.items.feeNXT = items.feeNXT || '0.1';
+  $scope.items.deadline = items.deadline || '1440';
   $scope.items.valid = true;
+  $scope.items.secretPhrase = items.secretPhrase || '';
+
+  $scope.sendSuccess     = false;
+  $scope.accounts        = [];
+  $scope.selectedAccount = null;
+  $scope.useSecretPhrase = false;
+  $scope.senderRSCalc    = { id: 'FIM-?', balance: '?' };
+
+  /* Load accounts from database */
+  db.accounts.orderBy('name').toArray().then(
+    function (accounts) {
+      $timeout(function () { 
+        $scope.accounts = accounts;
+        $scope.selectedAccount = accounts[0];
+        if ($scope.items.senderRS) {
+          for (var i=0; i<$scope.accounts.length; i++) {
+            if ($scope.accounts[i].id_rs == $scope.items.senderRS) {
+              $scope.selectedAccount = accounts[i];
+              break;
+            }
+          }
+        }
+      });
+    }
+  ).catch(alerts.catch("Could not load accounts"));  
+
+  /* Register CRUD observer for accounts */
+  db.accounts.addObserver($scope, 
+    db.createObserver($scope, 'accounts', 'id_rs', {
+      finally: function () {
+        $scope.$applyAsync();
+      }
+    })
+  );
+
+  /* Special case when there are no accounts don't show the select list */
+  db.accounts.count().then(
+    function (count) {
+      if (count == 0) {
+        $timeout(function () {
+          $scope.useSecretPhrase = true;
+        });        
+      }
+    }
+  );
+
+  $scope.senderChanged = function () {
+  };
+
+  $scope.secretPhraseChanged = function () {
+    $timeout(function () {
+      $scope.senderRSCalc.id = nxt.crypto.getAccountId($scope.items.secretPhrase, true);
+      $scope.senderRSCalc.balance = '?';
+      nxt.getAccount({account:$scope.senderRSCalc.id}).then(
+        function (account) {
+          $timeout(function () {
+            $scope.senderRSCalc.balance = nxt.util.convertToNXT(account.balanceNQT);
+          });
+        }
+      );
+    });
+  };
+
+  $scope.showAddAccount = function () {
+    var account = {};
+    plugins.get('accounts').add(account).then(
+      function (items) {
+        alerts.success("Successfully added account");
+      }
+    );
+  };
+
+  $scope.selectContact = function () {
+    plugins.get('contacts').select().then(
+      function (items) {
+        $timeout(function () {
+          $scope.items.recipientRS = items.id_rs;
+          $scope.recipientChanged();
+        });
+      }
+    );
+  };  
+
+  $scope.formatAccount = function (account) {
+    return account.id_rs + ' - ' + account.name;
+  };
 
   $scope.to_trusted = function(html_code) {
     return $sce.trustAsHtml(html_code);
   };
 
   $scope.close = function () {
-    nxt.sendMoney({
-      amountNQT:  nxt.util.convertToNQT($scope.items.amountNXT),
-      feeNQT:     nxt.util.convertToNQT($scope.items.feeNXT),
-      deadline:   $scope.items.deadline,
-      recipient:  $scope.items.recipient,
-      sender:     $scope.items.senderRS
-    }).then(
-      function (data) {
-        alerts.success('Payment send successfully');
+    if ($scope.sendSuccess) {
+      if ($scope.items.skipSaveContact) {
         $modalInstance.close($scope.items);
-      },
-      alerts.catch('Could not send money')
-    );
+      }
+      else {
+        /* See if the recipient is already a contact */
+        db.contacts.where('id_rs').equals($scope.items.recipientRS).toArray().then(
+          function (contacts) {
+            if (contacts.length == 0) {
+              plugins.get('contacts').add({
+                message: 'Do you want to add this contact?', 
+                id_rs: $scope.items.recipientRS
+              }).then(
+                function () {
+                  $modalInstance.close($scope.items);
+                }
+              );
+            }
+            else {
+              $modalInstance.close($scope.items);
+            }
+          }
+        );
+      }
+    }
+    else {
+      var args = {
+        amountNQT:  nxt.util.convertToNQT($scope.items.amountNXT),
+        feeNQT:     nxt.util.convertToNQT($scope.items.feeNXT),
+        deadline:   $scope.items.deadline,
+      };  
+
+      /* Either provide the recipient publicKey or recipient id */      
+      if ($scope.items.recipientPublicKey) {
+        args.recipientPublicKey = $scope.items.recipientPublicKey;
+        args.recipient = nxt.crypto.getAccountIdFromPublicKey(args.recipientPublicKey, false);
+      }
+      else {
+        args.recipient = $scope.items.recipient;
+      }
+
+      /* */
+      if ($scope.useSecretPhrase) {
+        args.secretPhrase = $scope.items.secretPhrase;
+        args.publicKey    = nxt.crypto.secretPhraseToPublicKey(args.secretPhrase);
+      }
+      else {
+        args.sender = $scope.selectedAccount.id_rs;
+      }
+
+      nxt.sendMoney(args).then(
+        function (data) {
+          $timeout(function () {
+            $scope.sendSuccess = true;
+            angular.extend($scope.items, data);
+          });          
+        },
+        alerts.catch('Could not send money')
+      );
+    }
   };
 
   $scope.dismiss = function () {
@@ -52,12 +193,18 @@ module.controller('PaymentPluginCreateModalController', function(items, $modalIn
     $('form[name=paymentCreateForm] input[name=recipient]').val(element.getAttribute('data-address')).change();
   };
 
-  $scope.recipientChanged = function (element) {
-    $scope.items.recipientPublickey = null;
+  $scope.recipientChanged = function () {
+    $scope.items.recipientPublicKey = null;
     $scope.items.recipientDescriptionHTML = null;
     $scope.items.showPublicKey = false;
 
     var account = $scope.items.recipientRS;
+    var parts   = account.split(':');
+    if (parts.length > 1) {
+      $scope.items.recipientRS        = account = parts[0];
+      $scope.items.recipientPublicKey = parts[1]; /* XXX this asumes no ':' character is ever in a public key */
+      $scope.items.showPublicKey      = true;
+    }
     if (/^(FIM\-)?[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+\-[A-Z0-9]+/i.test(account)) {
       var address = new NxtAddress();
       if (address.set(account)) {
@@ -69,7 +216,7 @@ module.controller('PaymentPluginCreateModalController', function(items, $modalIn
               setDescription('warning', i18n.format('recipient_no_public_key', {__nxt__: nxt.util.convertToNXT(account.unconfirmedBalanceNQT) }));
             }
             else {
-              $scope.items.recipientPublickey = account.publicKey;
+              $scope.items.recipientPublicKey = account.publicKey;
               $scope.items.recipient = account.account;
               setDescription('info', i18n.format('recipient_info', {__nxt__: nxt.util.convertToNXT(account.unconfirmedBalanceNQT) })); 
             }

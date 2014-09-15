@@ -2,17 +2,19 @@
 <html lang="en" ng-app="fim.base" ng-controller="appController">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>FIM Community Client</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
+    <!-- Bootswatch theme switcher -->
+    <link type="text/css" rel="stylesheet" ng-attr-href="{{selectedTheme.url}}" />
+
     <!-- build:css({.tmp,app}) styles/main.css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css" />
-    <link rel="stylesheet" href="bower_components/ng-grid/ng-grid.min.css" />
-    <link rel="stylesheet" href="bower_components/ng-table/ng-table.css" />
-    <link rel="stylesheet" href="styles/main.css">
+    <link type="text/css" rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css" />
+    <link type="text/css" rel="stylesheet" href="bower_components/ng-grid/ng-grid.min.css" />
+    <link type="text/css" rel="stylesheet" href="bower_components/ng-table/ng-table.css" />
+    <link type="text/css" rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
 
     <!--[if lt IE 9]>
@@ -23,6 +25,7 @@
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <!--<script src="scripts/lib/underscore-min.js"></script>-->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="scripts/lib/nw-edit-menu.js"></script>
     <script src="scripts/lib/highstock.js"></script>
     <script src="scripts/lib/IndexedDBShim.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
@@ -54,7 +57,9 @@
     <script src="scripts/lib/nxt/crypto/curve25519_.js"></script>
     <script src="scripts/lib/nxt/crypto/3rdparty/cryptojs/aes.js"></script>
     <script src="scripts/lib/nxt/crypto/3rdparty/cryptojs/sha256.js"></script>
-    
+    <script src="scripts/lib/nxt/crypto/3rdparty/seedrandom.js"></script>
+    <script src="scripts/lib/validate.js"></script>
+
     <script src="scripts/utils.js"></script>
     
     <script src="scripts/app.js"></script>
@@ -62,10 +67,11 @@
     <script src="scripts/config/i18n.js"></script>
     <script src="scripts/config/routes.js"></script>
 
+    <script src="scripts/models/setting.js"></script>
     <script src="scripts/models/transaction.js"></script>
     <script src="scripts/models/account.js"></script>
     <script src="scripts/models/block.js"></script>
-    <!--<script src="scripts/models/plugin.js"></script>-->
+    <script src="scripts/models/contact.js"></script>
 
     <script src="scripts/directives/money.js"></script>
     <script src="scripts/services/exchange-service.js"></script>
@@ -79,6 +85,7 @@
     <script src="scripts/services/db.js"></script>
     <script src="scripts/services/plugin-service.js"></script>
     <script src="scripts/services/i18n.js"></script>
+    <script src="scripts/services/setting-service.js"></script>
 
     <script src="scripts/controllers/app.js"></script>
     <script src="scripts/controllers/home.js"></script>
@@ -96,20 +103,36 @@
     <script src="scripts/controllers/trades.js"></script>
     <script src="scripts/controllers/server.js"></script>
 
+    <!-- Theme switcher plugin -->
+    <script src="plugins/themes/config.js"></script>
 
-    <!-- Accounts plugin -->
+    <!-- Accounts plugin (extends app) -->
     <script src="plugins/accounts/config.js"></script>
     <script src="plugins/accounts/controllers/accounts.js"></script>
-    <script src="plugins/accounts/controllers/accounts-tab.js"></script>
-    <script src="plugins/accounts/controllers/accounts-list.js"></script>
     <script src="plugins/accounts/controllers/accounts-transactions.js"></script>
-    <script src="plugins/accounts/controllers/accounts-add-modal.js"></script>
+    <script src="plugins/accounts/controllers/accounts-add-modal2.js"></script>
     <script src="plugins/accounts/controllers/accounts-detail-modal.js"></script>
     <script src="plugins/accounts/controllers/accounts-edit-modal.js"></script>
 
-    <!-- Payment plugin -->
+    <!-- Contacts plugin (extends app) -->
+    <script src="plugins/contacts/config.js"></script>
+    <script src="plugins/contacts/controllers/contacts.js"></script>
+    <script src="plugins/contacts/controllers/contacts-list.js"></script>
+    <script src="plugins/contacts/controllers/contacts-select-modal.js"></script>
+    <script src="plugins/contacts/controllers/contacts-add-modal.js"></script>
+
+    <!-- Settings plugin (extends app) -->
+    <script src="plugins/settings/config.js"></script>
+    <script src="plugins/settings/controllers/settings.js"></script>
+
+    <!-- Database Settings plugin (extends settings) -->
+    <script src="plugins/settings-db/config.js"></script>
+    <script src="plugins/settings-db/controllers/settings-db.js"></script>
+
+    <!-- Payment plugin (extends accounts + contacts) -->
     <script src="plugins/payment/config.js"></script>
     <script src="plugins/payment/controllers/payment-create-modal.js"></script>
+
 
     <!--<script src="scripts/controllers/login.js"></script>
     <script src="scripts/controllers/logout.js"></script>
@@ -118,13 +141,43 @@
 
   </head>
   <body>
-
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
+<!--     <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" ui-sref="home"><strong>FIMK</strong> BETA</a>
+        </div>        
+        <nav class="navbar-collapse bs-navbar-collapse collapse in" role="navigation">
+          <ul class="nav navbar-nav">
+            <li ng-repeat="p in plugins" ui-sref-active="active" ui-sref="{{p.sref}}"><a>{{p.label}}</a></li>
+            <li ng-show="isNodeJS"><a ng-click="openDevTools()">Dev Tools</a></li>
+          </ul>
+          <form class="navbar-form navbar-right" role="search">
+            <div class="form-group">
+              <div class="input-group">
+                <select class="pull-right form-control" 
+                      ng-model="selectedTheme"
+                      ng-options="t as t.label for t in themes"
+                      ng-change="themeChanged()"></select>
+                <span class="input-group-addon glyphicon glyphicon-fire" style="top: 0"></span>                      
+              </div>
+            </div>
+          </form>          
+        </nav>
+      </div>
+    </header> -->
+
 
     <div class="navbar navbar-default" role="navigation">
-      <div class="container-fluid">
+      <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
@@ -134,22 +187,31 @@
           </button>
           <a class="navbar-brand" ui-sref="home"><strong>FIMK</strong> BETA</a>
         </div>
-        <div class="navbar-collapse collapse" style="z-index: 100000">
+        <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li ng-repeat="p in plugins" ui-sref-active="active" ui-sref="{{p.sref}}"><a>{{p.label}}</a></li>
             <li ng-show="isNodeJS"><a ng-click="openDevTools()">Dev Tools</a></li>
           </ul>
-        </div><!--/.nav-collapse -->
-      </div><!--/.container-fluid -->
+          <form class="navbar-form navbar-right" role="search">
+            <div class="form-group">
+              <div class="input-group">
+                <select class="pull-right form-control" 
+                      ng-model="selectedTheme"
+                      ng-options="t as t.label for t in themes"
+                      ng-change="themeChanged()"></select>
+                <span class="input-group-addon glyphicon glyphicon-fire" style="top: 0"></span>                      
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="container-fluid" ng-style="getOuterContainerStyle()">
-      <div style="position: absolute; z-index: 99999; top: 10px; right: 10px; background-color: transparent; ">
+    <div class="container">
+      <div style="position: absolute; z-index: 999; top: 20px; right: 10px; background-color: transparent; ">
         <alert ng-repeat="a in alerts" type="{{a.type}}" style="max-width: 500px; min-width: 500px;">
           <strong ng-bind="a.msg.split('|')[0]"></strong>
-          <div ng-show="a.url">{{alert.url}} says <b>{{a.msg.split('|')[1]}}</b></div>
-          <div ng-show="a.retry"><a href ng-click="a.retry(); closeAlert($index)" class="alert-link">Click to retry..</a></div>
         </alert>
       </div>      
       <div ui-view></div>

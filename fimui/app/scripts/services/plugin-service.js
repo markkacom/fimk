@@ -4,6 +4,14 @@ var module = angular.module('fim.base');
 module.factory('plugins', function($log) {
   var registry = {};
   return {
+
+    /* Returns a plugin by id */
+    get: function (id) {
+      if (!(id in registry)) {
+        throw new Error('No such plugin "'+id+'"');
+      }
+      return registry[id];
+    },
     
     /* Registers a plugin */
     register: function (options) {
@@ -25,7 +33,7 @@ module.factory('plugins', function($log) {
       for (var argName in config) {
         var argConfig = config[argName];
         if (argConfig.required && !(argName in args)) {
-          $log.error("Missing required argument "+argName);
+          console.error("Missing required argument "+argName);
           return false;
         }
       }
@@ -33,11 +41,11 @@ module.factory('plugins', function($log) {
       for (var argName in args) {
         var argValue = args[argName];
         if (!(argName in config)) {
-          $log.error("Unexpected argument "+argName);
+          console.error("Unexpected argument "+argName);
           return false;
         }
         if (!(new Object(argValue) instanceof config[argName].type)) {
-          $log.error("Argument for "+argName+" of wrong type");
+          console.error("Argument for "+argName+" of wrong type. Expecting "+config[argName].type+" but got "+argValue);
           return false;
         }
       }

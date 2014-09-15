@@ -2,14 +2,28 @@
   <div class="col-md-12">
     <ul class="nav nav-pills">
       <li><button class="btn btn-xs btn-success btn-navbar" ng-click="addAccount()">Add</button></li>
-      <li><button class="btn btn-xs btn-info btn-navbar" ng-click="editAccount(selectedAccount)">Edit</button></li>
-      <li><button class="btn btn-xs btn-warning btn-navbar" ng-click="removeAccount(selectedAccount)">Remove</button></li>
-      <!-- Include the plugins here -->
+      <li><button class="btn btn-xs btn-info btn-navbar" ng-click="editAccount(selectedAccount)" 
+        ng-disabled="!selectedAccount">Edit</button></li>
+      <li><button class="btn btn-xs btn-warning btn-navbar" ng-click="removeAccount(selectedAccount)" 
+        ng-disabled="!selectedAccount">Remove</button></li>
+      <li><button class="btn btn-xs btn-success btn-navbar" ng-click="refresh()" 
+        ng-disabled="!selectedAccount">Refresh</button></li>
+      <!-- Include plugins here -->
       <li ng-repeat="p in plugins.create">
         <button class="btn btn-xs btn-navbar" ng-click="p.create({senderRS: selectedAccount.id_rs})">{{p.label}}</button>
       </li>
     </ul>
     <br>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="alert alert-warning" role="alert" ng-show="errorCode == 5"><p>The blockchain is not aware of this account. For new accounts <strong>with a published publickey</strong>  please wait 30 seconds.</p><p>Accounts that have not yet published their public key must use their deposit+publish address for their first transaction<strong> <a href ng-click="depositPublishVisible = !depositPublishVisible">(show deposit+publish address)</a></strong>.</p></div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="alert alert-info" ng-init="showPublishInstructions=false" ng-show="showPublishInstructions"><p>Since the publickey for your account has not been published to the blockchain we can not guarantee it's security. A publickey is published when it's in the blockchain. You cannot send anything to an account without knowing it's publickey. To send FIM or a message to an account without a published publickey you must use a so-called deposit+publish address.</p><p>After you have received your first transaction you no longer have to use the deposit+publish address but can use your shorter address instead. If you want you can keep using the deposit+publish address in the future, it will keep working but is a lot longer to write down everytime.</p><p>Another option is to publish the publickey yourself <strong><a href ng-click="publishAndFundAccount()">please click here to do so</a></strong> (costs 0.1. FIM).</p></div>
   </div>
 </div>
 <div class="row">
@@ -26,12 +40,27 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="account-balance" class="control-label col-xs-2">Balance</label>
-        <span class="form-control-static col-xs-6" id="account-balance">{{selectedAccount.balanceNXT}}</span>
-      </div>
-      <div class="form-group">
         <label for="account-id" class="control-label col-xs-2">ID</label>
         <span class="form-control-static col-xs-6" id="account-id" popover="Numeric ID: {{selectedAccount.id}}">{{selectedAccount.id_rs}}</span>
+      </div>
+      
+      <div class="form-group" ng-init="depositPublishVisible = false" ng-show="depositPublishAddress">
+        <label class="control-label col-xs-12">
+          <a href class="form-control-static" ng-click="depositPublishVisible = true" ng-show="!depositPublishVisible">
+            Show deposit+publish address
+          </a>
+          <a href class="form-control-static" ng-click="depositPublishVisible = false" ng-show="depositPublishVisible">
+            Hide deposit+publish address
+          </a>
+        </label>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-6">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="account-balance" class="control-label col-xs-2">Balance</label>
+        <span class="form-control-static col-xs-6" id="account-balance">{{selectedAccount.balanceNXT}}</span>
       </div>
       <div class="form-group">
         <label for="account-effective" class="control-label col-xs-2">Effective</label>
@@ -41,14 +70,21 @@
         <label for="account-forged" class="control-label col-xs-2">Forged</label>
         <span class="form-control-static col-xs-6" id="account-forged">{{selectedAccount.forgedBalanceNXT}}</span>
       </div>
-    </form>
-  </div>
-  <div class="col-md-6">
-    
+    </form>    
   </div>
 </div>
 <div class="row">
   <div class="col-md-12">
+    <div ng-show="depositPublishVisible">
+      <div><br></div>
+      <textarea rows="2" class="form-control monospace" readonly id="deposit-publish" name="deposit_publish">{{depositPublishAddress}}</textarea>
+      <a href class="pull-right" ng-click="showPublishInstructions = true">How does this work?</a>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div><br></div>    
     <tabset>
       <tab>
         <tab-heading>
@@ -56,13 +92,13 @@
         </tab-heading>
         <div ui-view="transactions"></div>
       </tab>
-      <tab>
+      <tab ng-show="assets">
         <tab-heading>
           <i class="glyphicon glyphicon-flash"></i> Assets
         </tab-heading>
         Assets go here
       </tab>
-      <tab>
+      <tab ng-show="aliases">
         <tab-heading>
           <i class="glyphicon glyphicon-globe"></i> Aliases
         </tab-heading>

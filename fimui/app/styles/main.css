@@ -2,6 +2,11 @@
   cursor: pointer;
 }
 
+.back-next-group .col-xs-3 {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
 .form-group {
   margin-bottom: 2px;
 }
@@ -22,8 +27,8 @@
   text-align: left;
 }
 
-input.monospace {
-  font: 11px monospace;
+input.monospace, select.monospace, textarea.monospace {
+  font: 14px monospace;
 }
 
 .malformed_address {

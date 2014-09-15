@@ -7,7 +7,9 @@ property in nxt-default.properties will not work.
 
 Test net is enabled at the source code level. 
 
-* Upgrade to use NXT 1.2.6
+                          == Core ==
+
+* Upgraded to NXT 1.2.6 (current last mayor update)
 
 * Digital Goods Store
 
@@ -17,6 +19,63 @@ Test net is enabled at the source code level.
   empty which does not allow anyone to forge, a * to allow everyone or a ; 
   delimited list of account numbers (either old or RS format)
 
+* Alias transfer
+
+* ... please see NXT 1.2.6 changelogs for all features
+
+                    == FIM Community Client ==
+
+* New client.
+  Written from scratch with one thing in mind. Extensibility! 
+  Designed from the ground up to be a community driven plugin based crypto wallet. 
+  Community members are encouraged to built upon the solid basis provided by FIM 
+  Community Client to realize their ideas or built their next FIM/NXT related 
+  business.
+
+* Plugin based. 
+  Except from some core functionality everything is built as a plugin. 
+  Plugins can have their own plugins. Plugins are statically linked for now 
+  plugin installer framework will follow but requires more investigation with 
+  regard to security.
+
+* Theme switcher. 
+  Comes bundled with 19 beautiful themes which are plugins themselves. 
+  Community members can create their own themes.
+
+* Client side transaction signing. 
+  Your secret phrase is no longer send to the server all transactions are always 
+  signed client side.
+
+* New address format for new accounts.
+  New accounts require the public key to be published on the block chain before 
+  use. Implemented a seamless solution in the client to either publish the public
+  yourself or use a special one-time deposit+publish address.
+
+  This address format adds your public key to the end of your FIM address separated
+  by a colon (':'). Merchants and exchanges should start accepting that address 
+  format before this branch is released on main-net.
+
+  FIM Community Client has complete support for this new address format. It is not 
+  expected that the old FIM client will be made compatible with this new format.
+
+* ORM based observable and searchable database.
+  Switched the database layer to use IndexedDB in combination with Dexie 
+  (https://github.com/dfahlander/Dexie.js). Tables and columns are strongly typed 
+  and searchable. Tables can have a model class associated with them to add behavior 
+  to database objects (much like Active-Record in Ruby-on-Rails).
+
+* Offline support first! 
+  All UI is built from data in the database which is always available when online 
+  the application will communicate with FIM server to download updates which are 
+  added to the database. Since the UI is aware of changes to the database it is 
+  automatically updated. Plugin authors have full access to this functionality.
+
+* Settings service.
+  Reusable generic settings service to be used by plugin authors. Settings are
+  stored in the database and can be edited from one central place in the 
+  application (not yet fully visible). Plugins can add their own settings, or 
+  extend the settings UI. (See database inspector plugin).
   
-
-
+* Temporary removed ability to start FIM server from Windows and Linux versions.
+  Will be added back in next release but requires some more polishing. The desktop
+  versions will all connect to one of our FIM nodes on the test net.

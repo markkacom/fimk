@@ -348,6 +348,7 @@ module.run(function (nxt) {
   nxt.crypto = {
     secretPhraseToPublicKey: secretPhraseToPublicKey,
     getAccountId: getAccountId,
+    getAccountIdFromPublicKey: getAccountIdFromPublicKey,
     signBytes: signBytes,
     verifyBytes: verifyBytes
   };

@@ -3,9 +3,9 @@
 
 var module = angular.module('fim.base');
 
-module.factory('nxt', function ($modal, $http, $q, modals, i18n) {
+module.factory('nxt', function ($modal, $http, $q, modals, i18n, alerts) {
 
-  var TEST_NET      = false;
+  var TEST_NET      = true;
   var PKANNOUNCEMENTBLOCKPASSED = TEST_NET ? true : false;
   var DGSBLOCKPASSED = TEST_NET ? true : false;
 
@@ -50,7 +50,7 @@ module.factory('nxt', function ($modal, $http, $q, modals, i18n) {
         sender:                       {type: String, argument: false},
         publicKey:                    {type: String}, // sender public key
         secretPhrase:                 {type: String},
-        recipient:                    {type: String, required: true},
+        recipient:                    {type: String},
         recipientPublicKey:           {type: String},
         message:                      {type: String},
         messageIsText:                {type: Boolean},

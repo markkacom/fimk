@@ -6,30 +6,46 @@ module.factory('db', function ($log, $injector, alerts, $timeout) {
 
   var db = new Dexie('fimkrypto-db');
   db.version(1).stores({
+    settings:     "id,label,value",
     accounts:     "id_rs,&id,&name,balanceNXT,forgedBalanceNXT",
     transactions: "transaction,type,subtype,timestamp,recipientRS,senderRS,height,block",
-    blocks:       "id,&height,generator_rs,fee_nxt,length"
+    blocks:       "id,&height,generator_rs,fee_nxt,length",
+    contacts:     "id_rs,&name,email,website"
   });
 
   /* Load models here to prevent cicrular dependency errors */
+  $injector.get('Setting').initialize(db);
   $injector.get('Account').initialize(db);
   $injector.get('Transaction').initialize(db);
   $injector.get('Block').initialize(db);
+  $injector.get('Contact').initialize(db);
 
-  db.on('error', alerts.catch("Database error"));
-  db.on('populate', function () {
-    db.accounts.add({
-      id_rs:  'FIM-9MAB-AXFN-XXL7-6BHU3',
-      id:     '4677526180684090633',
-      name:   'KryptoFin'
-    });
+  db.on('error', alerts.catch("Database error - see error console for details"));
+  // db.on('populate', function () {
+  //   db.accounts.add({
+  //     id_rs:  'FIM-9MAB-AXFN-XXL7-6BHU3',
+  //     id:     '4677526180684090633',
+  //     name:   'KryptoFin'
+  //   });
 
-    db.accounts.add({
-      id_rs:  'FIM-R4X4-KMHT-RCXD-CLGFZ',
-      id:     '12661257429910784930',
-      name:   'Someone'
-    });
-  });
+  //   db.accounts.add({
+  //     id_rs:  'FIM-R4X4-KMHT-RCXD-CLGFZ',
+  //     id:     '12661257429910784930',
+  //     name:   'Someone'
+  //   });
+
+  //   db.contacts.add({
+  //     id_rs:  'FIM-R4X4-KMHT-RCXD-CLGFZ',
+  //     name:   'A person',
+  //     email:  'person@gmail.com'
+  //   });
+
+  //   db.contacts.add({
+  //     id_rs:  'FIM-9MAB-AXFN-XXL7-6BHU3',
+  //     name:   'A company',
+  //     email:  'company@gmail.com'
+  //   });
+  // });
   db.on('changes', function (changes, partial) {
     var tables = {};
     changes.forEach(function (change) {
@@ -52,11 +68,11 @@ module.factory('db', function ($log, $injector, alerts, $timeout) {
     $timeout(function () {
       angular.forEach(tables, function (table, key) {
         db[key].notifyObservers(function (observer) {
-          observer.create(table.create);
-          observer.update(table.update);
-          observer.remove(table.remove);
+          if (observer.create) observer.create(table.create) 
+          if (observer.update) observer.update(table.update);
+          if (observer.remove) observer.remove(table.remove);
           if (!partial) {
-            observer.finally();
+            if (observer.finally) observer.finally();
           }
         });
       });

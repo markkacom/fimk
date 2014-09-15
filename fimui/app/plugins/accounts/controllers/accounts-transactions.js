@@ -2,86 +2,123 @@
 'use strict';
 var module = angular.module('fim.base');
 
-module.controller('AccountsPluginTransactionsController', function($scope, alerts, $timeout, ngTableParams, nxt, modals) {
+module.controller('AccountsPluginTransactionsController', 
+  function($scope, alerts, $timeout, ngTableParams, nxt, modals, plugins, db, $filter) {
 
   /* Show detail modal for account */
   $scope.showAccount = function (id_rs) {
-    nxt.getAccount({account: id_rs}).then(
-      function (account) {
-        modals.open('accountsDetail', {
-          resolve: {
-            items: function () {
-              angular.extend(account, {
-                guaranteedBalanceNXT: NRS.convertToNXT(account.guaranteedBalanceNQT),
-                balanceNXT: NRS.convertToNXT(account.balanceNQT),
-                effectiveBalanceNXT: account.effectiveBalanceNXT,
-                unconfirmedBalanceNXT: NRS.convertToNXT(account.unconfirmedBalanceNQT),
-                forgedBalanceNXT: NRS.convertToNXT(account.forgedBalanceNQT)
-              });
-              return account;
-            }
-          }
-        });
-      },
-      alerts.catch("Could not obtain account")
-    );
+    plugins.get('accounts').detail(id_rs);
   }; 
 
-  $scope.$watch('selectedAccount', function () {
-    if ($scope.selectedAccount) {
-      $scope.selectedAccount.transactions().then(
-        function (transactions) {
-          $timeout(
-            function () {
-              var txns = [];
-              angular.forEach(transactions, function (transaction) {
-
-                // We are the sender
-                if (transaction.senderRS == $scope.selectedAccount.id_rs) {
-                  var account = transaction.recipientRS;
-                  var fee     = UTILS.formatPrice(NRS.convertToNXT(transaction.feeNQT), 8);
-                  var amount  = UTILS.formatPrice('-' + NRS.convertToNXT(transaction.amountNQT), 8);
-                }
-                // We are the recipient
-                else {
-                  var account = transaction.recipientRS;
-                  var fee     = UTILS.formatPrice(NRS.convertToNXT(transaction.feeNQT), 8);
-                  var amount  = UTILS.formatPrice(NRS.convertToNXT(transaction.amountNQT), 8);
-                }
-
-                txns.push({
-                  transaction: transaction.transaction,
-                  type: transactionTypeToString(transaction.type, transaction.subtype),
-                  account: account,
-                  date: NRS.formatTimestamp(transaction.timestamp),
-                  fee: fee,
-                  amount: amount,
-                  attachment: transaction.attachment,
-                  timestamp: transaction.timestamp
-                });
-              });
-
-              txns.sort(function (a,b) {
-                return b.timestamp - a.timestamp;
-              });
-
-              $scope.tableParams = new ngTableParams({
-                  page: 1,            // show first page
-                  count: 10           // count per page
-                }, 
-                {
-                  total: txns.length,   // length of data
-                  getData: function($defer, params) {
-                    $defer.resolve(txns.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-                  }
-                }
-              );
-            }
-          );
+  /* ng-table config XXX - TODO look into https://datatables.net/ instead */ 
+  $scope.transactions = [];
+  $scope.tableParams = new ngTableParams({
+      page: 1,   // show first page
+      count: 10  // count per page
+    }, 
+    {
+      total: 0,   // length of data
+      getData: function($defer, params) {
+        if ($scope.selectedAccount) {
+          var list = $scope.transactions.slice((params.page() - 1) * params.count(), params.page() * params.count());
         }
-      ).catch(alerts.catch("Could not find transactions"));
+        else {
+          var list = [];
+        }
+
+        var transactions = [];
+        angular.forEach(list, function (transaction) {
+          // We are the sender
+          if (transaction.senderRS == $scope.selectedAccount.id_rs) {
+            var account = transaction.recipientRS;
+            var fee     = nxt.util.convertToNXT(transaction.feeNQT);
+            var amount  = nxt.util.convertToNXT(transaction.amountNQT);
+          }
+          // We are the recipient
+          else {
+            var account = transaction.senderRS;
+            var fee     = nxt.util.convertToNXT(transaction.feeNQT);
+            var amount  = nxt.util.convertToNXT(transaction.amountNQT);
+          }
+
+          transactions.push({
+            transaction: transaction.transaction,
+            type: transactionTypeToString(transaction.type, transaction.subtype),
+            account: account,
+            date: NRS.formatTimestamp(transaction.timestamp), /* XXX - TODO - fix relying on NRS */
+            fee: fee,
+            amount: amount,
+            attachment: transaction.attachment,
+            timestamp: transaction.timestamp
+          });
+        });
+        $defer.resolve(transactions);
+      }
     }
+  );
+
+  function find(array, id, value) {
+    for(var i=0,l=array.length; i<l; i++) { if (array[i][id] == value) { return i; } }
+    return -1;
+  }
+
+  function sorter(a,b) {
+    return b.timestamp - a.timestamp;
+  }
+
+  function filter(array) {
+    if ($scope.selectedAccount) {
+      var id_rs = $scope.selectedAccount.id_rs
+      return array.filter(function (t) { return t.senderRS == id_rs || t.recipientRS == id_rs });
+    }
+    return [];
+  }
+
+  $scope.$watch('selectedAccount', function (selectedAccount) {    
+    $scope.transactions = [];
+    if (!selectedAccount) return;
+
+    /* Load transactions from database */
+    db.transactions.where('senderRS').equals($scope.selectedAccount.id_rs).
+                    or('recipientRS').equals($scope.selectedAccount.id_rs).toArray().then(
+      function (transactions) {
+        $timeout(function () {
+          transactions.sort(sorter);
+          $scope.transactions = transactions;
+          $scope.tableParams.total(transactions.length);
+          $scope.tableParams.reload(); 
+        });
+      }
+    ).catch(alerts.catch("Could not load transactions from database"));
   });
+
+  /* Register transactions CRUD observer */
+  db.transactions.addObserver($scope, {
+    create: function (transactions) {
+      $scope.transactions = $scope.transactions.concat(filter(transactions));
+      $scope.transactions.sort(sorter);
+    },
+    update: function (transactions) {
+      angular.forEach(filter(transactions), function (t) {
+        var index = find($scope.transactions, 'transaction', t.transaction);
+        if (index != -1) {
+          angular.extend($scope.transactions[index], t);
+        }
+      });
+    },
+    remove: function (transactions) {
+      angular.forEach(filter(transactions), function (t) {
+        var index = find($scope.transactions, 'transaction', t.transaction);
+        if (index != -1) {
+          $scope.transactions.splice(index, 1);
+        }
+      });
+    },
+    finally: function () { /* called from $timeout */
+      $scope.tableParams.total($scope.transactions.length);
+      $scope.tableParams.reload(); 
+    }
+  });  
 
   var TYPE_PAYMENT = 0
   var TYPE_MESSAGING = 1

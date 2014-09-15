@@ -76,7 +76,8 @@ module.run(function (nxt) {
     convertToNXT: function (amountNQT) {
       return commaFormat(convertNQT(amountNQT, 8));
     },
-    convertToNQT: convertToNQT
+    convertToNQT: convertToNQT,
+    commaFormat: commaFormat
   };
 
 });

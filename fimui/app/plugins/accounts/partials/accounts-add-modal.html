@@ -1,32 +1,166 @@
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Add Account</h3>
-  </div>
-  <div class="panel-body">
-    <form accept-charset="UTF-8" role="form" name="accountAddForm" class="form-horizontal">
-      <div class="form-group">
-        <label for="account-name-1" class="control-label col-xs-2">Name</label>
-        <div class="col-xs-10">
-          <input class="form-control" id="account-name-1" placeholder="Name" name="name" type="text" ng-model="items.name">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="account-id-1" class="control-label col-xs-2">Account</label>
-        <div class="col-xs-10">
-          <input class="form-control" id="account-id-1" placeholder="Account" name="account" type="text" ng-model="items.id_rs">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-xs-12"></label>
-      </div>
+<div class="modal-header">
+  <h4 class="modal-title">Add Account</h4>
+</div>
+<div class="modal-body">
+  <form accept-charset="UTF-8" role="form" name="accountAddForm" class="form-horizontal">
+
+    <!-- Start screen -->
+    <div ng-show="state == 0">
+      <div class="well"><p>You can create a new account or add an existing account. To add an existing account all you need is the account number.</p></div>
+      <br>
       <div class="form-group">
         <div class="col-xs-6">
-          <button class="btn btn-block btn-success" ng-click="close()">Create Account</button>
+          <button class="btn btn-block btn-success" ng-click="setState(1)">Create New Account</button>
         </div>
         <div class="col-xs-6">
-          <button ng-click="dismiss()" type="button" class="btn btn-block btn-warn">Cancel</button>
+          <button ng-click="setState(7)" type="button" class="btn btn-block btn-warn">Add Existing Account</button>
         </div>
-      </div>  
-    </form>
-  </div>
+      </div>
+      <br>
+      <br>      
+    </div>
+
+    <!-- Add new account -->
+    <div ng-show="state == 1">
+      <div ng-if="mouseRandom && !mouseRandomDone">
+        <div class="well"><p>In order to create the secretphrase to access your FIM account we need to gather some random data.</p><p>Please keep moving your mouse until the progressbar is full.</p></div>
+        <div class="progress">
+          <progressbar max="100" value="mouseRandomPercent">{{mouseRandomPercent}}%</progressbar>
+        </div>
+      </div>
+      <div ng-if="!mouseRandom || mouseRandomDone">
+        <div class="well">Please write down or memorize these 12 words (their order and capitalization matters). This secret phrase is needed in order to access your FIM account.</div>
+        <div>
+          <textarea rows="2" class="form-control monospace" readonly id="accounts-plugin-secretPhrase">{{items.secretPhrase}}</textarea>
+          <a href class="pull-right" ng-click="generateSecretPhrase()">Generate a different secretphrase</a>
+        </div>
+        <br>
+        <div class="form-group">
+          <center><h3><strong>{{items.id_rs}}</strong></h3></center>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm secretPhrase -->
+    <div ng-show="state == 2">
+      <div class="well"><p>Your secret phrase is very important! In order to be sure that you have saved it, please write your secret phrase below:</p></div>
+      <textarea rows="2" class="form-control monospace" ng-change="secretPhraseConfirmChanged()" ng-model="$parent.secretPhraseConfirm"></textarea>
+    </div>    
+
+    <!-- Choose public key publish method -->
+    <div ng-show="state == 3">
+      <div class="well" ng-show="!publisDepositAddress"><p><strong>Congratulations!</strong> You are almost done creating your FIM account.</p><p>Now you must publish your public key on the blockchain. You can do that yourself if you have another account with at least 0.1 FIM or it can be done by someone who sends FIM to a special one time deposit+publish address.</p><p>Please select how you want to publish your publickey.</p></div>
+      <center ng-show="!publisDepositAddress"><strong><a href ng-click="choosePublishMethod(1)">I have another account (instant costs 0.1 FIM)</a></strong></center>
+      <br>
+      <center ng-show="!publisDepositAddress"><strong><a href ng-click="choosePublishMethod(2)">Generate deposit+publish address (slower free)</a></strong></center>
+      <div class="well" ng-show="publisDepositAddress"><p><center><strong>Attention!</strong></center></p><p>Since this is a new account which does not yet have a public key the first deposit has to be made to this special one time address.</p><p>After you received this first deposit you can use the normal (shorter) address ({{items.id_rs}})</p></div>
+      <div class="form-group" ng-show="publisDepositAddress">
+        <div class="col-xs-12">
+          <textarea rows="3" class="form-control monospace" id="account-publish-4" name="publish4" readonly>{{publisDepositAddress}}</textarea>
+        </div>
+      </div>
+      <br>
+    </div>
+
+    <!-- Publish public key -->
+    <div ng-show="state == 4 || state == 5">
+      <div class="well" ng-show="!publishTransactionID"><p>Please enter the secret phrase for the <strong>existing account</strong> that will publish the public key for your <strong>new</strong> account.</p></div>
+      <div class="alert alert-success" role="alert" ng-if="!publishTransactionID && publisherAccountPublickey">Your secretphrase seems to be for {{publisherAccount}} which has a balance of {{publisherBalance}} FIM.</div>
+      <div class="alert alert-danger" role="alert" ng-if="!publishTransactionID && publisherAccount && !publisherAccountPublickey">The secretphrase unlocks account {{publisherAccount}} but that account does not have a public key.</div>
+      <div class="alert alert-success" role="alert" ng-if="publishTransactionID">Successfully published publickey. Transaction ID is {{publishTransactionID}}</div>
+      <div class="form-group" ng-show="!publishTransactionID">
+        <label for="account-secret-2" class="control-label col-xs-2">Secretphrase</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-phrase-2" placeholder="Secretphrase" name="secretphrase2" type="password" 
+            ng-model="$parent.publisherSecretPhrase" ng-change="publisherSecretPhraseChanged()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="account-publisher-2" class="control-label col-xs-2">Publisher</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-publisher-2" type="text" readonly ng-model="$parent.publisherAccount">
+        </div>
+      </div>      
+      <div class="form-group" ng-show="!publishTransactionID">
+        <label class="control-label col-xs-2"></label>
+        <div class="col-xs-10">
+          <input id="account-publish-checkbox" name="remember" type="checkbox" ng-model="$parent.publishCostsAgree" 
+                ng-change="publishAgreeChanged()">
+          <label for="account-publish-checkbox">I understand publishing a public key costs 0.1 FIM</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save created account to database -->
+    <div ng-show="state == 6">
+      <div class="well"><p>You have <strong>successfully created</strong> your new FIM account and <strong>published it's public key</strong>.</p><p>Please enter a name for your new account so we can store it in your local client database.</p></div>
+      <div class="alert alert-danger" role="alert" ng-if="duplicateName">That name already exists</div>
+      <div class="form-group">
+        <label for="account-id-3" class="control-label col-xs-2">Account</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-id-3" type="text" readonly ng-model="items.id_rs">
+        </div>
+      </div> 
+      <div class="form-group">
+        <label for="account-name-3" class="control-label col-xs-2">Name</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-name-3" type="text" ng-model="items.name" ng-change="nameChanged()">
+        </div>
+      </div>
+      <br>
+    </div>
+
+    <!-- Add existing account -->
+    <div ng-show="state == 7">
+      <div class="form-group">
+        <label for="account-id-1" class="control-label col-xs-2">Account *</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-id-1" placeholder="Account" name="account" type="text" 
+            ng-model="items.id_rs" ng-change="verifyExistingAccount()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="account-phrase-1" class="control-label col-xs-2">Secretphrase</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-phrase-1" placeholder="Secretphrase (optional)" name="secretphrase" type="password" 
+            ng-model="items.secretPhrase" ng-change="verifyExistingAccount()">
+        </div>
+      </div>
+      <br>
+      <div class="alert alert-danger" role="alert" ng-if="addExistingAccountError">{{addExistingAccountError}}</div>
+    </div>
+
+    <!-- Enter a name for your existing account -->
+    <div ng-show="state == 8">
+      <div class="well"><p><strong>Congratulations!</strong> You are almost done adding an existing FIM account.</p><p>Please enter a name for this account so we can store it in your local client database.</p></div>
+      <div class="alert alert-danger" role="alert" ng-if="duplicateName">That name already exists</div>
+      <div class="form-group">
+        <label for="account-id-3" class="control-label col-xs-2">Account</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-id-3" type="text" readonly ng-model="items.id_rs">
+        </div>
+      </div> 
+      <div class="form-group">
+        <label for="account-name-3" class="control-label col-xs-2">Name</label>
+        <div class="col-xs-10">
+          <input class="form-control" id="account-name-3" type="text" ng-model="items.name" ng-change="nameChanged()">
+        </div>
+      </div>
+      <br>
+    </div>
+
+
+  </form>
+
+  <div class="modal-footer" ng-show="state != 0">
+    <div class="form-group">
+      <div class="col-xs-6">
+        <button class="btn btn-block btn-success" ng-click="close()" ng-disabled="!safeEnabled" ng-show="state!=3">{{getButtonLabel(state)}}</button>
+      </div>
+      <div class="col-xs-6">
+        <button ng-click="dismiss()" type="button" class="btn btn-block btn-warn">Cancel</button>
+      </div>
+    </div>      
+  </div> 
+
 </div>

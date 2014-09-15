@@ -2,12 +2,11 @@
 
   function TableObserverAddon(db) {
     
-    db.Table.prototype._observers  = [];
-    
-    db.Table.prototype.addObserver = function (observer, $scope) {
-      var index = this._observers.indexOf(observer);
+    db.Table.prototype.addObserver = function ($scope, observer) {
+      var observers = this._observers || (this._observers = []);
+      var index = observers.indexOf(observer);
       if (index === -1) {
-        this._observers.push(observer);  
+        observers.push(observer);  
       }
       /* Auto remove observer when $scope was provided */
       if ($scope) {
@@ -17,16 +16,19 @@
     };
 
     db.Table.prototype.removeObserver = function (observer) {
-      var index = this._observers.indexOf(observer);
+      var observers = this._observers || (this._observers = []);
+      var index = observers.indexOf(observer);
       if (index !== -1) {
-        this._observers.splice(index, 1);
+        observers.splice(index, 1);
       }
     };
 
     db.Table.prototype.notifyObservers = function (callback) {
-      angular.forEach(this._observers, function (observer) {
-        callback(observer);
-      });
+      if (this._observers) {
+        angular.forEach(this._observers, function (observer) {
+          callback(observer);
+        });
+      }
     };
   }
 

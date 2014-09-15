@@ -3,7 +3,7 @@
 
 var module = angular.module('fim.base');
 
-module.factory('modals', function ($modal, $timeout) {
+module.factory('modals', function ($modal) {
 
 var instance;
 
@@ -50,6 +50,9 @@ instance = {
     var options = {};
     angular.copy(modal.options, options);
     angular.extend(options, extraOptions||{});
+
+    options.keyboard = false;
+    options.backdrop = 'static';
 
     modal.instance = $modal.open(options);
     modal.instance.result.then(
