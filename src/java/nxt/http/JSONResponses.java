@@ -123,6 +123,7 @@ public final class JSONResponses {
     public static final JSONStreamAware INCORRECT_HEIGHT = incorrect("height");
     public static final JSONStreamAware MISSING_HEIGHT = missing("height");
     public static final JSONStreamAware INCORRECT_PLAIN_MESSAGE = incorrect("messageToEncrypt");
+    public static final JSONStreamAware INCORRECT_FILTER = incorrect("filter");
 
     public static final JSONStreamAware NOT_ENOUGH_FUNDS;
     static {

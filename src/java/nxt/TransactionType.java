@@ -17,6 +17,7 @@ public abstract class TransactionType {
     private static final byte TYPE_COLORED_COINS = 2;
     private static final byte TYPE_DIGITAL_GOODS = 3;
     private static final byte TYPE_ACCOUNT_CONTROL = 4;
+    private static final byte TYPE_FIMKRYPTO_MESSAGING = 40;
 
     private static final byte SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0;
 
@@ -46,6 +47,8 @@ public abstract class TransactionType {
     private static final byte SUBTYPE_DIGITAL_GOODS_REFUND = 7;
 
     private static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0;
+
+    private static final byte SUBTYPE_FIM_MESSAGING_NAMESPACED_ALIAS_ASSIGNMENT = 0;
 
     public static TransactionType findTransactionType(byte type, byte subtype) {
         switch (type) {
@@ -124,6 +127,14 @@ public abstract class TransactionType {
                     default:
                         return null;
                 }
+                
+            case TYPE_FIMKRYPTO_MESSAGING:
+              switch (subtype) {
+                  case SUBTYPE_FIM_MESSAGING_NAMESPACED_ALIAS_ASSIGNMENT:
+                      return FIMKryptoMessaging.NAMESPACED_ALIAS_ASSIGNMENT;
+                  default:
+                      return null;
+              }
             default:
                 return null;
         }
@@ -790,6 +801,98 @@ public abstract class TransactionType {
 
     }
 
+    public static abstract class FIMKryptoMessaging extends TransactionType {
+
+      private FIMKryptoMessaging() {
+      }
+
+      @Override
+      public final byte getType() {
+          return TransactionType.TYPE_FIMKRYPTO_MESSAGING;
+      }
+
+      @Override
+      final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+          return true;
+      }
+
+      @Override
+      final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+      }
+
+      public static final TransactionType NAMESPACED_ALIAS_ASSIGNMENT = new FIMKryptoMessaging() {
+
+          @Override
+          public final byte getSubtype() {
+              return TransactionType.SUBTYPE_FIM_MESSAGING_NAMESPACED_ALIAS_ASSIGNMENT;
+          }
+
+          @Override
+          Attachment.FIMKryptoMessagingNamespacedAliasAssignment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.ValidationException {
+              return new Attachment.FIMKryptoMessagingNamespacedAliasAssignment(buffer, transactionVersion);
+          }
+
+          @Override
+          Attachment.FIMKryptoMessagingNamespacedAliasAssignment parseAttachment(JSONObject attachmentData) throws NxtException.ValidationException {
+              return new Attachment.FIMKryptoMessagingNamespacedAliasAssignment(attachmentData);
+          }
+
+          @Override
+          void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+              Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment = (Attachment.FIMKryptoMessagingNamespacedAliasAssignment) transaction.getAttachment();
+              NamespacedAlias.addOrUpdateAlias(senderAccount, transaction.getId(), attachment.getAliasName(),
+                      attachment.getAliasURI(), transaction.getBlockTimestamp());
+          }
+
+          @Override
+          void undoAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) throws UndoNotSupportedException {
+              Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment = (Attachment.FIMKryptoMessagingNamespacedAliasAssignment) transaction.getAttachment();
+              NamespacedAlias alias = NamespacedAlias.getAlias(senderAccount, attachment.getAliasName());
+              if (alias.getId().equals(transaction.getId())) {
+                  NamespacedAlias.remove(alias);
+              } else {
+                  // alias has been updated, can't tell what was its previous uri
+                  throw new UndoNotSupportedException("Reversal of alias assignment not supported");
+              }
+          }
+
+          @Override
+          boolean isDuplicate(Transaction transaction, Map<TransactionType, Set<String>> duplicates) {
+              Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment = (Attachment.FIMKryptoMessagingNamespacedAliasAssignment) transaction.getAttachment();
+              StringBuilder key = new StringBuilder();
+              key.append(transaction.getSenderId());
+              key.append(attachment.getAliasName().toLowerCase());
+              return isDuplicate(FIMKryptoMessaging.NAMESPACED_ALIAS_ASSIGNMENT, key.toString(), duplicates);
+          }
+
+          @Override
+          void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+              Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment = (Attachment.FIMKryptoMessagingNamespacedAliasAssignment) transaction.getAttachment();
+              if (attachment.getAliasName().length() == 0
+                      || attachment.getAliasName().length() > Constants.MAX_ALIAS_LENGTH
+                      || attachment.getAliasURI().length() > Constants.MAX_ALIAS_URI_LENGTH) {
+                  throw new NxtException.NotValidException("Invalid alias assignment: " + attachment.getJSONObject());
+              }
+              String normalizedAlias = attachment.getAliasName().toLowerCase();
+              for (int i = 0; i < normalizedAlias.length(); i++) {
+                  if (Constants.NAMESPACED_ALPHABET.indexOf(normalizedAlias.charAt(i)) < 0) {
+                      throw new NxtException.NotValidException("Invalid alias name: " + normalizedAlias);
+                  }
+              }
+              if (!NamespacedAlias.isEnabled()) {
+                  throw new NxtException.NotYetEnabledException("Namespaced Alias not yet enabled at height " +  Nxt.getBlockchain().getLastBlock().getHeight());
+              }
+          }
+
+          @Override
+          public boolean hasRecipient() {
+              return false;
+          }
+
+      };
+
+    }
+    
     public static abstract class ColoredCoins extends TransactionType {
 
         private ColoredCoins() {}

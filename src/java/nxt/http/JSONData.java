@@ -2,6 +2,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Alias;
+import nxt.NamespacedAlias;
 import nxt.Appendix;
 import nxt.Asset;
 import nxt.Block;
@@ -44,6 +45,16 @@ final class JSONData {
         }
         return json;
     }
+
+    static JSONObject namespacedAlias(NamespacedAlias alias) {
+        JSONObject json = new JSONObject();
+        putAccount(json, "account", alias.getAccountId());
+        json.put("aliasName", alias.getAliasName());
+        json.put("aliasURI", alias.getAliasURI());
+        json.put("timestamp", alias.getTimestamp());
+        json.put("alias", Convert.toUnsignedLong(alias.getId()));
+        return json;
+    }    
 
     static JSONObject accountBalance(Account account) {
         JSONObject json = new JSONObject();

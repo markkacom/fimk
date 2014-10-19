@@ -2,6 +2,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Alias;
+import nxt.NamespacedAlias;
 import nxt.Asset;
 import nxt.Constants;
 import nxt.DigitalGoodsStore;
@@ -10,6 +11,7 @@ import nxt.crypto.EncryptedData;
 import nxt.util.Convert;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +41,36 @@ final class ParameterParser {
         return alias;
     }
 
+    static NamespacedAlias getNamespacedAlias(HttpServletRequest req) throws ParameterException {
+        Long aliasId;
+        try {
+            aliasId = Convert.parseUnsignedLong(Convert.emptyToNull(req.getParameter("alias")));
+        } catch (RuntimeException e) {
+            throw new ParameterException(INCORRECT_ALIAS);
+        }        
+        String aliasName = Convert.emptyToNull(req.getParameter("aliasName"));
+        NamespacedAlias alias;
+        if (aliasId != null) {
+            alias = NamespacedAlias.getAlias(aliasId);
+        } else if (aliasName != null) {
+            alias = NamespacedAlias.getAlias(getAccount(req), aliasName);
+        } else {
+            throw new ParameterException(MISSING_ALIAS_OR_ALIAS_NAME);
+        }
+        if (alias == null) {
+            throw new ParameterException(UNKNOWN_ALIAS);
+        }
+        return alias;
+    }
+
+    static String getFilter(HttpServletRequest req) throws ParameterException {
+        String filter = Convert.emptyToNull(req.getParameter("filter"));
+        if (filter != null && filter.length() > Constants.MAX_ALIAS_LENGTH) {
+            throw new ParameterException(INCORRECT_FILTER);
+        }
+        return filter;
+    }  
+    
     static long getAmountNQT(HttpServletRequest req) throws ParameterException {
         String amountValueNQT = Convert.emptyToNull(req.getParameter("amountNQT"));
         if (amountValueNQT == null) {
@@ -388,7 +420,6 @@ final class ParameterParser {
         } catch (NumberFormatException e) {
             return Integer.MAX_VALUE;
         }
-
     }
 
     private ParameterParser() {} // never

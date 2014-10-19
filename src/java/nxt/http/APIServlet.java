@@ -154,6 +154,11 @@ public final class APIServlet extends HttpServlet {
         map.put("getForging", GetForging.instance);
         map.put("transferAsset", TransferAsset.instance);
 
+        /* XXX - NamespacedAlias */
+        map.put("getNamespacedAlias", GetNamespacedAlias.instance);
+        map.put("setNamespacedAlias", SetNamespacedAlias.instance);
+        map.put("getNamespacedAliases", GetNamespacedAliases.instance);
+
         apiRequestHandlers = Collections.unmodifiableMap(map);
     }
 

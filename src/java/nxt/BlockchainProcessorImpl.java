@@ -806,6 +806,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }
             Account.clear();
             Alias.clear();
+            NamespacedAlias.clear();
             Asset.clear();
             Order.clear();
             Poll.clear();
