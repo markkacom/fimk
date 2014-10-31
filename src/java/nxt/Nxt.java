@@ -17,10 +17,10 @@ import java.util.Properties;
 public final class Nxt {
 
     public static final String NXT_VERSION = "1.2.6";
-    public static final String APPLICATION = "FIM";
+    public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.2.5";
+    public static final String VERSION = "0.3";
 
     private static final Properties defaultProperties = new Properties();
     static {

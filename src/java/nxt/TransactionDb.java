@@ -131,7 +131,8 @@ final class TransactionDb {
             if (rs.getBoolean("has_encrypttoself_message")) {
                 builder.encryptToSelfMessage(new Appendix.EncryptToSelfMessage(buffer, version));
             }
-            if (ecBlockHeight != 0) {
+            /* XXX - NXT 1.3.1 critical bug fix */
+            if (version > 0) {
                 builder.ecBlockHeight(ecBlockHeight);
                 builder.ecBlockId(ecBlockId);
             }

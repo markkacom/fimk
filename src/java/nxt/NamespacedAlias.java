@@ -127,10 +127,6 @@ public final class NamespacedAlias {
         if(Nxt.getBlockchain().getLastBlock().getHeight() >= Constants.NAMESPACED_ALIAS_BLOCK) {
             return true;
         }
-        Alias enabled = Alias.getAlias("namespaced_alias");
-        if(enabled != null && enabled.getAliasURI().equals("enabled")) {
-            return true;
-        }
         return false;
     }
 }

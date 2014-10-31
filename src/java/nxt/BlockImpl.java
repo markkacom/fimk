@@ -337,6 +337,10 @@ final class BlockImpl implements Block {
         return Crypto.verify(blockSignature, data2, generatorPublicKey, version >= 3) && account.setOrVerify(generatorPublicKey, this.height);
 
     }
+    
+    /* XXX - fix for invalid generation signature block 96249 */
+    final byte[] GENERATION_SIG_96248 = Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd");
+    final byte[] GENERATION_SIG_96249 = Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4");    
 
     boolean verifyGenerationSignature() throws BlockchainProcessor.BlockOutOfOrderException {
 
@@ -368,6 +372,15 @@ final class BlockImpl implements Block {
                     return false;
                 }
             }
+            
+            /* XXX - fix for invalid generation signature block 96249 */
+            if (previousBlock.height == 96248 && 
+                Arrays.equals(GENERATION_SIG_96248, previousBlock.generationSignature) && 
+                Arrays.equals(GENERATION_SIG_96249, generationSignature)) {
+              
+              Logger.logMessage("Block 96249 generation signature checkpoint passed");
+              return true;
+            }
 
             BigInteger hit = new BigInteger(1, new byte[] {generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
 
@@ -381,6 +394,41 @@ final class BlockImpl implements Block {
         }
 
     }
+//    
+//    class Whitelist {
+//      int previousBlockHeight;
+//      byte[] previousBlockGenerationSig;
+//      byte[] generationSignature;
+//      Whitelist(int previousBlockHeight, byte[] previousBlockGenerationSig, byte[] generationSignature) {
+//        this.previousBlockHeight = previousBlockHeight;
+//        this.previousBlockGenerationSig = previousBlockGenerationSig;
+//        this.generationSignature = generationSignature;
+//      }
+//      boolean match(BlockImpl previousBlock, byte[] generationSignature) {
+//        return previousBlock.height == this.previousBlockHeight && 
+//               Arrays.equals(this.previousBlockGenerationSig, previousBlock.generationSignature) && 
+//               Arrays.equals(this.generationSignature, generationSignature);
+//      }
+//    }
+//    
+//    final byte[] GENERATION_SIG_96248 = Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd");
+//    final byte[] GENERATION_SIG_96249 = Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4");
+//    
+//    boolean isWhiteListed(BlockImpl previousBlock) {
+//      ArrayList<Whitelist> list = new ArrayList<Whitelist>();
+//      
+//      list.add(new Whitelist(96248, 
+//          Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd"), 
+//          Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4")));
+//      
+//      for (Whitelist whitelist : list) {
+//        if (whitelist.match(previousBlock, generationSignature)) {
+//          return true;
+//        }
+//      }
+//      
+//      return false;
+//    }
 
     void apply() {
         /* XXX - Add the POS reward to the block forger */
