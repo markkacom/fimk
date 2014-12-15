@@ -418,7 +418,10 @@ public interface Appendix {
 
         @Override
         void undo(Transaction transaction, Account senderAccount, Account recipientAccount) {
-            recipientAccount.undo(transaction.getHeight());
+            recipientAccount.apply(this.publicKey, transaction.getHeight());
+            if (recipientAccount.setOrVerify(publicKey, transaction.getHeight())) {
+                recipientAccount.apply(this.publicKey, transaction.getHeight());
+            }            
         }
 
         public byte[] getPublicKey() {
