@@ -217,10 +217,10 @@ public final class Generator {
 
         Block lastBlock = Nxt.getBlockchain().getLastBlock();
 
-        /* XXX - re-enable forging below  Constants.ASSET_EXCHANGE_BLOCK */
-        /* XXX - re-enable forging below  Constants.TRANSPARENT_FORGING_BLOCK */
-        
-        
+        if (lastBlock.getHeight() < Constants.DIGITAL_GOODS_STORE_BLOCK) {
+            return;
+        }
+
         if (! lastBlock.equals(lastBlocks.get(accountId))) {
 
             BigInteger hit = getHit(publicKey, lastBlock);

@@ -340,7 +340,11 @@ final class BlockImpl implements Block {
     
     /* XXX - fix for invalid generation signature block 96249 */
     final byte[] GENERATION_SIG_96248 = Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd");
-    final byte[] GENERATION_SIG_96249 = Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4");    
+    final byte[] GENERATION_SIG_96249 = Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4"); 
+    
+    /* XXX - fix for invalid generation signature block 272974 */
+    final byte[] GENERATION_SIG_272974 = Convert.parseHexString("147345e8e51e8d026c5e277cda8764e6a50abe763b583f38910572f810f7b7a3");
+    final byte[] GENERATION_SIG_272975 = Convert.parseHexString("1a6ed2bcf9c9f70e169e76c6c260cfab72d95f8218e4fb6e91c106ea5d881b49");
 
     boolean verifyGenerationSignature() throws BlockchainProcessor.BlockOutOfOrderException {
 
@@ -379,6 +383,15 @@ final class BlockImpl implements Block {
                 Arrays.equals(GENERATION_SIG_96249, generationSignature)) {
               
               Logger.logMessage("Block 96249 generation signature checkpoint passed");
+              return true;
+            }
+            
+            /* XXX - fix for invalid generation signature block 272974 */
+            if (previousBlock.height == 272974 && 
+                Arrays.equals(GENERATION_SIG_272974, previousBlock.generationSignature) && 
+                Arrays.equals(GENERATION_SIG_272975, generationSignature)) {
+              
+              Logger.logMessage("Block 272974 generation signature checkpoint passed");
               return true;
             }
 
