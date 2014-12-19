@@ -205,7 +205,7 @@ final class PeerImpl implements Peer {
 
     @Override
     public boolean isBlacklisted() {
-        return blacklistingTime > 0 || Peers.knownBlacklistedPeers.contains(peerAddress);
+        return blacklistingTime > 0 || Peers.knownBlacklistedPeers.contains(peerAddress) || Peers.blacklistedVersion(version);
     }
 
     @Override

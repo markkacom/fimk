@@ -761,7 +761,7 @@ final class TransactionImpl implements Transaction {
         }
         
         /* Throws NxtException.NotValidException if senderPublicKey is on locked list */
-        Locked.test(Nxt.getBlockchain().getHeight(), senderPublicKey);        
+        Locked.test(Nxt.getBlockchain().getHeight(), senderPublicKey);
     }
 
     // returns false iff double spending

@@ -52,6 +52,8 @@ public final class Peers {
         ADDED_ACTIVE_PEER, CHANGED_ACTIVE_PEER,
         NEW_PEER
     }
+    
+    static final String VERSION_0_3_3 = "0.3.3";    
 
     static final int LOGGING_MASK_EXCEPTIONS = 1;
     static final int LOGGING_MASK_NON200_RESPONSES = 2;
@@ -714,5 +716,12 @@ public final class Peers {
     }
 
     private Peers() {} // never
+
+    public static boolean blacklistedVersion(String version) {
+      if (version != null && VERSION_0_3_3.equals(version)) {
+        return false;
+      } 
+      return true;      
+    }
 
 }
