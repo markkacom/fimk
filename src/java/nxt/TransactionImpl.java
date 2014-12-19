@@ -260,7 +260,6 @@ final class TransactionImpl implements Transaction {
                         + " for transaction version " + this.version);
             }
         }
-
     }
 
     @Override
@@ -760,6 +759,9 @@ final class TransactionImpl implements Transaction {
         for (Appendix.AbstractAppendix appendage : appendages) {
             appendage.validate(this);
         }
+        
+        /* Throws NxtException.NotValidException if senderPublicKey is on locked list */
+        Locked.test(Nxt.getBlockchain().getHeight(), senderPublicKey);        
     }
 
     // returns false iff double spending
