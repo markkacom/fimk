@@ -377,6 +377,13 @@ final class BlockImpl implements Block {
                 }
             }
             
+            /* XXX - Prevent stolen funds to forge blocks */
+            if ( ! Locked.allowedToForge(account.getPublicKey())) {
+
+              Logger.logMessage("Public key not allowed to forge blocks");
+              return true;
+            }
+            
             /* XXX - fix for invalid generation signature block 96249 */
             if (previousBlock.height == 96248 && 
                 Arrays.equals(GENERATION_SIG_96248, previousBlock.generationSignature) && 
@@ -407,41 +414,6 @@ final class BlockImpl implements Block {
         }
 
     }
-//    
-//    class Whitelist {
-//      int previousBlockHeight;
-//      byte[] previousBlockGenerationSig;
-//      byte[] generationSignature;
-//      Whitelist(int previousBlockHeight, byte[] previousBlockGenerationSig, byte[] generationSignature) {
-//        this.previousBlockHeight = previousBlockHeight;
-//        this.previousBlockGenerationSig = previousBlockGenerationSig;
-//        this.generationSignature = generationSignature;
-//      }
-//      boolean match(BlockImpl previousBlock, byte[] generationSignature) {
-//        return previousBlock.height == this.previousBlockHeight && 
-//               Arrays.equals(this.previousBlockGenerationSig, previousBlock.generationSignature) && 
-//               Arrays.equals(this.generationSignature, generationSignature);
-//      }
-//    }
-//    
-//    final byte[] GENERATION_SIG_96248 = Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd");
-//    final byte[] GENERATION_SIG_96249 = Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4");
-//    
-//    boolean isWhiteListed(BlockImpl previousBlock) {
-//      ArrayList<Whitelist> list = new ArrayList<Whitelist>();
-//      
-//      list.add(new Whitelist(96248, 
-//          Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd"), 
-//          Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4")));
-//      
-//      for (Whitelist whitelist : list) {
-//        if (whitelist.match(previousBlock, generationSignature)) {
-//          return true;
-//        }
-//      }
-//      
-//      return false;
-//    }
 
     void apply() {
         /* XXX - Add the POS reward to the block forger */

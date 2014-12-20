@@ -69,14 +69,23 @@ public class Locked {
     Convert.parseHexString("271ca64483b4f79b358baf242f309968415d42c28e47b61d420aa41de694e840"),    
     Convert.parseHexString("2eed045000b4d824f4cac979f23b3a7ffc5a90b0d1e930db9d76b80f5a729e1f")
   };
+  
+  private static boolean hit(byte[] senderPublickey) {
+    for (int i=0; i<locked_282470.length; i++) {
+      if (Arrays.equals(senderPublickey, locked_282470[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   public static void test(int height, byte[] senderPublickey) throws NotValidException {
-    if (height > THEFT_BLOCK_57MIL) {
-      for (int i=0; i<locked_282470.length; i++) {
-        if (Arrays.equals(senderPublickey, locked_282470[i])) {
-          throw new NxtException.NotValidException("Public key locked for outgoing transactions");
-        }
-      }
+    if (height > THEFT_BLOCK_57MIL && hit(senderPublickey)) {
+      throw new NxtException.NotValidException("Public key locked for outgoing transactions");
     }    
-  }  
+  }
+  
+  public static boolean allowedToForge(byte[] senderPublickey) {
+    return hit(senderPublickey) == false;
+  }
 }

@@ -142,16 +142,7 @@ final class DbVersion {
             case 36:
                 apply("CREATE TABLE IF NOT EXISTS peer (address VARCHAR PRIMARY KEY)");
             case 37:
-                /* XXX - Update known peers */
-                if (!Constants.isTestnet) {
-                    apply("INSERT INTO peer (address) VALUES " +
-                        "('5.101.102.194'), ('5.101.102.195'), ('5.101.102.196'), ('5.101.102.197'), " +
-                        "('5.101.102.199'), ('5.101.102.200'), ('5.101.102.201'), ('5.101.102.202'), " +
-                        "('5.101.102.203'), ('5.101.102.204'), ('5.101.102.205'), ('107.170.73.9'), " + 
-                        "('107.170.123.54'), ('107.170.138.55'), ('107.170.149.231')");
-                } else {
-                    apply("INSERT INTO peer (address) VALUES " + "('178.62.176.45'), ('178.62.176.46')");
-                }
+              apply(null);
             case 38:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS full_hash BINARY(32)");
             case 39:
@@ -246,6 +237,27 @@ final class DbVersion {
             case 68:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS has_encrypttoself_message BOOLEAN NOT NULL DEFAULT FALSE");
             case 69:
+              /* Remove all peers since we start blacklisting peers from before 0.3.3 */
+              apply("DELETE FROM peer");
+            case 70:
+              if (!Constants.isTestnet) {
+                  apply("INSERT INTO peer (address) VALUES " +
+                      "('5.101.102.194'), ('5.101.102.195'), ('5.101.102.196'), ('5.101.102.197'), " +
+                      "('5.101.102.199'), ('5.101.102.200'), ('5.101.102.201'), ('5.101.102.202'), " +
+                      "('5.101.102.203'), ('5.101.102.204'), ('5.101.102.205'), ('107.170.73.9'), " + 
+                      "('107.170.123.54'), ('107.170.138.55')");
+              } else {
+                  apply("INSERT INTO peer (address) VALUES " + "('178.62.176.45'), ('178.62.176.46')");
+              }
+            case 71:
+              apply(null);
+            case 72:
+              /* Validate the chain to be compatible with the 0.3.3 fork */
+              if ( ! Constants.isTestnet) {
+                  BlockchainProcessorImpl.getInstance().validateAtNextScan();
+              }
+              apply(null);
+            case 73:
                 return;
             default:
                 throw new RuntimeException("Database inconsistent with code, probably trying to run older code on newer database");

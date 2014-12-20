@@ -10,6 +10,7 @@ import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -34,6 +35,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 final class BlockchainProcessorImpl implements BlockchainProcessor {
+  
+    /* Rollback 57M theft */
+    static final Long ASSET_FREEZE_57M_THEFT_BLOCK = Convert.parseUnsignedLong("13325683304515417100");
+    static final int ASSET_FREEZE_57M_THEFT_HEIGHT = 282570;  
 
     /* XXX - Remove CHECKSUM_TRANSPARENT_FORGING check */
     private static final BlockchainProcessorImpl instance = new BlockchainProcessorImpl();
@@ -471,7 +476,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         }
         return digest.digest();
     }
-
+    
     private void pushBlock(final BlockImpl block) throws BlockNotAcceptedException {
 
         int curTime = Convert.getEpochTime();
@@ -502,6 +507,12 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 if (block.getId().equals(Long.valueOf(0L)) || BlockDb.hasBlock(block.getId())) {
                     throw new BlockNotAcceptedException("Duplicate block or invalid id");
                 }
+                
+                /* Rollback 57M theft */
+                if ( block.getId().equals(ASSET_FREEZE_57M_THEFT_BLOCK) && previousLastBlock.getHeight() == (ASSET_FREEZE_57M_THEFT_HEIGHT - 1)) {
+                  throw new BlockNotAcceptedException("Asset freeze after 57M theft");
+                }
+                
                 if (! block.verifyGenerationSignature()) {
                     throw new BlockNotAcceptedException("Generation signature verification failed");
                 }
@@ -836,6 +847,10 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                             if (currentBlock.getVersion() != getBlockVersion(blockchain.getHeight())) {
                                 throw new NxtException.NotValidException("Invalid block version");
                             }
+                            if ( currentBlock.getId().equals(ASSET_FREEZE_57M_THEFT_BLOCK) && currentBlock.getHeight() == ASSET_FREEZE_57M_THEFT_HEIGHT) {
+                                throw new NxtException.NotValidException("Asset freeze after 57M theft");
+                            }                            
+                            
                             byte[] blockBytes = currentBlock.getBytes();
                             JSONObject blockJSON = (JSONObject) JSONValue.parse(currentBlock.getJSONObject().toJSONString());
                             if (! Arrays.equals(blockBytes, parseBlock(blockJSON).getBytes())) {

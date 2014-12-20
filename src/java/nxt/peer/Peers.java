@@ -52,8 +52,6 @@ public final class Peers {
         ADDED_ACTIVE_PEER, CHANGED_ACTIVE_PEER,
         NEW_PEER
     }
-    
-    static final String VERSION_0_3_3 = "0.3.3";    
 
     static final int LOGGING_MASK_EXCEPTIONS = 1;
     static final int LOGGING_MASK_NON200_RESPONSES = 2;
@@ -62,6 +60,7 @@ public final class Peers {
 
     static final Set<String> wellKnownPeers;
     static final Set<String> knownBlacklistedPeers;
+    static final Set<String> knownWhitelistedPeers;
 
     static final int connectTimeout;
     static final int readTimeout;
@@ -171,6 +170,13 @@ public final class Peers {
         } else {
             knownBlacklistedPeers = Collections.unmodifiableSet(new HashSet<>(knownBlacklistedPeersList));
         }
+        
+        List<String> knownWhitelistedPeersList = Nxt.getStringListProperty("nxt.knownWhitelistedPeers");
+        if (knownWhitelistedPeersList.isEmpty()) {
+            knownWhitelistedPeers = Collections.emptySet();
+        } else {
+            knownWhitelistedPeers = Collections.unmodifiableSet(new HashSet<>(knownWhitelistedPeersList));
+        }        
 
         maxNumberOfConnectedPublicPeers = Nxt.getIntProperty("nxt.maxNumberOfConnectedPublicPeers");
         connectTimeout = Nxt.getIntProperty("nxt.connectTimeout");
@@ -716,12 +722,5 @@ public final class Peers {
     }
 
     private Peers() {} // never
-
-    public static boolean blacklistedVersion(String version) {
-      if (version != null && VERSION_0_3_3.equals(version)) {
-        return false;
-      } 
-      return true;      
-    }
 
 }

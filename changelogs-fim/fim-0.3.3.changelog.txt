@@ -1,7 +1,46 @@
 FIMK 0.3.3 is based on NXT 1.2.6.
 
-Temporarily blocked all transactions from acccounts with confirmed stolen funds 
-after a major theft of 57M FIMK
+This is a hard fork everyone MUST update to this release. 
 
 This release and all future releases blacklist any peer that is on or below 
-version 0.3.2.
+version 0.3.2. 
+
+On startup a one time scan and verification of the blockchain will be performed. 
+Deleting your folder blockchain is not required for this update.
+
+About the hard fork:
+
+  On Friday December 19th 2014 we were informed of a theft of 57 Million FIMK 
+  from a user's account by a hacker, who gained gained access to the accounts 
+  through the user carelessly sending his account passphrases to a rigged public 
+  node. The hacker transferred a total of approx. 57 Million FIMK from several 
+  accounts to 59 other accounts, each account receiving roughly 1M FIMK. 
+  In total this amounts to 13.9 % of all FIMK in existence at this time.
+  
+  As the portion of stolen funds is a significant portion of the total FIMK in 
+  circulation, the association is obliged to intervene. To avoid a situation 
+  where FIMK would at the mercy of a thief in possession of a large portion of 
+  total funds, strengthening her stake by forging constantly and thus gaining 
+  undue control of the network, AND likely dumping some of the large stash 
+  constantly rendering the remaining FIMK worthless (as has happened before with 
+  other coins in similar large scale incidents) the association decided to freeze 
+  the hacker assets by releasing customized emergency version of the FIMKrypto 
+  server which does just that. 
+  
+  This release temporarily seals the stolen FIMK in the protocol making them 
+  untouchable by no one, not even by the association. This is done to prevent 
+  mixing of the stolen funds through further transfers to obfuscate the origin, 
+  which we were able to prevent just in time. The following steps and measures 
+  to be taken for the frozen stash are discussed with the community and decided 
+  on the basis of those discussions.
+
+Mandatory update
+
+  Earlier server releases (before 0.3.3) are blacklisted by default to prevent 
+  the chance of future forks and keep the network coherent.
+  
+Hacker accounts locked
+
+  There are 59 accounts identified that hold the stolen FIMK, the public keys to
+  these accounts are locked from making outgoing transactions and are not allowed
+  to forge blocks.
