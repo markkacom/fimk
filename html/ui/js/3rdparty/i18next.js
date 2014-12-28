@@ -23,7 +23,6 @@
 		fallbackLng: ['dev'],
 		fallbackNS: [],
 		detectLngQS: 'setLng',
-		detectLngFromLocalStorage: false,
 		ns: 'translation',
 		fallbackOnNull: true,
 		fallbackOnEmpty: false,
@@ -201,15 +200,14 @@
 		o.interpolationPrefixEscaped = f.regexEscape(o.interpolationPrefix);
 		o.interpolationSuffixEscaped = f.regexEscape(o.interpolationSuffix);
 
-		if (!o.lng) o.lng = f.detectLanguage();
+		//if (!o.lng) o.lng = f.detectLanguage();
+		if (!o.lng) {
+			o.lng = o.fallbackLng[0];
+		}
 
 		languages = f.toLanguages(o.lng);
 		currentLng = languages[0];
 		f.log('currentLng set to: ' + currentLng);
-
-		if (o.detectLngFromLocalStorage && typeof document !== 'undefined' && window.localstorage) {
-			window.localStorage.setItem('i18next_lng', currentLng);
-		}
 
 		var lngTranslate = translate;
 		if (options.fixLng) {
@@ -448,17 +446,7 @@
 	}
 
 	function needsPlural(options) {
-		if (options.count == undefined) {
-			return false;
-		} else if (typeof options.count == 'string') {
-			if (options.count !== "1") {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return (options.count !== 1);
-		}
+		return (options.count !== undefined && typeof options.count != 'string' && options.count !== 1);
 	}
 
 	function exists(key, options) {
@@ -602,10 +590,7 @@
 			var pluralKey = ns + o.nsseparator + key + o.pluralSuffix;
 			var pluralExtension = pluralExtensions.get(lngs[0], options.count);
 			if (pluralExtension >= 0) {
-				var newPluralKey = pluralKey + '_' + pluralExtension;
-				if (exists(newPluralKey)) {
-					pluralKey = newPluralKey;
-				}
+				pluralKey = pluralKey + '_' + pluralExtension;
 			} else if (pluralExtension === 1) {
 				pluralKey = ns + o.nsseparator + key; // singular
 			}
@@ -717,25 +702,13 @@
 			}
 		}
 
-		// get from localstorage
-		if (!detectedLng && typeof document !== 'undefined' && window.localstorage && o.detectLngFromLocalStorage) {
-			detectedLng = window.localStorage.getItem('i18next_lng');
-		}
-
 		// get from navigator
 		if (!detectedLng && typeof navigator !== 'undefined') {
 			detectedLng = (navigator.language) ? navigator.language : navigator.userLanguage;
 		}
 
-		//fallback
-		if (!detectedLng) {
-			detectedLng = o.fallbackLng[0];
-		}
-
 		if (detectedLng.indexOf("en-") == 0) {
 			detectedLng = "en";
-		} else if (detectedLng.indexOf("zh-") == 0 && detectedLng != "zh-tw") {
-			detectedLng = "zh";
 		}
 
 		return detectedLng;

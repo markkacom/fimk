@@ -15,9 +15,7 @@ var NRS = (function(NRS, $, undefined) {
 		"asset_transfer_warning": "10000",
 		"24_hour_format": 1,
 		"remember_passphrase": 0,
-		"language": "en",
-		"items_page": 15,
-		"themeChoice": "default"
+		"language": "en"
 	};
 
 	NRS.defaultColors = {
@@ -447,39 +445,14 @@ var NRS = (function(NRS, $, undefined) {
 			}
 			NRS.applySettings();
 		}
-	};
+	}
+
 	NRS.applySettings = function(key) {
-	    if (!key || key == "themeChoice") {
-			if(NRS.settings["themeChoice"] == "default"){
-				var oldlink = document.getElementsByTagName("link").item(3);
-				var newlink = document.createElement("link");
-        		newlink.setAttribute("rel", "stylesheet");
-       			newlink.setAttribute("type", "text/css");
-        		newlink.setAttribute("href", 'css/app.css');
-				document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
-				$("#settings_box .box-success form .box-body .form-group").css("display", "block");
-			}
-			else if (NRS.settings["themeChoice"] != ""){
-				var oldlink = document.getElementsByTagName("link").item(3);
-				var newlink = document.createElement("link");
-        		newlink.setAttribute("rel", "stylesheet");
-       			newlink.setAttribute("type", "text/css");
-        		newlink.setAttribute("href", "css/" + NRS.settings["themeChoice"] + ".css");
-				document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
-				$("#settings_box .box-success form .box-body .form-group").css("display", "none");
-				$("#settings_box .box-success form .box-body .form-group:first-child").css("display", "block");
-			}
-			$("#change_theme").val(NRS.settings["themeChoice"]);
-		}
-		
 		if (!key || key == "language") {
 			if ($.i18n.lng() != NRS.settings["language"]) {
 				$.i18n.setLng(NRS.settings["language"], null, function() {
 					$("[data-i18n]").i18n();
 				});
-				if (key && window.localstorage) {
-					window.localStorage.setItem('i18next_lng', NRS.settings["language"]);
-				}
 				if (NRS.inApp) {
 					parent.postMessage({
 						"type": "language",
@@ -514,10 +487,6 @@ var NRS = (function(NRS, $, undefined) {
 			} else if (NRS.settings["news"] == 1) {
 				$("#news_link").show();
 			}
-		}
-		
-		if (!key || key == "items_page") {
-			NRS.itemsPerPage = NRS.settings["items_page"];
 		}
 
 		if (!NRS.inApp && !NRS.downloadingBlockchain) {

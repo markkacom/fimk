@@ -282,7 +282,7 @@ var NRS = (function(NRS, $, undefined) {
 
 			if (!/^[0]+$/.test(toRemove)) {
 				//return new Big(price).div(new Big(Math.pow(10, decimals))).round(8, 0);
-				throw $.t("error_invalid_input");
+				throw "Invalid input.";
 			} else {
 				return price.slice(0, -decimals);
 			}
@@ -384,7 +384,7 @@ var NRS = (function(NRS, $, undefined) {
 
 			return parts[0] + "." + fraction;
 		} else {
-			throw $.t("error_invalid_input");
+			throw "Incorrect input";
 		}
 	}
 
@@ -405,7 +405,7 @@ var NRS = (function(NRS, $, undefined) {
 				var fraction = parts[1].substring(0, 8);
 			}
 		} else {
-			throw $.t("error_invalid_input");
+			throw "Invalid input";
 		}
 
 		for (var i = fraction.length; i < 8; i++) {
@@ -416,7 +416,7 @@ var NRS = (function(NRS, $, undefined) {
 
 		//in case there's a comma or something else in there.. at this point there should only be numbers
 		if (!/^\d+$/.test(result)) {
-			throw $.t("error_invalid_input");
+			throw "Invalid input.";
 		}
 
 		//remove leading zeroes
@@ -731,24 +731,9 @@ var NRS = (function(NRS, $, undefined) {
 		if (!unmodified) {
 			delete data.request_type;
 			delete data.converted_account_id;
-			delete data.merchant_info;
 		}
 
 		return data;
-	}
-
-	NRS.convertNumericToRSAccountFormat = function(account) {
-		if (/^NXT\-/i.test(account)) {
-			return String(account).escapeHTML();
-		} else {
-			var address = new NxtAddress();
-
-			if (address.set(account)) {
-				return address.toString().escapeHTML();
-			} else {
-				return "";
-			}
-		}
 	}
 
 	NRS.getAccountLink = function(object, acc) {
@@ -1005,13 +990,11 @@ var NRS = (function(NRS, $, undefined) {
 				value = NRS.formatAmount(new BigInteger(String(value))) + " FIM";
 			} else if (key == "sender" || key == "recipient" || key == "account" || key == "seller" || key == "buyer") {
 				value = "<a href='#' data-user='" + String(value).escapeHTML() + "'>" + NRS.getAccountTitle(value) + "</a>";
-			} else if (key == "request_processing_time") { /* Skip from displaying request processing time */
-				continue;
 			} else {
 				value = String(value).escapeHTML().nl2br();
 			}
 
-			rows += "<tr><td style='font-weight:bold" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" + value + "</td></tr>";
+			rows += "<tr><td style='font-weight:bold;white-space:nowrap" + (fixed ? ";width:150px" : "") + "'>" + $.t(key).escapeHTML() + (type ? " " + type.escapeHTML() : "") + ":</td><td style='width:90%;word-break:break-all'>" + value + "</td></tr>";
 		}
 
 		return rows;
@@ -1190,11 +1173,6 @@ var NRS = (function(NRS, $, undefined) {
 			$('.left-side').toggleClass("collapse-left");
 			$(".right-side").toggleClass("strech");
 		}
-		
-		$(".left-side").one($.support.transition.end,
-		function() {
-			$(".content.content-stretch:visible").width($(".page:visible").width());
-		});
 	});
 
 	$.fn.tree = function() {
@@ -1507,7 +1485,7 @@ var NRS = (function(NRS, $, undefined) {
 		if ($.i18n.exists(nameKey)) {
 			return $.t(nameKey).escapeHTML();
 		} else {
-			return nameKey.replace(/_/g, " ").escapeHTML();
+			return String(name).escapeHTML();
 		}
 	}
 

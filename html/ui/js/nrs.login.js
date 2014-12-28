@@ -152,8 +152,7 @@ var NRS = (function(NRS, $, undefined) {
 				"secretPhrase": password
 			}, function(response) {
 				if (!response.errorCode) {
-					NRS.account = String(response.account).escapeHTML();
-					NRS.accountRS = String(response.accountRS).escapeHTML();
+					NRS.account = String(response.accountId).escapeHTML();
 					NRS.publicKey = NRS.getPublicKey(converters.stringToHexString(password));
 				}
 
@@ -163,7 +162,13 @@ var NRS = (function(NRS, $, undefined) {
 						"offset": 10
 					});
 					return;
-				} else if (!NRS.accountRS) {
+				}
+
+				var nxtAddress = new NxtAddress();
+
+				if (nxtAddress.set(NRS.account)) {
+					NRS.accountRS = nxtAddress.toString();
+				} else {
 					$.growl($.t("error_generate_account_id"), {
 						"type": "danger",
 						"offset": 10
