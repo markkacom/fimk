@@ -39,7 +39,8 @@ public class NxtProperties {
       outStream.close();
     }
     catch (IOException e) {
-      throw new RuntimeException("Error loading logging properties", e);
+      //throw new RuntimeException("Error loading logging properties", e);
+      System.out.println("Error loading logging properties");
     }
   }
 
@@ -55,7 +56,8 @@ public class NxtProperties {
         }
       }
       catch (IOException e) {
-        throw new RuntimeException("Error loading properties", e);
+        //throw new RuntimeException("Error loading properties", e);
+        System.out.println("Error loading properties");
       }
     }
     return properties;
