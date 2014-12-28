@@ -26,7 +26,7 @@ var NRS = (function(NRS, $, undefined) {
 
 					_messages[otherUser].push(response.transactions[i]);
 				}
-
+				
 				displayMessageSidebar(callback);
 			} else {
 				$("#no_message_selected").hide();
@@ -355,7 +355,7 @@ var NRS = (function(NRS, $, undefined) {
 
 		var requestType = "sendMessage";
 
-		if (NRS.dgsBlockPassed && $("#inline_message_encrypt").is(":checked")) {
+		if ($("#inline_message_encrypt").is(":checked")) {
 			data.encrypt_message = true;
 		}
 

@@ -5,6 +5,7 @@ import nxt.peer.Peers;
 import nxt.user.Users;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
+import nxt.util.Time;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,11 +17,13 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.2.6";
+    public static final String NXT_VERSION = "1.3.5";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.3.3";
+    public static final String VERSION = "0.3.4";
+
+    private static volatile Time time = new Time.EpochTime();
 
     private static final Properties defaultProperties = new Properties();
     static {
@@ -130,6 +133,14 @@ public final class Nxt {
         return TransactionProcessorImpl.getInstance();
     }
 
+    public static int getEpochTime() {
+        return time.getTime();
+    }
+
+    static void setTime(Time time) {
+        Nxt.time = time;
+    }
+
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -150,10 +161,10 @@ public final class Nxt {
     }
 
     public static void shutdown() {
+        Logger.logShutdownMessage("Shutting down...");
         API.shutdown();
         Users.shutdown();
         Peers.shutdown();
-        TransactionProcessorImpl.getInstance().shutdown();
         ThreadPool.shutdown();
         Db.shutdown();
         Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") stopped.");
@@ -163,24 +174,44 @@ public final class Nxt {
     private static class Init {
 
         static {
+            try {
+                long startTime = System.currentTimeMillis();
+                Logger.init();
+                logSystemProperties();
+                Db.init();
+                TransactionProcessorImpl.getInstance();
+                BlockchainProcessorImpl.getInstance();
+                Account.init();
+                Alias.init();
+                Asset.init();
+                DigitalGoodsStore.init();
+                Hub.init();
+                Order.init();
+                Poll.init();
+                Trade.init();
+                AssetTransfer.init();
+                Vote.init();
+                Peers.init();
+                Generator.init();
+                API.init();
+                Users.init();
+                DebugTrace.init();
+                int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
+                ThreadPool.start(timeMultiplier);
+                if (timeMultiplier > 1) {
+                    setTime(new Time.FasterTime(Math.max(getEpochTime(), Nxt.getBlockchain().getLastBlock().getTimestamp()), timeMultiplier));
+                    Logger.logMessage("TIME WILL FLOW " + timeMultiplier + " TIMES FASTER!");
+                }
 
-            long startTime = System.currentTimeMillis();
-            Logger.init();
-            Db.init();
-            BlockchainProcessorImpl.getInstance();
-            TransactionProcessorImpl.getInstance();
-            Peers.init();
-            Generator.init();
-            API.init();
-            Users.init();
-            DebugTrace.init();
-            ThreadPool.start();
-
-            long currentTime = System.currentTimeMillis();
-            Logger.logDebugMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
-            Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") started successfully.");
-            if (Constants.isTestnet) {
-                Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
+                long currentTime = System.currentTimeMillis();
+                Logger.logMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
+                Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") started successfully.");
+                if (Constants.isTestnet) {
+                    Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
+                }
+            } catch (Exception e) {
+                Logger.logErrorMessage(e.getMessage(), e);
+                System.exit(1);
             }
         }
 
@@ -188,6 +219,28 @@ public final class Nxt {
 
         private Init() {} // never
 
+    }
+
+    private static void logSystemProperties() {
+        String[] loggedProperties = new String[] {
+                "java.version",
+                "java.vm.version",
+                "java.vm.name",
+                "java.vendor",
+                "java.vm.vendor",
+                "java.home",
+                "java.library.path",
+                "java.class.path",
+                "os.arch",
+                "sun.arch.data.model",
+                "os.name",
+                "file.encoding"
+        };
+        for (String property : loggedProperties) {
+            Logger.logDebugMessage(String.format("%s = %s", property, System.getProperty(property)));
+        }
+        Logger.logDebugMessage(String.format("availableProcessors = %s", Runtime.getRuntime().availableProcessors()));
+        Logger.logDebugMessage(String.format("maxMemory = %s", Runtime.getRuntime().maxMemory()));
     }
 
     private Nxt() {} // never

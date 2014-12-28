@@ -457,7 +457,7 @@ var NRS = (function(NRS, $, undefined) {
 			$("#decrypt_note_form_container, " + formEl).show();
 		} else {
 			NRS.removeDecryptionForm();
-			$(outputEl).html(output).show();
+			$(outputEl).append(output).show();
 		}
 	}
 
@@ -525,6 +525,9 @@ var NRS = (function(NRS, $, undefined) {
 			var nonceField = (typeof title != "string" ? title.nonce : key + "Nonce");
 
 			if (key == "encryptedMessage" || key == "encryptToSelfMessage") {
+			    if (key == "encryptToSelfMessage") {
+					otherAccount=accountId;
+				}
 				encrypted = _encryptedNote.transaction.attachment[key].data;
 				nonce = _encryptedNote.transaction.attachment[key].nonce;
 			} else if (_encryptedNote.transaction.attachment && _encryptedNote.transaction.attachment[key]) {
@@ -581,7 +584,7 @@ var NRS = (function(NRS, $, undefined) {
 
 		var outputEl = (_encryptedNote.options.outputEl ? String(_encryptedNote.options.outputEl).escapeHTML() : "#transaction_info_output_bottom");
 
-		$(outputEl).html(output).show();
+		$(outputEl).append(output).show();
 
 		_encryptedNote = null;
 

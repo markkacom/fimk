@@ -11,7 +11,7 @@ FIM is different from NXT in the following ways:
 
 This README is based of the original NXT README.
 
-This is FIM version 0.3.3 which is based on NXT 1.2.6.
+This is FIM version 0.3.4 which is based on NXT 1.3.5.
 
 
 Running the FIM software:
@@ -29,6 +29,10 @@ Open a browser, without stopping the java process, and go to
 http://localhost:7886 , where the FIM UI should now be available. To stop the
 application, type Ctrl-C inside the console window.
 
+Warning: It is better to use only latin characters and no spaces in the path
+to the Nxt installation directory, as the use of special characters may result
+in permissions denied error in the browser, which is a known jetty issue.
+
 
 Customization:
 
@@ -44,6 +48,17 @@ settings in nxt.properties override those in nxt-default.properties. This way,
 when upgrading the software, you can safely overwrite nxt-default.properties
 with the updated file from the new package, while your customizations remain
 safe in the nxt.properties file.
+
+
+How to contribute?
+
+There are many ways to contribute to Nxt. Here are some examples:
+
+ * create pull requests
+ * review pull requests
+ * review existing code
+ * create issues (aka feature ideas, bug reports, documentation etc.)
+ * answer issues
 
 
 Technical details:
@@ -104,6 +119,8 @@ Compiling:
 
 The source is included in the src subdirectory. To compile it on linux, just
 run the enclosed compile.sh script. This will compile all java classes and
-package them in an fim.jar file, replacing the existing one.
-
+put them under the classes subdirectory, which is already in the classpath
+used by the run.sh startup script. The compiled class files can optionally be
+packaged in a nxt.jar file using the enclosed jar.sh script, and then nxt.jar
+should be included in the classpath instead of the classes subdirectory.
 

@@ -38,6 +38,12 @@ public final class Constants {
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
     
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
+    public static final int MAX_ROLLBACK = Nxt.getIntProperty("nxt.maxRollback");
+    static {
+        if (MAX_ROLLBACK < 1440) {
+            throw new RuntimeException("nxt.maxRollback must be at least 1440");
+        }
+    }
 
     public static final int MAX_ALIAS_URI_LENGTH = 1000;
     public static final int MAX_ALIAS_LENGTH = 100;
@@ -49,7 +55,6 @@ public final class Constants {
     public static final int MAX_ACCOUNT_DESCRIPTION_LENGTH = 1000;
 
     public static final long MAX_ASSET_QUANTITY_QNT = 1000000000L * 100000000L;
-    public static final long ASSET_ISSUANCE_FEE_NQT = 1000 * ONE_NXT;
     public static final int MIN_ASSET_NAME_LENGTH = 3;
     public static final int MAX_ASSET_NAME_LENGTH = 10;
     public static final int MAX_ASSET_DESCRIPTION_LENGTH = 1000;
@@ -86,6 +91,7 @@ public final class Constants {
     public static final int TRANSPARENT_FORGING_BLOCK_6 = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK_7 = Integer.MAX_VALUE;
     public static final int TRANSPARENT_FORGING_BLOCK_8 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
+    public static final int LAST_KNOWN_BLOCK = isTestnet ? 80000 : 308000;
 
     public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
     

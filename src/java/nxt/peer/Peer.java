@@ -16,8 +16,6 @@ public interface Peer extends Comparable<Peer> {
     State getState();
 
     String getVersion();
-    
-    String getNXTVersion();
 
     String getApplication();
 

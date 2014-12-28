@@ -9,7 +9,6 @@ import nxt.util.Convert;
 import nxt.util.CountingInputStream;
 import nxt.util.CountingOutputStream;
 import nxt.util.Logger;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
@@ -33,7 +32,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -47,6 +48,7 @@ final class PeerImpl implements Peer {
     private volatile String platform;
     private volatile String application;
     private volatile String version;
+    private volatile boolean isOldVersion;
     private volatile String nxt_version;    
     private volatile long adjustedWeight;
     private volatile long blacklistingTime;
@@ -54,7 +56,8 @@ final class PeerImpl implements Peer {
     private volatile long downloadedVolume;
     private volatile long uploadedVolume;
     private volatile int lastUpdated;
-    private volatile boolean isOldVersion;
+    private volatile long hallmarkBalance = -1;
+    private volatile int hallmarkBalanceHeight;
 
     PeerImpl(String peerAddress, String announcedAddress) {
         this.peerAddress = peerAddress;
@@ -119,60 +122,41 @@ final class PeerImpl implements Peer {
     }
 
     void setVersion(String version) {
-        if (version == null || version.equals("?")) {
-            Logger.logDebugMessage("Could not determine version of " + peerAddress);
-            this.version = version;
-            return;
-        }
-        
         if (this.version != null && this.version.equals(version)) {
             return;
         }
         this.version = version;
-
         isOldVersion = false;
         if (application != null && ! Nxt.APPLICATION.equals(application)) {
           isOldVersion = true;
-        }        
+        }          
         else if (Nxt.APPLICATION.equals(application) && version != null) {
             String[] versions = version.split("\\.");
             if (versions.length < Constants.MIN_VERSION.length) {
                 isOldVersion = true;
-            }
-            else {
+            } else {
                 for (int i = 0; i < Constants.MIN_VERSION.length; i++) {
                     try {
                         int v = Integer.parseInt(versions[i]);
                         if (v > Constants.MIN_VERSION[i]) {
                             isOldVersion = false;
                             break;
-                        }
-                        else if (v < Constants.MIN_VERSION[i]) {
+                        } else if (v < Constants.MIN_VERSION[i]) {
                             isOldVersion = true;
                             break;
                         }
-                    }
-                    catch (NumberFormatException e) {
+                    } catch (NumberFormatException e) {
                         isOldVersion = true;
                         break;
                     }
                 }
             }
-        }
-        if (isOldVersion) {
-            Logger.logDebugMessage(String.format("Blacklisting %s version %s", peerAddress, version));
+            if (isOldVersion) {
+                Logger.logDebugMessage(String.format("Blacklisting %s version %s", peerAddress, version));
+            }
         }
     }
 
-    @Override
-    public String getNXTVersion() {
-        return nxt_version;
-    }
-
-    void setNXTVersion(String version) {
-        this.nxt_version = version;
-    }
-    
     @Override
     public String getApplication() {
         return application;
@@ -241,11 +225,13 @@ final class PeerImpl implements Peer {
         if (hallmark == null) {
             return 0;
         }
-        Account account = Account.getAccount(hallmark.getAccountId());
-        if (account == null) {
-            return 0;
+        if (hallmarkBalance == -1 || hallmarkBalanceHeight < Nxt.getBlockchain().getHeight() - 60) {
+            long accountId = hallmark.getAccountId();
+            Account account = Account.getAccount(accountId);
+            hallmarkBalance = account == null ? 0 : account.getBalanceNQT();
+            hallmarkBalanceHeight = Nxt.getBlockchain().getHeight();
         }
-        return (int)(adjustedWeight * (account.getBalanceNQT() / Constants.ONE_NXT) / Constants.MAX_BALANCE_NXT);
+        return (int)(adjustedWeight * (hallmarkBalance / Constants.ONE_NXT) / Constants.MAX_BALANCE_NXT);
     }
 
     @Override
@@ -263,13 +249,14 @@ final class PeerImpl implements Peer {
 
     @Override
     public void blacklist(Exception cause) {
-        if (cause instanceof NxtException.NotCurrentlyValidException || cause instanceof BlockchainProcessor.BlockOutOfOrderException) {
-            // don't blacklist peers just because a feature is not yet enabled
+        if (cause instanceof NxtException.NotCurrentlyValidException || cause instanceof BlockchainProcessor.BlockOutOfOrderException
+                || cause instanceof SQLException || cause.getCause() instanceof SQLException) {
+            // don't blacklist peers just because a feature is not yet enabled, or because of database timeouts
             // prevents erroneous blacklisting during loading of blockchain from scratch
             return;
         }
-        if (! isBlacklisted()) {
-            Logger.logDebugMessage("Blacklisting " + peerAddress + " because of: " + cause.toString());
+        if (! isBlacklisted() && ! (cause instanceof IOException)) {
+            Logger.logDebugMessage("Blacklisting " + peerAddress + " because of: " + cause.toString(), cause);
         }
         blacklist();
     }
@@ -327,7 +314,14 @@ final class PeerImpl implements Peer {
         try {
 
             String address = announcedAddress != null ? announcedAddress : peerAddress;
-            URL url = new URL("http://" + address + (port <= 0 ? ":" + (Constants.isTestnet ? Peers.TESTNET_PEER_PORT : Peers.DEFAULT_PEER_PORT) : "") + "/nxt");
+            StringBuilder buf = new StringBuilder("http://");
+            buf.append(address);
+            if (port <= 0) {
+                buf.append(':');
+                buf.append(Peers.getDefaultPeerPort());
+            }
+            buf.append("/nxt");
+            URL url = new URL(buf.toString());
 
             if (Peers.communicationLoggingMask != 0) {
                 StringWriter stringWriter = new StringWriter();
@@ -443,7 +437,7 @@ final class PeerImpl implements Peer {
             }
             if (announcedAddress == null) {
                 setAnnouncedAddress(peerAddress);
-                Logger.logDebugMessage("Connected to peer without announced address, setting to " + peerAddress);
+                //Logger.logDebugMessage("Connected to peer without announced address, setting to " + peerAddress);
             }
             if (analyzeHallmark(announcedAddress, (String)response.get("hallmark"))) {
                 setState(State.CONNECTED);
@@ -451,7 +445,7 @@ final class PeerImpl implements Peer {
             } else {
                 blacklist();
             }
-            lastUpdated = Convert.getEpochTime();
+            lastUpdated = Nxt.getEpochTime();
         } else {
             setState(State.NON_CONNECTED);
         }
@@ -477,13 +471,13 @@ final class PeerImpl implements Peer {
             String host = uri.getHost();
 
             Hallmark hallmark = Hallmark.parseHallmark(hallmarkString);
-            if (! hallmark.isValid()
-                    || ! (hallmark.getHost().equals(host) || InetAddress.getByName(host).equals(InetAddress.getByName(hallmark.getHost())))) {
+            if (!hallmark.isValid()
+                    || !(hallmark.getHost().equals(host) || InetAddress.getByName(host).equals(InetAddress.getByName(hallmark.getHost())))) {
                 //Logger.logDebugMessage("Invalid hallmark for " + host + ", hallmark host is " + hallmark.getHost());
                 return false;
             }
             this.hallmark = hallmark;
-            Long accountId = Account.getId(hallmark.getPublicKey());
+            long accountId = Account.getId(hallmark.getPublicKey());
             List<PeerImpl> groupedPeers = new ArrayList<>();
             int mostRecentDate = 0;
             long totalWeight = 0;
@@ -491,7 +485,7 @@ final class PeerImpl implements Peer {
                 if (peer.hallmark == null) {
                     continue;
                 }
-                if (accountId.equals(peer.hallmark.getAccountId())) {
+                if (accountId == peer.hallmark.getAccountId()) {
                     groupedPeers.add(peer);
                     if (peer.hallmark.getDate() > mostRecentDate) {
                         mostRecentDate = peer.hallmark.getDate();
@@ -509,8 +503,9 @@ final class PeerImpl implements Peer {
 
             return true;
 
-        } catch (URISyntaxException | UnknownHostException | RuntimeException e) {
-            Logger.logDebugMessage("Failed to analyze hallmark for peer " + address + ", " + e.toString());
+        } catch (UnknownHostException ignore) {
+        } catch (URISyntaxException | RuntimeException e) {
+            Logger.logDebugMessage("Failed to analyze hallmark for peer " + address + ", " + e.toString(), e);
         }
         return false;
 

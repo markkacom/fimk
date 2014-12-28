@@ -1,6 +1,6 @@
 package nxt.peer;
 
-import nxt.util.Convert;
+import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -34,12 +34,6 @@ final class GetInfo extends PeerServlet.PeerRequestHandler {
         }
         peerImpl.setVersion(version.trim());
 
-        String nxtversion = (String)request.get("nxtversion");
-        if (nxtversion == null) {
-          nxtversion = "?";
-        }
-        peerImpl.setNXTVersion(nxtversion.trim());
-
         String platform = (String)request.get("platform");
         if (platform == null) {
             platform = "?";
@@ -47,7 +41,7 @@ final class GetInfo extends PeerServlet.PeerRequestHandler {
         peerImpl.setPlatform(platform.trim());
 
         peerImpl.setShareAddress(Boolean.TRUE.equals(request.get("shareAddress")));
-        peerImpl.setLastUpdated(Convert.getEpochTime());
+        peerImpl.setLastUpdated(Nxt.getEpochTime());
 
         //peerImpl.setState(Peer.State.CONNECTED);
         Peers.notifyListeners(peerImpl, Peers.Event.ADDED_ACTIVE_PEER);

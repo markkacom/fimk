@@ -1,9 +1,17 @@
 package nxt.http;
 
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
-import static nxt.http.JSONResponses.POST_REQUIRED;
+import nxt.Db;
+import nxt.Nxt;
+import nxt.NxtException;
+import nxt.util.JSON;
+import nxt.util.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
@@ -14,18 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.util.JSON;
-import nxt.util.Logger;
-
-import org.json.simple.JSONStreamAware;
+import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
+import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
+import static nxt.http.JSONResponses.POST_REQUIRED;
 
 public final class APIServlet extends HttpServlet {
 
@@ -53,6 +52,10 @@ public final class APIServlet extends HttpServlet {
             return false;
         }
 
+        boolean startDbTransaction() {
+            return false;
+        }
+
     }
 
     private static final boolean enforcePost = Nxt.getBooleanProperty("nxt.apiServerEnforcePOST");
@@ -67,8 +70,8 @@ public final class APIServlet extends HttpServlet {
         map.put("calculateFullHash", CalculateFullHash.instance);
         map.put("cancelAskOrder", CancelAskOrder.instance);
         map.put("cancelBidOrder", CancelBidOrder.instance);
-        map.put("castVote", CastVote.instance);
-        map.put("createPoll", CreatePoll.instance);
+        //map.put("castVote", CastVote.instance);
+        //map.put("createPoll", CreatePoll.instance);
         map.put("decryptFrom", DecryptFrom.instance);
         map.put("dgsListing", DGSListing.instance);
         map.put("dgsDelisting", DGSDelisting.instance);
@@ -83,51 +86,69 @@ public final class APIServlet extends HttpServlet {
         map.put("encryptTo", EncryptTo.instance);
         map.put("generateToken", GenerateToken.instance);
         map.put("getAccount", GetAccount.instance);
+        map.put("getAccountBlockCount", GetAccountBlockCount.instance);
         map.put("getAccountBlockIds", GetAccountBlockIds.instance);
+        map.put("getAccountBlocks", GetAccountBlocks.instance);
         map.put("getAccountId", GetAccountId.instance);
         map.put("getAccountPublicKey", GetAccountPublicKey.instance);
         map.put("getAccountTransactionIds", GetAccountTransactionIds.instance);
         map.put("getAccountTransactions", GetAccountTransactions.instance);
+        map.put("getAccountLessors", GetAccountLessors.instance);
+        map.put("getAccountAssets", GetAccountAssets.instance);
+        map.put("getAccountAssetCount", GetAccountAssetCount.instance);
         map.put("sellAlias", SellAlias.instance);
         map.put("buyAlias", BuyAlias.instance);
         map.put("getAlias", GetAlias.instance);
+        map.put("getAliasCount", GetAliasCount.instance);
         map.put("getAliases", GetAliases.instance);
         map.put("getAllAssets", GetAllAssets.instance);
         map.put("getAsset", GetAsset.instance);
         map.put("getAssets", GetAssets.instance);
         map.put("getAssetIds", GetAssetIds.instance);
         map.put("getAssetsByIssuer", GetAssetsByIssuer.instance);
+        map.put("getAssetAccounts", GetAssetAccounts.instance);
+        map.put("getAssetAccountCount", GetAssetAccountCount.instance);
         map.put("getBalance", GetBalance.instance);
         map.put("getBlock", GetBlock.instance);
         map.put("getBlockId", GetBlockId.instance);
+        map.put("getBlocks", GetBlocks.instance);
         map.put("getBlockchainStatus", GetBlockchainStatus.instance);
         map.put("getBlocksIdsFromHeight", GetBlocksIdsFromHeight.instance);        
         map.put("getConstants", GetConstants.instance);
         map.put("getDGSGoods", GetDGSGoods.instance);
+        map.put("getDGSGoodsCount", GetDGSGoodsCount.instance);
         map.put("getDGSGood", GetDGSGood.instance);
+        map.put("getDGSGoodsPurchases", GetDGSGoodsPurchases.instance);
+        map.put("getDGSGoodsPurchaseCount", GetDGSGoodsPurchaseCount.instance);
         map.put("getDGSPurchases", GetDGSPurchases.instance);
         map.put("getDGSPurchase", GetDGSPurchase.instance);
+        map.put("getDGSPurchaseCount", GetDGSPurchaseCount.instance);
         map.put("getDGSPendingPurchases", GetDGSPendingPurchases.instance);
+        map.put("getDGSTags", GetDGSTags.instance);
+        map.put("getDGSTagCount", GetDGSTagCount.instance);
         map.put("getGuaranteedBalance", GetGuaranteedBalance.instance);
+        map.put("getECBlock", GetECBlock.instance);
         map.put("getMyInfo", GetMyInfo.instance);
-        if (Constants.isTestnet) {
-            map.put("getNextBlockGenerators", GetNextBlockGenerators.instance);
-        }
+        //map.put("getNextBlockGenerators", GetNextBlockGenerators.instance);
         map.put("getPeer", GetPeer.instance);
         map.put("getPeers", GetPeers.instance);
-        map.put("getPoll", GetPoll.instance);
-        map.put("getPollIds", GetPollIds.instance);
+        //map.put("getPoll", GetPoll.instance);
+        //map.put("getPollIds", GetPollIds.instance);
         map.put("getState", GetState.instance);
         map.put("getTime", GetTime.instance);
         map.put("getTrades", GetTrades.instance);
         map.put("getAllTrades", GetAllTrades.instance);
+        map.put("getAssetTransfers", GetAssetTransfers.instance);
         map.put("getTransaction", GetTransaction.instance);
         map.put("getTransactionBytes", GetTransactionBytes.instance);
         map.put("getUnconfirmedTransactionIds", GetUnconfirmedTransactionIds.instance);
         map.put("getUnconfirmedTransactions", GetUnconfirmedTransactions.instance);
         map.put("getAccountCurrentAskOrderIds", GetAccountCurrentAskOrderIds.instance);
         map.put("getAccountCurrentBidOrderIds", GetAccountCurrentBidOrderIds.instance);
-        map.put("getAllOpenOrders", GetAllOpenOrders.instance);
+        map.put("getAccountCurrentAskOrders", GetAccountCurrentAskOrders.instance);
+        map.put("getAccountCurrentBidOrders", GetAccountCurrentBidOrders.instance);
+        map.put("getAllOpenAskOrders", GetAllOpenAskOrders.instance);
+        map.put("getAllOpenBidOrders", GetAllOpenBidOrders.instance);
         map.put("getAskOrder", GetAskOrder.instance);
         map.put("getAskOrderIds", GetAskOrderIds.instance);
         map.put("getAskOrders", GetAskOrders.instance);
@@ -135,9 +156,8 @@ public final class APIServlet extends HttpServlet {
         map.put("getBidOrderIds", GetBidOrderIds.instance);
         map.put("getBidOrders", GetBidOrders.instance);
         map.put("issueAsset", IssueAsset.instance);
-        
-        /* XXX - ENABLE BALANCE LEASING */
         map.put("leaseBalance", LeaseBalance.instance);
+        map.put("longConvert", LongConvert.instance);
         map.put("markHost", MarkHost.instance);
         map.put("parseTransaction", ParseTransaction.instance);
         map.put("placeAskOrder", PlaceAskOrder.instance);
@@ -153,11 +173,21 @@ public final class APIServlet extends HttpServlet {
         map.put("stopForging", StopForging.instance);
         map.put("getForging", GetForging.instance);
         map.put("transferAsset", TransferAsset.instance);
-
+        map.put("searchDGSGoods", SearchDGSGoods.instance);
+        map.put("searchAssets", SearchAssets.instance);
+        
         /* XXX - NamespacedAlias */
         map.put("getNamespacedAlias", GetNamespacedAlias.instance);
         map.put("setNamespacedAlias", SetNamespacedAlias.instance);
         map.put("getNamespacedAliases", GetNamespacedAliases.instance);
+
+        if (API.enableDebugAPI) {
+            map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);
+            map.put("fullReset", FullReset.instance);
+            map.put("popOff", PopOff.instance);
+            map.put("scan", Scan.instance);
+            map.put("luceneReindex", LuceneReindex.instance);
+        }
 
         apiRequestHandlers = Collections.unmodifiableMap(map);
     }
@@ -182,6 +212,8 @@ public final class APIServlet extends HttpServlet {
 
         try {
 
+            long startTime = System.currentTimeMillis();
+
             if (API.allowedBotHosts != null && ! API.allowedBotHosts.contains(req.getRemoteHost())) {
                 response = ERROR_NOT_ALLOWED;
                 return;
@@ -205,12 +237,23 @@ public final class APIServlet extends HttpServlet {
             }
 
             try {
+                if (apiRequestHandler.startDbTransaction()) {
+                    Db.db.beginTransaction();
+                }
                 response = apiRequestHandler.processRequest(req);
             } catch (ParameterException e) {
                 response = e.getErrorResponse();
             } catch (NxtException |RuntimeException e) {
                 Logger.logDebugMessage("Error processing API request", e);
                 response = ERROR_INCORRECT_REQUEST;
+            } finally {
+                if (apiRequestHandler.startDbTransaction()) {
+                    Db.db.endTransaction();
+                }
+            }
+
+            if (response instanceof JSONObject) {
+                ((JSONObject)response).put("requestProcessingTime", System.currentTimeMillis() - startTime);
             }
 
         } finally {

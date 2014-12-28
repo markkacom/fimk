@@ -1,5 +1,6 @@
 package nxt;
 
+import nxt.db.DbUtils;
 import nxt.util.Convert;
 
 import java.nio.ByteBuffer;
@@ -14,59 +15,59 @@ import java.util.List;
 
 final class TransactionDb {
 
-    static Transaction findTransaction(Long transactionId) {
-        try (Connection con = Db.getConnection();
+    static Transaction findTransaction(long transactionId) {
+        try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT * FROM transaction WHERE id = ?")) {
             pstmt.setLong(1, transactionId);
-            ResultSet rs = pstmt.executeQuery();
-            Transaction transaction = null;
-            if (rs.next()) {
-                transaction = loadTransaction(con, rs);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return loadTransaction(con, rs);
+                }
+                return null;
             }
-            rs.close();
-            return transaction;
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         } catch (NxtException.ValidationException e) {
-            throw new RuntimeException("Transaction already in database, id = " + transactionId + ", does not pass validation!");
+            throw new RuntimeException("Transaction already in database, id = " + transactionId + ", does not pass validation!", e);
         }
     }
 
     static Transaction findTransactionByFullHash(String fullHash) {
-        try (Connection con = Db.getConnection();
+        try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT * FROM transaction WHERE full_hash = ?")) {
             pstmt.setBytes(1, Convert.parseHexString(fullHash));
-            ResultSet rs = pstmt.executeQuery();
-            Transaction transaction = null;
-            if (rs.next()) {
-                transaction = loadTransaction(con, rs);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return loadTransaction(con, rs);
+                }
+                return null;
             }
-            rs.close();
-            return transaction;
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         } catch (NxtException.ValidationException e) {
-            throw new RuntimeException("Transaction already in database, full_hash = " + fullHash + ", does not pass validation!");
+            throw new RuntimeException("Transaction already in database, full_hash = " + fullHash + ", does not pass validation!", e);
         }
     }
 
-    static boolean hasTransaction(Long transactionId) {
-        try (Connection con = Db.getConnection();
+    static boolean hasTransaction(long transactionId) {
+        try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT 1 FROM transaction WHERE id = ?")) {
             pstmt.setLong(1, transactionId);
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         }
     }
 
     static boolean hasTransactionByFullHash(String fullHash) {
-        try (Connection con = Db.getConnection();
+        try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT 1 FROM transaction WHERE full_hash = ?")) {
             pstmt.setBytes(1, Convert.parseHexString(fullHash));
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         }
@@ -84,12 +85,12 @@ final class TransactionDb {
             long feeNQT = rs.getLong("fee");
             byte[] referencedTransactionFullHash = rs.getBytes("referenced_transaction_full_hash");
             int ecBlockHeight = rs.getInt("ec_block_height");
-            Long ecBlockId = rs.getLong("ec_block_id");
+            long ecBlockId = rs.getLong("ec_block_id");
             byte[] signature = rs.getBytes("signature");
-            Long blockId = rs.getLong("block_id");
+            long blockId = rs.getLong("block_id");
             int height = rs.getInt("height");
-            Long id = rs.getLong("id");
-            Long senderId = rs.getLong("sender_id");
+            long id = rs.getLong("id");
+            long senderId = rs.getLong("sender_id");
             byte[] attachmentBytes = rs.getBytes("attachment_bytes");
             int blockTimestamp = rs.getInt("block_timestamp");
             byte[] fullHash = rs.getBytes("full_hash");
@@ -113,7 +114,7 @@ final class TransactionDb {
                     .senderId(senderId)
                     .blockTimestamp(blockTimestamp)
                     .fullHash(fullHash);
-            if (transactionType.hasRecipient()) {
+            if (transactionType.canHaveRecipient()) {
                 long recipientId = rs.getLong("recipient_id");
                 if (! rs.wasNull()) {
                     builder.recipientId(recipientId);
@@ -131,7 +132,6 @@ final class TransactionDb {
             if (rs.getBoolean("has_encrypttoself_message")) {
                 builder.encryptToSelfMessage(new Appendix.EncryptToSelfMessage(buffer, version));
             }
-            /* XXX - NXT 1.3.1 critical bug fix */
             if (version > 0) {
                 builder.ecBlockHeight(ecBlockHeight);
                 builder.ecBlockId(ecBlockId);
@@ -144,16 +144,17 @@ final class TransactionDb {
         }
     }
 
-    static List<TransactionImpl> findBlockTransactions(Connection con, Long blockId) {
-        List<TransactionImpl> list = new ArrayList<>();
-        try (PreparedStatement pstmt = con.prepareStatement("SELECT * FROM transaction WHERE block_id = ? ORDER BY id")) {
+    static List<TransactionImpl> findBlockTransactions(long blockId) {
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM transaction WHERE block_id = ? ORDER BY id")) {
             pstmt.setLong(1, blockId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                list.add(loadTransaction(con, rs));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                List<TransactionImpl> list = new ArrayList<>();
+                while (rs.next()) {
+                    list.add(loadTransaction(con, rs));
+                }
+                return list;
             }
-            rs.close();
-            return list;
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         } catch (NxtException.ValidationException e) {
@@ -175,18 +176,10 @@ final class TransactionDb {
                     pstmt.setLong(++i, transaction.getId());
                     pstmt.setShort(++i, transaction.getDeadline());
                     pstmt.setBytes(++i, transaction.getSenderPublicKey());
-                    if (transaction.getType().hasRecipient() && transaction.getRecipientId() != null) {
-                        pstmt.setLong(++i, transaction.getRecipientId());
-                    } else {
-                        pstmt.setNull(++i, Types.BIGINT);
-                    }
+                    DbUtils.setLongZeroToNull(pstmt, ++i, transaction.getRecipientId());
                     pstmt.setLong(++i, transaction.getAmountNQT());
                     pstmt.setLong(++i, transaction.getFeeNQT());
-                    if (transaction.getReferencedTransactionFullHash() != null) {
-                        pstmt.setBytes(++i, Convert.parseHexString(transaction.getReferencedTransactionFullHash()));
-                    } else {
-                        pstmt.setNull(++i, Types.BINARY);
-                    }
+                    DbUtils.setBytes(pstmt, ++i, Convert.parseHexString(transaction.getReferencedTransactionFullHash()));
                     pstmt.setInt(++i, transaction.getHeight());
                     pstmt.setLong(++i, transaction.getBlockId());
                     pstmt.setBytes(++i, transaction.getSignature());
@@ -216,11 +209,7 @@ final class TransactionDb {
                     pstmt.setBoolean(++i, transaction.getPublicKeyAnnouncement() != null);
                     pstmt.setBoolean(++i, transaction.getEncryptToSelfMessage() != null);
                     pstmt.setInt(++i, transaction.getECBlockHeight());
-                    if (transaction.getECBlockId() != null) {
-                        pstmt.setLong(++i, transaction.getECBlockId());
-                    } else {
-                        pstmt.setNull(++i, Types.BIGINT);
-                    }
+                    DbUtils.setLongZeroToNull(pstmt, ++i, transaction.getECBlockId());
                     pstmt.executeUpdate();
                 }
             }

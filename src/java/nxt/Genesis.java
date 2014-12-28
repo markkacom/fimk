@@ -2,10 +2,10 @@ package nxt;
 import java.math.BigInteger;
 public class Genesis {
   public static final long TOTAL_GENESIS_AMOUNT_NQT = Constants.isTestnet ? 66624546500000000L : 666280000 * Constants.ONE_NXT;
-  public static final Long GENESIS_BLOCK_ID = Constants.isTestnet ? new BigInteger("12509080563931393352").longValue() : new BigInteger("10818277776995751093").longValue();
-  public static final Long CREATOR_ID = 1739068987193023818L;
+  public static final long GENESIS_BLOCK_ID = Constants.isTestnet ? new BigInteger("12509080563931393352").longValue() : new BigInteger("10818277776995751093").longValue();
+  public static final long CREATOR_ID = 1739068987193023818L;
   public static final byte[] CREATOR_PUBLIC_KEY = { 18, 89, -20, 33, -45, 26, 48, -119, -115, 124, -47, 96, -97, -128, -39, 102, -117, 71, 120, -29, -39, 126, -108, 16, 68, -77, -97, 12, 68, -46, -27, 27 };
-  public static final Long[] GENESIS_RECIPIENTS = Constants.isTestnet ? new Long[421] : new Long[434];
+  public static final long[] GENESIS_RECIPIENTS = Constants.isTestnet ? new long[421] : new long[434];
   static void initializer_0() {
     GENESIS_RECIPIENTS[0] = (new BigInteger("333786280990000040")).longValue(); // FIM-XJXA-VCLN-4BWL-2SGAB
     GENESIS_RECIPIENTS[1] = (new BigInteger("12487547243938871544")).longValue(); // FIM-6Y9S-3TVG-B28U-CG7MU
