@@ -60,7 +60,7 @@ final class ParameterParser {
         if (aliasId != null) {
             alias = NamespacedAlias.getAlias(aliasId);
         } else if (aliasName != null) {
-            alias = NamespacedAlias.getAlias(getAccount(req), aliasName);
+            alias = NamespacedAlias.getAlias(getAccount(req).getId(), aliasName);
         } else {
             throw new ParameterException(MISSING_ALIAS_OR_ALIAS_NAME);
         }

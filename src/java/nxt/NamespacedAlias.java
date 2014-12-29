@@ -1,20 +1,14 @@
 package nxt;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
+import nxt.Attachment.FIMKryptoMessagingNamespacedAliasAssignment;
 import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
-import nxt.db.DbKey.LinkKeyFactory;
 
 public final class NamespacedAlias {
 
@@ -45,73 +39,110 @@ public final class NamespacedAlias {
         }
     
     };
-
+    
+    public static int getCount() {
+        return aliasTable.getCount();
+    }
+    
+    public static int getAccountAliasCount(long accountId) {
+        return aliasTable.getCount(new DbClause.LongClause("account_id", accountId));
+    }
+    
     public static DbIterator<NamespacedAlias> getAliasesByOwner(long accountId, int from, int to) {
         return aliasTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
     }
-
-    public static NamespacedAlias getAlias(Account sender, String aliasName) {
-        return aliasTable.getBy(new DbClause.StringClause("alias_name_lower", aliasName.toLowerCase()));
+    
+    public static NamespacedAlias getAlias(final long sender_id, final String aliasName) {
+        DbClause dbClause = new DbClause(" account_id = ? AND alias_name_lower = ? ") {
+            @Override
+            public int set(PreparedStatement pstmt, int index) throws SQLException {
+                pstmt.setLong(index++, sender_id);
+                pstmt.setString(index++, aliasName);
+                return index;
+            }
+        };      
+        return aliasTable.getBy(dbClause);
     }
-
-    public static NamespacedAlias getAlias(Long id) {
-        return aliasIdToAliasMappings.get(id);
+    
+    public static NamespacedAlias getAlias(long id) {
+        return aliasTable.get(aliasDbKeyFactory.newKey(id));
     }
-
-    static void addOrUpdateAlias(Account account, Long transactionId, String aliasName, String aliasURI, int timestamp) {
-        String normalizedAlias = aliasName.toLowerCase();
-        NamespacedAlias oldAlias = aliases.get(NamespacedKey.valueOf(account.getId(), normalizedAlias));
-        if (oldAlias == null) {
-            NamespacedAlias newAlias = new NamespacedAlias(account, transactionId, aliasName, aliasURI, timestamp);
-            aliases.put(NamespacedKey.valueOf(account.getId(), normalizedAlias), newAlias);
-            aliasIdToAliasMappings.put(transactionId, newAlias);
+    
+    static void addOrUpdateAlias(Transaction transaction, Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment) {
+      NamespacedAlias alias = getAlias(transaction.getSenderId(), attachment.getAliasName());
+        if (alias == null) {
+            alias = new NamespacedAlias(transaction.getId(), transaction, attachment);
         } else {
-            oldAlias.aliasURI = aliasURI.intern();
-            oldAlias.timestamp = timestamp;
+            alias.aliasURI = attachment.getAliasURI();
+            alias.timestamp = transaction.getBlockTimestamp();
+        }
+        aliasTable.insert(alias);
+    }
+    
+    static void init() {}
+    
+    private long accountId;
+    private final long id;
+    private final DbKey dbKey;
+    private final String aliasName;
+    private String aliasURI;
+    private int timestamp;
+    
+    private NamespacedAlias(long id, long accountId, String aliasName, String aliasURI, int timestamp) {
+      this.id = id;
+      this.dbKey = aliasDbKeyFactory.newKey(this.id);
+      this.accountId = accountId;
+      this.aliasName = aliasName;
+      this.aliasURI = aliasURI;
+      this.timestamp = timestamp;
+    }    
+
+    private NamespacedAlias(long aliasId, Transaction transaction, FIMKryptoMessagingNamespacedAliasAssignment attachment) {
+      this(aliasId, transaction.getSenderId(), attachment.getAliasName(), attachment.getAliasURI(),
+          transaction.getBlockTimestamp());
+    }
+    
+    private NamespacedAlias(ResultSet rs) throws SQLException {
+        this.id = rs.getLong("id");
+        this.dbKey = aliasDbKeyFactory.newKey(this.id);
+        this.accountId = rs.getLong("account_id");
+        this.aliasName = rs.getString("alias_name");
+        this.aliasURI = rs.getString("alias_uri");
+        this.timestamp = rs.getInt("timestamp");
+    }
+    
+    private void save(Connection con) throws SQLException {
+        try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO namespaced_alias (id, account_id, alias_name, "
+                + "alias_uri, timestamp, height) "
+                + "VALUES (?, ?, ?, ?, ?, ?)")) {
+            int i = 0;
+            pstmt.setLong(++i, this.getId());
+            pstmt.setLong(++i, this.getAccountId());
+            pstmt.setString(++i, this.getAliasName());
+            pstmt.setString(++i, this.getAliasURI());
+            pstmt.setInt(++i, this.getTimestamp());
+            pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
+            pstmt.executeUpdate();
         }
     }
-
-    static void remove(NamespacedAlias alias) {
-        aliases.remove(NamespacedKey.valueOf(alias.getAccountId(), alias.getAliasName().toLowerCase()));
-        aliasIdToAliasMappings.remove(alias.getId());
-    }
-
-    static void clear() {
-        aliases.clear();
-        aliasIdToAliasMappings.clear();
-    }
-
-    private final Long accountId;
-    private final Long id;
-    private final String aliasName;
-    private volatile String aliasURI;
-    private volatile int timestamp;
-
-    private NamespacedAlias(Account account, Long id, String aliasName, String aliasURI, int timestamp) {
-        this.accountId = account.getId();
-        this.id = id;
-        this.aliasName = aliasName.intern();
-        this.aliasURI = aliasURI.intern();
-        this.timestamp = timestamp;
-    }
-
-    public Long getId() {
+    
+    public long getId() {
         return id;
     }
-
+    
     public String getAliasName() {
         return aliasName;
     }
-
+    
     public String getAliasURI() {
         return aliasURI;
     }
-
+    
     public int getTimestamp() {
         return timestamp;
     }
-
-    public Long getAccountId() {
+    
+    public long getAccountId() {
         return accountId;
     }
 

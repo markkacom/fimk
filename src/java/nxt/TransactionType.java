@@ -776,8 +776,7 @@ public abstract class TransactionType {
           @Override
           void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
               Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment = (Attachment.FIMKryptoMessagingNamespacedAliasAssignment) transaction.getAttachment();
-              NamespacedAlias.addOrUpdateAlias(senderAccount, transaction.getId(), attachment.getAliasName(),
-                      attachment.getAliasURI(), transaction.getBlockTimestamp());
+              NamespacedAlias.addOrUpdateAlias(transaction, attachment);
           }
 
           @Override

@@ -1,11 +1,7 @@
 package nxt.http;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import nxt.Account;
 import nxt.NamespacedAlias;
+import nxt.db.FilteringIterator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -25,30 +21,33 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
       
-        Account account = ParameterParser.getAccount(req);
-        int timestamp = ParameterParser.getTimestamp(req);
-        String filter = ParameterParser.getFilter(req);
-        
-        Collection<NamespacedAlias> filtered = new ArrayList<NamespacedAlias>();
-        if (filter == null && timestamp == 0) {
-            filtered = NamespacedAlias.getAliasesByOwner(account.getId());
-        }
-        else {
-            filtered = NamespacedAlias.getAliasesByOwner(account.getId(), filter, timestamp);
-        }
-
-        List<NamespacedAlias> list = new ArrayList<NamespacedAlias>(filtered);        
-        
+        final long accountId = ParameterParser.getAccount(req).getId();
+        final int timestamp = ParameterParser.getTimestamp(req);
+        final String filter = ParameterParser.getFilter(req);
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = Math.max(ParameterParser.getLastIndex(req), 0);
         if ((lastIndex - firstIndex) > 1000) {
             lastIndex = firstIndex + 1000; /* Guard against server spam */
-        }
-
+        }        
+        
         JSONArray aliases = new JSONArray();
-        for (NamespacedAlias alias : list.subList(firstIndex, lastIndex > list.size() ? list.size() : lastIndex)) {
-            aliases.add(JSONData.namespacedAlias(alias));
-        }
+        try (FilteringIterator<NamespacedAlias> aliasIterator = new FilteringIterator<>(NamespacedAlias.getAliasesByOwner(accountId, 0, -1),
+                new FilteringIterator.Filter<NamespacedAlias>() {
+                    @Override
+                    public boolean ok(NamespacedAlias alias) {
+                        if (alias.getTimestamp() >= timestamp) {
+                            if (filter != null && ! alias.getAliasName().startsWith(filter)) {
+                                return false;
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+                }, firstIndex, lastIndex)) {
+            while(aliasIterator.hasNext()) {
+                aliases.add(JSONData.namespacedAlias(aliasIterator.next()));
+            }
+        }        
         
         JSONObject response = new JSONObject();
         response.put("aliases", aliases);
