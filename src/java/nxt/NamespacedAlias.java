@@ -1,5 +1,8 @@
 package nxt;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,59 +10,48 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import nxt.db.DbClause;
+import nxt.db.DbIterator;
+import nxt.db.DbKey;
+import nxt.db.VersionedEntityDbTable;
+import nxt.db.DbKey.LinkKeyFactory;
+
 public final class NamespacedAlias {
 
-    static class NamespacedKey {
-        private final Long namespace;
-        private final String key;
+    private static final DbKey.LongKeyFactory<NamespacedAlias> aliasDbKeyFactory = new DbKey.LongKeyFactory<NamespacedAlias>("id") {
     
-        static NamespacedKey valueOf(Long namespace, String key) {
-            return new NamespacedKey(namespace, key);
-        }
-        
-        private NamespacedKey(Long namespace, String key) {
-            if (namespace == null || key == null) { 
-                throw new NullPointerException("String or Long cannot be null");
-            }
-            this.namespace = namespace;
-            this.key = key;
-        }
-        
         @Override
-        public boolean equals(Object o) {
-            if(o != null && o instanceof NamespacedKey){
-                NamespacedKey other = (NamespacedKey) o;
-                return this.namespace.equals(other.namespace) && this.key.equals(other.key);
-            }    
-            return false;
+        public DbKey newKey(NamespacedAlias alias) {
+            return alias.dbKey;
         }
-        
+    
+    };
+    
+    private static final VersionedEntityDbTable<NamespacedAlias> aliasTable = new VersionedEntityDbTable<NamespacedAlias>("namespaced_alias", aliasDbKeyFactory) {
+    
         @Override
-        public int hashCode() {
-            return key.hashCode() * 37 + namespace.intValue();
+        protected NamespacedAlias load(Connection con, ResultSet rs) throws SQLException {
+            return new NamespacedAlias(rs);
         }
-    }
-  
-    private static final ConcurrentMap<NamespacedKey, NamespacedAlias> aliases = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<Long, NamespacedAlias> aliasIdToAliasMappings = new ConcurrentHashMap<>();
-    private static final Collection<NamespacedAlias> allAliases = Collections.unmodifiableCollection(aliases.values());
-
-    public static Collection<NamespacedAlias> getAllAliases() {
-        return allAliases;
-    }
-
-    public static Collection<NamespacedAlias> getAliasesByOwner(Long accountId) {
-        List<NamespacedAlias> filtered = new ArrayList<>();
-        for (NamespacedAlias alias : NamespacedAlias.getAllAliases()) {
-            if (alias.getAccountId().equals(accountId)) {
-                filtered.add(alias);
-            }
+    
+        @Override
+        protected void save(Connection con, NamespacedAlias alias) throws SQLException {
+            alias.save(con);
         }
-        return filtered;
+    
+        @Override
+        protected String defaultSort() {
+            return " ORDER BY alias_name_lower ";
+        }
+    
+    };
+
+    public static DbIterator<NamespacedAlias> getAliasesByOwner(long accountId, int from, int to) {
+        return aliasTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
     }
 
     public static NamespacedAlias getAlias(Account sender, String aliasName) {
-        return aliases.get(NamespacedKey.valueOf(sender.getId(), aliasName.toLowerCase()));
+        return aliasTable.getBy(new DbClause.StringClause("alias_name_lower", aliasName.toLowerCase()));
     }
 
     public static NamespacedAlias getAlias(Long id) {

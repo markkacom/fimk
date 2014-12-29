@@ -91,49 +91,7 @@ class NxtDbVersion extends DbVersion {
             case 36:
                 apply("CREATE TABLE IF NOT EXISTS peer (address VARCHAR PRIMARY KEY)");
             case 37:
-                if (!Constants.isTestnet) {
-                    apply("INSERT INTO peer (address) VALUES " +
-                            "('85.25.198.120'), ('banli.szn.dk'), ('80.86.92.139'), ('94.113.207.67'), ('162.243.145.83'), " +
-                            "('enricoip.no-ip.biz'), ('bitsy06.vps.nxtcrypto.org'), ('93.81.191.235'), ('94.102.50.69'), " +
-                            "('23.88.59.163'), ('nxt3.webice.ru'), ('178.62.185.131'), ('83.35.165.232'), ('80.150.243.95'), " +
-                            "('54.65.152.248'), ('88.163.78.131'), ('54.64.135.26'), ('nxt5.webice.ru'), ('89.212.19.49'), " +
-                            "('178.33.203.157'), ('nxt01.now.im'), ('80.150.243.11'), ('nxt1.webice.ru'), ('217.51.10.8'), " +
-                            "('167.114.2.203'), ('5.196.227.91'), ('89.72.57.246'), ('198.211.127.34'), ('nxtx.ru'), " +
-                            "('nxtnode.linuxd.org'), ('beor.homeip.net'), ('192.99.246.20'), ('nacho.damnserver.com'), " +
-                            "('84.241.44.180'), ('93.103.20.35'), ('cryptkeeper.vps.nxtcrypto.org'), ('195.154.127.172'), " +
-                            "('80.86.92.66'), ('87.139.122.157'), ('167.114.71.191'), ('81.64.77.101'), ('85.84.66.131'), " +
-                            "('118.18.12.138'), ('txn14.cloudapp.net'), ('bitsy07.vps.nxtcrypto.org'), ('pakisnxt.no-ip.org'), " +
-                            "('192.3.158.120'), ('46.173.9.98'), ('192.99.246.33'), ('108.61.57.76'), ('node5.mynxtcoin.org'), " +
-                            "('54.154.19.155'), ('69.172.212.4'), ('gunka.szn.dk'), ('95.68.77.55'), ('23.89.192.151'), " +
-                            "('nxt4.webice.ru'), ('77.179.115.112'), ('62.194.6.163'), ('bitsy10.vps.nxtcrypto.org'), " +
-                            "('77.120.107.17'), ('209.222.2.110'), ('167.114.2.171'), ('54.64.165.249'), ('104.236.52.104'), " +
-                            "('176.94.115.161'), ('66.30.204.105'), ('103.22.181.239'), ('silvanoip.dhcp.biz'), ('5.196.26.85'), " +
-                            "('188.138.88.154'), ('209.126.70.156'), ('191.238.101.73'), ('scripterron.dyndns.biz'), " +
-                            "('198.50.146.93'), ('167.114.2.205'), ('nxt.phukhew.com'), ('5.147.113.212'), ('84.242.91.139'), " +
-                            "('sluni.szn.dk'), ('bitsy09.vps.nxtcrypto.org'), ('node4.mynxtcoin.org'), ('23.88.104.225'), " +
-                            "('178.15.99.67'), ('82.0.149.148'), ('67.212.71.171'), ('162.243.242.8'), ('184.164.72.177'), " +
-                            "('167.114.2.206'), ('172.245.57.170'), ('209.126.70.159'), ('2.225.88.10'), ('54.69.13.182'), " +
-                            "('192.99.212.250'), ('113.106.85.172'), ('192.99.246.126'), ('nxtnode.hopto.org'), ('dilnu.szn.dk'), " +
-                            "('104.131.103.151'), ('178.32.122.65'), ('nxt10.webice.ru'), ('92.222.72.98'), ('54.69.94.208'), " +
-                            "('131.72.136.251'), ('87.139.122.48'), ('nxt.sx'), ('104.130.7.74'), ('89.250.240.60'), " +
-                            "('23.102.0.45'), ('jnxt.org'), ('89.250.243.166'), ('54.83.4.11'), ('81.2.216.179'), " +
-                            "('178.24.154.23'), ('98.210.27.184'), ('77.88.208.12'), ('209.126.70.170'), ('178.150.207.53'), " +
-                            "('80.153.101.190'), ('92.47.120.90'), ('190.10.9.166'), ('37.187.21.28'), ('88.79.173.189'), " +
-                            "('162.243.122.251'), ('67.212.71.173'), ('98.89.94.71'), ('node0.forgenxt.com'), ('nxt6.webice.ru'), " +
-                            "('23.95.37.134'), ('31.186.100.21'), ('78.56.100.171'), ('217.26.24.27'), ('81.220.60.240'), " +
-                            "('92.222.22.16'), ('178.20.9.9'), ('phalanx149.ddns.net'), ('bug.airdns.org'), ('81.23.22.150'), " +
-                            "('enricoip.no-ip.biz:65074'), ('67.212.71.172'), ('nxtforgersr.ddns.net'), ('91.121.150.75'), " +
-                            "('vh44.linkpc.net:7872'), ('zdani.szn.dk'), ('81.169.150.141'), ('83.82.53.78'), ('37.59.115.204'), " +
-                            "('80.150.243.97'), ('54.169.132.50'), ('85.25.223.7'), ('167.114.2.204'), ('23.88.246.117'), " +
-                            "('54.213.222.141'), ('espo.no-ip.biz'), ('vh44.ddns.net:7873'), ('miasik.no-ip.org'), " +
-                            "('198.98.122.86'), ('23.88.59.40'), ('77.58.253.73')");
-                } else {
-                    apply("INSERT INTO peer (address) VALUES " +
-                            "('nxt.scryptmh.eu'), ('54.186.98.117'), ('178.150.207.53'), ('192.241.223.132'), ('node9.mynxtcoin.org'), " +
-                            "('node10.mynxtcoin.org'), ('node3.mynxtcoin.org'), ('109.87.169.253'), ('nxtnet.fr'), ('50.112.241.97'), " +
-                            "('2.84.142.149'), ('bug.airdns.org'), ('83.212.103.14'), ('62.210.131.30'), ('104.131.254.22'), " +
-                            "('46.28.111.249'), ('94.79.54.205'), ('174.140.168.136')");
-                }
+              apply(null);
             case 38:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS full_hash BINARY(32)");
             case 39:
@@ -198,18 +156,51 @@ class NxtDbVersion extends DbVersion {
             case 68:
                 apply("ALTER TABLE transaction ADD COLUMN IF NOT EXISTS has_encrypttoself_message BOOLEAN NOT NULL DEFAULT FALSE");
             case 69:
-                apply("CREATE INDEX IF NOT EXISTS transaction_block_timestamp_idx ON transaction (block_timestamp DESC)");
+                /* Remove all peers since we start blacklisting peers from before 0.3.3 */
+                apply("DELETE FROM peer");
             case 70:
-                apply("DROP INDEX transaction_timestamp_idx");
+                if (!Constants.isTestnet) {
+                    apply("INSERT INTO peer (address) VALUES " +
+                        "('5.101.102.194'), ('5.101.102.195'), ('5.101.102.196'), ('5.101.102.197'), " +
+                        "('5.101.102.199'), ('5.101.102.200'), ('5.101.102.201'), ('5.101.102.202'), " +
+                        "('5.101.102.203'), ('5.101.102.204'), ('5.101.102.205'), ('107.170.73.9'), " + 
+                        "('107.170.123.54'), ('107.170.138.55')");
+                } else {
+                    apply("INSERT INTO peer (address) VALUES " + "('178.62.176.45'), ('178.62.176.46')");
+                }
             case 71:
-                apply("CREATE TABLE IF NOT EXISTS alias (db_id IDENTITY, id BIGINT NOT NULL, "
-                        + "account_id BIGINT NOT NULL, alias_name VARCHAR NOT NULL, "
-                        + "alias_name_lower VARCHAR AS LOWER (alias_name) NOT NULL, "
-                        + "alias_uri VARCHAR NOT NULL, timestamp INT NOT NULL, "
-                        + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");
+                apply(null);
             case 72:
+                /* Validate the chain to be compatible with the 0.3.3 fork */
+                if ( ! Constants.isTestnet) {
+                    BlockchainProcessorImpl.getInstance().validateAtNextScan();
+                }
+
+                /* Create Namespaced Alias table */
+                apply("CREATE TABLE IF NOT EXISTS namespaced_alias (db_id IDENTITY, id BIGINT NOT NULL, "
+                    + "account_id BIGINT NOT NULL, alias_name VARCHAR NOT NULL, "
+                    + "alias_name_lower VARCHAR AS LOWER (alias_name) NOT NULL, "
+                    + "alias_uri VARCHAR NOT NULL, timestamp INT NOT NULL, "
+                    + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");              
+              
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS alias_id_height_idx ON namespaced_alias (id, height DESC)");
+              
+                apply("CREATE INDEX IF NOT EXISTS alias_account_id_idx ON namespaced_alias (account_id, height DESC)");
+
+                apply("CREATE INDEX IF NOT EXISTS alias_name_lower_idx ON namespaced_alias (alias_name_lower)");
+            case 73:              
+                apply("CREATE INDEX IF NOT EXISTS transaction_block_timestamp_idx ON transaction (block_timestamp DESC)");
+              
+                apply("DROP INDEX transaction_timestamp_idx");
+              
+                apply("CREATE TABLE IF NOT EXISTS alias (db_id IDENTITY, id BIGINT NOT NULL, "
+                    + "account_id BIGINT NOT NULL, alias_name VARCHAR NOT NULL, "
+                    + "alias_name_lower VARCHAR AS LOWER (alias_name) NOT NULL, "
+                    + "alias_uri VARCHAR NOT NULL, timestamp INT NOT NULL, "
+                    + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");              
+              
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS alias_id_height_idx ON alias (id, height DESC)");
-            case 73:
+              
                 apply("CREATE INDEX IF NOT EXISTS alias_account_id_idx ON alias (account_id, height DESC)");
             case 74:
                 apply("CREATE INDEX IF NOT EXISTS alias_name_lower_idx ON alias (alias_name_lower)");

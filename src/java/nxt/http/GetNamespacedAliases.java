@@ -34,16 +34,7 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
             filtered = NamespacedAlias.getAliasesByOwner(account.getId());
         }
         else {
-            for (NamespacedAlias alias : NamespacedAlias.getAllAliases()) {
-                if (alias.getAccountId().equals(account.getId())) {
-                    if (filter != null && !alias.getAliasName().startsWith(filter)) {
-                        continue;
-                    }
-                    if (alias.getTimestamp() >= timestamp) {
-                        filtered.add(alias);
-                    }
-                }
-            }
+            filtered = NamespacedAlias.getAliasesByOwner(account.getId(), filter, timestamp);
         }
 
         List<NamespacedAlias> list = new ArrayList<NamespacedAlias>(filtered);        
