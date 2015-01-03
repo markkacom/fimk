@@ -188,6 +188,8 @@ public final class Trade {
             pstmt.executeUpdate();
         }
     }
+    
+    public static EntityDbTable<Trade> getTable() { return tradeTable; }
 
     public long getBlockId() { return blockId; }
 
