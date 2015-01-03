@@ -124,6 +124,21 @@ final class JSONData {
         return json;
     }
 
+    static JSONObject minimalBlock(Block block) {
+        JSONObject json = new JSONObject();
+        json.put("block", block.getStringId());
+        json.put("height", block.getHeight());
+        json.put("generator", Crypto.rsEncode(block.getGeneratorId())); 
+        json.put("timestamp", block.getTimestamp());
+        json.put("numberOfTransactions", block.getTransactions().size());
+        json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
+        json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
+        
+        /* XXX - Include POS reward for block */
+        json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
+        return json;
+    }
+    
     static JSONObject block(Block block, boolean includeTransactions) {
         JSONObject json = new JSONObject();
         json.put("block", block.getStringId());
@@ -158,9 +173,6 @@ final class JSONData {
         
         /* XXX - Include POS reward for block */
         json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
-        
-        /* XXX - Include cumulative difficulty */
-        json.put("cumulativeDifficulty", block.getCumulativeDifficulty().toString());
         return json;
     }
 
