@@ -180,6 +180,9 @@ public final class APIServlet extends HttpServlet {
         map.put("getNamespacedAlias", GetNamespacedAlias.instance);
         map.put("setNamespacedAlias", SetNamespacedAlias.instance);
         map.put("getNamespacedAliases", GetNamespacedAliases.instance);
+        
+        /* XXX - MofoWallet specific extensions */
+        map.put("mofoGetActivity", MofoGetActivity.instance);
 
         if (API.enableDebugAPI) {
             map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);
