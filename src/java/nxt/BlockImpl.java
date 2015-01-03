@@ -84,11 +84,6 @@ final class BlockImpl implements Block {
         this.nextBlockId = nextBlockId;
         this.height = height;
         this.id = id;
-        
-        /* XXX do not allow transactions before SECOND_BIRTH_BLOCK */
-        if (height != 0 && height <= Constants.SECOND_BIRTH_BLOCK && ! this.blockTransactions.isEmpty() ) {
-            throw new NxtException.NotValidException("Attempted to create a block with transactions before SECOND_BIRTH_BLOCK");
-        }
     }
 
     @Override
