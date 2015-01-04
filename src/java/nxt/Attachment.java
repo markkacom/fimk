@@ -799,7 +799,8 @@ public interface Attachment extends Appendix {
 
         @Override
         void putMyJSON(JSONObject attachment) {
-            attachment.put("asset", Convert.toUnsignedLong(assetId));
+            // attachment.put("asset", Convert.toUnsignedLong(assetId));
+            Asset.putAsset(attachment, assetId);
             attachment.put("quantityQNT", quantityQNT);
             if (getVersion() == 0) {
                 attachment.put("comment", comment);
@@ -865,7 +866,8 @@ public interface Attachment extends Appendix {
 
         @Override
         void putMyJSON(JSONObject attachment) {
-            attachment.put("asset", Convert.toUnsignedLong(assetId));
+            // attachment.put("asset", Convert.toUnsignedLong(assetId));
+            Asset.putAsset(attachment, assetId);
             attachment.put("quantityQNT", quantityQNT);
             attachment.put("priceNQT", priceNQT);
         }

@@ -4,11 +4,14 @@ import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.EntityDbTable;
+import nxt.util.Convert;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.json.simple.JSONObject;
 
 public final class Asset {
 
@@ -57,6 +60,15 @@ public final class Asset {
 
     static void addAsset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
         assetTable.insert(new Asset(transaction, attachment));
+    }
+    
+    public static void putAsset(JSONObject json, long id) {
+        Asset asset = getAsset(id);
+        if (asset != null) {
+            json.put("asset", Convert.toUnsignedLong(id));
+            json.put("name", asset.getName());
+            json.put("decimals", asset.getDecimals());
+        }
     }
 
     static void init() {}

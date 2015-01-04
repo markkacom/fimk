@@ -116,7 +116,8 @@ final class JSONData {
     static JSONObject order(Order order) {
         JSONObject json = new JSONObject();
         json.put("order", Convert.toUnsignedLong(order.getId()));
-        json.put("asset", Convert.toUnsignedLong(order.getAssetId()));
+        // json.put("asset", Convert.toUnsignedLong(order.getAssetId()));
+        Asset.putAsset(json, order.getAssetId());
         putAccount(json, "account", order.getAccountId());
         json.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(order.getPriceNQT()));
