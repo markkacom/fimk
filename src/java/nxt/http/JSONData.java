@@ -320,7 +320,8 @@ final class JSONData {
         json.put("timestamp", trade.getTimestamp());
         json.put("quantityQNT", String.valueOf(trade.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(trade.getPriceNQT()));
-        json.put("asset", Convert.toUnsignedLong(trade.getAssetId()));
+        // json.put("asset", Convert.toUnsignedLong(trade.getAssetId()));
+        Asset.putAsset(json, trade.getAssetId());
         json.put("askOrder", Convert.toUnsignedLong(trade.getAskOrderId()));
         json.put("bidOrder", Convert.toUnsignedLong(trade.getBidOrderId()));
         json.put("askOrderHeight", trade.getAskOrderHeight());
@@ -425,6 +426,10 @@ final class JSONData {
     }
 
     static void putAccount(JSONObject json, String name, long accountId) {
+        Account account = Account.getAccount(accountId);
+        if (account != null) {
+          json.put(name + "Name", account.getName());
+        }
         json.put(name, Convert.toUnsignedLong(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));
     }

@@ -182,7 +182,9 @@ public final class APIServlet extends HttpServlet {
         map.put("getNamespacedAliases", GetNamespacedAliases.instance);
         
         /* XXX - MofoWallet specific extensions */
+        map.put("mofoCombine", MofoCombine.instance);
         map.put("mofoGetActivity", MofoGetActivity.instance);
+        map.put("mofoGetActivityStatistics", MofoGetActivityStatistics.instance);
 
         if (API.enableDebugAPI) {
             map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);

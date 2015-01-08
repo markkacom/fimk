@@ -2,6 +2,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Alias;
+import nxt.MofoQueries.TransactionFilter;
 import nxt.NamespacedAlias;
 import nxt.Asset;
 import nxt.Constants;
@@ -13,6 +14,7 @@ import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.util.Convert;
 import nxt.util.Logger;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -497,6 +499,34 @@ final class ParameterParser {
         }
     }
 
+    static List<TransactionFilter> getTransactionFilter(HttpServletRequest req) throws ParameterException {
+        String param = Convert.emptyToNull(req.getParameter("transactionFilter"));
+        if (param == null) {
+            return null;
+        }
+      
+        List<TransactionFilter> filter = new ArrayList<TransactionFilter>();
+        String[] pairs = param.split(",");
+        for (String p : pairs) {
+            
+            String[] pair = p.split(":");
+            if (pair.length != 2) {
+                throw new ParameterException(INCORRECT_FILTER);
+            }
+            
+            try {
+                filter.add(new TransactionFilter(
+                    Integer.parseInt(pair[0]), 
+                    Integer.parseInt(pair[1])
+                ));
+            }
+            catch (NumberFormatException e) {
+                throw new ParameterException(INCORRECT_FILTER);
+            }
+        }
+        
+        return filter;
+    }
 
     private ParameterParser() {} // never
 
