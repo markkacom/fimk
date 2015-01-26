@@ -37,6 +37,7 @@ public final class API {
 
     static final Set<String> allowedBotHosts;
     static final boolean enableDebugAPI = Nxt.getBooleanProperty("nxt.enableDebugAPI");
+    static final boolean enableWebsockets = Nxt.getBooleanProperty("nxt.enableWebsockets");
 
     private static final Server apiServer;
 
@@ -118,7 +119,11 @@ public final class API {
             if (enableDebugAPI) {
                 apiHandler.addServlet(DbShellServlet.class, "/dbshell");
             }
-
+            
+            if (enableWebsockets) {
+                apiHandler.addServlet(MofoEventServlet.class, "/ws/*");
+            }
+            
             if (Nxt.getBooleanProperty("nxt.apiServerCORS")) {
                 FilterHolder filterHolder = apiHandler.addFilter(CrossOriginFilter.class, "/*", null);
                 filterHolder.setInitParameter("allowedHeaders", "*");
