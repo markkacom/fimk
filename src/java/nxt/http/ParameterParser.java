@@ -357,6 +357,25 @@ final class ParameterParser {
         }
         return result;
     }
+    
+    static List<Long> getAccountIds(HttpServletRequest req) throws ParameterException {
+        String[] accountValues = req.getParameterValues("account");
+        if (accountValues == null || accountValues.length == 0) {
+            throw new ParameterException(MISSING_ACCOUNT);
+        }
+        List<Long> result = new ArrayList<>();
+        for (String accountValue : accountValues) {
+            if (accountValue == null || accountValue.equals("")) {
+                continue;
+            }
+            try {
+                result.add(Convert.parseAccountId(accountValue));
+            } catch (RuntimeException e) {
+                throw new ParameterException(INCORRECT_ACCOUNT);
+            }
+        }
+        return result;
+    }
 
     static int getTimestamp(HttpServletRequest req) throws ParameterException {
         String timestampValue = Convert.emptyToNull(req.getParameter("timestamp"));
