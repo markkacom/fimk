@@ -1,6 +1,7 @@
 package nxt.http;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import nxt.Account;
@@ -27,7 +28,7 @@ public final class MofoGetActivity extends APIServlet.APIRequestHandler {
     
     private MofoGetActivity() {
         super(new APITag[] {APITag.MOFO}, "timestamp", "account", "includeAssetInfo", 
-            "includeBlocks", "transactionFilter", "includeTrades");
+            "includeBlocks", "transactionFilter", "includeTrades", "includeTransactions");
     }
 
     private DbIterator<? extends Trade> getTrades(Account account, int timestamp, boolean includeTrades) {
@@ -50,11 +51,24 @@ public final class MofoGetActivity extends APIServlet.APIRequestHandler {
         return null;
     }
     
-    private DbIterator<? extends Transaction> getTransactions(Account account, int timestamp, List<TransactionFilter> filters) {
-        if (account != null) {
-            return MofoQueries.getTransactions(account, timestamp, COUNT, filters);
+    private DbIterator<? extends Transaction> getTransactions(Account account, int timestamp, List<TransactionFilter> filters, boolean includeTransactions) {
+        if (includeTransactions) {
+            if (account != null) {
+                return MofoQueries.getTransactions(account, timestamp, COUNT, filters);
+            }
+            return MofoQueries.getTransactions(timestamp, COUNT, filters);
         }
-        return MofoQueries.getTransactions(timestamp, COUNT, filters);
+        return null;
+    }
+    
+    private List<Transaction> getUnconfirmedTransactions(Account account, int timestamp, List<TransactionFilter> filters, boolean includeTransactions) {
+        if (includeTransactions && Nxt.getBlockchain().getLastBlock().getTimestamp() < timestamp) {
+            if (account != null) {
+                return MofoQueries.getUnconfirmedTransactions(account, timestamp, COUNT, filters);
+            }
+            return MofoQueries.getUnconfirmedTransactions(COUNT, timestamp, filters);
+        }
+        return null;
     }
     
     private int getHighestIndex(int x, int y, int z) {
@@ -78,18 +92,24 @@ public final class MofoGetActivity extends APIServlet.APIRequestHandler {
         boolean includeAssetInfo = "true".equalsIgnoreCase(req.getParameter("includeAssetInfo"));
         boolean includeBlocks = "true".equalsIgnoreCase(req.getParameter("includeBlocks"));
         boolean includeTrades = !"false".equalsIgnoreCase(req.getParameter("includeTrades"));
+        boolean includeTransactions = !"false".equalsIgnoreCase(req.getParameter("includeTransactions"));
         
         List<TransactionFilter> filters = ParameterParser.getTransactionFilter(req);
         
         List<Trade> trades = null;
         List<Block> blocks = null;
         List<Transaction> transactions = null;
+        List<Transaction> unconfirmedTransactions = getUnconfirmedTransactions(account, timestamp, filters, includeTransactions);
+        Iterator<Transaction> unconfirmedTransactionIterator = null;
+        if (includeTransactions && unconfirmedTransactions != null) {
+            unconfirmedTransactionIterator = unconfirmedTransactions.iterator();
+        }
         
         try (
             DbIterator<? extends Trade> tradeIterator = getTrades(account, timestamp, includeTrades);
             DbIterator<? extends Block> blockIterator = getBlocks(account, timestamp, includeBlocks);
-            DbIterator<? extends Transaction> transactionIterator = getTransactions(account, timestamp, filters);
-        ) {          
+            DbIterator<? extends Transaction> transactionIterator = getTransactions(account, timestamp, filters, includeTransactions);
+        ) {
             int i = 0;
             Trade trade = null;
             Block block = null;
@@ -102,8 +122,13 @@ public final class MofoGetActivity extends APIServlet.APIRequestHandler {
                 if (includeBlocks && block == null && blockIterator.hasNext()) {
                     block = blockIterator.next();
                 }
-                if (transaction == null && transactionIterator.hasNext()) {
-                    transaction = transactionIterator.next();
+                if (includeTransactions && transaction == null) {
+                    if (unconfirmedTransactionIterator != null && unconfirmedTransactionIterator.hasNext()) {
+                        transaction = unconfirmedTransactionIterator.next();
+                    }
+                    else if (transactionIterator.hasNext()) {
+                        transaction = transactionIterator.next();
+                    }
                 }
                 
                 switch (getHighestIndex(
