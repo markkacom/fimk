@@ -129,7 +129,7 @@ final class JSONData {
         JSONObject json = new JSONObject();
         json.put("block", block.getStringId());
         json.put("height", block.getHeight());
-        json.put("generator", Crypto.rsEncode(block.getGeneratorId())); 
+        json.put("generator", Convert.rsAccount(block.getGeneratorId())); 
         json.put("timestamp", block.getTimestamp());
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
@@ -425,10 +425,10 @@ final class JSONData {
         }
     }
 
-    static void putAccount(JSONObject json, String name, long accountId) {
+    static void putAccount(JSONObject json, String name, long accountId) {        
         Account account = Account.getAccount(accountId);
         if (account != null) {
-          json.put(name + "Name", account.getName());
+            json.put(name + "Name", account.getName());
         }
         json.put(name, Convert.toUnsignedLong(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));
