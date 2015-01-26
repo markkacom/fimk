@@ -23,7 +23,7 @@ public final class MofoGetActivityStatistics extends APIServlet.APIRequestHandle
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         JSONObject response = new JSONObject();        
-        int time = Nxt.getEpochTime();
+        int time = Nxt.getBlockchain().getLastBlock().getTimestamp();
       
         response.put("averageBlockTime24H", MofoQueries.getAverageBlockTime24H());
         response.put("transactionCountToday", MofoQueries.getTransactionCountSince(time - SECONDS_24H));
@@ -31,15 +31,15 @@ public final class MofoGetActivityStatistics extends APIServlet.APIRequestHandle
         response.put("transactionCountMonth", MofoQueries.getTransactionCountSince(time - SECONDS_MONTH));
         
         // TODO SQL statements are too slow currently.
-        long dayReward = MofoQueries.getBlockRewardsSince(time - SECONDS_24H).getTotalRewards();
+        long dayReward = MofoQueries.getBlockRewardsSince(time - SECONDS_24H).getTotalRewardsNQT();
         // long weekReward = MofoQueries.getBlockRewardsSince(time - SECONDS_WEEK).getTotalRewards();
         // long monthReward = MofoQueries.getBlockRewardsSince(time - SECONDS_MONTH).getTotalRewards();
         long weekReward = 7 * dayReward;
         long monthReward = 30 * weekReward;
 
-        response.put("rewardsToday", dayReward);        
-        response.put("rewardsWeek", weekReward);
-        response.put("rewardsMonth", monthReward);
+        response.put("rewardsToday", String.valueOf(dayReward));        
+        response.put("rewardsWeek", String.valueOf(weekReward));
+        response.put("rewardsMonth", String.valueOf(monthReward));
      
         response.put("lastBlock", JSONData.minimalBlock(Nxt.getBlockchain().getLastBlock()));
         
