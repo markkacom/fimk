@@ -21,7 +21,7 @@ public final class Nxt {
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.3.5";
+    public static final String VERSION = "0.4";
 
     private static volatile Time time = new Time.EpochTime();
 
@@ -183,6 +183,7 @@ public final class Nxt {
                 BlockchainProcessorImpl.getInstance();
                 Account.init();
                 Alias.init();
+                NamespacedAlias.init();
                 Asset.init();
                 DigitalGoodsStore.init();
                 Hub.init();

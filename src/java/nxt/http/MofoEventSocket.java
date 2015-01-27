@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +22,14 @@ import nxt.NxtException;
 import nxt.Trade;
 import nxt.Transaction;
 import nxt.TransactionProcessor;
+import nxt.Attachment.MonetarySystemCurrencyDeletion;
+import nxt.Attachment.MonetarySystemCurrencyMinting;
+import nxt.Attachment.MonetarySystemCurrencyTransfer;
+import nxt.Attachment.MonetarySystemExchangeBuy;
+import nxt.Attachment.MonetarySystemExchangeSell;
+import nxt.Attachment.MonetarySystemPublishExchangeOffer;
+import nxt.Attachment.MonetarySystemReserveClaim;
+import nxt.Attachment.MonetarySystemReserveIncrease;
 import nxt.NxtException.NotValidException;
 import nxt.util.Convert;
 import nxt.util.Listener;
@@ -163,8 +172,45 @@ public class MofoEventSocket extends WebSocketAdapter {
             JSONObject attachmentJSON = new JSONObject();
             for (Appendix appendage : transaction.getAppendages()) {
                 attachmentJSON.putAll(appendage.getJSONObject());
+                if (transaction.getType().getType() == 5) {
+                    final long currencyId;
+                    switch (transaction.getType().getSubtype()) {
+                        case 1: 
+                            currencyId = ((MonetarySystemReserveIncrease) appendage).getCurrencyId(); 
+                            break;  
+                        case 2: 
+                            currencyId = ((MonetarySystemReserveClaim) appendage).getCurrencyId(); 
+                            break;
+                        case 3: 
+                            currencyId = ((MonetarySystemCurrencyTransfer) appendage).getCurrencyId(); 
+                            break;
+                        case 4: 
+                            currencyId = ((MonetarySystemPublishExchangeOffer) appendage).getCurrencyId(); 
+                            break;
+                        case 5: 
+                            currencyId = ((MonetarySystemExchangeBuy) appendage).getCurrencyId(); 
+                            break;
+                        case 6: 
+                            currencyId = ((MonetarySystemExchangeSell) appendage).getCurrencyId(); 
+                            break;
+                        case 7: 
+                            currencyId = ((MonetarySystemCurrencyMinting) appendage).getCurrencyId(); 
+                            break;
+                        case 8: 
+                            currencyId = ((MonetarySystemCurrencyDeletion) appendage).getCurrencyId(); 
+                            break;
+                        default:
+                            continue;
+                    }                
+                    JSONData.putCurrencyInfo(attachmentJSON, currencyId);
+                }
             }
             if (! attachmentJSON.isEmpty()) {
+                for (Map.Entry entry : (Iterable<Map.Entry>) attachmentJSON.entrySet()) {
+                    if (entry.getValue() instanceof Long) {
+                        entry.setValue(String.valueOf(entry.getValue()));
+                    }
+                }
                 json.put("attachment", attachmentJSON);
             }
             result.add(json);

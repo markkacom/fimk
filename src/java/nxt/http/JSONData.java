@@ -2,9 +2,18 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Alias;
+import nxt.Asset;
+import nxt.Attachment.MonetarySystemCurrencyDeletion;
+import nxt.Attachment.MonetarySystemCurrencyIssuance;
+import nxt.Attachment.MonetarySystemCurrencyMinting;
+import nxt.Attachment.MonetarySystemCurrencyTransfer;
+import nxt.Attachment.MonetarySystemExchangeBuy;
+import nxt.Attachment.MonetarySystemExchangeSell;
+import nxt.Attachment.MonetarySystemPublishExchangeOffer;
+import nxt.Attachment.MonetarySystemReserveClaim;
+import nxt.Attachment.MonetarySystemReserveIncrease;
 import nxt.NamespacedAlias;
 import nxt.Appendix;
-import nxt.Asset;
 import nxt.AssetTransfer;
 import nxt.Attachment;
 import nxt.Block;
@@ -27,6 +36,7 @@ import nxt.crypto.EncryptedData;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
 import nxt.util.Convert;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -181,7 +191,8 @@ final class JSONData {
     static JSONObject order(Order order) {
         JSONObject json = new JSONObject();
         json.put("order", Convert.toUnsignedLong(order.getId()));
-        Asset.putAsset(json, order.getAssetId());
+        putAssetInfo(json, order.getAssetId());
+        json.put("asset", Convert.toUnsignedLong(order.getAssetId()));
         putAccount(json, "account", order.getAccountId());
         json.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(order.getPriceNQT()));
@@ -397,7 +408,7 @@ final class JSONData {
         json.put("timestamp", trade.getTimestamp());
         json.put("quantityQNT", String.valueOf(trade.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(trade.getPriceNQT()));
-        Asset.putAsset(json, trade.getAssetId());
+        json.put("asset", Convert.toUnsignedLong(trade.getAssetId()));
         json.put("askOrder", Convert.toUnsignedLong(trade.getAskOrderId()));
         json.put("bidOrder", Convert.toUnsignedLong(trade.getBidOrderId()));
         json.put("askOrderHeight", trade.getAskOrderHeight());
@@ -500,6 +511,38 @@ final class JSONData {
         JSONObject attachmentJSON = new JSONObject();
         for (Appendix appendage : transaction.getAppendages()) {
             attachmentJSON.putAll(appendage.getJSONObject());
+            if (transaction.getType().getType() == 5) {
+                final long currencyId;
+                switch (transaction.getType().getSubtype()) {
+                    case 1: 
+                        currencyId = ((MonetarySystemReserveIncrease) appendage).getCurrencyId(); 
+                        break;  
+                    case 2: 
+                        currencyId = ((MonetarySystemReserveClaim) appendage).getCurrencyId(); 
+                        break;
+                    case 3: 
+                        currencyId = ((MonetarySystemCurrencyTransfer) appendage).getCurrencyId(); 
+                        break;
+                    case 4: 
+                        currencyId = ((MonetarySystemPublishExchangeOffer) appendage).getCurrencyId(); 
+                        break;
+                    case 5: 
+                        currencyId = ((MonetarySystemExchangeBuy) appendage).getCurrencyId(); 
+                        break;
+                    case 6: 
+                        currencyId = ((MonetarySystemExchangeSell) appendage).getCurrencyId(); 
+                        break;
+                    case 7: 
+                        currencyId = ((MonetarySystemCurrencyMinting) appendage).getCurrencyId(); 
+                        break;
+                    case 8: 
+                        currencyId = ((MonetarySystemCurrencyDeletion) appendage).getCurrencyId(); 
+                        break;
+                    default:
+                        continue;
+                }                
+                putCurrencyInfo(attachmentJSON, currencyId);
+            }
         }
         if (! attachmentJSON.isEmpty()) {
             for (Map.Entry entry : (Iterable<Map.Entry>) attachmentJSON.entrySet()) {
@@ -537,7 +580,7 @@ final class JSONData {
         json.put(name, Convert.toUnsignedLong(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));
     }
-
+    
     static void putCurrencyInfo(JSONObject json, long currencyId) {
         Currency currency = Currency.getCurrency(currencyId);
         if (currency == null) {

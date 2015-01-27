@@ -2,6 +2,7 @@ package nxt.http;
 
 import nxt.NamespacedAlias;
 import nxt.db.FilteringIterator;
+import nxt.util.Filter;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -32,7 +33,7 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
         
         JSONArray aliases = new JSONArray();
         try (FilteringIterator<NamespacedAlias> aliasIterator = new FilteringIterator<>(NamespacedAlias.getAliasesByOwner(accountId, 0, -1),
-                new FilteringIterator.Filter<NamespacedAlias>() {
+                new Filter<NamespacedAlias>() {
                     @Override
                     public boolean ok(NamespacedAlias alias) {
                         if (alias.getTimestamp() >= timestamp) {

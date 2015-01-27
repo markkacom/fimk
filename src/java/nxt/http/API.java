@@ -6,16 +6,13 @@ import nxt.util.Logger;
 import nxt.util.ThreadPool;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.FilterHolder;
@@ -39,7 +36,7 @@ public final class API {
 
     public static final int TESTNET_API_PORT = 6886;
 
-    private static final Set<String> allowedBotHosts;
+    static final Set<String> allowedBotHosts;
     private static final List<NetworkAddress> allowedBotNets;
     static final boolean enableDebugAPI = Nxt.getBooleanProperty("nxt.enableDebugAPI");
     static final boolean enableWebsockets = Nxt.getBooleanProperty("nxt.enableWebsockets");

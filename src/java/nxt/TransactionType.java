@@ -16,7 +16,7 @@ public abstract class TransactionType {
     private static final byte TYPE_COLORED_COINS = 2;
     private static final byte TYPE_DIGITAL_GOODS = 3;
     private static final byte TYPE_ACCOUNT_CONTROL = 4;
-    private static final byte TYPE_MONETARY_SYSTEM = 5;
+    static final byte TYPE_MONETARY_SYSTEM = 5;
     private static final byte TYPE_FIMKRYPTO_MESSAGING = 40;
 
     private static final byte SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0;
@@ -860,12 +860,12 @@ public abstract class TransactionType {
           }
 
           @Override
-          boolean isDuplicate(Transaction transaction, Map<TransactionType, Set<String>> duplicates) {
+          boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
               Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment = (Attachment.FIMKryptoMessagingNamespacedAliasAssignment) transaction.getAttachment();
               StringBuilder key = new StringBuilder();
               key.append(transaction.getSenderId());
               key.append(attachment.getAliasName().toLowerCase());
-              return isDuplicate(FIMKryptoMessaging.NAMESPACED_ALIAS_ASSIGNMENT, key.toString(), duplicates);
+              return isDuplicate(FIMKryptoMessaging.NAMESPACED_ALIAS_ASSIGNMENT, key.toString(), duplicates, true);
           }
 
           @Override

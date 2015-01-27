@@ -178,10 +178,6 @@ class NxtDbVersion extends DbVersion {
             case 71:
                 apply(null);
             case 72:
-                /* Validate the chain to be compatible with the 0.3.3 fork */
-                if ( ! Constants.isTestnet) {
-                    BlockchainProcessorImpl.getInstance().validateAtNextScan();
-                }
                 apply(null);
             case 73:
                 apply("CREATE TABLE IF NOT EXISTS namespaced_alias (db_id IDENTITY, id BIGINT NOT NULL, "
@@ -377,7 +373,6 @@ class NxtDbVersion extends DbVersion {
             case 144:
                 apply("CREATE INDEX IF NOT EXISTS tag_in_stock_count_idx ON tag (in_stock_count DESC, height DESC)");
             case 145:
-                BlockchainProcessorImpl.getInstance().forceScanAtStart();
                 apply(null);
             case 146:
                 apply("CREATE TABLE IF NOT EXISTS currency (db_id IDENTITY, id BIGINT NOT NULL, account_id BIGINT NOT NULL, "
@@ -525,7 +520,8 @@ class NxtDbVersion extends DbVersion {
             case 194:
                 apply("CREATE INDEX IF NOT EXISTS currency_creation_height_idx ON currency (creation_height DESC)");
             case 195:
-                BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
+                /* Validate the chain to be compatible with the 0.3.3 fork */
+                BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
                 apply(null);
             case 196:
                 return;
