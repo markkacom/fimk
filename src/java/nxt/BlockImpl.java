@@ -63,13 +63,6 @@ final class BlockImpl implements Block {
             if (blockTransactions.size() > Constants.MAX_NUMBER_OF_TRANSACTIONS) {
                 throw new NxtException.NotValidException("attempted to create a block with " + blockTransactions.size() + " transactions");
             }
-            long previousId = 0;
-            for (Transaction transaction : this.blockTransactions) {
-                if (transaction.getId() <= previousId && previousId != 0) {
-                    throw new NxtException.NotValidException("Block transactions are not sorted!");
-                }
-                previousId = transaction.getId();
-            }
         }
     }
 
@@ -403,7 +396,7 @@ final class BlockImpl implements Block {
         Arrays.sort(badBlocks);
     }
 
-    void apply() {
+    void apply() throws BlockchainProcessor.TransactionNotAcceptedException {
         /* XXX - Add the POS reward to the block forger */
         long augmentedFeeNQT = RewardsImpl.augmentFee(this, totalFeeNQT);
       
@@ -412,7 +405,12 @@ final class BlockImpl implements Block {
         generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(augmentedFeeNQT);
         generatorAccount.addToForgedBalanceNQT(augmentedFeeNQT);
         for (TransactionImpl transaction : getTransactions()) {
-            transaction.apply();
+            try {
+                transaction.apply();
+            } catch (RuntimeException e) {
+                Logger.logErrorMessage(e.toString(), e);
+                throw new BlockchainProcessor.TransactionNotAcceptedException(e, transaction);
+            }
         }
     }
 
@@ -427,8 +425,10 @@ final class BlockImpl implements Block {
         } else {
             this.height = 0;
         }
+        short index = 0;
         for (TransactionImpl transaction : getTransactions()) {
             transaction.setBlock(this);
+            transaction.setIndex(index++);
         }
     }
 

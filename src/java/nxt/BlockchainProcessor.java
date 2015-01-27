@@ -28,11 +28,7 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
 
     void fullReset();
 
-    void scan(int height);
-
-    void forceScanAtStart();
-
-    void validateAtNextScan();
+    void scan(int height, boolean validate);
 
     void setGetMoreBlocks(boolean getMoreBlocks);
 
@@ -40,11 +36,14 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
 
     void registerDerivedTable(DerivedDbTable table);
 
-
     public static class BlockNotAcceptedException extends NxtException {
 
         BlockNotAcceptedException(String message) {
             super(message);
+        }
+
+        BlockNotAcceptedException(Throwable cause) {
+            super(cause);
         }
 
     }
@@ -55,6 +54,11 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
 
         TransactionNotAcceptedException(String message, TransactionImpl transaction) {
             super(message  + " transaction: " + transaction.getJSONObject().toJSONString());
+            this.transaction = transaction;
+        }
+
+        TransactionNotAcceptedException(Throwable cause, TransactionImpl transaction) {
+            super(cause);
             this.transaction = transaction;
         }
 

@@ -12,9 +12,6 @@
 /fim.jar
 /fim_test_db/
 /fim_db/
-/fim.linux/
-/fim.mac/
-/fim.win/
 *.trace
 /fim-trace.csv
 /README_win.txt
@@ -25,14 +22,11 @@
 /.project
 /.settings/
 /compile.bat
-/MY_Genesis.java
-/genesis.rb
+/test/classes/
 /test_net_keys.csv
 /logs/*
-/accounts.csv
 /*.zip
 /announcements/
 *.csv
 dist
-/html/ui/beta/*
 downloads

@@ -4,7 +4,6 @@ import nxt.Constants;
 import nxt.Nxt;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
-
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NCSARequestLog;
@@ -26,6 +25,11 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
+import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -33,9 +37,10 @@ import java.util.Set;
 
 public final class API {
 
-    private static final int TESTNET_API_PORT = 6886;
+    public static final int TESTNET_API_PORT = 6886;
 
-    static final Set<String> allowedBotHosts;
+    private static final Set<String> allowedBotHosts;
+    private static final List<NetworkAddress> allowedBotNets;
     static final boolean enableDebugAPI = Nxt.getBooleanProperty("nxt.enableDebugAPI");
     static final boolean enableWebsockets = Nxt.getBooleanProperty("nxt.enableWebsockets");
 
@@ -44,9 +49,25 @@ public final class API {
     static {
         List<String> allowedBotHostsList = Nxt.getStringListProperty("nxt.allowedBotHosts");
         if (! allowedBotHostsList.contains("*")) {
-            allowedBotHosts = Collections.unmodifiableSet(new HashSet<>(allowedBotHostsList));
+            Set<String> hosts = new HashSet<>();
+            List<NetworkAddress> nets = new ArrayList<>();
+            for (String host : allowedBotHostsList) {
+                if (host.contains("/")) {
+                    try {
+                        nets.add(new NetworkAddress(host));
+                    } catch (UnknownHostException e) {
+                        Logger.logErrorMessage("Unknown network " + host, e);
+                        throw new RuntimeException(e.toString(), e);
+                    }
+                } else {
+                    hosts.add(host);
+                }
+            }
+            allowedBotHosts = Collections.unmodifiableSet(hosts);
+            allowedBotNets = Collections.unmodifiableList(nets);
         } else {
             allowedBotHosts = null;
+            allowedBotNets = null;
         }
 
         boolean enableAPIServer = Nxt.getBooleanProperty("nxt.enableAPIServer");
@@ -94,7 +115,7 @@ public final class API {
                 defaultServletHolder.setInitParameter("redirectWelcome", "true");
                 defaultServletHolder.setInitParameter("gzip", "true");
                 apiHandler.addServlet(defaultServletHolder, "/*");
-                apiHandler.setWelcomeFiles(new String[]{"index.html"});
+                apiHandler.setWelcomeFiles(new String[]{Nxt.getStringProperty("nxt.apiWelcomeFile")});
             }
 
             String javadocResourceBase = Nxt.getStringProperty("nxt.javadocResourceBase");
@@ -129,22 +150,8 @@ public final class API {
                 filterHolder.setInitParameter("allowedHeaders", "*");
                 filterHolder.setAsyncSupported(true);
             }
-            
-            apiHandlers.addHandler(apiHandler);
-            
-            /* XXX - add nxt.enableAPIServerRequestLog */
-            if (Nxt.getBooleanProperty("nxt.enableAPIServerRequestLog")) {
-              RequestLogHandler requestLogHandler = new RequestLogHandler();
-              apiHandlers.addHandler(requestLogHandler);
-               
-              NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-api-yyyy_mm_dd.request.log");
-              requestLog.setRetainDays(90);
-              requestLog.setAppend(true);
-              requestLog.setExtended(false);
-              requestLog.setLogTimeZone("GMT");
-              requestLogHandler.setRequestLog(requestLog);                  
-            }
 
+            apiHandlers.addHandler(apiHandler);
             apiHandlers.addHandler(new DefaultHandler());
 
             apiServer.setHandler(apiHandlers);
@@ -181,6 +188,53 @@ public final class API {
                 Logger.logShutdownMessage("Failed to stop API server", e);
             }
         }
+    }
+
+    static boolean isAllowed(String remoteHost) {
+        if (API.allowedBotHosts == null || API.allowedBotHosts.contains(remoteHost)) {
+            return true;
+        }
+        try {
+            BigInteger hostAddressToCheck = new BigInteger(InetAddress.getByName(remoteHost).getAddress());
+            for (NetworkAddress network : API.allowedBotNets) {
+                if (network.contains(hostAddressToCheck)) {
+                    return true;
+                }
+            }
+        } catch (UnknownHostException e) {
+            // can't resolve, disallow
+            Logger.logMessage("Unknown remote host " + remoteHost);
+        }
+        return false;
+
+    }
+
+    private static class NetworkAddress {
+
+        private BigInteger netAddress;
+        private BigInteger netMask;
+
+        private NetworkAddress(String address) throws UnknownHostException {
+            String[] addressParts = address.split("/");
+            if (addressParts.length == 2) {
+                InetAddress targetHostAddress = InetAddress.getByName(addressParts[0]);
+                byte[] srcBytes = targetHostAddress.getAddress();
+                netAddress = new BigInteger(1, srcBytes);
+                int maskBitLength = Integer.valueOf(addressParts[1]);
+                int addressBitLength = (targetHostAddress instanceof Inet4Address) ? 32 : 128;
+                netMask = BigInteger.ZERO
+                        .setBit(addressBitLength)
+                        .subtract(BigInteger.ONE)
+                        .subtract(BigInteger.ZERO.setBit(addressBitLength - maskBitLength).subtract(BigInteger.ONE));
+            } else {
+                throw new IllegalArgumentException("Invalid address: " + address);
+            }
+        }
+
+        private boolean contains(BigInteger hostAddressToCheck) {
+            return hostAddressToCheck.and(netMask).equals(netAddress);
+        }
+
     }
 
     private API() {} // never

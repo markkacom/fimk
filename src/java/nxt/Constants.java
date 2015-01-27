@@ -14,27 +14,19 @@ public final class Constants {
   
     public static final long ONE_NXT = 100000000;
     
-    /* XXX - MINIMUM FEE IS 0.1 FIM */
     public static final long MIN_FEE_NQT = ONE_NXT / 10;
-
     public static final int BLOCK_HEADER_LENGTH = 232;
     
-    /* XXX - max transactions is 512 */
     public static final int MAX_NUMBER_OF_TRANSACTIONS = 512;
     public static final int MAX_PAYLOAD_LENGTH = MAX_NUMBER_OF_TRANSACTIONS * 176;
-    
-    /* XXX - number of seconds between blocks */
     public static final int SECONDS_BETWEEN_BLOCKS = 30;
     
     /* XXX - POS reward amounts and halving */
     public static final long FORGER_FEE_STAGE_CHANGE_AT_BLOCK = 889920;
     public static final long[] FORGER_FEE_AMOUNT_NQT_STAGES = { 200 * ONE_NXT, 100 * ONE_NXT, 50 * ONE_NXT, 25 * ONE_NXT };
     
-    /* XXX - max balance is calculated from */
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
-    
-    /* XXX - adjust base target for MAX_BALANCE_NXT (192153584) */
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
     
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
@@ -53,6 +45,7 @@ public final class Constants {
 
     public static final int MAX_ACCOUNT_NAME_LENGTH = 100;
     public static final int MAX_ACCOUNT_DESCRIPTION_LENGTH = 1000;
+    public static final int MAX_ACCOUNT_MESSAGE_PATTERN_LENGTH = 100;
 
     public static final long MAX_ASSET_QUANTITY_QNT = 1000000000L * 100000000L;
     public static final int MIN_ASSET_NAME_LENGTH = 3;
@@ -79,6 +72,19 @@ public final class Constants {
     public static final int THIRD_BIRTH_BLOCK = 203000;
     public static final int THIRD_BIRTH_BLOCK_TEST = 19530;
 
+    public static final int MIN_CURRENCY_NAME_LENGTH = 3;
+    public static final int MAX_CURRENCY_NAME_LENGTH = 10;
+    public static final int MIN_CURRENCY_CODE_LENGTH = 3;
+    public static final int MAX_CURRENCY_CODE_LENGTH = 5;
+    public static final int MAX_CURRENCY_DESCRIPTION_LENGTH = 1000;
+    public static final long MAX_CURRENCY_TOTAL_SUPPLY = 1000000000L * 100000000L;
+    public static final int MAX_MINTING_RATIO = 10000; // per mint units not more than 0.01% of total supply
+    public static final byte MIN_NUMBER_OF_SHUFFLING_PARTICIPANTS = 3;
+    public static final byte MAX_NUMBER_OF_SHUFFLING_PARTICIPANTS = 100;
+    public static final short MIN_SHUFFLING_DELAY = 5;
+    public static final short MAX_SHUFFLING_DELAY = 1440;
+    public static final int MAX_SHUFFLING_RECIPIENTS_LENGTH = 10000;
+
     public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
     
     public static final int ALIAS_SYSTEM_BLOCK = SECOND_BIRTH_BLOCK;
@@ -91,26 +97,23 @@ public final class Constants {
     public static final int TRANSPARENT_FORGING_BLOCK_6 = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK_7 = Integer.MAX_VALUE;
     public static final int TRANSPARENT_FORGING_BLOCK_8 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
-    public static final int LAST_KNOWN_BLOCK = isTestnet ? 80000 : 308000;
 
-    public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
-    
     public static final int NQT_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int FRACTIONAL_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int ASSET_EXCHANGE_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK = 0;
     public static final int NAMESPACED_ALIAS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
-    
-    /* XXX - Set REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP to 0 */    
     public static final int REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP = 0;
-
     public static final int VOTING_SYSTEM_BLOCK = Integer.MAX_VALUE;
     public static final int DIGITAL_GOODS_STORE_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
-
-    /* XXX - Make UNCONFIRMED_POOL_DEPOSIT_NQT same on testnet as main net */
-    public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;
+    public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
+    public static final int MONETARY_SYSTEM_BLOCK = Integer.MAX_VALUE;
+    public static final int LAST_KNOWN_BLOCK = isTestnet ? 136000 : 326000;
+            
+    public static final int[] MIN_VERSION = new int[] {0, 3, 3};                
     
-    /* XXX - FORGER_FEE_BLOCK, FORGER_FEE_AMOUNT_NQT */
+    public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;    
+    
     public static final int FORGER_FEE_BLOCK = SECOND_BIRTH_BLOCK + 1;
 
     public static final long EPOCH_BEGINNING;
@@ -126,9 +129,8 @@ public final class Constants {
         EPOCH_BEGINNING = calendar.getTimeInMillis();
     }
     
-    public static final int[] MIN_VERSION = new int[] {0, 3, 3};    
-
     public static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
+    public static final String ALLOWED_CURRENCY_CODE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String NAMESPACED_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz!#$%&()*+-./:;<=>?@[]_{|}";
 
     public static final int EC_RULE_TERMINATOR = 600; /* cfb: This constant defines a straight edge when "longest chain"

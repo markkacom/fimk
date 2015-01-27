@@ -17,7 +17,7 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.3.5";
+    public static final String NXT_VERSION = "1.4.7";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
@@ -167,7 +167,7 @@ public final class Nxt {
         Peers.shutdown();
         ThreadPool.shutdown();
         Db.shutdown();
-        Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") stopped.");
+        Logger.logShutdownMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") stopped.");
         Logger.shutdown();
     }
 
@@ -191,6 +191,13 @@ public final class Nxt {
                 Trade.init();
                 AssetTransfer.init();
                 Vote.init();
+                Currency.init();
+                CurrencyBuyOffer.init();
+                CurrencySellOffer.init();
+                CurrencyFounder.init();
+                CurrencyMint.init();
+                CurrencyTransfer.init();
+                Exchange.init();
                 Peers.init();
                 Generator.init();
                 API.init();
