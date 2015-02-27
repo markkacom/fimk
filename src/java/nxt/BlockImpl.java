@@ -322,7 +322,6 @@ final class BlockImpl implements Block {
     boolean verifyGenerationSignature() throws BlockchainProcessor.BlockOutOfOrderException {
 
         try {
-
             BlockImpl previousBlock = BlockchainImpl.getInstance().getBlock(getPreviousBlockId());
             if (previousBlock == null) {
                 throw new BlockchainProcessor.BlockOutOfOrderException("Can't verify signature because previous block is missing");
@@ -378,7 +377,7 @@ final class BlockImpl implements Block {
             BigInteger hit = new BigInteger(1, new byte[]{generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
 
             return Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)
-                    || (this.height < Constants.TRANSPARENT_FORGING_BLOCK_5 && Arrays.binarySearch(badBlocks, this.getId()) >= 0);
+                    || (this.height < Constants.TRANSPARENT_FORGING_BLOCK_5 /* NXT specific ** && Arrays.binarySearch(badBlocks, this.getId()) >= 0*/);
 
         } catch (RuntimeException e) {
 
@@ -389,12 +388,13 @@ final class BlockImpl implements Block {
 
     }
 
-    private static final long[] badBlocks = new long[] {
+    /* NXT specific */
+    /*private static final long[] badBlocks = new long[] {
             5113090348579089956L, 8032405266942971936L, 7702042872885598917L, -407022268390237559L, -3320029330888410250L,
             -6568770202903512165L, 4288642518741472722L, 5315076199486616536L, -6175599071600228543L};
     static {
         Arrays.sort(badBlocks);
-    }
+    }*/
 
     void apply() throws BlockchainProcessor.TransactionNotAcceptedException {
         /* XXX - Add the POS reward to the block forger */
