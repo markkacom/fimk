@@ -14,13 +14,13 @@ public interface Attachment extends Appendix {
 
     TransactionType getTransactionType();
 
-    abstract static class AbstractAttachment extends AbstractAppendix implements Attachment {
+    public abstract static class AbstractAttachment extends AbstractAppendix implements Attachment {
 
-        private AbstractAttachment(ByteBuffer buffer, byte transactionVersion) {
+        protected AbstractAttachment(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
         }
 
-        private AbstractAttachment(JSONObject attachmentData) {
+        protected AbstractAttachment(JSONObject attachmentData) {
             super(attachmentData);
         }
 
@@ -28,7 +28,7 @@ public interface Attachment extends Appendix {
             super(version);
         }
 
-        private AbstractAttachment() {}
+        protected AbstractAttachment() {}
 
         @Override
         final void validate(Transaction transaction) throws NxtException.ValidationException {
@@ -96,68 +96,6 @@ public interface Attachment extends Appendix {
         }
 
     };
-
-    public final static class FIMKryptoMessagingNamespacedAliasAssignment extends AbstractAttachment {
-
-      private final String aliasName;
-      private final String aliasURI;
-
-      FIMKryptoMessagingNamespacedAliasAssignment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
-          super(buffer, transactionVersion);
-          aliasName = Convert.readString(buffer, buffer.get(), Constants.MAX_ALIAS_LENGTH).trim().intern();
-          aliasURI = Convert.readString(buffer, buffer.getShort(), Constants.MAX_ALIAS_URI_LENGTH).trim().intern();
-      }
-
-      FIMKryptoMessagingNamespacedAliasAssignment(JSONObject attachmentData) {
-          super(attachmentData);
-          aliasName = (Convert.nullToEmpty((String) attachmentData.get("alias"))).trim().intern();
-          aliasURI = (Convert.nullToEmpty((String) attachmentData.get("uri"))).trim().intern();
-      }
-
-      public FIMKryptoMessagingNamespacedAliasAssignment(String aliasName, String aliasURI) {
-          this.aliasName = aliasName.trim().intern();
-          this.aliasURI = aliasURI.trim().intern();
-      }
-
-      @Override
-      String getAppendixName() {
-          return "NamespacedAliasAssignment";
-      }
-
-      @Override
-      int getMySize() {
-          return 1 + Convert.toBytes(aliasName).length + 2 + Convert.toBytes(aliasURI).length;
-      }
-
-      @Override
-      void putMyBytes(ByteBuffer buffer) {
-          byte[] alias = Convert.toBytes(this.aliasName);
-          byte[] uri = Convert.toBytes(this.aliasURI);
-          buffer.put((byte)alias.length);
-          buffer.put(alias);
-          buffer.putShort((short) uri.length);
-          buffer.put(uri);
-      }
-
-      @Override
-      void putMyJSON(JSONObject attachment) {
-          attachment.put("alias", aliasName);
-          attachment.put("uri", aliasURI);
-      }
-
-      @Override
-      public TransactionType getTransactionType() {
-          return TransactionType.FIMKryptoMessaging.NAMESPACED_ALIAS_ASSIGNMENT;
-      }
-
-      public String getAliasName() {
-          return aliasName;
-      }
-
-      public String getAliasURI() {
-          return aliasURI;
-      }
-    }
     
     public final static class MessagingAliasAssignment extends AbstractAttachment {
 
