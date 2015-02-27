@@ -151,6 +151,15 @@ public final class Generator implements Comparable<Generator> {
     public static Generator getGenerator(String secretPhrase) {
         return generators.get(secretPhrase);
     }
+    
+    public static boolean isAccountForging(long id) {
+        for (Generator generator : getAllGenerators()) {
+            if (generator.accountId == id) {
+                return true;
+            }
+        }
+        return false;
+    }    
 
     public static Collection<Generator> getAllGenerators() {
         return allGenerators;
