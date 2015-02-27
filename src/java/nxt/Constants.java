@@ -70,7 +70,7 @@ public final class Constants {
     
     public static final int SECOND_BIRTH_BLOCK = 1;
     public static final int THIRD_BIRTH_BLOCK = 203000;
-    public static final int THIRD_BIRTH_BLOCK_TEST = 19530;
+    public static final int THIRD_BIRTH_BLOCK_TEST = 2;
 
     public static final int MIN_CURRENCY_NAME_LENGTH = 3;
     public static final int MAX_CURRENCY_NAME_LENGTH = 10;
@@ -107,9 +107,12 @@ public final class Constants {
     public static final int VOTING_SYSTEM_BLOCK = Integer.MAX_VALUE;
     public static final int DIGITAL_GOODS_STORE_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
-    public static final int MONETARY_SYSTEM_BLOCK = Integer.MAX_VALUE;
-    public static final int LAST_KNOWN_BLOCK = isTestnet ? 136000 : 326000;
+    public static final int MONETARY_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
+    public static final int LAST_KNOWN_BLOCK = isTestnet ? 0 : 384000;
+    public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
             
+    public static final long MAX_PRIVATE_ASSET_ORDER_FEE_NQT = 1000000000L * 100000000L;
+    
     public static final int[] MIN_VERSION = new int[] {0, 3, 3};                
     
     public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;    
