@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import nxt.Attachment.FIMKryptoMessagingNamespacedAliasAssignment;
 import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
@@ -68,7 +67,7 @@ public final class NamespacedAlias {
         return aliasTable.get(aliasDbKeyFactory.newKey(id));
     }
     
-    static void addOrUpdateAlias(Transaction transaction, Attachment.FIMKryptoMessagingNamespacedAliasAssignment attachment) {
+    static void addOrUpdateAlias(Transaction transaction, MofoAttachment.NamespacedAliasAssignmentAttachment attachment) {
       NamespacedAlias alias = getAlias(transaction.getSenderId(), attachment.getAliasName());
         if (alias == null) {
             alias = new NamespacedAlias(transaction.getId(), transaction, attachment);
@@ -97,7 +96,7 @@ public final class NamespacedAlias {
       this.timestamp = timestamp;
     }    
 
-    private NamespacedAlias(long aliasId, Transaction transaction, FIMKryptoMessagingNamespacedAliasAssignment attachment) {
+    private NamespacedAlias(long aliasId, Transaction transaction, MofoAttachment.NamespacedAliasAssignmentAttachment attachment) {
       this(aliasId, transaction.getSenderId(), attachment.getAliasName(), attachment.getAliasURI(),
           transaction.getBlockTimestamp());
     }

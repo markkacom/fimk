@@ -4,6 +4,7 @@ package nxt.http;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
+import nxt.MofoAttachment;
 import nxt.NxtException;
 import nxt.util.Convert;
 
@@ -51,7 +52,7 @@ public final class SetNamespacedAlias extends CreateTransaction {
         }
 
         Account account = ParameterParser.getSenderAccount(req);
-        Attachment attachment = new Attachment.FIMKryptoMessagingNamespacedAliasAssignment(aliasName, aliasURI);
+        Attachment attachment = new MofoAttachment.NamespacedAliasAssignmentAttachment(aliasName, aliasURI);
         return createTransaction(req, account, attachment);
 
     }
