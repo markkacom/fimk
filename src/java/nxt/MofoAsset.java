@@ -14,8 +14,8 @@ public final class MofoAsset {
     public static class PrivateAsset {
 
         private final long assetId;
-        private final int orderFeePercentage;
-        private final int tradeFeePercentage;
+        private int orderFeePercentage;
+        private int tradeFeePercentage;
         private final DbKey dbKey;
 
         private PrivateAsset(long assetId, int orderFeePercentage, int tradeFeePercentage) {
@@ -45,6 +45,10 @@ public final class MofoAsset {
             }
         }
 
+        public void save() {
+            privateAssetTable.insert(this);
+        }
+
         public long getAssetId() {
             return assetId;
         }
@@ -71,7 +75,7 @@ public final class MofoAsset {
                       ), 
                       getOrderFeePercentage()
                    );
-        }        
+        }       
     }
     
     public static class PrivateAssetAccount {
@@ -109,7 +113,7 @@ public final class MofoAsset {
         }
         
         public void save() {
-            privateAssetAccountTable.insert(this);          
+            privateAssetAccountTable.insert(this);
         }
 
         public long getAssetId() {
@@ -212,5 +216,17 @@ public final class MofoAsset {
         privateAssetAccount.save();
     }
 
+    public static void setFee(long assetId, int orderFeePercentage, int tradeFeePercentage) {
+        PrivateAsset privateAsset;
+        privateAsset = privateAssetTable.get(privateAssetDbKeyFactory.newKey(assetId));
+        if (privateAsset == null) {
+            privateAsset = new PrivateAsset(assetId, orderFeePercentage, tradeFeePercentage);
+        } else {
+            privateAsset.orderFeePercentage = orderFeePercentage;
+            privateAsset.tradeFeePercentage = tradeFeePercentage;
+        }
+        privateAsset.save();
+    }    
+    
     static void init() {}
 }
