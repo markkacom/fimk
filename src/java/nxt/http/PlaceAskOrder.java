@@ -5,6 +5,7 @@ import nxt.Asset;
 import nxt.Attachment;
 import nxt.MofoAsset;
 import nxt.MofoAsset.PrivateAsset;
+import nxt.util.Convert;
 import nxt.NxtException;
 
 import org.json.simple.JSONStreamAware;
@@ -19,7 +20,7 @@ public final class PlaceAskOrder extends CreateTransaction {
     static final PlaceAskOrder instance = new PlaceAskOrder();
 
     private PlaceAskOrder() {
-        super(new APITag[] {APITag.AE, APITag.CREATE_TRANSACTION}, "asset", "quantityQNT", "priceNQT", "oderFeeQNT");
+        super(new APITag[] {APITag.AE, APITag.CREATE_TRANSACTION}, "asset", "quantityQNT", "priceNQT", "oderFeeNQT");
     }
 
     @Override
@@ -28,7 +29,7 @@ public final class PlaceAskOrder extends CreateTransaction {
         Asset asset = ParameterParser.getAsset(req);
         long priceNQT = ParameterParser.getPriceNQT(req);
         long quantityQNT = ParameterParser.getQuantityQNT(req);
-        long oderFeeQNT = ParameterParser.getOrderFeeQNT(req, asset.getQuantityQNT());
+        long oderFeeNQT = ParameterParser.getOrderFeeNQT(req);
         Account account = ParameterParser.getSenderAccount(req);
 
         long assetBalance = account.getUnconfirmedAssetBalanceQNT(asset.getId());
@@ -38,7 +39,9 @@ public final class PlaceAskOrder extends CreateTransaction {
 
         PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
         if (privateAsset != null) {
-            if (privateAsset.calculateOrderFee(quantityQNT) > oderFeeQNT) {
+          
+            long totalNQT = Convert.safeMultiply(priceNQT, quantityQNT);          
+            if (privateAsset.calculateOrderFee(totalNQT) > oderFeeNQT) {
                 return ERROR_INCORRECT_REQUEST;
             }
         }
