@@ -1,6 +1,6 @@
 /.idea/
-/fim_db/
-/nxt_db/
+/nxt_db*
+/nxt_test_db*
 /nxt.iml
 /webapps/
 /classes/
@@ -10,8 +10,8 @@
 /html/**/*.gz
 /keystore
 /fim.jar
-/fim_test_db/
-/fim_db/
+/fim_test_db*
+/fim_db*
 *.trace
 /fim-trace.csv
 /README_win.txt
