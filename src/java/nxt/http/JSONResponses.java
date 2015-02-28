@@ -126,6 +126,7 @@ public final class JSONResponses {
     public static final JSONStreamAware INCORRECT_OFFER = incorrect("offer");
     public static final JSONStreamAware INCORRECT_MESSAGE_PATTERN_REGEX = incorrect("messagePatternRegex");
     public static final JSONStreamAware INCORRECT_MESSAGE_PATTERN_FLAGS = incorrect("messagePatternFlags");
+    public static final JSONStreamAware INCORRECT_ORDER_TYPE = incorrect("type", "(must be either bid or ask)");
 
     public static final JSONStreamAware NOT_ENOUGH_FUNDS;
     static {
