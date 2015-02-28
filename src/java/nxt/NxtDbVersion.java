@@ -572,6 +572,10 @@ class NxtDbVersion extends DbVersion {
             case 214:
                 apply("UPDATE asset SET type = 0");
             case 215:
+                apply("CREATE TABLE IF NOT EXISTS private_asset (db_id IDENTITY, asset_id BIGINT NOT NULL, "
+                    + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
+                    + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
+            case 216:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
