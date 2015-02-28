@@ -14,10 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
-import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
 import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
 import static nxt.http.JSONResponses.POST_REQUIRED;
@@ -213,6 +207,7 @@ public final class APIServlet extends HttpServlet {
         map.put("searchDGSGoods", SearchDGSGoods.instance);
         map.put("searchAssets", SearchAssets.instance);
         map.put("searchCurrencies", SearchCurrencies.instance);
+        
         /* XXX - NamespacedAlias */
         map.put("getNamespacedAlias", GetNamespacedAlias.instance);
         map.put("setNamespacedAlias", SetNamespacedAlias.instance);
@@ -220,13 +215,6 @@ public final class APIServlet extends HttpServlet {
         
         /* XXX - MofoWallet specific extensions */
         map.put("mofoCombine", MofoCombine.instance);
-        map.put("mofoGetAccount", MofoGetAccount.instance);
-        map.put("mofoGetAccounts", MofoGetAccounts.instance);
-        map.put("mofoGetRecentTransactions", MofoGetRecentTransactions.instance);
-        map.put("mofoGetActivity", MofoGetActivity.instance);
-        map.put("mofoGetActivityStatistics", MofoGetActivityStatistics.instance);
-        map.put("mofoGetForgingStats", MofoGetForgingStats.instance);
-        map.put("mofoGetAccountComments", MofoGetAccountComments.instance);
 
         if (API.enableDebugAPI) {
             map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);
