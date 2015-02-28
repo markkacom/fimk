@@ -53,6 +53,7 @@ public class MofoAttachment {
             buffer.put(uri);
         }
     
+        @SuppressWarnings("unchecked")
         @Override
         void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
@@ -94,7 +95,7 @@ public class MofoAttachment {
     
         @Override
         String getAppendixName() {
-            return "PrivateAssetAddAccount";
+            return "PrivateAssetAccountAllowed";
         }
     
         @Override
@@ -121,4 +122,74 @@ public class MofoAttachment {
             return assetId;
         }
     }
+
+    public final static class PrivateAssetSetFeeAttachment extends AbstractAttachment {
+        
+        private final long assetId;
+        private final int orderFeePercentage;
+        private final int tradeFeePercentage;
+    
+        PrivateAssetSetFeeAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+            this.assetId = buffer.getLong();
+            this.orderFeePercentage = buffer.getInt();
+            this.tradeFeePercentage = buffer.getInt();
+        }
+    
+        PrivateAssetSetFeeAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+            this.assetId = Convert.parseUnsignedLong((String) attachmentData.get("asset"));
+            this.orderFeePercentage = ((Long)attachmentData.get("orderFeePercentage")).intValue();
+            this.tradeFeePercentage = ((Long)attachmentData.get("orderFeePercentage")).intValue();
+        }
+    
+        public PrivateAssetSetFeeAttachment(long assetId, int orderFeePercentage, int tradeFeePercentage) {
+            super();
+            this.assetId = assetId;
+            this.orderFeePercentage = orderFeePercentage;
+            this.tradeFeePercentage = tradeFeePercentage;
+        }
+    
+        @Override
+        String getAppendixName() {
+            return "PrivateAssetSetFee";
+        }
+    
+        @Override
+        int getMySize() {
+            return 8 + 4 + 4;
+        }
+    
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            buffer.putLong(assetId);
+            buffer.putInt(orderFeePercentage);
+            buffer.putInt(tradeFeePercentage);
+        }
+    
+        @SuppressWarnings("unchecked")
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            Asset.putAsset(attachment, assetId);
+            attachment.put("orderFeePercentage", orderFeePercentage);
+            attachment.put("tradeFeePercentage", tradeFeePercentage);
+        }
+    
+        @Override
+        public TransactionType getTransactionType() {
+            return MofoTransactions.PrivateAssetSetFeeTransaction.PRIVATE_ASSET_SET_FEE;
+        }
+
+        public long getAssetId() {
+            return assetId;
+        }
+
+        public int getOrderFeePercentage() {
+            return orderFeePercentage;
+        }
+
+        public int getTradeFeePercentage() {
+            return tradeFeePercentage;
+        }
+  }
 }
