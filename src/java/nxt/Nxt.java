@@ -208,6 +208,7 @@ public final class Nxt {
                 DebugTrace.init();
                 MofoChart.init();
                 MofoMessaging.init();
+                MofoAsset.init();
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
