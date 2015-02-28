@@ -55,6 +55,7 @@ public final class JSONResponses {
     public static final JSONStreamAware INCORRECT_ASSET_TRANSFER_COMMENT = incorrect("comment", "(length must not exceed " + Constants.MAX_ASSET_TRANSFER_COMMENT_LENGTH + " characters)");
     public static final JSONStreamAware MISSING_NAME = missing("name");
     public static final JSONStreamAware INCORRECT_DECIMALS = incorrect("decimals");
+    public static final JSONStreamAware INCORRECT_TYPE = incorrect("type");    
     public static final JSONStreamAware MISSING_HOST = missing("host");
     public static final JSONStreamAware MISSING_DATE = missing("date");
     public static final JSONStreamAware MISSING_WEIGHT = missing("weight");

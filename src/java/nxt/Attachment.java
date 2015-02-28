@@ -716,6 +716,7 @@ public interface Attachment extends Appendix {
         private final String description;
         private final long quantityQNT;
         private final byte decimals;
+        private final byte type;
 
         ColoredCoinsAssetIssuance(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
@@ -723,6 +724,7 @@ public interface Attachment extends Appendix {
             this.description = Convert.readString(buffer, buffer.getShort(), Constants.MAX_ASSET_DESCRIPTION_LENGTH);
             this.quantityQNT = buffer.getLong();
             this.decimals = buffer.get();
+            this.type = Asset.privateEnabled() ? buffer.get() : 0;
         }
 
         ColoredCoinsAssetIssuance(JSONObject attachmentData) {
@@ -731,13 +733,15 @@ public interface Attachment extends Appendix {
             this.description = Convert.nullToEmpty((String) attachmentData.get("description"));
             this.quantityQNT = Convert.parseLong(attachmentData.get("quantityQNT"));
             this.decimals = ((Long) attachmentData.get("decimals")).byteValue();
+            this.type = Asset.privateEnabled() ? ((Long) attachmentData.get("type")).byteValue() : 0;
         }
 
-        public ColoredCoinsAssetIssuance(String name, String description, long quantityQNT, byte decimals) {
+        public ColoredCoinsAssetIssuance(String name, String description, long quantityQNT, byte decimals, byte type) {
             this.name = name;
             this.description = Convert.nullToEmpty(description);
             this.quantityQNT = quantityQNT;
             this.decimals = decimals;
+            this.type = type;
         }
 
         @Override
@@ -747,7 +751,7 @@ public interface Attachment extends Appendix {
 
         @Override
         int getMySize() {
-            return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1;
+            return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1 + (Asset.privateEnabled() ? 1 : 0);
         }
 
         @Override
@@ -760,6 +764,9 @@ public interface Attachment extends Appendix {
             buffer.put(description);
             buffer.putLong(quantityQNT);
             buffer.put(decimals);
+            if (Asset.privateEnabled()) {
+                buffer.put(type);
+            }
         }
 
         @Override
@@ -768,6 +775,7 @@ public interface Attachment extends Appendix {
             attachment.put("description", description);
             attachment.put("quantityQNT", quantityQNT);
             attachment.put("decimals", decimals);
+            attachment.put("type", type);
         }
 
         @Override
@@ -789,6 +797,10 @@ public interface Attachment extends Appendix {
 
         public byte getDecimals() {
             return decimals;
+        }
+
+        public byte getType() {
+            return type;
         }
     }
 
