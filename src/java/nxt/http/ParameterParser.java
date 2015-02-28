@@ -147,6 +147,10 @@ final class ParameterParser {
     static long getFeeNQT(HttpServletRequest req) throws ParameterException {
         return getLong(req, "feeNQT", 0L, Constants.MAX_BALANCE_NQT, true);
     }
+    
+    static long getOrderFeeNQT(HttpServletRequest req) throws ParameterException {
+        return getLong(req, "orderFeeNQT", 0L, Constants.MAX_BALANCE_NQT, true);
+    }
 
     static long getPriceNQT(HttpServletRequest req) throws ParameterException {
         return getLong(req, "priceNQT", 1L, Constants.MAX_BALANCE_NQT, true);
