@@ -173,7 +173,7 @@ class NxtDbVersion extends DbVersion {
                         "('5.101.102.203'), ('5.101.102.204'), ('5.101.102.205'), ('107.170.73.9'), " + 
                         "('107.170.123.54'), ('107.170.138.55')");
                 } else {
-                    apply("INSERT INTO peer (address) VALUES " + "('178.62.176.45'), ('178.62.176.46')");
+                    apply("INSERT INTO peer (address) VALUES " + "('188.166.36.203'), ('188.166.0.145')");
                 }
             case 71:
                 apply(null);
@@ -520,10 +520,54 @@ class NxtDbVersion extends DbVersion {
             case 194:
                 apply("CREATE INDEX IF NOT EXISTS currency_creation_height_idx ON currency (creation_height DESC)");
             case 195:
-                /* Validate the chain to be compatible with the 0.3.3 fork */
-                BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
                 apply(null);
             case 196:
+                /* MofoQueries */
+                apply("CREATE INDEX IF NOT EXISTS transaction_timestamp_desc_idx ON transaction (timestamp DESC)");
+            case 197:
+                /* MofoQueries */
+                apply("CREATE INDEX IF NOT EXISTS trade_timestamp_desc_idx ON trade (timestamp DESC)");
+            case 198:
+                apply("CREATE TABLE IF NOT EXISTS mofo_asset_chart (asset_id BIGINT NOT NULL, timestamp INT NOT NULL, "
+                    + "window TINYINT NOT NULL, openNQT BIGINT NOT NULL, highNQT BIGINT NOT NULL, lowNQT BIGINT NOT NULL, "
+                    + "closeNQT BIGINT NOT NULL, averageNQT BIGINT NOT NULL, volumeQNT BIGINT NOT NULL, height INT NOT NULL)");
+            case 199:
+                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_asset_id_idx ON mofo_asset_chart (asset_id)");
+            case 200:
+                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_window_idx ON mofo_asset_chart (window)");
+            case 201:
+                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_timestamp_desc_idx ON mofo_asset_chart (timestamp DESC)");
+            case 202:
+                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_height_idx ON mofo_asset_chart (height)");
+            case 203:
+                apply("CREATE TABLE IF NOT EXISTS mofo_post ( "
+                    + "type TINYINT NOT NULL, timestamp INT NOT NULL, sender_account_id BIGINT NOT NULL, "
+                    + "referenced_entity_id BIGINT NOT NULL, transaction_id BIGINT NOT NULL, "
+                    + "FOREIGN KEY (transaction_id) REFERENCES transaction (id) ON DELETE CASCADE)");
+            case 204:
+                apply("CREATE INDEX IF NOT EXISTS mofo_post_timestamp_desc_idx ON mofo_post (timestamp DESC)");
+            case 205:
+                apply("CREATE INDEX IF NOT EXISTS mofo_post_type_idx ON mofo_post (type)");
+            case 206:
+                apply("CREATE INDEX IF NOT EXISTS mofo_post_sender_account_id_idx ON mofo_post (sender_account_id)");
+            case 207:
+                apply("CREATE INDEX IF NOT EXISTS mofo_post_referenced_entity_id_idx ON mofo_post (referenced_entity_id)");
+            case 208:
+                apply("CREATE TABLE IF NOT EXISTS mofo_comment ( "
+                    + "timestamp INT NOT NULL, post_transaction_id BIGINT NOT NULL, transaction_id BIGINT NOT NULL, "
+                    + "sender_account_id BIGINT NOT NULL, "
+                    + "FOREIGN KEY (transaction_id) REFERENCES transaction (id) ON DELETE CASCADE)");
+            case 209:
+                apply("CREATE INDEX IF NOT EXISTS mofo_comment_timestamp_idx ON mofo_comment (timestamp)");
+            case 210:
+                apply("CREATE INDEX IF NOT EXISTS mofo_comment_sender_account_id_idx ON mofo_comment (sender_account_id)");
+            case 211:
+                apply("CREATE INDEX IF NOT EXISTS mofo_comment_post_transaction_id_idx ON mofo_comment (post_transaction_id)");
+            case 212:
+                /* schedule a scan to fill the comment and post tables */
+                BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
+                apply(null);
+            case 213:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
