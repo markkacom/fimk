@@ -4,8 +4,8 @@ public enum APITag {
 
     ACCOUNTS("Accounts"), ALIASES("Aliases"), AE("Asset Exchange"), CREATE_TRANSACTION("Create Transaction"),
     BLOCKS("Blocks"), DGS("Digital Goods Store"), FORGING("Forging"), INFO("Server Info"), MESSAGES("Messages"),
-    TRANSACTIONS("Transactions"), TOKENS("Tokens"), VS("Voting System"), MS("Monetary System"), SEARCH("Search"), UTILS("Utils"), DEBUG("Debug"),
-    MOFO("MofoWallet");
+    TRANSACTIONS("Transactions"), TOKENS("Tokens"), VS("Voting System"), MS("Monetary System"), SEARCH("Search"),
+    NETWORK("Networking"), UTILS("Utils"), DEBUG("Debug"), MOFO("MofoWallet");
 
     private final String displayName;
 
