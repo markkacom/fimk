@@ -576,6 +576,8 @@ class NxtDbVersion extends DbVersion {
                     + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 216:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_height_idx ON private_asset (asset_id, height DESC)");
+            case 217:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
