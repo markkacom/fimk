@@ -177,6 +177,10 @@ public abstract class Order {
 
         };
 
+        public static VersionedEntityDbTable<Ask> getTable() {
+            return askOrderTable;
+        }
+        
         public static int getCount() {
             return askOrderTable.getCount();
         }
@@ -305,6 +309,10 @@ public abstract class Order {
             }
 
         };
+        
+        public static VersionedEntityDbTable<Bid> getTable() {
+            return bidOrderTable;
+        }
 
         public static int getCount() {
             return bidOrderTable.getCount();
