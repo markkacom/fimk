@@ -20,7 +20,7 @@ public final class PlaceBidOrder extends CreateTransaction {
     static final PlaceBidOrder instance = new PlaceBidOrder();
 
     private PlaceBidOrder() {
-        super(new APITag[] {APITag.AE, APITag.CREATE_TRANSACTION}, "asset", "quantityQNT", "priceNQT", "orderFeeQNT");
+        super(new APITag[] {APITag.AE, APITag.CREATE_TRANSACTION}, "asset", "quantityQNT", "priceNQT", "orderFeeNQT");
     }
 
     @Override
@@ -30,29 +30,37 @@ public final class PlaceBidOrder extends CreateTransaction {
         long priceNQT = ParameterParser.getPriceNQT(req);
         long quantityQNT = ParameterParser.getQuantityQNT(req);
         long feeNQT = ParameterParser.getFeeNQT(req);
-        long orderFeeQNT = ParameterParser.getOrderFeeQNT(req, asset.getQuantityQNT());
+        long orderFeeNQT = ParameterParser.getOrderFeeNQT(req);
         Account account = ParameterParser.getSenderAccount(req);
 
+        long totalNQT = Convert.safeMultiply(priceNQT, quantityQNT);
+        
         try {
-            if (Convert.safeAdd(feeNQT, Convert.safeMultiply(priceNQT, quantityQNT)) > account.getUnconfirmedBalanceNQT()) {
+            if (Convert.safeAdd(feeNQT, totalNQT) > account.getUnconfirmedBalanceNQT()) {
                 return NOT_ENOUGH_FUNDS;
             }
         } catch (ArithmeticException e) {
             return NOT_ENOUGH_FUNDS;
         }
         
-        try {
-            PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
-            if (privateAsset != null) {
-                if (privateAsset.calculateOrderFee(quantityQNT) > orderFeeQNT) {
-                    return ERROR_INCORRECT_REQUEST;
+        PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
+        if (privateAsset != null) {
+            
+            long minOrderFeeNQT = privateAsset.calculateOrderFee(totalNQT);
+            if (minOrderFeeNQT > orderFeeNQT) {
+                return ERROR_INCORRECT_REQUEST;
+            }
+            
+            try {
+                if (Convert.safeAdd( Convert.safeAdd(feeNQT, totalNQT), orderFeeNQT) > account.getUnconfirmedBalanceNQT()) {
+                    return NOT_ENOUGH_FUNDS;
                 }
-            }            
-        } catch (ArithmeticException e) {
-            return NOT_ENOUGH_FUNDS;
-        }        
+            } catch (ArithmeticException e) {
+                return NOT_ENOUGH_FUNDS;
+            }
+        }         
 
-        Attachment attachment = new Attachment.ColoredCoinsBidOrderPlacement(asset.getId(), quantityQNT, priceNQT);
+        Attachment attachment = new Attachment.ColoredCoinsBidOrderPlacement(asset.getId(), quantityQNT, priceNQT, orderFeeNQT);
         return createTransaction(req, account, attachment);
     }
 

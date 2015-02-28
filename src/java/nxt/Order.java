@@ -381,7 +381,7 @@ public abstract class Order {
             super(rs);
             this.dbKey = bidOrderDbKeyFactory.newKey(super.id);
         }
-
+        
         private void save(Connection con, String table) throws SQLException {
             super.save(con, table);
         }

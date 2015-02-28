@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import nxt.MofoAsset.PrivateAssetAccount;
 import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
 import nxt.util.Convert;
@@ -56,10 +57,6 @@ public final class MofoAsset {
         public int getTradeFeePercentage() {
             return tradeFeePercentage;
         }
-
-//        private void save() {
-//            privateAssetTable.insert(this);
-//        }
 
         @Override
         public String toString() {
@@ -188,12 +185,24 @@ public final class MofoAsset {
     };
     
     public static PrivateAsset getPrivateAsset(long asset_id) {
-        return privateAssetTable.get(privateAssetDbKeyFactory.newKey(asset_id));
+        if (Asset.privateEnabled()) {
+            return privateAssetTable.get(privateAssetDbKeyFactory.newKey(asset_id));
+        }
+        return null;
     }
   
+    public static PrivateAssetAccount getPrivateAssetAccount(long assetId, long accountId) {
+        if (Asset.privateEnabled()) {
+            return privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
+        }
+        return null;
+    }    
+    
     static void init() {}
     
     static {
         
     }
+
+
 }
