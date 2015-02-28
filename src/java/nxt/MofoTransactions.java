@@ -3,6 +3,7 @@ package nxt;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import nxt.MofoAsset.PrivateAsset;
 import nxt.MofoAsset.PrivateAssetAccount;
 
 import org.json.simple.JSONObject;
@@ -14,6 +15,7 @@ public class MofoTransactions {
     private static final byte SUBTYPE_FIMKRYPTO_NAMESPACED_ALIAS_ASSIGNMENT = 0;
     private static final byte SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_ADD_ACCOUNT = 1;
     private static final byte SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_REMOVE_ACCOUNT = 2;
+    private static final byte SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE = 3;
     
     public static abstract class NamespacedAliasAssignmentTransaction extends TransactionType {
 
@@ -172,7 +174,7 @@ public class MofoTransactions {
   
             @Override
             public boolean canHaveRecipient() {
-                return false;
+                return true;
             }  
         };
     }
@@ -263,11 +265,106 @@ public class MofoTransactions {
   
             @Override
             public boolean canHaveRecipient() {
-                return false;
+                return true;
             }  
         };
     }
-      
+
+    public static abstract class PrivateAssetSetFeeTransaction extends TransactionType {
+        
+        private PrivateAssetSetFeeTransaction() {
+        }
+  
+        @Override
+        public final byte getType() {
+            return TYPE_FIMKRYPTO;
+        }
+  
+        @Override
+        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+            return true;
+        }
+  
+        @Override
+        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        }
+  
+        public static final TransactionType PRIVATE_ASSET_SET_FEE = new PrivateAssetSetFeeTransaction() {
+  
+            @Override
+            public final byte getSubtype() {
+                return SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE;
+            }
+  
+            @Override
+            MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.PrivateAssetSetFeeAttachment(buffer, transactionVersion);
+            }
+  
+            @Override
+            MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.PrivateAssetSetFeeAttachment(attachmentData);
+            }
+  
+            @Override
+            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+                MofoAttachment.PrivateAssetSetFeeAttachment attachment = (MofoAttachment.PrivateAssetSetFeeAttachment) transaction.getAttachment();
+                MofoAsset.setFee(attachment.getAssetId(), attachment.getOrderFeePercentage(), attachment.getTradeFeePercentage());
+            }
+  
+            @Override
+            boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
+                MofoAttachment.PrivateAssetSetFeeAttachment attachment = (MofoAttachment.PrivateAssetSetFeeAttachment) transaction.getAttachment();
+                StringBuilder key = new StringBuilder();
+                key.append(transaction.getSenderId());
+                key.append(transaction.getRecipientId());
+                key.append(attachment.getAssetId());
+                key.append(attachment.getOrderFeePercentage());
+                key.append(attachment.getTradeFeePercentage());
+                return isDuplicate(PRIVATE_ASSET_SET_FEE, key.toString(), duplicates, true);
+            }
+  
+            @Override
+            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+                MofoAttachment.PrivateAssetSetFeeAttachment attachment = (MofoAttachment.PrivateAssetSetFeeAttachment) transaction.getAttachment();
+                Asset asset = Asset.getAsset(attachment.getAssetId());
+                if (asset == null) {
+                    throw new NxtException.NotValidException("Asset does not exist");
+                }
+                Account senderAccount = Account.getAccount(transaction.getSenderId());
+                if (senderAccount == null) {
+                    throw new NxtException.NotValidException("Sender account does not exist");
+                }
+                if (asset.getAccountId() != senderAccount.getId()) {
+                    throw new NxtException.NotValidException("Only asset issuer can set private asset fee");
+                }
+                
+                if (attachment.getOrderFeePercentage() < Constants.MIN_PRIVATE_ASSET_FEE_PERCENTAGE || 
+                    attachment.getOrderFeePercentage() > Constants.MAX_PRIVATE_ASSET_FEE_PERCENTAGE) {
+                    throw new NxtException.NotValidException("Out of range order fee percentage");
+                }
+                
+                if (attachment.getTradeFeePercentage() < Constants.MIN_PRIVATE_ASSET_FEE_PERCENTAGE || 
+                    attachment.getTradeFeePercentage() > Constants.MAX_PRIVATE_ASSET_FEE_PERCENTAGE) {
+                    throw new NxtException.NotValidException("Out of range trade fee percentage");
+                }
+  
+                PrivateAsset privateAsset = MofoAsset.getPrivateAsset(attachment.getAssetId()); 
+                if (privateAsset == null) {
+                    throw new NxtException.NotValidException("Cannot set fee for private asset that is not a private asset");
+                }
+                if ( ! Asset.privateEnabled()) {
+                    throw new NxtException.NotYetEnabledException("Private Assets not yet enabled at height " +  Nxt.getBlockchain().getLastBlock().getHeight());
+                }
+            }
+  
+            @Override
+            public boolean canHaveRecipient() {
+                return false;
+            }
+        };
+    }
+
     public static TransactionType findTransactionType(byte subtype) {      
         switch (subtype) {
             case SUBTYPE_FIMKRYPTO_NAMESPACED_ALIAS_ASSIGNMENT:
@@ -276,6 +373,8 @@ public class MofoTransactions {
                 return PrivateAssetAddAccountTransaction.PRIVATE_ASSET_ADD_ACCOUNT;
             case SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_REMOVE_ACCOUNT:
                 return PrivateAssetRemoveAccountTransaction.PRIVATE_ASSET_REMOVE_ACCOUNT;
+            case SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE:
+                return PrivateAssetSetFeeTransaction.PRIVATE_ASSET_SET_FEE;
             default:
                 return null;
         }
