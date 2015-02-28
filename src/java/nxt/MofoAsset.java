@@ -66,6 +66,16 @@ public final class MofoAsset {
             return "PrivateAsset asset_id: " + Convert.toUnsignedLong(assetId)
                     + " order fee: " + orderFeePercentage + " trade fee: " + tradeFeePercentage;
         }
+
+        public long calculateOrderFee(long amount) {
+            return Convert.safeMultiply( 
+                      Convert.safeDivide(
+                          amount, 
+                          100000000
+                      ), 
+                      getOrderFeePercentage()
+                   );
+        }        
     }
     
     public static class PrivateAssetAccount {
@@ -177,15 +187,8 @@ public final class MofoAsset {
         }  
     };
     
-    public static long calculateOrderFee(long asset_id, long amount) {
-        PrivateAsset privateAsset = privateAssetTable.get(privateAssetDbKeyFactory.newKey(asset_id));
-        return Convert.safeMultiply( 
-                  Convert.safeDivide(
-                      amount, 
-                      100000000
-                  ), 
-                  privateAsset.getOrderFeePercentage()
-               );
+    public static PrivateAsset getPrivateAsset(long asset_id) {
+        return privateAssetTable.get(privateAssetDbKeyFactory.newKey(asset_id));
     }
   
     static void init() {}
