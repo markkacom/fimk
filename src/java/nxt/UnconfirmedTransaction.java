@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-class UnconfirmedTransaction implements Transaction {
+public class UnconfirmedTransaction implements Transaction {
 
     private final TransactionImpl transaction;
     private final long arrivalTimestamp;
