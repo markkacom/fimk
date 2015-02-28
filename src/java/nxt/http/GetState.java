@@ -46,20 +46,6 @@ public final class GetState extends APIServlet.APIRequestHandler {
         }
         response.put("totalEffectiveBalanceNXT", totalEffectiveBalance);
         */
-        
-        int totalOpenSockets = 0;
-        int totalClosedSockets = 0;
-        for (MofoEventSocket socket : MofoEventSocket.sockets) {
-            if (socket.getSession() != null && socket.getSession().isOpen()) {
-                totalOpenSockets++;
-            }
-            else {
-                totalClosedSockets++;
-            }            
-        }
-        
-        response.put("totalOpenSockets", totalOpenSockets);
-        response.put("totalClosedSockets", totalClosedSockets);
 
         if (!"false".equalsIgnoreCase(req.getParameter("includeCounts"))) {
             response.put("numberOfTransactions", Nxt.getBlockchain().getTransactionCount());
