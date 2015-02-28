@@ -1,17 +1,19 @@
 package nxt.http;
 
 import nxt.NxtException;
+
 import org.json.simple.JSONStreamAware;
 
-final class ParameterException extends NxtException {
+@SuppressWarnings("serial")
+public final class ParameterException extends NxtException {
 
     private final JSONStreamAware errorResponse;
 
-    ParameterException(JSONStreamAware errorResponse) {
+    public ParameterException(JSONStreamAware errorResponse) {
         this.errorResponse = errorResponse;
     }
 
-    JSONStreamAware getErrorResponse() {
+    public JSONStreamAware getErrorResponse() {
         return errorResponse;
     }
 
