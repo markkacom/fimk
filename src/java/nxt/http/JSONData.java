@@ -3,15 +3,7 @@ package nxt.http;
 import nxt.Account;
 import nxt.Alias;
 import nxt.Asset;
-import nxt.Attachment.MonetarySystemCurrencyDeletion;
-import nxt.Attachment.MonetarySystemCurrencyIssuance;
-import nxt.Attachment.MonetarySystemCurrencyMinting;
-import nxt.Attachment.MonetarySystemCurrencyTransfer;
-import nxt.Attachment.MonetarySystemExchangeBuy;
-import nxt.Attachment.MonetarySystemExchangeSell;
-import nxt.Attachment.MonetarySystemPublishExchangeOffer;
-import nxt.Attachment.MonetarySystemReserveClaim;
-import nxt.Attachment.MonetarySystemReserveIncrease;
+import nxt.Attachment.MonetarySystemAttachment;
 import nxt.NamespacedAlias;
 import nxt.Appendix;
 import nxt.AssetTransfer;
@@ -511,36 +503,8 @@ final class JSONData {
         JSONObject attachmentJSON = new JSONObject();
         for (Appendix appendage : transaction.getAppendages()) {
             attachmentJSON.putAll(appendage.getJSONObject());
-            if (transaction.getType().getType() == 5) {
-                final long currencyId;
-                switch (transaction.getType().getSubtype()) {
-                    case 1: 
-                        currencyId = ((MonetarySystemReserveIncrease) appendage).getCurrencyId(); 
-                        break;  
-                    case 2: 
-                        currencyId = ((MonetarySystemReserveClaim) appendage).getCurrencyId(); 
-                        break;
-                    case 3: 
-                        currencyId = ((MonetarySystemCurrencyTransfer) appendage).getCurrencyId(); 
-                        break;
-                    case 4: 
-                        currencyId = ((MonetarySystemPublishExchangeOffer) appendage).getCurrencyId(); 
-                        break;
-                    case 5: 
-                        currencyId = ((MonetarySystemExchangeBuy) appendage).getCurrencyId(); 
-                        break;
-                    case 6: 
-                        currencyId = ((MonetarySystemExchangeSell) appendage).getCurrencyId(); 
-                        break;
-                    case 7: 
-                        currencyId = ((MonetarySystemCurrencyMinting) appendage).getCurrencyId(); 
-                        break;
-                    case 8: 
-                        currencyId = ((MonetarySystemCurrencyDeletion) appendage).getCurrencyId(); 
-                        break;
-                    default:
-                        continue;
-                }                
+            if (transaction.getType().getType() == 5 && appendage instanceof MonetarySystemAttachment) {              
+                final long currencyId = ((MonetarySystemAttachment) appendage).getCurrencyId();
                 putCurrencyInfo(attachmentJSON, currencyId);
             }
         }
