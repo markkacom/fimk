@@ -110,8 +110,10 @@ public final class Constants {
     public static final int MONETARY_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
     public static final int LAST_KNOWN_BLOCK = isTestnet ? 0 : 384000;
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
-            
-    public static final long MAX_PRIVATE_ASSET_ORDER_FEE_NQT = 1000000000L * 100000000L;
+    
+    /* range 0.000001% to 2000% / 1 - 2000000000 */
+    public static final long MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0L; 
+    public static final long MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000L;
     
     public static final int[] MIN_VERSION = new int[] {0, 3, 3};                
     
