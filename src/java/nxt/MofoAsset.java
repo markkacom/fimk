@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import nxt.MofoAsset.PrivateAssetAccount;
 import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
 import nxt.util.Convert;
@@ -79,7 +78,7 @@ public final class MofoAsset {
   
         private final long assetId;
         private final long accountId;          
-        private final boolean allowed;
+        private boolean allowed;
         private final DbKey dbKey;
   
         private PrivateAssetAccount(long assetId, long accountId, boolean allowed) {
@@ -107,6 +106,10 @@ public final class MofoAsset {
                 pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
                 pstmt.executeUpdate();
             }
+        }
+        
+        public void save() {
+            privateAssetAccountTable.insert(this);          
         }
 
         public long getAssetId() {
@@ -196,13 +199,18 @@ public final class MofoAsset {
             return privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
         }
         return null;
-    }    
+    }
     
-    static void init() {}
-    
-    static {
-        
+    public static void setAccountAllowed(long assetId, long accountId, boolean allowed) {
+        PrivateAssetAccount privateAssetAccount;
+        privateAssetAccount = privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
+        if (privateAssetAccount == null) {
+            privateAssetAccount = new PrivateAssetAccount(assetId, accountId, allowed);
+        } else {
+            privateAssetAccount.allowed = allowed;
+        }
+        privateAssetAccount.save();
     }
 
-
+    static void init() {}
 }
