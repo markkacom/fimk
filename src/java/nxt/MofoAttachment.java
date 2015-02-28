@@ -73,21 +73,21 @@ public class MofoAttachment {
         }
     }
   
-    public final static class PrivateAssetAddAccountAttachment extends AbstractAttachment {
+    public final static class PrivateAssetAccountAllowedAttachment extends AbstractAttachment {
         
         private final long assetId;
     
-        PrivateAssetAddAccountAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        PrivateAssetAccountAllowedAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
             assetId = buffer.getLong();
         }
     
-        PrivateAssetAddAccountAttachment(JSONObject attachmentData) {
+        PrivateAssetAccountAllowedAttachment(JSONObject attachmentData) {
             super(attachmentData);
             this.assetId = Convert.parseUnsignedLong((String) attachmentData.get("asset"));
         }
     
-        public PrivateAssetAddAccountAttachment(long assetId) {
+        public PrivateAssetAccountAllowedAttachment(long assetId) {
             super();
             this.assetId = assetId;
         }
@@ -119,6 +119,6 @@ public class MofoAttachment {
         
         public long getAssetId() {
             return assetId;
-        }        
+        }
     }
 }
