@@ -1,6 +1,7 @@
 package nxt;
 
 import nxt.http.API;
+import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
 import nxt.user.Users;
 import nxt.util.Logger;
@@ -21,7 +22,7 @@ public final class Nxt {
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.4";
+    public static final String VERSION = "0.4.0";
 
     private static volatile Time time = new Time.EpochTime();
 
@@ -202,8 +203,11 @@ public final class Nxt {
                 Peers.init();
                 Generator.init();
                 API.init();
+                WebsocketServer.init();
                 Users.init();
                 DebugTrace.init();
+                MofoChart.init();
+                MofoMessaging.init();
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
