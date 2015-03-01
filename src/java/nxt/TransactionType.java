@@ -1,7 +1,5 @@
 package nxt;
 
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-import static nxt.http.JSONResponses.NOT_ENOUGH_ASSETS;
 import nxt.MofoAsset.PrivateAsset;
 import nxt.MofoAsset.PrivateAssetAccount;
 import nxt.util.Convert;
