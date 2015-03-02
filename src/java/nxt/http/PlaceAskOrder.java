@@ -30,7 +30,7 @@ public final class PlaceAskOrder extends CreateTransaction {
         Asset asset = ParameterParser.getAsset(req);
         long priceNQT = ParameterParser.getPriceNQT(req);
         long quantityQNT = ParameterParser.getQuantityQNT(req);
-        long orderFeeQNT = ParameterParser.getOrderFeeQNT(req, asset.getQuantityQNT());
+        long orderFeeQNT = Asset.privateEnabled() ? ParameterParser.getOrderFeeQNT(req, asset.getQuantityQNT()) : 0;
         Account account = ParameterParser.getSenderAccount(req);
 
         long assetBalance = account.getUnconfirmedAssetBalanceQNT(asset.getId());
@@ -38,17 +38,19 @@ public final class PlaceAskOrder extends CreateTransaction {
             return NOT_ENOUGH_ASSETS;
         }
 
-        PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
-        if (privateAsset != null) {
-            try {
-                if (assetBalance < Convert.safeAdd(quantityQNT, orderFeeQNT)) {
+        if (Asset.privateEnabled()) {
+            PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
+            if (privateAsset != null) {
+                try {
+                    if (assetBalance < Convert.safeAdd(quantityQNT, orderFeeQNT)) {
+                        return NOT_ENOUGH_ASSETS;
+                    }
+                } catch (ArithmeticException e) {
                     return NOT_ENOUGH_ASSETS;
                 }
-            } catch (ArithmeticException e) {
-                return NOT_ENOUGH_ASSETS;
-            }
-            if (privateAsset.calculateOrderFee(quantityQNT) > orderFeeQNT) {
-                return ERROR_INCORRECT_REQUEST;
+                if (privateAsset.calculateOrderFee(quantityQNT) > orderFeeQNT) {
+                    return ERROR_INCORRECT_REQUEST;
+                }
             }
         }
 
