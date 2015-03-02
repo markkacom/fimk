@@ -568,7 +568,7 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
                 apply(null);
             case 213:
-                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT NOT NULL");
+                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
             case 214:
                 apply("UPDATE asset SET type = 0");
             case 215:
