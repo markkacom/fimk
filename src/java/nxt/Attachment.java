@@ -775,7 +775,9 @@ public interface Attachment extends Appendix {
             attachment.put("description", description);
             attachment.put("quantityQNT", quantityQNT);
             attachment.put("decimals", decimals);
-            attachment.put("type", type);
+            if (Asset.privateEnabled()) {
+                attachment.put("type", type);
+            }
         }
 
         @Override
@@ -945,12 +947,12 @@ public interface Attachment extends Appendix {
 
         ColoredCoinsAskOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
-            this.orderFeeQNT = buffer.getLong();
+            this.orderFeeQNT = Asset.privateEnabled() ? buffer.getLong() : 0;
         }
 
         ColoredCoinsAskOrderPlacement(JSONObject attachmentData) {
             super(attachmentData);
-            this.orderFeeQNT = Convert.parseLong(attachmentData.get("orderFeeQNT"));
+            this.orderFeeQNT = Asset.privateEnabled() ? Convert.parseLong(attachmentData.get("orderFeeQNT")) : 0;
         }
 
         public ColoredCoinsAskOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeQNT) {
@@ -976,13 +978,17 @@ public interface Attachment extends Appendix {
         @Override
         void putMyBytes(ByteBuffer buffer) {
             super.putMyBytes(buffer);
-            buffer.putLong(orderFeeQNT);
+            if (Asset.privateEnabled()) {
+                buffer.putLong(orderFeeQNT);
+            }
         }
 
         @Override
         void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
-            attachment.put("orderFeeQNT", orderFeeQNT);
+            if (Asset.privateEnabled()) {
+                attachment.put("orderFeeQNT", orderFeeQNT);
+            }
         }
 
         public long getOrderFeeQNT() {
@@ -996,12 +1002,12 @@ public interface Attachment extends Appendix {
       
         ColoredCoinsBidOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
-            this.orderFeeNQT = buffer.getLong();
+            this.orderFeeNQT = Asset.privateEnabled() ? buffer.getLong() : 0;
         }
 
         ColoredCoinsBidOrderPlacement(JSONObject attachmentData) {
             super(attachmentData);
-            this.orderFeeNQT = Convert.parseLong(attachmentData.get("orderFeeNQT"));
+            this.orderFeeNQT = Asset.privateEnabled() ? Convert.parseLong(attachmentData.get("orderFeeNQT")) : 0;
         }
 
         public ColoredCoinsBidOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeNQT) {
@@ -1027,13 +1033,17 @@ public interface Attachment extends Appendix {
         @Override
         void putMyBytes(ByteBuffer buffer) {
             super.putMyBytes(buffer);
-            buffer.putLong(orderFeeNQT);
+            if (Asset.privateEnabled()) {
+                buffer.putLong(orderFeeNQT);
+            }
         }
 
         @Override
         void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
-            attachment.put("orderFeeNQT", orderFeeNQT);
+            if (Asset.privateEnabled()) {
+                attachment.put("orderFeeNQT", orderFeeNQT);
+            }
         }
 
         public long getOrderFeeNQT() {
