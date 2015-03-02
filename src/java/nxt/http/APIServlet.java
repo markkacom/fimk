@@ -215,6 +215,9 @@ public final class APIServlet extends HttpServlet {
         
         /* XXX - MofoWallet specific extensions */
         map.put("mofoCombine", MofoCombine.instance);
+        
+        map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
+        map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
 
         if (API.enableDebugAPI) {
             map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);
