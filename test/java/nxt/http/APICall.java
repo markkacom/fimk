@@ -26,6 +26,10 @@ public class APICall {
     private APICall(Builder builder) {
         this.params = builder.params;
     }
+    
+    public static Builder call(String requestType) {
+        return new Builder(requestType);
+    }
 
     public static class Builder {
 

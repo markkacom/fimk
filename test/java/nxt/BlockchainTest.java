@@ -12,12 +12,21 @@ import java.util.Properties;
 public abstract class BlockchainTest extends AbstractBlockchainTest {
 
     protected static int baseHeight;
-
-    protected static final String forgerSecretPhrase = "aSykrgKGZNlSVOMDxkZZgbTvQqJPGtsBggb";
-    protected static final String secretPhrase1 = "hope peace happen touch easy pretend worthless talk them indeed wheel state";
-    protected static final String secretPhrase2 = "rshw9abtpsa2";
-    protected static final String secretPhrase3 = "eOdBVLMgySFvyiTy8xMuRXDTr45oTzB7L5J";
-    protected static final String secretPhrase4 = "t9G2ymCmDsQij7VtYinqrbGCOAtDDA3WiNr";
+    
+    // FIM-9MAB-AXFN-XXL7-6BHU3
+    protected static final String forgerSecretPhrase = "franz dark offer race fuel fake joust waste tensor jk sw 101st";
+    
+    // FIM-R4X4-KMHT-RCXD-CLGFZ
+    protected static final String secretPhrase1 = "anion harp ere sandal cobol chink bunch tire clare power fogy hump";
+    
+    // FIM-7MGS-PLDG-ULV4-GHEHB
+    protected static final String secretPhrase2 = "astral void larkin era beebe r6 guyana woke hoc dacca cancer await";
+    
+    // FIM-B842-25LP-FLG8-HLTDH
+    protected static final String secretPhrase3 = "mush ripen wharf tub shut nine baldy sk wink epsom batik 6u";
+    
+    // FIM-LJ94-SPJZ-QHQM-B3VFF
+    protected static final String secretPhrase4 = "dublin janus spout lykes tacky gland nice bigot rubric 4v vb peace";
 
     protected static long id1;
     protected static long id2;
