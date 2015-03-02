@@ -30,7 +30,7 @@ public final class PlaceBidOrder extends CreateTransaction {
         long priceNQT = ParameterParser.getPriceNQT(req);
         long quantityQNT = ParameterParser.getQuantityQNT(req);
         long feeNQT = ParameterParser.getFeeNQT(req);
-        long orderFeeNQT = ParameterParser.getOrderFeeNQT(req);
+        long orderFeeNQT = Asset.privateEnabled() ? ParameterParser.getOrderFeeNQT(req) : 0;
         Account account = ParameterParser.getSenderAccount(req);
 
         long totalNQT = Convert.safeMultiply(priceNQT, quantityQNT);
@@ -43,22 +43,24 @@ public final class PlaceBidOrder extends CreateTransaction {
             return NOT_ENOUGH_FUNDS;
         }
         
-        PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
-        if (privateAsset != null) {
-            
-            long minOrderFeeNQT = privateAsset.calculateOrderFee(totalNQT);
-            if (minOrderFeeNQT > orderFeeNQT) {
-                return ERROR_INCORRECT_REQUEST;
-            }
-            
-            try {
-                if (Convert.safeAdd( Convert.safeAdd(feeNQT, totalNQT), orderFeeNQT) > account.getUnconfirmedBalanceNQT()) {
+        if (Asset.privateEnabled()) {
+            PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
+            if (privateAsset != null) {
+                
+                long minOrderFeeNQT = privateAsset.calculateOrderFee(totalNQT);
+                if (minOrderFeeNQT > orderFeeNQT) {
+                    return ERROR_INCORRECT_REQUEST;
+                }
+                
+                try {
+                    if (Convert.safeAdd( Convert.safeAdd(feeNQT, totalNQT), orderFeeNQT) > account.getUnconfirmedBalanceNQT()) {
+                        return NOT_ENOUGH_FUNDS;
+                    }
+                } catch (ArithmeticException e) {
                     return NOT_ENOUGH_FUNDS;
                 }
-            } catch (ArithmeticException e) {
-                return NOT_ENOUGH_FUNDS;
             }
-        }         
+        }
 
         Attachment attachment = new Attachment.ColoredCoinsBidOrderPlacement(asset.getId(), quantityQNT, priceNQT, orderFeeNQT);
         return createTransaction(req, account, attachment);
