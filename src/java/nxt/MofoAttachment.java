@@ -74,28 +74,23 @@ public class MofoAttachment {
         }
     }
   
-    public final static class PrivateAssetAccountAllowedAttachment extends AbstractAttachment {
-        
+    static abstract class PrivateAssetAllowedAttachment extends AbstractAttachment {
+      
         private final long assetId;
     
-        PrivateAssetAccountAllowedAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        PrivateAssetAllowedAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
             assetId = buffer.getLong();
         }
     
-        PrivateAssetAccountAllowedAttachment(JSONObject attachmentData) {
+        PrivateAssetAllowedAttachment(JSONObject attachmentData) {
             super(attachmentData);
             this.assetId = Convert.parseUnsignedLong((String) attachmentData.get("asset"));
         }
     
-        public PrivateAssetAccountAllowedAttachment(long assetId) {
+        public PrivateAssetAllowedAttachment(long assetId) {
             super();
             this.assetId = assetId;
-        }
-    
-        @Override
-        String getAppendixName() {
-            return "PrivateAssetAccountAllowed";
         }
     
         @Override
@@ -112,14 +107,60 @@ public class MofoAttachment {
         void putMyJSON(JSONObject attachment) {
             Asset.putAsset(attachment, assetId);
         }
+        
+        public long getAssetId() {
+            return assetId;
+        }
+    }
     
+    public final static class AddPrivateAssetAccountAttachment extends PrivateAssetAllowedAttachment {
+    
+        AddPrivateAssetAccountAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+        }
+    
+        AddPrivateAssetAccountAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+        }      
+      
+        public AddPrivateAssetAccountAttachment(long assetId) {
+            super(assetId);
+        }        
+
+        @Override
+        String getAppendixName() {
+            return "PrivateAssetAddAccount";
+        }
+
         @Override
         public TransactionType getTransactionType() {
             return MofoTransactions.PrivateAssetAddAccountTransaction.PRIVATE_ASSET_ADD_ACCOUNT;
         }
         
-        public long getAssetId() {
-            return assetId;
+    }
+    
+    public final static class RemovePrivateAssetAccountAttachment extends PrivateAssetAllowedAttachment {
+        
+      RemovePrivateAssetAccountAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+        }
+
+      RemovePrivateAssetAccountAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+        }
+    
+        public RemovePrivateAssetAccountAttachment(long assetId) {
+            super(assetId);
+        } 
+
+        @Override
+        String getAppendixName() {
+            return "PrivateAssetRemoveAccount";
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return MofoTransactions.PrivateAssetRemoveAccountTransaction.PRIVATE_ASSET_REMOVE_ACCOUNT;
         }
     }
 
