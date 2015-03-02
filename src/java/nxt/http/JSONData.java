@@ -95,6 +95,9 @@ final class JSONData {
             json.put("numberOfTransfers", AssetTransfer.getTransferCount(asset.getId()));
             json.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
         }
+        if (Asset.privateEnabled()) {
+            json.put("type", asset.getType());
+        }
         return json;
     }
 
@@ -562,6 +565,9 @@ final class JSONData {
         Asset asset = Asset.getAsset(assetId);
         json.put("name", asset.getName());
         json.put("decimals", asset.getDecimals());
+        if (Asset.privateEnabled()) {
+            json.put("type", asset.getType());
+        }
     }
 
     private JSONData() {} // never
