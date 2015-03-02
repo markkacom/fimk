@@ -1,10 +1,12 @@
 package nxt.http;
 
 import nxt.Account;
+import nxt.Asset;
 import nxt.Attachment;
 import nxt.Constants;
 import nxt.NxtException;
 import nxt.util.Convert;
+
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +32,7 @@ public final class IssueAsset extends CreateTransaction {
         String name = req.getParameter("name");
         String description = req.getParameter("description");
         String decimalsValue = Convert.emptyToNull(req.getParameter("decimals"));
-        String typeValue = Convert.emptyToNull(req.getParameter("type"));
+        String typeValue = Asset.privateEnabled() ? Convert.emptyToNull(req.getParameter("type")) : null;
 
         if (name == null) {
             return MISSING_NAME;
