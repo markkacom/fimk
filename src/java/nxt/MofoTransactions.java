@@ -121,24 +121,24 @@ public class MofoTransactions {
             }
   
             @Override
-            MofoAttachment.PrivateAssetAccountAllowedAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
-                return new MofoAttachment.PrivateAssetAccountAllowedAttachment(buffer, transactionVersion);
+            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.AddPrivateAssetAccountAttachment(buffer, transactionVersion);
             }
   
             @Override
-            MofoAttachment.PrivateAssetAccountAllowedAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
-                return new MofoAttachment.PrivateAssetAccountAllowedAttachment(attachmentData);
+            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.AddPrivateAssetAccountAttachment(attachmentData);
             }
   
             @Override
             void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
-                MofoAttachment.PrivateAssetAccountAllowedAttachment attachment = (MofoAttachment.PrivateAssetAccountAllowedAttachment) transaction.getAttachment();
+                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 MofoAsset.setAccountAllowed(attachment.getAssetId(), transaction.getRecipientId(), true);
             }
   
             @Override
             boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
-                MofoAttachment.PrivateAssetAccountAllowedAttachment attachment = (MofoAttachment.PrivateAssetAccountAllowedAttachment) transaction.getAttachment();
+                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 StringBuilder key = new StringBuilder();
                 key.append(transaction.getSenderId());
                 key.append(transaction.getRecipientId());
@@ -148,7 +148,7 @@ public class MofoTransactions {
   
             @Override
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                MofoAttachment.PrivateAssetAccountAllowedAttachment attachment = (MofoAttachment.PrivateAssetAccountAllowedAttachment) transaction.getAttachment();
+                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
                     throw new NxtException.NotValidException("Asset does not exist");
@@ -206,24 +206,24 @@ public class MofoTransactions {
             }
   
             @Override
-            MofoAttachment.PrivateAssetAccountAllowedAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
-                return new MofoAttachment.PrivateAssetAccountAllowedAttachment(buffer, transactionVersion);
+            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.AddPrivateAssetAccountAttachment(buffer, transactionVersion);
             }
   
             @Override
-            MofoAttachment.PrivateAssetAccountAllowedAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
-                return new MofoAttachment.PrivateAssetAccountAllowedAttachment(attachmentData);
+            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.AddPrivateAssetAccountAttachment(attachmentData);
             }
   
             @Override
             void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
-                MofoAttachment.PrivateAssetAccountAllowedAttachment attachment = (MofoAttachment.PrivateAssetAccountAllowedAttachment) transaction.getAttachment();
+                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 MofoAsset.setAccountAllowed(attachment.getAssetId(), transaction.getRecipientId(), false);
             }
   
             @Override
             boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
-                MofoAttachment.PrivateAssetAccountAllowedAttachment attachment = (MofoAttachment.PrivateAssetAccountAllowedAttachment) transaction.getAttachment();
+                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 StringBuilder key = new StringBuilder();
                 key.append(transaction.getSenderId());
                 key.append(transaction.getRecipientId());
@@ -233,7 +233,7 @@ public class MofoTransactions {
   
             @Override
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                MofoAttachment.PrivateAssetAccountAllowedAttachment attachment = (MofoAttachment.PrivateAssetAccountAllowedAttachment) transaction.getAttachment();
+                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
                     throw new NxtException.NotValidException("Asset does not exist");
