@@ -14,6 +14,9 @@ import java.sql.SQLException;
 import org.json.simple.JSONObject;
 
 public final class Asset {
+  
+    public final static byte TYPE_REGULAR_ASSET = (byte) 0;
+    public final static byte TYPE_PRIVATE_ASSET = (byte) 1;    
 
     private static final DbKey.LongKeyFactory<Asset> assetDbKeyFactory = new DbKey.LongKeyFactory<Asset>("id") {
 
