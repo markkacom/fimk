@@ -1,8 +1,6 @@
 package nxt.http.rpc;
 
 import nxt.Account;
-import nxt.MofoQueries;
-import nxt.Transaction;
 import nxt.db.DbIterator;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
