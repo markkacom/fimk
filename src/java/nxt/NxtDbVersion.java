@@ -584,6 +584,9 @@ class NxtDbVersion extends DbVersion {
             case 218:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
             case 219:
+                /* GROUP THIS CHANGE WITH private_asset creation */
+                apply("ALTER TABLE private_asset ADD FOREIGN KEY (asset_id) REFERENCES asset (id) ON DELETE CASCADE");
+            case 220:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
