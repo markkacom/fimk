@@ -218,6 +218,7 @@ public final class APIServlet extends HttpServlet {
         
         map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
         map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
+        map.put("setPrivateAssetFee", SetPrivateAssetFee.instance);
 
         if (API.enableDebugAPI) {
             map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);
