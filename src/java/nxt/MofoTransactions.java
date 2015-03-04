@@ -3,9 +3,6 @@ package nxt;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-import nxt.MofoAsset.PrivateAsset;
-import nxt.MofoAsset.PrivateAssetAccount;
-
 import org.json.simple.JSONObject;
 
 public class MofoTransactions {
@@ -206,24 +203,24 @@ public class MofoTransactions {
             }
   
             @Override
-            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
-                return new MofoAttachment.AddPrivateAssetAccountAttachment(buffer, transactionVersion);
+            MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.RemovePrivateAssetAccountAttachment(buffer, transactionVersion);
             }
   
             @Override
-            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
-                return new MofoAttachment.AddPrivateAssetAccountAttachment(attachmentData);
+            MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.RemovePrivateAssetAccountAttachment(attachmentData);
             }
   
             @Override
             void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
-                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
+                MofoAttachment.RemovePrivateAssetAccountAttachment attachment = (MofoAttachment.RemovePrivateAssetAccountAttachment) transaction.getAttachment();
                 MofoAsset.setAccountAllowed(attachment.getAssetId(), transaction.getRecipientId(), false);
             }
   
             @Override
             boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
-                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
+                MofoAttachment.RemovePrivateAssetAccountAttachment attachment = (MofoAttachment.RemovePrivateAssetAccountAttachment) transaction.getAttachment();
                 StringBuilder key = new StringBuilder();
                 key.append(transaction.getSenderId());
                 key.append(transaction.getRecipientId());
@@ -233,7 +230,7 @@ public class MofoTransactions {
   
             @Override
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
+                MofoAttachment.RemovePrivateAssetAccountAttachment attachment = (MofoAttachment.RemovePrivateAssetAccountAttachment) transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
                     throw new NxtException.NotValidException("Asset does not exist");
@@ -254,8 +251,7 @@ public class MofoTransactions {
                     throw new NxtException.NotValidException("Issuer account can not be removed as private account");
                 }                
                 
-                PrivateAssetAccount privateAssetAccount = MofoAsset.getPrivateAssetAccount(attachment.getAssetId(), recipientAccount.getId()); 
-                if (privateAssetAccount == null || ! privateAssetAccount.getAllowed()) {
+                if ( ! MofoAsset.getAccountAllowed(attachment.getAssetId(), recipientAccount.getId())) {
                     throw new NxtException.NotValidException("Cannot remove account as private account that is not a private account");
                 }
                 if ( ! Asset.privateEnabled()) {
@@ -338,20 +334,16 @@ public class MofoTransactions {
                 if (asset.getAccountId() != senderAccount.getId()) {
                     throw new NxtException.NotValidException("Only asset issuer can set private asset fee");
                 }
-                
                 if (attachment.getOrderFeePercentage() < Constants.MIN_PRIVATE_ASSET_FEE_PERCENTAGE || 
                     attachment.getOrderFeePercentage() > Constants.MAX_PRIVATE_ASSET_FEE_PERCENTAGE) {
                     throw new NxtException.NotValidException("Out of range order fee percentage");
                 }
-                
                 if (attachment.getTradeFeePercentage() < Constants.MIN_PRIVATE_ASSET_FEE_PERCENTAGE || 
                     attachment.getTradeFeePercentage() > Constants.MAX_PRIVATE_ASSET_FEE_PERCENTAGE) {
                     throw new NxtException.NotValidException("Out of range trade fee percentage");
                 }
-  
-                PrivateAsset privateAsset = MofoAsset.getPrivateAsset(attachment.getAssetId()); 
-                if (privateAsset == null) {
-                    throw new NxtException.NotValidException("Cannot set fee for private asset that is not a private asset");
+                if (asset.getType() != Asset.TYPE_PRIVATE_ASSET) {
+                    throw new NxtException.NotValidException("Asset is not private");
                 }
                 if ( ! Asset.privateEnabled()) {
                     throw new NxtException.NotYetEnabledException("Private Assets not yet enabled at height " +  Nxt.getBlockchain().getLastBlock().getHeight());
