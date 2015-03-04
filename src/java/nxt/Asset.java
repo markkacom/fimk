@@ -71,7 +71,9 @@ public final class Asset {
             json.put("asset", Convert.toUnsignedLong(id));
             json.put("name", asset.getName());
             json.put("decimals", asset.getDecimals());
-            json.put("type", asset.getType());
+            if (privateEnabled()) {
+                json.put("type", asset.getType());
+            }
         }
     }
 
