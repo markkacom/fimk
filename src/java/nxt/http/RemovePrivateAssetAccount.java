@@ -4,7 +4,6 @@ import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
 import nxt.MofoAsset;
-import nxt.MofoAsset.PrivateAsset;
 import nxt.MofoAttachment;
 import nxt.NxtException;
 
@@ -30,8 +29,7 @@ public final class RemovePrivateAssetAccount extends CreateTransaction {
         }
         long recipientId = ParameterParser.getRecipientId(req);
         Asset asset = ParameterParser.getAsset(req);
-        PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
-        if (privateAsset == null) {
+        if ( ! MofoAsset.isPrivateAsset(asset)) {
             return INCORRECT_ASSET;
         }
 
