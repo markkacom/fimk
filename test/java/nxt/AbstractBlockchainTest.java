@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public abstract class AbstractBlockchainTest {
 
-    protected static BlockchainProcessorImpl blockchainProcessor;
+    public static BlockchainProcessorImpl blockchainProcessor;
     protected static BlockchainImpl blockchain;
     private static final Object doneLock = new Object();
     private static boolean done = false;
