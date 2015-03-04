@@ -1,5 +1,8 @@
 package nxt;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,12 +14,34 @@ import nxt.util.Convert;
 
 public final class MofoAsset {
 
-    public static class PrivateAsset {
-
-        private final long assetId;
+    final static int ONE_HUNDRED_PERCENT = 100000000;
+  
+    public static class AssetFee {
+        public static AssetFee NULL_FEE = new AssetFee(0, 0);
+      
         private int orderFeePercentage;
         private int tradeFeePercentage;
+        
+        public AssetFee(int orderFeePercentage, int tradeFeePercentage) {
+            this.orderFeePercentage = orderFeePercentage;
+            this.tradeFeePercentage = tradeFeePercentage;
+        }
+        
+        public int getOrderFeePercentage() {
+            return orderFeePercentage;
+        }
+        
+        public int getTradeFeePercentage() {
+            return tradeFeePercentage;
+        }
+    }
+  
+    private static class PrivateAsset {
+
+        private final long assetId;
         private final DbKey dbKey;
+        private int orderFeePercentage;
+        private int tradeFeePercentage;        
 
         private PrivateAsset(long assetId, int orderFeePercentage, int tradeFeePercentage) {
             this.assetId = assetId;
@@ -28,12 +53,12 @@ public final class MofoAsset {
         private PrivateAsset(ResultSet rs) throws SQLException {
             this.assetId = rs.getLong("asset_id");
             this.dbKey = privateAssetDbKeyFactory.newKey(this.assetId);
-            this.orderFeePercentage = rs.getInt("orderFeePercentage");
-            this.tradeFeePercentage = rs.getInt("tradeFeePercentage");
+            this.orderFeePercentage = rs.getInt("order_fee_percentage");
+            this.tradeFeePercentage = rs.getInt("trade_fee_percentage");
         }
-    
+
         private void save(Connection con) throws SQLException {
-            try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO account_asset "
+            try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO private_asset "
                     + "(asset_id, order_fee_percentage, trade_fee_percentage, height, latest) "
                     + "KEY (asset_id, height) VALUES (?, ?, ?, ?, TRUE)")) {
                 int i = 0;
@@ -49,33 +74,11 @@ public final class MofoAsset {
             privateAssetTable.insert(this);
         }
 
-        public long getAssetId() {
-            return assetId;
-        }
-
-        public int getOrderFeePercentage() {
-            return orderFeePercentage;
-        }
-
-        public int getTradeFeePercentage() {
-            return tradeFeePercentage;
-        }
-
         @Override
         public String toString() {
             return "PrivateAsset asset_id: " + Convert.toUnsignedLong(assetId)
                     + " order fee: " + orderFeePercentage + " trade fee: " + tradeFeePercentage;
-        }
-
-        public long calculateOrderFee(long amount) {
-            return Convert.safeMultiply( 
-                      Convert.safeDivide(
-                          amount, 
-                          100000000
-                      ), 
-                      getOrderFeePercentage()
-                   );
-        }       
+        }    
     }
     
     public static class PrivateAssetAccount {
@@ -85,7 +88,7 @@ public final class MofoAsset {
         private boolean allowed;
         private final DbKey dbKey;
   
-        private PrivateAssetAccount(long assetId, long accountId, boolean allowed) {
+        public PrivateAssetAccount(long assetId, long accountId, boolean allowed) {
             this.assetId = assetId;
             this.accountId = accountId;            
             this.dbKey = privateAssetAccountDbKeyFactory.newKey(this.assetId, this.accountId);
@@ -98,10 +101,10 @@ public final class MofoAsset {
             this.dbKey = privateAssetAccountDbKeyFactory.newKey(this.assetId, this.accountId);
             this.allowed = rs.getBoolean("allowed");
         }
-    
+
         private void save(Connection con) throws SQLException {
             try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO private_asset_account "
-                    + "(account_id, asset_id, allowed, height, latest) "
+                    + "(asset_id, account_id, allowed, height, latest) "
                     + "KEY (asset_id, account_id, height) VALUES (?, ?, ?, ?, TRUE)")) {
                 int i = 0;
                 pstmt.setLong(++i, this.assetId);
@@ -116,18 +119,6 @@ public final class MofoAsset {
             privateAssetAccountTable.insert(this);
         }
 
-        public long getAssetId() {
-            return assetId;
-        }        
-        
-        public long getAccountId() {
-            return accountId;
-        }
-  
-        public boolean getAllowed() {
-            return allowed;
-        }
-  
         @Override
         public String toString() {
             return "PrivateAssetAccount asset_id: " + Convert.toUnsignedLong(assetId) 
@@ -154,7 +145,7 @@ public final class MofoAsset {
   
         @Override
         protected void save(Connection con, PrivateAsset privateAsset) throws SQLException {
-          privateAsset.save(con);
+            privateAsset.save(con);
         }
   
         @Override
@@ -191,18 +182,33 @@ public final class MofoAsset {
         }  
     };
     
-    public static PrivateAsset getPrivateAsset(long asset_id) {
+    public static boolean isPrivateAsset(long assetId) {
         if (Asset.privateEnabled()) {
-            return privateAssetTable.get(privateAssetDbKeyFactory.newKey(asset_id));
+            Asset asset = Asset.getAsset(assetId);
+            if (asset != null) {
+                return isPrivateAsset(asset);
+            }
         }
-        return null;
+        return false; 
     }
-  
-    public static PrivateAssetAccount getPrivateAssetAccount(long assetId, long accountId) {
+    
+    public static boolean isPrivateAsset(Asset asset) {
+        return asset.getType() == Asset.TYPE_PRIVATE_ASSET;
+    }
+    
+    public static boolean getAccountAllowed(long assetId, long accountId) {
         if (Asset.privateEnabled()) {
-            return privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
+            Asset asset = Asset.getAsset(assetId);
+            if (asset != null && asset.getAccountId() == accountId) {
+                return true;
+            }
+            PrivateAssetAccount privateAssetAccount;
+            privateAssetAccount = privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
+            if (privateAssetAccount != null) {
+                return privateAssetAccount.allowed;
+            }
         }
-        return null;
+        return false;
     }
     
     public static void setAccountAllowed(long assetId, long accountId, boolean allowed) {
@@ -226,7 +232,44 @@ public final class MofoAsset {
             privateAsset.tradeFeePercentage = tradeFeePercentage;
         }
         privateAsset.save();
-    }    
+    }
+    
+    public static AssetFee getFee(long assetId) {
+        if (Asset.privateEnabled()) {
+            PrivateAsset privateAsset;
+            privateAsset = privateAssetTable.get(privateAssetDbKeyFactory.newKey(assetId));
+            if (privateAsset != null) {
+                return new AssetFee(privateAsset.orderFeePercentage, privateAsset.tradeFeePercentage);
+            }
+        }
+        return AssetFee.NULL_FEE;
+    }
+    
+    /**
+     * Order fee is always calculated up to the nearest whole number.
+     * 
+     * 2000%      - 2,000,000,000
+     * 100%       - 100,000,000
+     * 10%        - 10,000,000
+     * 1%         - 1,000,000
+     * 0.1%       - 100,000
+     * 0.01%      - 10,000
+     * 0.001%     - 1,000
+     * 0.0001%    - 100
+     * 0.00001%   - 10
+     * 0.000001%  - 1
+     */
+    public static long calculateOrderFee(long assetId, long amount) {
+        AssetFee fee = getFee(assetId);
+        if (AssetFee.NULL_FEE != fee) {
+            return BigDecimal.valueOf(amount).
+                              divide(BigDecimal.valueOf(ONE_HUNDRED_PERCENT)).
+                              multiply(BigDecimal.valueOf(fee.getOrderFeePercentage())).
+                              setScale(0, RoundingMode.CEILING).
+                              longValue();
+        }
+        return 0;
+    }
     
     static void init() {}
 }
