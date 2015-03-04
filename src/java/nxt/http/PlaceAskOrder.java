@@ -4,17 +4,16 @@ import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
 import nxt.MofoAsset;
-import nxt.MofoAsset.PrivateAsset;
 import nxt.util.Convert;
+import nxt.util.JSON;
 import nxt.NxtException;
 
+import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static nxt.http.JSONResponses.NOT_ENOUGH_ASSETS;
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-import static nxt.http.JSONResponses.NOT_ENOUGH_FUNDS;
 
 public final class PlaceAskOrder extends CreateTransaction {
 
@@ -24,6 +23,7 @@ public final class PlaceAskOrder extends CreateTransaction {
         super(new APITag[] {APITag.AE, APITag.CREATE_TRANSACTION}, "asset", "quantityQNT", "priceNQT", "orderFeeQNT");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
@@ -38,19 +38,20 @@ public final class PlaceAskOrder extends CreateTransaction {
             return NOT_ENOUGH_ASSETS;
         }
 
-        if (Asset.privateEnabled()) {
-            PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
-            if (privateAsset != null) {
-                try {
-                    if (assetBalance < Convert.safeAdd(quantityQNT, orderFeeQNT)) {
-                        return NOT_ENOUGH_ASSETS;
-                    }
-                } catch (ArithmeticException e) {
+        if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
+            try {
+                if (assetBalance < Convert.safeAdd(quantityQNT, orderFeeQNT)) {
                     return NOT_ENOUGH_ASSETS;
                 }
-                if (privateAsset.calculateOrderFee(quantityQNT) > orderFeeQNT) {
-                    return ERROR_INCORRECT_REQUEST;
-                }
+            } catch (ArithmeticException e) {
+                return NOT_ENOUGH_ASSETS;
+            }
+            
+            long minOrderFeeQNT = MofoAsset.calculateOrderFee(asset.getId(), quantityQNT);
+            if (minOrderFeeQNT > orderFeeQNT) {
+                JSONObject response = new JSONObject();
+                response.put("error", "Insufficient \"orderFeeQNT\": minimum of " + Long.valueOf(minOrderFeeQNT) + " required");
+                return JSON.prepare(response);
             }
         }
 
