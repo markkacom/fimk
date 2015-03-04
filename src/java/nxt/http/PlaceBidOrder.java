@@ -5,14 +5,14 @@ import nxt.Asset;
 import nxt.Attachment;
 import nxt.MofoAsset;
 import nxt.NxtException;
-import nxt.MofoAsset.PrivateAsset;
 import nxt.util.Convert;
+import nxt.util.JSON;
 
+import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
 import static nxt.http.JSONResponses.NOT_ENOUGH_FUNDS;
 
 public final class PlaceBidOrder extends CreateTransaction {
@@ -23,6 +23,7 @@ public final class PlaceBidOrder extends CreateTransaction {
         super(new APITag[] {APITag.AE, APITag.CREATE_TRANSACTION}, "asset", "quantityQNT", "priceNQT", "orderFeeNQT");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
@@ -43,22 +44,21 @@ public final class PlaceBidOrder extends CreateTransaction {
             return NOT_ENOUGH_FUNDS;
         }
         
-        if (Asset.privateEnabled()) {
-            PrivateAsset privateAsset = MofoAsset.getPrivateAsset(asset.getId());
-            if (privateAsset != null) {
+        if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
                 
-                long minOrderFeeNQT = privateAsset.calculateOrderFee(totalNQT);
-                if (minOrderFeeNQT > orderFeeNQT) {
-                    return ERROR_INCORRECT_REQUEST;
-                }
-                
-                try {
-                    if (Convert.safeAdd( Convert.safeAdd(feeNQT, totalNQT), orderFeeNQT) > account.getUnconfirmedBalanceNQT()) {
-                        return NOT_ENOUGH_FUNDS;
-                    }
-                } catch (ArithmeticException e) {
+            long minOrderFeeNQT = MofoAsset.calculateOrderFee(asset.getId(), totalNQT);
+            if (minOrderFeeNQT > orderFeeNQT) {
+                JSONObject response = new JSONObject();
+                response.put("error", "Insufficient \"orderFeeNQT\": minimum of " + Long.valueOf(minOrderFeeNQT) + " required");
+                return JSON.prepare(response);
+            }
+            
+            try {
+                if (Convert.safeAdd( Convert.safeAdd(feeNQT, totalNQT), orderFeeNQT) > account.getUnconfirmedBalanceNQT()) {
                     return NOT_ENOUGH_FUNDS;
                 }
+            } catch (ArithmeticException e) {
+                return NOT_ENOUGH_FUNDS;
             }
         }
 
