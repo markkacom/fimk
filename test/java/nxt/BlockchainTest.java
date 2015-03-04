@@ -65,4 +65,8 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
         }
     }
 
+    public static void rollback(int height) {
+        blockchainProcessor.popOffTo(height);
+    }
+    
 }
