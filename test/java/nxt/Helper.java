@@ -38,6 +38,15 @@ public class Helper {
             throw new RuntimeException(e.toString(), e);
         }
     }
+    
+    public static void truncate(String table) {
+        try (Connection con = Db.db.getConnection();
+             Statement statement = con.createStatement()) {
+            statement.executeUpdate("delete from " + table);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
 
     public static class BlockListener implements Listener<Block> {
         @Override
