@@ -142,7 +142,7 @@ public class MofoSocketServer {
     static void subscribe(MofoWebSocketAdapter socket, String topic) {
         topic = translateTopic(topic).toUpperCase();
       
-        Logger.logDebugMessage("MofoSocketServer subscribe " + topic);
+        //Logger.logDebugMessage("MofoSocketServer subscribe " + topic);
         
         synchronized (reverse_listeners) {
             synchronized (listeners) {        
@@ -166,7 +166,7 @@ public class MofoSocketServer {
     static void unsubscribe(MofoWebSocketAdapter socket, String topic) {
         topic = translateTopic(topic).toUpperCase();
         
-        Logger.logDebugMessage("MofoSocketServer unsubscribe " + topic);
+        //Logger.logDebugMessage("MofoSocketServer unsubscribe " + topic);
       
         synchronized (reverse_listeners) {
             synchronized (listeners) {
@@ -266,7 +266,7 @@ public class MofoSocketServer {
             @Override
             public void run() {
               
-                Logger.logDebugMessage("MofoSocketServer notify " + topic);
+                //Logger.logDebugMessage("MofoSocketServer notify " + topic);
               
                 Set<MofoWebSocketAdapter> sockets = listeners.get(topic);
                 if (sockets != null && ! sockets.isEmpty()) {
