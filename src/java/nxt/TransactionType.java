@@ -953,7 +953,7 @@ public abstract class TransactionType {
                     throw new NxtException.NotCurrentlyValidException("Asset " + Convert.toUnsignedLong(attachment.getAssetId()) +
                             " does not exist yet");
                 }
-                if (MofoAsset.isPrivateAsset(asset)) {
+                if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
                     if ( ! MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getSenderId())) {
                         throw new NxtException.NotValidException("Sender not allowed to transfer private asset");
                     }
