@@ -87,38 +87,6 @@ public class MofoHelper {
         return createAsset(createName(),"", true, quantityQNT, decimals);
     }
     
-    public static void setAssetFee(long assetId, int orderFeePercentage, int tradeFeePercentage) {
-        Assert.assertNotNull(secretPhrase);
-        MofoBuilder builder = call(secretPhrase, "setPrivateAssetFee");
-        builder.asset(Convert.toUnsignedLong(assetId));
-        builder.param("orderFeePercentage", orderFeePercentage);
-        builder.param("tradeFeePercentage", tradeFeePercentage);
-        
-        invoke(builder.build());
-        BlockchainTest.generateBlock();
-        
-        AssetFee fee = MofoAsset.getFee(assetId);        
-        Assert.assertEquals(orderFeePercentage, fee.getOrderFeePercentage());
-        Assert.assertEquals(tradeFeePercentage, fee.getTradeFeePercentage());
-    }
-    
-    public static void setAccountAllowed(long assetId, long accountId, boolean allowed) {
-        Assert.assertNotNull(secretPhrase);
-        MofoBuilder builder = call(secretPhrase, allowed ? "addPrivateAssetAccount" : "removePrivateAssetAccount");
-        builder.asset(Convert.toUnsignedLong(assetId));
-        builder.recipient(accountId);
-      
-        invoke(builder.build());
-        BlockchainTest.generateBlock();        
-        
-        if (allowed) {
-            Assert.assertTrue(MofoAsset.getAccountAllowed(assetId, accountId));
-        }
-        else {
-            Assert.assertFalse(MofoAsset.getAccountAllowed(assetId, accountId));
-        }
-    }
-    
     public static void transferAsset(String secretPhrase, long assetId, long recipientId, long quantityQNT) {
         Builder builder = call(secretPhrase, "transferAsset").asset(assetId).recipient(recipientId).param("quantityQNT", String.valueOf(quantityQNT));
         invoke(builder.build());
