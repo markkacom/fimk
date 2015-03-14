@@ -767,6 +767,18 @@ final class TransactionImpl implements Transaction {
         return flags;
     }
 
+    static boolean publicKeyAnnouncementRequired(int blockchainHeight) {
+        if (blockchainHeight > Constants.PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK) {
+            return false;
+        }
+        
+        Alias alias = Alias.getAlias("publickeyannouncementrequired");
+        if(alias != null && alias.getAliasURI().equals("false")) {
+            return false;
+        }
+        return true;
+    }
+    
     @Override
     public void validate() throws NxtException.ValidationException {
         int blockchainHeight = Nxt.getBlockchain().getHeight();
@@ -779,9 +791,9 @@ final class TransactionImpl implements Transaction {
                     feeNQT, minimumFeeNQT, blockchainHeight));
         }
         if (blockchainHeight >= Constants.PUBLIC_KEY_ANNOUNCEMENT_BLOCK) {
-            if (recipientId != 0 && ! (recipientId == getSenderId() && blockchainHeight > Constants.MONETARY_SYSTEM_BLOCK)) {
+            if (recipientId != 0 && ! (recipientId == getSenderId() && /*blockchainHeight > Constants.MONETARY_SYSTEM_BLOCK*/ ! publicKeyAnnouncementRequired(blockchainHeight))) {
                 Account recipientAccount = Account.getAccount(recipientId);
-                if (blockchainHeight < Constants.MONETARY_SYSTEM_BLOCK
+                if (/*blockchainHeight < Constants.MONETARY_SYSTEM_BLOCK*/ publicKeyAnnouncementRequired(blockchainHeight)
                         && (recipientAccount == null || recipientAccount.getPublicKey() == null)
                         && publicKeyAnnouncement == null) {
                     throw new NxtException.NotCurrentlyValidException("Recipient account does not have a public key, must attach a public key announcement");
