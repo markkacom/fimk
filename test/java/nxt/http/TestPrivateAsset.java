@@ -4,6 +4,9 @@ import nxt.BlockchainTest;
 import nxt.Constants;
 import nxt.MofoAsset;
 import nxt.Nxt;
+import nxt.MofoAsset.AssetFee;
+import nxt.http.MofoHelper.MofoBuilder;
+import nxt.util.Convert;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -48,13 +51,13 @@ public class TestPrivateAsset extends BlockchainTest {
         long assetPrivate1 = MofoHelper.createPrivateAsset(quantityQNT, decimals);
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetPrivate1, id2));
 
-        MofoHelper.setAccountAllowed(assetPrivate1, id2, true);
+        setAccountAllowed(assetPrivate1, id2, true);
         Assert.assertTrue(MofoAsset.getAccountAllowed(assetPrivate1, id2));        
-        MofoHelper.setAccountAllowed(assetPrivate1, id2, false);
+        setAccountAllowed(assetPrivate1, id2, false);
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetPrivate1, id2));
-        MofoHelper.setAccountAllowed(assetPrivate1, id2, true);
+        setAccountAllowed(assetPrivate1, id2, true);
         Assert.assertTrue(MofoAsset.getAccountAllowed(assetPrivate1, id2));
-        MofoHelper.setAccountAllowed(assetPrivate1, id2, false);
+        setAccountAllowed(assetPrivate1, id2, false);
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetPrivate1, id2));        
     }
 
@@ -82,8 +85,8 @@ public class TestPrivateAsset extends BlockchainTest {
       
         int rollback_1 = Nxt.getBlockchain().getHeight();
         
-        MofoHelper.setAssetFee(assetPrivate1, 1, 2);
-        MofoHelper.setAssetFee(assetPrivate2, 3, 4);
+        setAssetFee(assetPrivate1, 1, 2);
+        setAssetFee(assetPrivate2, 3, 4);
         
         Assert.assertEquals(1, MofoAsset.getFee(assetPrivate1).getOrderFeePercentage());
         Assert.assertEquals(2, MofoAsset.getFee(assetPrivate1).getTradeFeePercentage());
@@ -92,8 +95,8 @@ public class TestPrivateAsset extends BlockchainTest {
         
         int rollback_2 = Nxt.getBlockchain().getHeight();
         
-        MofoHelper.setAssetFee(assetPrivate1, 2, 3);
-        MofoHelper.setAssetFee(assetPrivate2, 4, 5);        
+        setAssetFee(assetPrivate1, 2, 3);
+        setAssetFee(assetPrivate2, 4, 5);        
         
         Assert.assertEquals(2, MofoAsset.getFee(assetPrivate1).getOrderFeePercentage());
         Assert.assertEquals(3, MofoAsset.getFee(assetPrivate1).getTradeFeePercentage());
@@ -135,9 +138,9 @@ public class TestPrivateAsset extends BlockchainTest {
         
         int rollback_1 = Nxt.getBlockchain().getHeight();
         
-        MofoHelper.setAccountAllowed(assetPrivate1, id2, true);
-        MofoHelper.setAccountAllowed(assetPrivate2, id2, true);
-        MofoHelper.setAccountAllowed(assetPrivate1, id3, true);
+        setAccountAllowed(assetPrivate1, id2, true);
+        setAccountAllowed(assetPrivate2, id2, true);
+        setAccountAllowed(assetPrivate1, id3, true);
         
         Assert.assertTrue(MofoAsset.getAccountAllowed(assetPrivate1, id2));
         Assert.assertTrue(MofoAsset.getAccountAllowed(assetPrivate2, id2));
@@ -146,7 +149,7 @@ public class TestPrivateAsset extends BlockchainTest {
         
         int rollback_2 = Nxt.getBlockchain().getHeight();
         
-        MofoHelper.setAccountAllowed(assetPrivate2, id3, true);
+        setAccountAllowed(assetPrivate2, id3, true);
         Assert.assertTrue(MofoAsset.getAccountAllowed(assetPrivate2, id3));
       
         BlockchainTest.rollback(rollback_2);
@@ -165,15 +168,15 @@ public class TestPrivateAsset extends BlockchainTest {
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetPrivate1, id3));
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetPrivate2, id3));
         
-        MofoHelper.setAccountAllowed(assetPrivate2, id3, true);
-        MofoHelper.setAccountAllowed(assetPrivate2, id3, true);
-        MofoHelper.setAccountAllowed(assetPrivate2, id3, true);
+        setAccountAllowed(assetPrivate2, id3, true);
+        setAccountAllowed(assetPrivate2, id3, true);
+        setAccountAllowed(assetPrivate2, id3, true);
         
         Assert.assertTrue(MofoAsset.getAccountAllowed(assetPrivate2, id3));
         
         System.out.println("Set account allowed false");
         
-        MofoHelper.setAccountAllowed(assetPrivate2, id3, false);
+        setAccountAllowed(assetPrivate2, id3, false);
         
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetPrivate2, id3));
     }
@@ -187,19 +190,19 @@ public class TestPrivateAsset extends BlockchainTest {
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetId, id2));        
         
         MofoHelper.transferAsset(secretPhrase1, assetId, id2, 1000, "Recipient not allowed to receive private asset");
-        MofoHelper.setAccountAllowed(assetId, id2, true);
+        setAccountAllowed(assetId, id2, true);
         
         MofoHelper.transferAsset(secretPhrase1, assetId, id2, 1000);
         generateBlock();
         
         Assert.assertEquals(1000, MofoHelper.getAssetBalance(assetId, id2));
        
-        MofoHelper.setAccountAllowed(assetId, id2, false);
+        setAccountAllowed(assetId, id2, false);
         
         MofoHelper.transferAsset(secretPhrase2, assetId, id1, 1000, "Sender not allowed to transfer private asset");
         MofoHelper.transferAsset(secretPhrase1, assetId, id2, 1000, "Recipient not allowed to receive private asset");
         
-        MofoHelper.setAccountAllowed(assetId, id2, true);
+        setAccountAllowed(assetId, id2, true);
         
         MofoHelper.transferAsset(secretPhrase2, assetId, id1, 500, "Sender not allowed to transfer private asset");
         generateBlock();
@@ -208,7 +211,7 @@ public class TestPrivateAsset extends BlockchainTest {
     }
     
     static void testFee(long assetId, int percentage, long amount, long result) {
-        MofoHelper.setAssetFee(assetId, percentage, percentage);
+        setAssetFee(assetId, percentage, percentage);
         Assert.assertEquals(result, MofoAsset.calculateOrderFee(assetId, amount));
     }
     
@@ -251,10 +254,10 @@ public class TestPrivateAsset extends BlockchainTest {
         Assert.assertFalse(MofoAsset.getAccountAllowed(assetId, id2));        
         
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1 * Constants.ONE_NXT, 200, 0, "Account not allowed to place bid order");
-        MofoHelper.setAccountAllowed(assetId, id2, true);
+        setAccountAllowed(assetId, id2, true);
         
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1 * Constants.ONE_NXT, 200, 0);
-        MofoHelper.setAssetFee(assetId, 1, 1);
+        setAssetFee(assetId, 1, 1);
         
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1 * Constants.ONE_NXT, 200, 0, "Insufficient \"orderFeeNQT\": minimum of 200 required");
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1 * Constants.ONE_NXT, 200, 200);        
@@ -264,7 +267,7 @@ public class TestPrivateAsset extends BlockchainTest {
     public void feeIsPaidForOrder() {
         MofoHelper.setSecretPhrase(secretPhrase1);
         long assetId = MofoHelper.createPrivateAsset(1000 * Constants.ONE_NXT, (short) 8);
-        MofoHelper.setAccountAllowed(assetId, id2, true);
+        setAccountAllowed(assetId, id2, true);
         MofoHelper.transferAsset(secretPhrase1, assetId, id2, 1 * Constants.ONE_NXT);
         generateBlock();
         
@@ -284,7 +287,7 @@ public class TestPrivateAsset extends BlockchainTest {
         Assert.assertEquals(999 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id1));
 
         // set fee at 1%
-        MofoHelper.setAssetFee(assetId, 1000000, 1000000);
+        setAssetFee(assetId, 1000000, 1000000);
         
         int height = Nxt.getBlockchain().getHeight();
         
@@ -314,5 +317,37 @@ public class TestPrivateAsset extends BlockchainTest {
     @Test
     public void feeIsPaidForBidOrder() {
       
+    }
+    
+    public static void setAssetFee(long assetId, int orderFeePercentage, int tradeFeePercentage) {
+        Assert.assertNotNull(MofoHelper.secretPhrase);
+        MofoBuilder builder = MofoHelper.call(MofoHelper.secretPhrase, "setPrivateAssetFee");
+        builder.asset(Convert.toUnsignedLong(assetId));
+        builder.param("orderFeePercentage", orderFeePercentage);
+        builder.param("tradeFeePercentage", tradeFeePercentage);
+        
+        MofoHelper.invoke(builder.build());
+        BlockchainTest.generateBlock();
+        
+        AssetFee fee = MofoAsset.getFee(assetId);        
+        Assert.assertEquals(orderFeePercentage, fee.getOrderFeePercentage());
+        Assert.assertEquals(tradeFeePercentage, fee.getTradeFeePercentage());
+    }
+    
+    public static void setAccountAllowed(long assetId, long accountId, boolean allowed) {
+        Assert.assertNotNull(MofoHelper.secretPhrase);
+        MofoBuilder builder = MofoHelper.call(MofoHelper.secretPhrase, allowed ? "addPrivateAssetAccount" : "removePrivateAssetAccount");
+        builder.asset(Convert.toUnsignedLong(assetId));
+        builder.recipient(accountId);
+      
+        MofoHelper.invoke(builder.build());
+        BlockchainTest.generateBlock();        
+        
+        if (allowed) {
+            Assert.assertTrue(MofoAsset.getAccountAllowed(assetId, accountId));
+        }
+        else {
+            Assert.assertFalse(MofoAsset.getAccountAllowed(assetId, accountId));
+        }
     }    
 }
