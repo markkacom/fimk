@@ -62,7 +62,7 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        Logger.logDebugMessage("Received TEXT message: " + message);
+        //Logger.logDebugMessage("Received TEXT message: " + message);
         
         Object json = JSONValue.parse(message);
         
@@ -143,7 +143,7 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
     
     public void sendAsync(String str) {
         if (getSession() != null && getSession().isOpen()) {
-            Logger.logDebugMessage("Send TEXT message: " + str);
+            //Logger.logDebugMessage("Send TEXT message: " + str);
             getSession().getRemote().sendStringByFuture(str);
         }
     }
