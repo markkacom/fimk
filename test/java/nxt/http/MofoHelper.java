@@ -5,8 +5,6 @@ import org.junit.Assert;
 
 import nxt.BlockchainTest;
 import nxt.Constants;
-import nxt.MofoAsset;
-import nxt.MofoAsset.AssetFee;
 import nxt.http.APICall.Builder;
 import nxt.util.Convert;
 
@@ -158,6 +156,33 @@ public class MofoHelper {
         response = call("getAsset").asset(assetId).build().invoke();
         Assert.assertEquals(assetId, response.get("asset"));        
         return Convert.parseUnsignedLong(assetId);
+    }
+    
+    public static void sendMoney(String secretPhrase, long recipientId, long amountNQT) {
+        sendMoney(secretPhrase, recipientId, amountNQT, null);
+    }
+    
+    public static void sendMoney(String secretPhrase, long recipientId, long amountNQT, String expected_error) {
+        sendMoney(secretPhrase, recipientId, null, amountNQT, expected_error);
+    }
+    
+    public static void sendMoney(String secretPhrase, long recipientId, String recipientPublicKey, long amountNQT) {
+        sendMoney(secretPhrase, recipientId, recipientPublicKey, amountNQT, null);
+    }    
+    
+    public static void sendMoney(String secretPhrase, long recipientId, String recipientPublicKey, long amountNQT, String expected_error) {
+        Builder builder = call(secretPhrase, "sendMoney").recipient(recipientId).param("amountNQT", String.valueOf(amountNQT));
+        if (recipientPublicKey != null) {
+            builder.param("recipientPublicKey", recipientPublicKey);
+        }
+        invoke(builder.build(), true, expected_error);
+        BlockchainTest.generateBlock();
+    }
+
+    public static void setAlias(String secretPhrase, String aliasName, String aliasURI) {
+        Builder builder = call(secretPhrase, "setAlias").param("aliasName", aliasName).param("aliasURI", aliasURI);
+        invoke(builder.build(), true, null);
+        BlockchainTest.generateBlock();
     }
     
     static String createName() {
