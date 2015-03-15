@@ -1,5 +1,7 @@
 package nxt.http;
 
+import nxt.Constants;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Assert;
@@ -7,6 +9,7 @@ import org.junit.Assert;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,6 +29,10 @@ public class APICall {
     private APICall(Builder builder) {
         this.params = builder.params;
     }
+    
+    public static Builder call(String requestType) {
+        return new Builder(requestType);
+    }
 
     public static class Builder {
 
@@ -34,6 +41,7 @@ public class APICall {
         public Builder(String requestType) {
             params.put("requestType", requestType);
             params.put("deadline", "1440");
+            params.put("feeNQT", String.valueOf(Constants.ONE_NXT / 10));
         }
 
         public Builder param(String key, String value) {
