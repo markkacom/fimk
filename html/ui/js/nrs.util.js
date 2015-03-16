@@ -753,7 +753,7 @@ var NRS = (function(NRS, $, undefined) {
 			formattedAcc = object;
 			object = null;
 		} else {
-			if (typeof object[acc + "RS"] == "undefined") {
+			if (object == null || typeof object[acc + "RS"] == "undefined") {
 				return "/";
 			} else {
 				formattedAcc = String(object[acc + "RS"]).escapeHTML();

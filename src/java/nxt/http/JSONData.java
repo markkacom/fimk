@@ -9,6 +9,7 @@ import nxt.Appendix;
 import nxt.AssetTransfer;
 import nxt.Attachment;
 import nxt.Block;
+import nxt.Constants;
 import nxt.Currency;
 import nxt.CurrencyExchangeOffer;
 import nxt.CurrencyFounder;
@@ -16,6 +17,7 @@ import nxt.CurrencyTransfer;
 import nxt.CurrencyType;
 import nxt.DigitalGoodsStore;
 import nxt.Exchange;
+import nxt.Generator;
 import nxt.Nxt;
 import nxt.Order;
 import nxt.Poll;
@@ -79,6 +81,18 @@ final class JSONData {
             json.put("forgedBalanceNQT", String.valueOf(account.getForgedBalanceNQT()));
             json.put("guaranteedBalanceNQT", String.valueOf(account.getGuaranteedBalanceNQT(1440)));
         }
+        return json;
+    }
+
+    static JSONObject lessor(Account account) {
+        JSONObject json = new JSONObject();
+        json.put("currentLesseeRS", Convert.rsAccount(account.getCurrentLesseeId()));
+        json.put("currentHeightFrom", String.valueOf(account.getCurrentLeasingHeightFrom()));
+        json.put("currentHeightTo", String.valueOf(account.getCurrentLeasingHeightTo()));
+        json.put("nextLesseeRS", Convert.rsAccount(account.getNextLesseeId()));
+        json.put("nextHeightFrom", String.valueOf(account.getNextLeasingHeightFrom()));
+        json.put("nextHeightTo", String.valueOf(account.getNextLeasingHeightTo()));
+        json.put("effectiveBalanceNXT", String.valueOf(account.getGuaranteedBalanceNQT(1440) / Constants.ONE_NXT));
         return json;
     }
 
@@ -329,6 +343,9 @@ final class JSONData {
         json.put("platform", peer.getPlatform());
         json.put("blacklisted", peer.isBlacklisted());
         json.put("lastUpdated", peer.getLastUpdated());
+        if (peer.isBlacklisted()) {
+            json.put("blacklistingCause", peer.getBlacklistingCause());
+        }
         return json;
     }
 
@@ -534,6 +551,16 @@ final class JSONData {
         json.put("blockTimestamp", transaction.getBlockTimestamp());
         json.put("transactionIndex", transaction.getIndex());
         return json;
+    }
+
+    static JSONObject generator(Generator generator, int elapsedTime) {
+        JSONObject response = new JSONObject();
+        long deadline = generator.getDeadline();
+        putAccount(response, "account", generator.getAccountId());
+        response.put("deadline", deadline);
+        response.put("hitTime", generator.getHitTime());
+        response.put("remaining", Math.max(deadline - elapsedTime, 0));
+        return response;
     }
 
     static void putAccount(JSONObject json, String name, long accountId) {

@@ -1,6 +1,8 @@
 package nxt;
 
 import java.util.ArrayList;
+import nxt.util.Logger;
+
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -32,10 +34,15 @@ public final class Constants {
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
     public static final int MAX_ROLLBACK = Nxt.getIntProperty("nxt.maxRollback");
     static {
-        if (MAX_ROLLBACK < 1440) {
-            throw new RuntimeException("nxt.maxRollback must be at least 1440");
+        if (MAX_ROLLBACK < 1441) {
+            Logger.logErrorMessage("nxt.maxRollback must be at least 1441");
+            throw new RuntimeException("nxt.maxRollback must be at least 1441");
         }
     }
+
+    public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
+    public static final int FORGING_DELAY = Nxt.getIntProperty("nxt.forgingDelay");
+    public static final int FORGING_SPEEDUP = Nxt.getIntProperty("nxt.forgingSpeedup");
 
     public static final int MAX_ALIAS_URI_LENGTH = 1000;
     public static final int MAX_ALIAS_LENGTH = 100;

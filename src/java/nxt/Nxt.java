@@ -18,7 +18,7 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.4.7";
+    public static final String NXT_VERSION = "1.4.13";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
@@ -43,6 +43,9 @@ public final class Nxt {
                 } else {
                     throw new RuntimeException("nxt-default.properties not in classpath and system property nxt-default.properties not defined either");
                 }
+            }
+            if (!VERSION.equals(Nxt.defaultProperties.getProperty("nxt.version"))) {
+                throw new RuntimeException("Using an nxt-default.properties file from a version other than " + VERSION + " is not supported!!!");
             }
         } catch (IOException e) {
             throw new RuntimeException("Error loading nxt-default.properties", e);
@@ -80,13 +83,17 @@ public final class Nxt {
     }
 
     public static String getStringProperty(String name) {
-        return getStringProperty(name, null);
+        return getStringProperty(name, null, false);
     }
 
     public static String getStringProperty(String name, String defaultValue) {
+        return getStringProperty(name, defaultValue, false);
+    }
+
+    public static String getStringProperty(String name, String defaultValue, boolean doNotLog) {
         String value = properties.getProperty(name);
         if (value != null && ! "".equals(value)) {
-            if (getDisplayProperties()) Logger.logMessage(name + " = \"" + value + "\"");
+            if (getDisplayProperties()) Logger.logMessage(name + " = \"" + (doNotLog ? "{not logged}" : value) + "\"");
             return value;
         } else {
             if (getDisplayProperties()) Logger.logMessage(name + " not defined");
@@ -134,6 +141,10 @@ public final class Nxt {
         return TransactionProcessorImpl.getInstance();
     }
 
+    public static Transaction.Builder newTransactionBuilder(byte[] senderPublicKey, long amountNQT, long feeNQT, short deadline, Attachment attachment) {
+        return new TransactionImpl.BuilderImpl((byte)1, senderPublicKey, amountNQT, feeNQT, deadline, (Attachment.AbstractAttachment)attachment);
+    }
+
     public static int getEpochTime() {
         return time.getTime();
     }
@@ -143,13 +154,17 @@ public final class Nxt {
     }
 
     public static void main(String[] args) {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Nxt.shutdown();
-            }
-        }));
-        init();
+        try {
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Nxt.shutdown();
+                }
+            }));
+            init();
+        } catch (Throwable t) {
+            System.out.println("Fatal error: " + t.toString());
+        }
     }
 
     public static void init(Properties customProperties) {
