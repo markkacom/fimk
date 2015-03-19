@@ -1,0 +1,308 @@
+<div ng-init="offCanvas=false" class="row row-offcanvas row-offcanvas-left" ng-class="{active: offCanvas}">
+  <div class="col-xs-6 col-sm-2 sidebar-offcanvas" id="sidebar">
+    <ul class="nav navbar-stacked">
+
+      <li ng-if="enableDualEngines">
+        <a ng-href="#/home/fim/activity/latest" translate-cloak>{{ 'home.dashboard' | translate:"{symbol:'FIM'}" }}</a>
+      </li>
+      <li ng-if="enableDualEngines">
+        <a ng-href="#/home/nxt/activity/latest" translate-cloak>{{ 'home.dashboard' | translate:"{symbol:'NXT'}" }}</a>
+      </li>
+      <li ng-if="enableDualEngines">
+        <hr class="stacked-divider">
+      </li> 
+      <li route-active="home/">
+        <a href="#/home/fim/activity/latest">
+          <i class="fa fa-book"></i>&nbsp;&nbsp;{{'translate.activity' | translate}}
+        </a>
+      </li>  
+      <li>
+        <a href="#/home/fim/inbox/latest">
+          <i class="fa fa-inbox"></i>&nbsp;&nbsp;{{'translate.inbox' | translate}}
+        </a>
+      </li>
+      <li>
+        <a href="#/home/fim/balance/latest">
+          <i class="fa fa-bar-chart"></i>&nbsp;&nbsp;{{'translate.balance' | translate}}
+        </a>
+      </li>
+      <li>
+        <hr class="stacked-divider">
+      </li> 
+      <li ng-repeat="a in accounts">
+        <a ng-href="#/accounts/{{a.id_rs}}/activity/latest">{{a.name||a.id_rs}}</a>
+      </li>
+      <li>
+        <a href ng-click="addAccount()">
+          <i class="fa fa-plus text-success"></i>&nbsp;&nbsp;{{'translate.add_account' | translate}}
+        </a>
+      </li>
+      <li ng-show="showFilter">
+        <hr class="stacked-divider">
+      </li>
+
+      <li ng-show="showFilter">
+        <a href ng-init="filterCollapse=true" ng-click="filterCollapse=!filterCollapse">
+          <span class="glyphicon glyphicon-wrench"></span>
+          &nbsp;&nbsp;{{'translate.filter' | translate}}&nbsp;<span class="caret"></span>
+        </a>
+
+        <ul class="nav navbar-stacked" collapse="filterCollapse">
+          <li>
+            <form class="navbar-form" role="search">
+              <div class="form-group">
+                <span class="form-control-static">
+                  <label class="control-label" translate translate-cloak>activity.period</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt" is-open="opened" min-date="minDate" 
+                        max-date="maxDate" datepicker-options="dateOptions" ng-required="true" translate-cloak 
+                        close-text="{{ 'home.close' | translate }}" placeholder="{{'home.period' | translate}}"/>
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                  </div>
+                </span>
+              </div>
+            </form>
+          </li>
+
+          <li ng-show="showTransactionFilter">
+            <form class="navbar-form" role="search">
+              <div class="form-group" style="width:100%">
+                <label class="control-label" translate translate-cloak>home.transaction_type</label>
+                <span class="form-control-static">
+                  <div class="panel panel-default">
+                    <!-- <div class="panel-heading">
+                      <h3 class="panel-title">{{ 'home.transaction_type' | translate }}</h3>
+                    </div> -->
+                    <div class="panel-body">
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.all" ng-change="filterAllChanged()">
+                          {{ 'home.filter.all' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.payments" ng-change="filterChanged()">
+                          {{ 'home.filter.payments' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.messages" ng-change="filterChanged()">
+                          {{ 'home.filter.messages' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.aliases" ng-change="filterChanged()">
+                          {{ 'home.filter.aliases' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.namespacedAliases" ng-change="filterChanged()">FIMKrypto</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.accountInfo" ng-change="filterChanged()">
+                          {{ 'home.filter.account_info' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.announceHub" ng-change="filterChanged()">
+                          {{ 'home.filter.announce_hub' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.polls" ng-change="filterChanged()">
+                          {{ 'home.filter.polls' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.goodsStore" ng-change="filterChanged()">
+                          {{ 'home.filter.goods_store' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.balanceLeasing" ng-change="filterChanged()">
+                          {{ 'home.filter.balanace_leasing' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.assetIssued" ng-change="filterChanged()">
+                          {{ 'home.filter.asset_issued' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.assetTransfer" ng-change="filterChanged()">
+                          {{ 'home.filter.asset_transfer' | translate }}</label>
+                      </div>
+                      <div class="checkbox">
+                        <label><input type="checkbox" ng-model="filter.assetOrder" ng-change="filterChanged()">
+                          {{ 'home.filter.asset_order' | translate }}</label>
+                      </div>
+                    </div>
+                  </div>
+                </span>
+              </div>
+            </form>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="col-xs-12 col-sm-10">
+    <p class="visible-xs">
+      <button type="button" class="btn btn-xs" ng-class="{'btn-default':offCanvas, 'btn-primary':!offCanvas}" 
+            data-toggle="offcanvas" ng-click="offCanvas=!offCanvas">
+        <i class="fa fa-angle-double-{{offCanvas?'left':'right'}}"></i>
+        <i class="fa fa-angle-double-{{offCanvas?'left':'right'}}"></i>
+        <i class="fa fa-angle-double-{{offCanvas?'left':'right'}}"></i>
+      </button>
+    </p>
+
+    <div class="row">
+      <div class="col-md-12">
+        <ol class="breadcrumb">
+          <li ng-repeat="b in breadcrumb" ng-class="{active: b.active}">
+            <span ng-if="b.translate && !b.period">
+              <a ng-if="b.href" href="{{b.href}}">{{ b.label | translate }}</a>
+              <span ng-if="!b.href">{{ b.label | translate }}</span>
+            </span>
+            <span ng-if="!b.translate && !b.period">
+              <a ng-if="b.href" href="{{b.href}}">{{ b.label }}</a>
+              <span ng-if="!b.href">{{ b.label }}</span>              
+            </span>
+            <span ng-if="b.period">
+              <span translate translate-cloak>home.show_results_before</span>&nbsp;<b>{{paramPeriod}}</b>
+              <a href="#/home/{{paramEngine}}/{{paramSection}}/latest">
+                <small>
+                  <i class="fa fa-times"></i>&nbsp;<span translate translate-cloak>home.show_latest</span>
+                </small>
+              </a>
+            </span>
+          </li>
+
+          <a href ng-click="provider.reload()" class="pull-right">
+            {{ 'home.reload' | translate }}&nbsp;&nbsp;
+            <i class="fa fa-refresh" ng-class="{'fa-spin': provider.isLoading}"></i>
+          </a>
+        </ol>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        
+        <!-- section: inbox and activity -->
+        <div ng-if="paramSection == 'activity' || paramSection == 'inbox'">
+          <div ng-if="transactionProvider.entities == 0">
+            <div class="well" translate="translate.dashboard_explained"></div>
+          </div>
+          <div ng-if="transactionProvider.entities.length > 0" infinite-scroll="transactionProvider.loadMore()" infinite-scroll-distance="0">
+            <table class="table table-striped activity-table">
+              <tbody>
+                <tr ng-repeat="a in transactionProvider.entities" ng-class="{ success: a.confirmations == 0 }">
+                  <td>
+                    <span ng-if="a.confirmations == 0"><i class="fa fa-refresh fa-spin"></i></span>
+                    <span ng-if="a.confirmations > 0 && a.confirmations <= 10" class="text-danger"><b>{{a.confirmations}}</b></span>
+                    <span ng-if="a.confirmations > 10" tooltip="{{a.confirmations}} confirmations"><i class="fa fa-check text-success"></i></span>
+                  </td>
+                  <td nowrap class="hidden-xs">{{a.date}}</td>
+                  <td style="word-wrap: break-word; word-break: break-all; white-space: normal; width: 100%;" ng-bind-html="a.renderedHTML"></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="load-more-button" ng-show="transactionProvider.hasMore">
+              <a href ng-click="transactionProvider.loadMore()" class="text-lowercase text-muted">
+                <span ng-show="transactionProvider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
+                <span translate="translate.load_more_activities"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- section: balance -->
+        <div ng-if="paramSection == 'balance'">
+          <div class="row">
+            <div class="col-md-6" ng-repeat="b in balanceProvider.balances">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <b>{{b.name||b.accountRS}}</b>
+                  <span ng-if="b.name"> - {{b.accountRS}}</span>
+                </div>
+                <div class="panel-body">
+                  <form class="form-compact" role="form">
+                    <div class="form-group">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.balance' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.balanceNXT }}</span></div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.unconfirmed_balance' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.unconfirmedBalanceNXT }}</span></div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.effective_balance' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.effectiveBalanceNXT }}</span></div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.guaranteed_balance' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.guaranteedBalanceNXT }}</span></div>
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="b.forging">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.forged_balance' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.forgedBalanceNXT }}</span></div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.total_blocks_forged' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.numberOfBlocks }}</span></div>
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="b.forging">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.last_block_forged' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.date }}</span></div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.last_block_height' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.lastBlockHeight }}</span></div>
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="b.forging">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.forged_amount_today' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.forgedBalanceTodayNXT }}</span></div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.block_count_today' | translate }}</label>
+                        <div>
+                          <span type="text" class="form-control-static">{{ b.forgedBalanceTodayCount }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="b.forging">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.forged_amount_week' | translate }}</label>
+                        <div>
+                          <span type="text" class="form-control-static">{{ b.forgedBalanceWeekNXT }}</span>
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.block_count_week' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.forgedBalanceWeekCount }}</span></div>
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="b.forging">
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.forged_amount_month' | translate }}</label>
+                        <div>
+                          <span type="text" class="form-control-static">{{ b.forgedBalanceMonthNXT }}</span>
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label class="control-label">{{ 'translate.block_count_month' | translate }}</label>
+                        <div><span type="text" class="form-control-static">{{ b.forgedBalanceMonthCount }}</span></div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

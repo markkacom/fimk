@@ -1,0 +1,95 @@
+<div class="row landing-page">
+  <div ng-if="isNodeJS">
+    <div class="col-md-12">
+      <center>
+        <p>
+          <br>
+          <br>
+          <br>
+          <br>
+          <h1><b>Welcome to FIMKRYPTO</b></h1>
+        </p>
+      </center>
+    </div>
+    <div class="col-md-4 col-md-offset-4">
+      <center>
+        <p>
+          <button type="button" class="btn btn-danger btn-block create-account-btn" ng-click="showNewAccountModal()" style="padding: 15px; font-size: 150%">
+            <big><b>Add account</b></big>
+          </button>
+        </p>
+        <p>
+          <div>
+            <span class="input-group-btn">
+              <span class="btn btn-primary btn-block btn-file">
+                <span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;&nbsp;Import wallet <input type="file" 
+                  onchange="window.onWalletFileSelected(event)">
+              </span>
+            </span>
+          </div>
+        </p>
+      </center>
+    </div>
+  </div>
+  <div ng-if="!isNodeJS">
+    <div class="col-md-6">
+      <div class="embed-responsive embed-responsive-16by9 hidden-xs" ng-if="!isNodeJS">
+        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/aGWCJ_XWauQ?autoplay=0&showinfo=0&controls=0&wmode=transparent&loop=1" frameborder="0" 
+          allowfullscreen></iframe>
+      </div>
+      <p>
+        <br>
+        <button type="button" class="btn btn-danger btn-block create-account-btn" ng-click="showNewAccountModal()" style="padding: 15px; font-size: 150%">
+          <big><b>Add account</b></big>
+        </button>
+      </p>
+      <p>
+        <div>
+          <span class="input-group-btn">
+            <span class="btn btn-primary btn-block btn-file">
+              <span class="glyphicon glyphicon-folder-open"></span>&nbsp;&nbsp;&nbsp;Import wallet <input type="file" 
+                onchange="window.onWalletFileSelected(event)">
+            </span>
+          </span>
+        </div>
+      </p>
+      <!-- <p>
+        <div class="form-group">
+          <div class="input-group">
+            <input class="form-control input-lg" placeholder="Enter email, stay informed" name="email" type="text" disabled>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-primary btn-lg" disabled>
+                <i class="fa fa-envelope-o"></i><span class="hidden-xs">&nbsp;&nbsp;Subscribe</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </p>
+      <p>
+        <button type="button" class="btn btn-primary btn-block" style="padding: 15px; font-size: 100%" disabled>
+          <big><b>Take the tour</b></big>
+        </button>
+      </p>  
+      <p>
+        <button type="button" class="btn btn-success btn-block" style="padding: 15px; font-size: 100%" disabled>
+          <big><b>Apply for <u>free</u> basic income</b></big><br> (currently) for Finnish nationals only
+        </button>
+      </p> -->
+    </div>
+    <div class="col-md-6">
+      <div class="jumbotron dark-background">
+        <!-- <h1>Join now!</h1> -->
+        <p><b>Fimkrypto is a growing community of free individuals who come in contact, organize and do business on the distributed consensus network of FIMKrypto.</b></p>
+        <p>The Fimkrypto network is fully decentralized and built on second generation bitcoin technology. Join the decentralized revolution, <b>join Fimkrypto today</b>.</p>
+        <p>*&nbsp;&nbsp;<b>Get social</b></p>
+        <p>*&nbsp;&nbsp;<b>Publish your thoughts</b></p>
+        <p>*&nbsp;&nbsp;<b>Encrypted messaging</b></p>
+        <p>*&nbsp;&nbsp;<b>Asset exchange</b></p>
+        <p>*&nbsp;&nbsp;<b><s>Goods store</s></b> (soon)</p>
+        <p>*&nbsp;&nbsp;<b><s>Issue your own currency</s></b> (soon)</p>
+        <p>*&nbsp;&nbsp;<b><s>Crowdfunding</s></b> (soon)</p>
+        <p>*&nbsp;&nbsp;<b>Supports FIMK <u>and NXT</u></b></p>
+      </div>
+    </div>   
+  </div>
+</div>
