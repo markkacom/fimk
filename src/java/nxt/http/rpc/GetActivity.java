@@ -146,11 +146,11 @@ public class GetActivity extends RPCCall {
                 }
                 else {
                     array.add(JSONData.transaction(transaction, false));
-                }              
+                }
             }
             response.put("transactions", array);
         } 
-  
+        
         return response;      
     }
 
