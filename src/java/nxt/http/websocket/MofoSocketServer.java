@@ -39,6 +39,7 @@ import nxt.http.rpc.GetComments;
 import nxt.http.rpc.GetForgingStats;
 import nxt.http.rpc.GetMyOpenOrders;
 import nxt.http.rpc.GetRecentTransactions;
+import nxt.peer.Peer;
 import nxt.util.Convert;
 import nxt.util.JSON;
 import nxt.util.Logger;
@@ -309,7 +310,14 @@ public class MofoSocketServer {
             return;
         }
         MofoSocketServer.notify(topic, JSONData.minimalBlock(block));
-    }    
+    }
+    
+    static void notifyPeerEvent(String topic, Peer peer) {
+        if ( ! listeners.containsKey(topic)) {
+            return;
+        }
+        MofoSocketServer.notify(topic, JSONData.peer(peer));      
+    }
     
     static void rpcCall(final MofoWebSocketAdapter socket, final String call_id, final String method, final JSONObject arguments) {
         if ( ! rpcCalls.containsKey(method)) {
