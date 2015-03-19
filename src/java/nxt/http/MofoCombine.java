@@ -81,6 +81,10 @@ public final class MofoCombine extends APIServlet.APIRequestHandler {
                 throw new ParameterException(INCORRECT_JSON_ARGS);
             }
             
+            if (apiRequestHandler.requirePassword()) {
+                API.verifyPassword(fakeReq);
+            }        
+            
             JSONObject resp = new JSONObject();
             resp.put("requestType", requestType);
             resp.put("response", apiRequestHandler.processRequest(fakeReq));
