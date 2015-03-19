@@ -341,9 +341,13 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             if (nextBlocks == null) {
                 return null;
             }
+            
+            /* XXX - Allow 1440 blocks as a transition period not to blacklist the whole network.
+             *       For a next version this should be set back to 720. 
+             * TODO  Set MAX blocks from peer to 720  */
             // prevent overloading with blocks
-            if (nextBlocks.size() > 720) {
-                Logger.logDebugMessage("Obsolete or rogue peer " + peer.getPeerAddress() + " sends too many nextBlocks, blacklisting");
+            if (nextBlocks.size() > 1440) {
+                Logger.logDebugMessage("Obsolete or rogue peer " + peer.getPeerAddress() + " sends too many nextBlocks (" + nextBlocks.size() + "), blacklisting");
                 peer.blacklist("Too many nextBlocks");
                 return null;
             }
@@ -442,6 +446,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }, Event.AFTER_BLOCK_APPLY);
         }
 
+        /*
+          XXX - TODO add checksum for THIRD_BIRTH_BLOCK
         blockListeners.addListener(new Listener<Block>() {
             @Override
             public void notify(Block block) {
@@ -456,6 +462,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 }
             }
         }, Event.BLOCK_PUSHED);
+        */
 
         blockListeners.addListener(new Listener<Block>() {
             @Override
