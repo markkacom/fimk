@@ -13,6 +13,8 @@ import nxt.Nxt;
 import nxt.Trade;
 import nxt.Transaction;
 import nxt.TransactionProcessor;
+import nxt.peer.Peer;
+import nxt.peer.Peers;
 import nxt.util.Convert;
 import nxt.util.Listener;
 
@@ -211,6 +213,76 @@ public final class EventForwarder {
                 }
             }
         }, BlockchainProcessor.Event.BLOCK_PUSHED);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_BLACKLIST", peer);
+            }
+         }, Peers.Event.BLACKLIST);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_UNBLACKLIST", peer);
+            }
+         }, Peers.Event.UNBLACKLIST);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_DEACTIVATE", peer);
+            }
+         }, Peers.Event.DEACTIVATE);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_REMOVE", peer); 
+            }
+         }, Peers.Event.REMOVE);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_DOWNLOADED_VOLUME", peer);
+            }
+         }, Peers.Event.DOWNLOADED_VOLUME);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_UPLOADED_VOLUME", peer);
+            }
+         }, Peers.Event.UPLOADED_VOLUME);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_WEIGHT", peer);
+            }
+         }, Peers.Event.WEIGHT);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_ADDED_ACTIVE_PEER", peer);
+            }
+         }, Peers.Event.ADDED_ACTIVE_PEER);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_CHANGED_ACTIVE_PEER", peer);
+            }
+         }, Peers.Event.CHANGED_ACTIVE_PEER);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_NEW_PEER", peer);
+            }
+         }, Peers.Event.NEW_PEER);        
     }
     
     static void init() {}
