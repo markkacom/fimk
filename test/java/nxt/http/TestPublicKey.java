@@ -17,7 +17,7 @@ public class TestPublicKey extends BlockchainTest {
      * "publickeyannouncementrequired" to "false".
      */  
   
-    static final int BEFORE_PUBLIC_KEY_ENABLED_HEIGHT = 43000;
+    static final int BEFORE_PUBLIC_KEY_ENABLED_HEIGHT = 4;
     static final String ALIAS_NAME = "publickeyannouncementrequired";
   
     @Test
