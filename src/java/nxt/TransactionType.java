@@ -598,6 +598,9 @@ public abstract class TransactionType {
 
             @Override
             void validateAttachment(final Transaction transaction) throws NxtException.ValidationException {
+                if (Nxt.getBlockchain().getLastBlock().getHeight() < Constants.MONETARY_SYSTEM_BLOCK) {
+                    throw new NxtException.NotYetEnabledException("Alias delete operation not yet enabled at height " + Nxt.getBlockchain().getLastBlock().getHeight());
+                }
                 final Attachment.MessagingAliasDelete attachment =
                         (Attachment.MessagingAliasDelete) transaction.getAttachment();
                 final String aliasName = attachment.getAliasName();
@@ -1226,6 +1229,9 @@ public abstract class TransactionType {
 
             @Override
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+                if (Nxt.getBlockchain().getLastBlock().getHeight() < Constants.MONETARY_SYSTEM_BLOCK) {
+                    throw new NxtException.NotYetEnabledException("Dividend payment not yet enabled at height " + Nxt.getBlockchain().getLastBlock().getHeight());
+                }
                 Attachment.ColoredCoinsDividendPayment attachment = (Attachment.ColoredCoinsDividendPayment)transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
@@ -1789,7 +1795,7 @@ public abstract class TransactionType {
                             + transaction.getJSONObject() + " transaction " + transaction.getStringId());
                 }
                 if (recipientAccount == null
-                        || (recipientAccount.getKeyHeight() <= 0 && ! transaction.getStringId().equals("5081403377391821646"))) {
+                        || (recipientAccount.getKeyHeight() <= 0 /*&& ! transaction.getStringId().equals("5081403377391821646")*/)) {
                     throw new NxtException.NotCurrentlyValidException("Invalid effective balance leasing: "
                             + " recipient account " + transaction.getRecipientId() + " not found or no public key published");
                 }
