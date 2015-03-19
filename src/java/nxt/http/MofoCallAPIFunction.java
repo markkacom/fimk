@@ -31,6 +31,10 @@ public final class MofoCallAPIFunction extends APIServlet.APIRequestHandler {
             throw new ParameterException(INCORRECT_JSON_ARGS);
         }
         
+        if (apiRequestHandler.requirePassword()) {
+            API.verifyPassword(req);
+        }
+
         return apiRequestHandler.processRequest(req);
     }
 }
