@@ -1,0 +1,282 @@
+This is the FIMK server package, while you can run this on your computer it's
+not intended as such. Users of the FIMK server package generally install it 
+on a server.
+
+For people looking for the installable FIMK client please check out our 
+desktop client dubbed MofoWallet which can be found at our github repo which 
+is here https://github.com/fimkrypto/mofowallet/releases.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+FIMK 0.4.0 is based on NXT 1.4.13 (plus the critical parts of 1.4.16)
+
+This is a hard fork everyone MUST update to this release. The hard fork will go 
+into effect the moment we set an alias that enables new accounts without public
+key to receive FIMK.
+
+On first startup a series of changes will be performed on the database, these 
+changes are quite extensive and might take a while to complete. Just let it run
+and FIMK will start when it's ready.
+
+* Fixed the recent forking issues
+
+* Upgraded to NXT 1.4.13/16 (most recent NXT release)
+  
+  Tons of upstream (NXT) security updates and general improvements.
+  
+  - Improvements in exception handling, transaction validation, error logging.
+  - Prevent server from starting if any of the startup tasks failed.
+  - Avoid unnecessary DNS queries.
+  - No longer process or return "comment" parameters in Asset Transfer.
+  - Stores all derived objects in the database, instead of keeping all of them 
+    in memory only.
+  - Startup time is now reduced to a few seconds only.
+  - Everywhere, object ids that used to be Longs are now primitive longs.
+  - Preserve and re-process unconfirmed transactions after fork resolution 
+    pop-off.
+  - Improved propagation of unconfirmed transactions.
+  - Multiple minor improvements and optimizations based on profiling results.
+  - Updated to latest Jetty version
+  - Allow re-broadcasting of transactions already in the unconfirmed pool.
+  - Show correct timestamps in asset transfer history.
+  - Only try to set account public key when inside a database transaction,
+    fixes a bug in setting public keys for accounts that never had an
+    outgoing transaction.
+  - Improved default H2 cache size allocation.
+  - Disabled the SSLv3 protocol when using SSL for the API.
+  - Fixed incorrect guaranteed balance bug in getAccountLessors API.
+  - Cache hallmarked peer account balances to reduce number of database calls.
+  - Other minor performance improvements and bugfixes.
+  - Fixed decryption of purchased DGS goods.
+  - Fixed missing DGS purchase feedbacks.
+  - Implemented full text search using the Lucene library, as supported by H2.
+  - Show purchase counts and public feedback counts in all API responses 
+    returning Goods JSON, unless includeCounts parameter is false.
+  - Increased default purchase delivery deadline to 168 hours (1 week).
+  - Include full peer info in getPeers API if includePeerInfo=true, to avoid 
+    having to do a separate getPeer request for each peer.
+  - Allow transaction signing in signTransaction to skip the validation of the
+    transaction bytes being signed, if an optional validate=false parameter is 
+    added.
+  - Allow sending messages with no recipient.
+  - Automatically blacklist peers with version older than 0.3.3
+  - After the Monetary System block, the order in which transactions in a block 
+    are executed will be determined by the block forger, instead of by id, 
+    default being by arrival time at the forger's node.
+  - Improvements in blockchain download to prevent getting stuck on the wrong 
+    fork.
+  - Nodes will download blocks in batches of not more than 719 blocks at a time
+    from a single peer, and after each such batch will verify  with
+    nxt.numberOfForkConfirmations other peers (default 5) if this is the best
+    fork, before continuing, unless the downloaded batch is of less than 10 
+    blocks.
+  - Rescan status is now saved in the database, to prevent the database from 
+    being left in an inconsistent state when a rescan fails or is interrupted. 
+    Once a rescan has been scheduled, it will be triggered again at restart, 
+    until it completes successfully.
+  - Improvements in the processing of unconfirmed transactions.
+  - Fixed currency decimals issue.
+  - Fixed minor bugs in MS transaction validation.
+  - Additional validations of Monetary System transactions, and bugfixes
+    in existing validations.
+  - Bugfixes in currency minting and in MintWorker.
+  - Improved peer networking to run the sending of blocks and transactions
+    to peers in a background thread.
+  - Do not log currency exchanges of zero amount.
+  - Fixed setting of peer state. Improvements in connecting to peers.
+  - Enforce that currency exchange offer expiration height is after the current
+    blockchain height.
+  - The Message Pattern in AccountInfo feature, introduced in 1.4.0e, has been
+    disabled, and will not be activated. This is to prevent
+    possible denial of service attacks by malicious regular expression patterns
+    which can cause excessive CPU load with certain inputs.
+  - Enhanced nxt.allowedBotHosts property to also accepts a range of addresses
+    using CIDR notation.
+  - Allow no more than one unconfirmed minting transaction per account and minted
+    currency to be accepted in the unconfirmed pool.
+  - Better validation of hallmarks for peers with multiple addresses. Do not
+    blacklist peers with invalid hallmarks but just treat them as not hallmarked.
+  - Minor peer networking improvement, addPeers and processBlock requests are now
+    executed in the background.
+  - Improvements in fork resolution. The peer networking getNextBlocks API no 
+    longer limits the number of blocks returned to 1 MB total payload size, 
+    but always returns 720 blocks, if available.
+  - Fixed a bug in transaction bytes parsing which could cause signature
+    verification failed errors and break forging.
+  - When downloading the blockchain, require at most one fork confirmation when
+    still below the last hardcoded checkpoint.
+  - Peer port handling has been improved to allow different peers to share the 
+    same IP address provided they use different ports.
+  - To prevent overloading a node with invalid peer addresses, the maximum total
+    number of known peers is limited to nxt.maxNumberOfKnownPeers (default 2000).
+    Once this number has been reached, new peer addresses are not added, and peers
+    that have been last connected to more than a week ago are removed from the known
+    peer list, provided the node has enough connected public peers, until the number
+    of known peers is again reduced to below nxt.minNumberOfKnownPeers (default
+    1000).
+  - Improved database performance by storing currency supply and reserve per unit
+    data in a separate table.
+  - Fixed a bug in transaction validation that could break blockchain downloading.
+  - The default (and minimum allowed) value for nxt.maxRollback is now 1441.
+  - Restrict maximum HTTP request and response size in peer networking to prevent
+    potential out of memory attacks.
+  - Improved fork resolution by allowing a better difficulty block pushed from a
+    peer to replace the current last block.
+  - When forging, do not accept a peer block with hit time after the next hit time
+    of a currently forging account (i.e. prevent front-running in forging).
+  - Removed the possibility of a forger to miss his turn. Even if late, the block
+    will still be generated and submitted.
+  - Delay forging and submission of blocks by 20 s, configurable via the
+    nxt.forgingDelay property, in order to be able to accumulate more transactions
+    in the forged block. The arrival of a front-running block from a peer however
+    cancels that delay and the next block is generated up to 3 s earlier instead,
+    which can be controlled via the nxt.forgingSpeedup property.
+  - Better logging of peer networking errors. Log, but do not blacklist missing or
+    malformed JSON responses.
+  - Database optimization. Moved the public key of accounts, transaction senders,
+    and block forgers to a separate table, resulting in 15% reduction of total
+    database size.
+  - Enforce that the nxt-default.properties file used matches the version of the
+    current release.
+  - Peer networking improvements, better logging, bugfixes.
+
+* The NXT client (known as wesley client) has been removed from the FIMK server 
+  package. A slimmed down single currency (without NXT support) version of
+  the FIMK client (aka MofoWallet) has replaced it.
+  
+  If people want the old client back they can copy it back from the FIMK 0.3.3 
+  release. You should copy the entire `html` folder from 0.3.3 and move it to 
+  FIMK 0.4.0. Then in nxt.properties set `nxt.apiResourceBase=html/ui`.
+  
+  We will no longer do work on the old client.
+  
+* FIMK now has an embedded WebSocket server, it's separate from the existing
+  API server. 
+  
+  The WebSocket protocol is an improvement of the more than 25 year
+  old HTTP protocol. WebSockets are faster, more efficient and allow for 
+  two-way communication.
+  
+  See these posts for background information:
+  
+  http://fimkchat.com/2015/03/connecting-to-fimk-websockets/
+  http://fimkchat.com/2015/03/fimk-adds-websocket-support-to-its-core/
+  
+* New functionality for FIMK is now exposed as asynchronous RPC calls accessed 
+  over the WebSocket server.
+  
+  Because of the two-way communication abilities of WebSockets now RPC calls 
+  can be created that do work in a background thread on the server and will 
+  notify the client when they are ready. Meanwhile the server and client can 
+  be used as normal.
+
+* The old API server is turned off by default. If you need to access it you can
+  enable it in nxt.properties through `nxt.enableAPIServer=true`
+  
+* A bridge exists in the callFunction RPC to call any old API method by name,
+  the old API calls are accessed from memory so no need to actually run/start
+  the API server (saves memory/cpu).
+  
+* Tons of new RPC calls, each one tailored to support a different aspect of the
+  FIMK client (aka MofoWallet).
+  
+  List of new RPC calls (WebSocket API).
+  
+  - CallAPIFunction  
+    Call any old API calls in the old HTTP API server. We support each call 
+    listed here http://wiki.nxtcrypto.org/wiki/Nxt_API. It is not necessary
+    for the API server to be running.    
+  
+  - GetAccount  
+    Returns the account balance, name and some other account related things. 
+  
+  - GetAccountAssets  
+    Allows to paginate through list of account owned assets. Asset data always 
+    includes the asset name, decimal places etc for easy access on the client.
+    Pagination is index based. 
+  
+  - GetAccountCurrencies  
+    Allows pagination through all currencies owned by an account, currency 
+    details are always included.
+    Pagination is index based.
+  
+  - GetAccountPosts  
+    Allows to paginate through all POSTS written by an account. 
+    POSTS are stored in the mofo_post database table.
+    Pagination is index based.
+    
+  - GetAssetPosts  
+    Same as account posts but works for asset posts
+    
+  - GetComments  
+    Allows to paginate over comments for account and asset posts.
+    Pagination is index based.
+    
+  - GetCommentCount  
+    Returns the number of comments for a post.
+  
+  - GetAccounts  
+    Returns balances for multiple accounts
+  
+  - GetActivity  
+    Returns blocks, transactions and trades. This extensive RPC call can be used
+    to return all trades + transactions spanning a selection of blocks. Supports
+    a filter mechanism to query for transactions based on time and on a range
+    of transaction types.
+  
+  - GetActivityStatistics  
+    Returns network statistics, average block time, block rewards per day, week 
+    month.
+    
+  - GetAskOrder, GetBidOrder  
+    Returns an ask/bid order.
+    
+  - GetAsset  
+    Does what it says
+    
+  - GetAssetChartData  
+    There is a listener that listens trades in blocks. The asset prices are 
+    bundled per hour, 3 hour, day and week to get a moving average and open, 
+    close, high, low and average prices. 
+    These moving averages (and open/close etc) are stored in a new table in the
+    database and this RPC accesses that data.
+  
+  - GetAssetOrders, GetAssetTrades  
+    Does what it says. Pagination is index based.
+    
+  - GetBlockchainState  
+    Minimalist blockchain state includes only height and timestamp.
+    
+  - GetForgingStats
+    Allows paginating over the list of top forgers for the past 24 hours.
+    Pagination is timestamp based.
+    
+  - GetMyOpenOrders
+    Allows paginating over all open orders but for a list of accounts.
+    Pagination is index based.
+  
+  - GetRecentTransactions
+    Returns recent transactions (includes unconfirmed) for a list of accounts.
+    Supports the same filter mechanism as GetActivity RPC.
+    Pagination is index based.
+
+* New feature.. Write POSTS/BLOGS linked to an Account or Asset. The POSTS are
+  stored on the blockchain (for now) and are entered through AM (arbitrary 
+  messages). The AM format was chosen instead of a new transaction type in 
+  order to stay compatible with NXT and allow the functionality to be used in 
+  multi-currency MofoWallet client.
+  
+  The POSTS are stored in the database and are fully aware of blockchain reorgs.
+  
+  Note: POSTS are limited to accounts and assets but will be extended to 
+  currencies and goods on the goods store.  
+  
+* New feature.. Write COMMENTS to POSTS/BLOGS every account can leave a comment
+  on each Asset or Account POST.
+  
+* Added tests for most new functionality
+
+* Upcoming big feature PRIVATE ASSETS. This is partially coded in this release
+  also tests have been created. Expected for an upcoming hard fork. Allows for
+  strong control over orders and participants and to set different order fee
+  and trade fee which will be paid to the ASSET ISSUER.
