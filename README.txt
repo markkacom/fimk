@@ -11,7 +11,7 @@ FIM is different from NXT in the following ways:
 
 This README is based of the original NXT README.
 
-This is FIM version 0.3.4 which is based on NXT 1.3.5.
+This is FIM version 0.4.0 which is based on NXT 1.4.16.
 
 
 Running the FIM software:
