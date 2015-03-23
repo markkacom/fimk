@@ -2,6 +2,8 @@ package nxt.http.rpc;
 
 import nxt.Account;
 import nxt.Generator;
+import nxt.Nxt;
+import nxt.crypto.Crypto;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
@@ -22,7 +24,9 @@ public class GetAccount extends RPCCall {
     @Override
     public JSONStreamAware call(JSONObject arguments) throws ParameterException {
       
-        Account account = ParameterParser.getAccount(arguments);        
+        Account account = ParameterParser.getAccount(arguments);
+        boolean includeForging = "true".equalsIgnoreCase((String) arguments.get("includeForging"));
+        
         JSONObject response = JSONData.accountBalance(account);
         JSONData.putAccount(response, "account", account.getId());
         if (account != null) {
@@ -31,14 +35,23 @@ public class GetAccount extends RPCCall {
             }          
             response.put("description", account.getDescription());
             
-            Generator generator = Generator.getGenerator(account.getId());
-            if (generator == null) {
-                response.put("isForging", false);
+            if (account.getCurrentLeasingHeightFrom() != Integer.MAX_VALUE) {
+                response.put("leasingHeightFrom", account.getCurrentLeasingHeightFrom());
+                response.put("leasingHeightTo", account.getCurrentLeasingHeightTo());
+                response.put("height", Nxt.getBlockchain().getHeight());
+                response.put("lesseeIdRS", Crypto.rsEncode(account.getCurrentLesseeId()));
             }
-            else {
-                response.put("isForging", true);
-                response.put("deadline", generator.getDeadline());
-                response.put("hitTime", generator.getHitTime());
+            
+            if (includeForging) {
+                Generator generator = Generator.getGenerator(account.getId());
+                if (generator == null) {
+                    response.put("isForging", false);
+                }
+                else {
+                    response.put("isForging", true);
+                    response.put("deadline", generator.getDeadline());
+                    response.put("hitTime", generator.getHitTime());
+                }
             }
         }
         return response;      
