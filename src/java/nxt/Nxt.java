@@ -22,7 +22,7 @@ public final class Nxt {
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.4.0";
+    public static final String VERSION = "0.4.1";
 
     private static volatile Time time = new Time.EpochTime();
 
