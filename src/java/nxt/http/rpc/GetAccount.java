@@ -29,8 +29,17 @@ public class GetAccount extends RPCCall {
             if (account.getPublicKey() != null) {
                 response.put("publicKey", Convert.toHexString(account.getPublicKey()));              
             }          
-            response.put("description", account.getDescription());          
-            response.put("isForging", Generator.isAccountForging(account.getId()));
+            response.put("description", account.getDescription());
+            
+            Generator generator = Generator.getGenerator(account.getId());
+            if (generator == null) {
+                response.put("isForging", false);
+            }
+            else {
+                response.put("isForging", true);
+                response.put("deadline", generator.getDeadline());
+                response.put("hitTime", generator.getHitTime());
+            }
         }
         return response;      
     }  

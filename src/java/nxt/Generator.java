@@ -172,13 +172,13 @@ public final class Generator implements Comparable<Generator> {
         return generators.get(secretPhrase);
     }
     
-    public static boolean isAccountForging(long id) {
+    public static Generator getGenerator(long id) {
         for (Generator generator : getAllGenerators()) {
             if (generator.accountId == id) {
-                return true;
+                return generator;
             }
         }
-        return false;
+        return null;
     }    
 
     public static Collection<Generator> getAllGenerators() {
