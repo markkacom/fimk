@@ -1,6 +1,7 @@
 package nxt.http.websocket;
 
 import java.io.IOException;
+
 import nxt.http.API;
 import nxt.util.Logger;
 
@@ -105,22 +106,48 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
             MofoSocketServer.rpcCall(this, call_id, method, arguments);
         }
         else if ("subscribe".equals(op)) {
-            if (argv.size() < 2 || !(argv.get(1) instanceof String)) {
+            if (argv.size() < 2) {
                 Logger.logDebugMessage("WebSocket - invalid topic - "+message);
-                return;
-            }          
-
-            final String topic = (String) argv.get(1);
-            MofoSocketServer.subscribe(this, topic);
+            }
+            else {
+                if (argv.get(1) instanceof String) {
+                    MofoSocketServer.subscribe(this, (String) argv.get(1));
+                }
+                else if (argv.get(1) instanceof JSONArray) {
+                    for (Object topic : (JSONArray) argv.get(1)) {
+                        if (!(topic instanceof String)) {
+                            Logger.logDebugMessage("WebSocket - invalid topic - "+message);
+                            break;
+                        }
+                        MofoSocketServer.subscribe(this, (String) topic);
+                    }
+                }
+                else {
+                    Logger.logDebugMessage("WebSocket - invalid topic - "+message);
+                }
+            }
         }
         else if ("unsubscribe".equals(op)) {
-            if (argv.size() < 2 || !(argv.get(1) instanceof String)) {
+            if (argv.size() < 2) {
                 Logger.logDebugMessage("WebSocket - invalid topic - "+message);
-                return;
             }
-          
-            final String topic = (String) argv.get(1);            
-            MofoSocketServer.unsubscribe(this, topic);
+            else {
+                if (argv.get(1) instanceof String) {
+                    MofoSocketServer.unsubscribe(this, (String) argv.get(1));
+                }
+                else if (argv.get(1) instanceof JSONArray) {
+                    for (Object topic : (JSONArray) argv.get(1)) {
+                        if (!(topic instanceof String)) {
+                            Logger.logDebugMessage("WebSocket - invalid topic - "+message);
+                            break;
+                        }
+                        MofoSocketServer.unsubscribe(this, (String) topic);
+                    }
+                }
+                else {
+                    Logger.logDebugMessage("WebSocket - invalid topic - "+message);
+                }
+            }          
         }
         else {
             Logger.logDebugMessage("WebSocket - operation not supported '"+op+"' - "+message);
