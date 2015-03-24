@@ -22,6 +22,7 @@ import nxt.http.rpc.CallAPIFunction;
 import nxt.http.rpc.GetAccount;
 import nxt.http.rpc.GetAccountAssets;
 import nxt.http.rpc.GetAccountCurrencies;
+import nxt.http.rpc.GetAccountLessors;
 import nxt.http.rpc.GetAccountPosts;
 import nxt.http.rpc.GetAccounts;
 import nxt.http.rpc.GetActivity;
@@ -99,6 +100,8 @@ public class MofoSocketServer {
         rpcCalls.put("getAssetTrades", GetAssetTrades.instance);
         rpcCalls.put("getMyOpenOrders", GetMyOpenOrders.instance);
         rpcCalls.put("getBlockchainState", GetBlockchainState.instance);
+        rpcCalls.put("getAccountLessors", GetAccountLessors.instance);
+        
     }
     
     static void socketClosed(MofoWebSocketAdapter socket) {
