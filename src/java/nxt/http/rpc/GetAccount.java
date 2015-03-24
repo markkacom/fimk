@@ -39,7 +39,7 @@ public class GetAccount extends RPCCall {
                 response.put("leasingHeightFrom", account.getCurrentLeasingHeightFrom());
                 response.put("leasingHeightTo", account.getCurrentLeasingHeightTo());
                 response.put("height", Nxt.getBlockchain().getHeight());
-                response.put("lesseeIdRS", Crypto.rsEncode(account.getCurrentLesseeId()));
+                response.put("lesseeIdRS", Convert.rsAccount(account.getCurrentLesseeId()));
             }
             
             if (includeForging) {
