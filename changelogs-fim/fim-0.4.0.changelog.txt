@@ -6,7 +6,8 @@ For people looking for the installable FIMK client please check out our
 desktop client dubbed MofoWallet which can be found at our github repo which 
 is here https://github.com/fimkrypto/mofowallet/releases.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+ 
 
 FIMK 0.4.0 is based on NXT 1.4.13 (plus the critical parts of 1.4.16)
 
@@ -145,8 +146,8 @@ and FIMK will start when it's ready.
   the FIMK client (aka MofoWallet) has replaced it.
   
   If people want the old client back they can copy it back from the FIMK 0.3.3 
-  release. You should copy the entire `html` folder from 0.3.3 and move it to 
-  FIMK 0.4.0. Then in nxt.properties set `nxt.apiResourceBase=html/ui`.
+  release. You should copy the entire 'html' folder from 0.3.3 and move it to 
+  FIMK 0.4.0. Then in nxt.properties set 'nxt.apiResourceBase=html/ui'.
   
   We will no longer do work on the old client.
   
@@ -171,7 +172,7 @@ and FIMK will start when it's ready.
   be used as normal.
 
 * The old API server is turned off by default. If you need to access it you can
-  enable it in nxt.properties through `nxt.enableAPIServer=true`
+  enable it in nxt.properties through 'nxt.enableAPIServer=true'
   
 * A bridge exists in the callFunction RPC to call any old API method by name,
   the old API calls are accessed from memory so no need to actually run/start
@@ -276,7 +277,4 @@ and FIMK will start when it's ready.
   
 * Added tests for most new functionality
 
-* Upcoming big feature PRIVATE ASSETS. This is partially coded in this release
-  also tests have been created. Expected for an upcoming hard fork. Allows for
-  strong control over orders and participants and to set different order fee
-  and trade fee which will be paid to the ASSET ISSUER.
+* Upcoming big feature PRIVATE ASSETS.
