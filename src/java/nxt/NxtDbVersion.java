@@ -557,7 +557,7 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply(null);
             case 219:
-                apply("CALL FTL_REINDEX()");
+                apply(null);
             case 220:
                 apply("CREATE TABLE IF NOT EXISTS public_key (db_id IDENTITY, account_id BIGINT NOT NULL, "
                         + "public_key BINARY(32), height INT NOT NULL, FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)");
@@ -623,6 +623,10 @@ class NxtDbVersion extends DbVersion {
             case 250:
                 apply("CREATE INDEX IF NOT EXISTS trade_height_idx ON trade(height)");
             case 251:
+                apply("CALL FTL_CREATE_INDEX('PUBLIC', 'ACCOUNT', 'NAME,DESCRIPTION')");
+            case 252:
+                apply("CALL FTL_REINDEX()"); // dont forget to remove the previous "apply("CALL FTL_REINDEX()");" above !!
+            case 253:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
