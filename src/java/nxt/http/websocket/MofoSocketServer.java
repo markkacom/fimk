@@ -40,6 +40,7 @@ import nxt.http.rpc.GetComments;
 import nxt.http.rpc.GetForgingStats;
 import nxt.http.rpc.GetMyOpenOrders;
 import nxt.http.rpc.GetRecentTransactions;
+import nxt.http.rpc.Search;
 import nxt.peer.Peer;
 import nxt.util.Convert;
 import nxt.util.JSON;
@@ -101,6 +102,7 @@ public class MofoSocketServer {
         rpcCalls.put("getMyOpenOrders", GetMyOpenOrders.instance);
         rpcCalls.put("getBlockchainState", GetBlockchainState.instance);
         rpcCalls.put("getAccountLessors", GetAccountLessors.instance);
+        rpcCalls.put("search", Search.instance);
         
     }
     
