@@ -3,7 +3,6 @@ package nxt.http.rpc;
 import nxt.Account;
 import nxt.Generator;
 import nxt.Nxt;
-import nxt.crypto.Crypto;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
