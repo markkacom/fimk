@@ -1,5 +1,6 @@
 package nxt.http.websocket;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import nxt.Attachment.ColoredCoinsAskOrderCancellation;
 import nxt.Attachment.ColoredCoinsBidOrderCancellation;
 import nxt.Block;
 import nxt.Currency;
+import nxt.DigitalGoodsStore;
 import nxt.Nxt;
 import nxt.Order;
 import nxt.Order.Ask;
@@ -298,6 +300,27 @@ public class JSONData {
         json.put("lastUpdated", peer.getLastUpdated());
         if (peer.isBlacklisted()) {
             json.put("blacklistingCause", peer.getBlacklistingCause());
+        }
+        return json;
+    }
+
+    public static JSONObject goods(DigitalGoodsStore.Goods goods, boolean includeCounts) {
+        JSONObject json = new JSONObject();
+        json.put("goods", Convert.toUnsignedLong(goods.getId()));
+        json.put("name", goods.getName());
+        json.put("description", goods.getDescription());
+        json.put("quantity", goods.getQuantity());
+        json.put("priceNQT", String.valueOf(goods.getPriceNQT()));
+        putAccount(json, "seller", goods.getSellerId());
+        json.put("tags", goods.getTags());
+        JSONArray tagsJSON = new JSONArray();
+        Collections.addAll(tagsJSON, goods.getParsedTags());
+        json.put("parsedTags", tagsJSON);
+        json.put("delisted", goods.isDelisted());
+        json.put("timestamp", goods.getTimestamp());
+        if (includeCounts) {
+            json.put("numberOfPurchases", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), false, true));
+            json.put("numberOfPublicFeedbacks", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), true, true));
         }
         return json;
     }
