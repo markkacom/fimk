@@ -17,8 +17,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import nxt.Appendix.Message;
-import nxt.Attachment.AbstractAttachment;
-import nxt.TransactionType.Messaging;
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
 import nxt.util.Convert;
@@ -937,6 +935,30 @@ public final class MofoQueries {
             return response;        
         } 
         catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+    
+    public static DbIterator<? extends Alias> searchAlias(String query, int from, int to) {
+        Connection con = null;
+        try {
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM alias "
+                    + "WHERE alias_name_lower LIKE ? "
+                    + "ORDER BY alias_name_lower "
+                    +  DbUtils.limitsClause(from, to));
+            
+            int i = 0;
+            pstmt.setString(++i, query);
+            DbUtils.setLimits(++i, pstmt, from, to);
+            
+            System.out.println(pstmt.toString());
+            System.out.println("Query:"+ query+" from:"+from+" to:"+to);
+            
+            return Alias.getTable().getManyBy(con, pstmt, true);
+            
+        } catch (SQLException e) {
+            DbUtils.close(con);
             throw new RuntimeException(e.toString(), e);
         }
     }
