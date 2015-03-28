@@ -31,6 +31,10 @@ public final class Account {
         BALANCE, UNCONFIRMED_BALANCE, ASSET_BALANCE, UNCONFIRMED_ASSET_BALANCE, CURRENCY_BALANCE, UNCONFIRMED_CURRENCY_BALANCE,
         LEASE_SCHEDULED, LEASE_STARTED, LEASE_ENDED
     }
+    
+    public static DbIterator<Account> searchAccounts(String query, int from, int to) {
+        return accountTable.search(query, DbClause.EMPTY_CLAUSE, from, to, " ORDER BY ft.score DESC" /*, account.height DESC "*/);
+    }    
 
     public static class AccountAsset {
 
