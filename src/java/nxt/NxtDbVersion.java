@@ -625,7 +625,7 @@ class NxtDbVersion extends DbVersion {
             case 251:
                 apply("CALL FTL_CREATE_INDEX('PUBLIC', 'ACCOUNT', 'NAME,DESCRIPTION')");
             case 252:
-                apply("CALL FTL_REINDEX()"); // dont forget to remove the previous "apply("CALL FTL_REINDEX()");" above !!
+                apply("CALL FTL_REINDEX()");
             case 253:
                 return;
             default:
