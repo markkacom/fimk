@@ -952,9 +952,6 @@ public final class MofoQueries {
             pstmt.setString(++i, query);
             DbUtils.setLimits(++i, pstmt, from, to);
             
-            System.out.println(pstmt.toString());
-            System.out.println("Query:"+ query+" from:"+from+" to:"+to);
-            
             return Alias.getTable().getManyBy(con, pstmt, true);
             
         } catch (SQLException e) {
