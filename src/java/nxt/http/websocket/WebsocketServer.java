@@ -28,7 +28,7 @@ public final class WebsocketServer {
     private final static boolean enableWebsockets = Nxt.getBooleanProperty("nxt.enableWebsockets");
     private final static int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("nxt.websocketServerPort");
     private final static String host = Nxt.getStringProperty("nxt.websocketServerHost");
-    private static final boolean enableSSL = Nxt.getBooleanProperty("nxt.websocketSSL");
+    private static final boolean enableSSL = Nxt.getBooleanProperty("nxt.apiSSL");
     
     public static void init() {}
     
