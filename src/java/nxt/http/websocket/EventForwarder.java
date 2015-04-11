@@ -25,16 +25,20 @@ public final class EventForwarder {
 
     static Map<Long, List<Transaction>> groupTransactionsAccount(List<? extends Transaction> _transactions) {
         Map<Long, List<Transaction>> map = new HashMap<Long, List<Transaction>>();
-        for (Transaction transaction : _transactions) {                      
-            List<Transaction> recipient = map.get(Long.valueOf(transaction.getRecipientId()));
+        for (Transaction transaction : _transactions) {       
+            Long recipientKey = Long.valueOf(transaction.getRecipientId());
+            List<Transaction> recipient = map.get(recipientKey);
             if (recipient == null) {
                 recipient = new ArrayList<Transaction>();
+                map.put(recipientKey, recipient);
             }
             recipient.add(transaction);
           
-            List<Transaction> sender = map.get(Long.valueOf(transaction.getSenderId()));
+            Long senderKey = Long.valueOf(transaction.getSenderId());
+            List<Transaction> sender = map.get(senderKey);
             if (sender == null) {
-              sender = new ArrayList<Transaction>();
+                sender = new ArrayList<Transaction>();
+                map.put(senderKey, sender);
             }
             sender.add(transaction);
         }
@@ -44,15 +48,19 @@ public final class EventForwarder {
     static Map<Long, List<Trade>> groupTradesAccount(List<? extends Trade> trades) {
         Map<Long, List<Trade>> map = new HashMap<Long, List<Trade>>();
         for (Trade trade : trades) {                      
-            List<Trade> seller = map.get(Long.valueOf(trade.getSellerId()));
+            Long sellerKey = Long.valueOf(trade.getSellerId());
+            List<Trade> seller = map.get(sellerKey);
             if (seller == null) {
-              seller = new ArrayList<Trade>();
+                seller = new ArrayList<Trade>();
+                map.put(sellerKey, seller);
             }
             seller.add(trade);
           
-            List<Trade> buyer = map.get(Long.valueOf(trade.getBuyerId()));
+            Long buyerKey = Long.valueOf(trade.getBuyerId());
+            List<Trade> buyer = map.get(buyerKey);
             if (buyer == null) {
-              buyer = new ArrayList<Trade>();
+                buyer = new ArrayList<Trade>();
+                map.put(buyerKey, buyer);
             }
             buyer.add(trade);
         }
@@ -61,10 +69,12 @@ public final class EventForwarder {
     
     static Map<Long, List<Trade>> groupTradesAsset(List<? extends Trade> trades) {
         Map<Long, List<Trade>> map = new HashMap<Long, List<Trade>>();
-        for (Trade trade : trades) {                      
-            List<Trade> asset = map.get(Long.valueOf(trade.getAssetId()));
+        for (Trade trade : trades) {            
+            Long assetKey = Long.valueOf(trade.getAssetId());
+            List<Trade> asset = map.get(assetKey);
             if (asset == null) {
-              asset = new ArrayList<Trade>();
+                asset = new ArrayList<Trade>();
+                map.put(assetKey, asset);
             }
             asset.add(trade);
         }
