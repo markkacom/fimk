@@ -39,7 +39,30 @@ public class Search extends RPCCall {
         JSONArray results = new JSONArray();
         response.put("results", results);
         
+        if (query == null) {
+            return response;
+        }
+        
         if ("assets".equalsIgnoreCase(category)) {
+            
+            /* it might be an asset ID */
+            try {
+                long asset_id = Convert.parseUnsignedLong(query.substring(0, query.length()-1));
+                if (asset_id != 0) {
+                    Asset asset = Asset.getAsset(asset_id);
+                    if (asset != null) {
+                        JSONObject json = new JSONObject();
+                        json.put("name", asset.getName());
+                        json.put("decimals", asset.getDecimals());
+                        json.put("description", asset.getDescription());
+                        json.put("asset", Convert.toUnsignedLong(asset.getId()));
+                        json.put("accountRS", Convert.rsAccount(asset.getAccountId()));
+                      
+                        results.add(json);
+                    }
+                }
+            } catch (Exception e) {}
+          
             try (DbIterator<Asset> assets = Asset.searchAssets(query, firstIndex, lastIndex)) {
                 while (assets.hasNext()) {
                     Asset asset = assets.next();
@@ -55,6 +78,25 @@ public class Search extends RPCCall {
             }
         }
         else if ("accounts".equalsIgnoreCase(category)) {
+            
+            /* it might be an RS or unsigned long account ID */
+            try {
+                long account_id = Convert.parseAccountId(query.substring(0, query.length()-1));
+                if (account_id != 0) {
+                    Account account = Account.getAccount(account_id);
+                    if (account != null) {
+                        JSONObject json = new JSONObject();
+                        json.put("name", account.getName());
+                        json.put("balanceNQT", account.getBalanceNQT());
+                        json.put("effectiveNXT", account.getEffectiveBalanceNXT());
+                        json.put("description", account.getDescription());
+                        json.put("accountRS", Convert.rsAccount(account.getId()));
+                      
+                        results.add(json);                      
+                    }
+                }
+            } catch (Exception e) {}
+          
             try (DbIterator<Account> accounts = Account.searchAccounts(query, firstIndex, lastIndex)) {
                 while (accounts.hasNext()) {
                     Account account = accounts.next();
