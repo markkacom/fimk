@@ -2,7 +2,7 @@
 <html lang="en" ng-app="fim.base" ng-controller="appController">
   <head>
     <meta charset="utf-8">
-    <title>Mofo Wallet 0.4</title>
+    <title ng-bind="TITLE"></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>.ng-cloak { display:none; }</style>
@@ -13,6 +13,14 @@
       isNodeJS = false;
     }
     DEBUG = false;
+
+    if (("www.mofowallet.com" == window.location.host || 
+         "mofowallet.com" == window.location.host) && (window.location.protocol != "https:")) {
+      window.location.protocol = "https";
+    }
+    else if ("fimkrypto.github.io" == window.location.host) {
+      window.location = "https://www.mofowallet.com/launch.html" + window.location.hash;
+    }
     </script>
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -23,7 +31,7 @@
 
     <link type="text/css" rel="stylesheet" href="amstockchart/amcharts/style.css" />
     
-    <link rel="stylesheet" href="styles/main.48bdf420.css">
+    <link rel="stylesheet" href="styles/main.87bb3d45.css">
 
     <style>
       a[title="JavaScript charts"] {
@@ -43,7 +51,7 @@
         console.log('=========================================')
     </script>-->
 
-    <script src="scripts/scripts.2473a96e.js"></script>
+    <script src="scripts/scripts.e91d5316.js"></script>
 
     <!-- Nxt engine (extends system) -->
     <!--<script src="plugins/nxt-engine/config.js"></script>
@@ -63,7 +71,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-          <span class="sr-only" translate translate-cloak>Toggle navigation</span>
+          <span class="sr-only" translate="translate.toggle_navigation"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
@@ -93,25 +101,34 @@
           </li>
 
           <li route-active="activity/{{paramEngine}}/assets">
-            <a ng-href="#/activity/{{paramEngine}}/assets/latest"><i class="fa fa-line-chart"></i>&nbsp;&nbsp;Assets</a>
+            <a ng-href="#/activity/{{paramEngine}}/assets/latest"><i class="fa fa-line-chart"></i>&nbsp;&nbsp;{{'translate.assets' | translate}}</a>
           </li>          
         </ul>
-        <ul class="nav navbar-nav navbar-right" nav-menu="active">
-          
-          <!-- <li route-active="plugins">
-            <a href class="dropdown-toggle" data-toggle="dropdown">
-              <span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;{{'plugins' | translate}}&nbsp;<span class="caret"></span>
-            </a>
 
+        <ul class="nav navbar-nav navbar-right" nav-menu="active">
+          <!-- <li>
+            <form class="navbar-form navbar-left" role="search">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search" style="max-width: 250px" ng-model="search.query" ng-changed="search.changed($value)">
+              </div>
+            </form>
+          </li>
+          <li class="dropdown">
+            <a href class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+              <i class="fa fa-search"></i>&nbsp;<span class="caret"></span>
+            </a>
             <ul class="dropdown-menu" role="menu">
-              <li route-active>
-                <a ng-href="#/plugins/faucet">{{'faucet' | translate}}</a> 
-              </li>
-              <li route-active>
-                <a ng-href="#/plugins/masspay">Mass Payment</a> 
+              <li ng-repeat="p in search.providers">
+                <a href ng-click="p.search()">{{p.label}}</a>
               </li>
             </ul>
           </li> -->
+
+          <li>
+            <a href="#/search/fim/accounts/">
+              <i class="fa fa-search"></i>&nbsp;&nbsp;{{'translate.search' | translate}}
+            </a>
+          </li>          
 
           <li style="margin-right: 10px" route-active="settings">
             <a href class="dropdown-toggle" data-toggle="dropdown">
@@ -120,7 +137,11 @@
 
             <ul class="dropdown-menu" role="menu">
               <li route-active>
-                <a ng-href="#/settings/themes"><span class="glyphicon glyphicon-fire"></span>&nbsp;&nbsp;{{'themes' | translate}}</a> 
+                <a ng-href="#/settings/themes"><span class="glyphicon glyphicon-fire"></span>&nbsp;&nbsp;{{'translate.themes' | translate}}</a> 
+              </li>
+              <!-- only displayed when running as front end for FIMK server package-->
+              <li route-active ng-if="forceLocalHost && !enableDualEngines">
+                <a ng-href="#/server/fim/peers"><i class="fa fa-globe"></i>&nbsp;&nbsp;{{'translate.peers' | translate}}</a> 
               </li>
               <li route-active ng-if="isNodeJS">
                 <a ng-href="#/server/fim/console"><span class="glyphicon glyphicon-hdd"></span>&nbsp;&nbsp;{{'translate.fim_server' | translate}}</a> 
@@ -129,33 +150,39 @@
                 <a ng-href="#/server/nxt/console"><span class="glyphicon glyphicon-hdd"></span>&nbsp;&nbsp;{{'translate.nxt_server' | translate}}</a>
               </li>              
               <li route-active>
-                <a ng-href="#/settings/wallet"><span class="glyphicon glyphicon-briefcase"></span>&nbsp;&nbsp;{{'wallet' | translate}}</a> 
+                <a ng-href="#/settings/wallet"><span class="glyphicon glyphicon-briefcase"></span>&nbsp;&nbsp;{{'translate.wallet' | translate}}</a> 
               </li>
               <li route-active>
-                <a ng-href="#/settings/contacts"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{'contacts' | translate}}</a> 
+                <a ng-href="#/settings/contacts"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{'translate.contacts' | translate}}</a> 
               </li>
               <li route-active>
-                <a ng-href="#/settings/database"><span class="glyphicon glyphicon-tasks"></span>&nbsp;&nbsp;{{'database' | translate}}</a> 
+                <a ng-href="#/settings/database"><span class="glyphicon glyphicon-tasks"></span>&nbsp;&nbsp;{{'translate.database' | translate}}</a> 
               </li>
               <li route-active ng-show="false">
-                <a ng-href="#/settings/nodes"><span class="glyphicon glyphicon-tree-deciduous"></span>&nbsp;&nbsp;{{'public_nodes' | translate}}</a> 
+                <a ng-href="#/settings/nodes"><span class="glyphicon glyphicon-tree-deciduous"></span>&nbsp;&nbsp;{{'translate.public_nodes' | translate}}</a> 
               </li>
               <li ng-if="isNodeJS">
                 <a href ng-click="openDevTools()">
-                  <span class="glyphicon glyphicon-dashboard"></span>&nbsp;&nbsp;{{'dev_tools' | translate}}
+                  <span class="glyphicon glyphicon-dashboard"></span>&nbsp;&nbsp;{{'translate.dev_tools' | translate}}
                 </a> 
               </li>
               <li ng-if="isNodeJS">
-                <a href ng-click="reloadMofoWallet()"><span class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;{{'reload_application' | translate}}</a> 
+                <a href ng-click="reloadMofoWallet()"><span class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;{{'translate.reload_application' | translate}}</a> 
               </li>
             </ul>
           </li> 
 
           <li style="margin-right: 10px" ng-if="multiLanguage">
             <a href class="dropdown-toggle" data-toggle="dropdown">
-              <i class="fa fa-globe text-danger"></i>&nbsp;&nbsp;{{'language'|translate}}&nbsp;<span class="caret"></span>
+              <i class="fa fa-globe text-danger"></i>&nbsp;&nbsp;{{'translate.language'|translate}}&nbsp;<span class="caret"></span>
             </a>
             <ul class="dropdown-menu lang-columns" role="menu">
+              <li><a ><b class="text-warning"><i class="fa fa-exclamation-triangle"></i></b><b class="text-danger">&nbsp;&nbsp;Experimental!</b></a></li>
+              <li>
+                <a href="#/translation/en">
+                  <b class="text-primary"><i class="fa fa-users"></i></b><b class="text-success">&nbsp;&nbsp;Help Translate.</b>
+                </a>
+              </li>
               <li><a href ng-click="setLang('af')">Afrikaans - ({{'lang.Afrikaans'|translate}})</a></li>
               <li><a href ng-click="setLang('sq')">Shqip - ({{'lang.Albanian'|translate}})</a></li>
               <li><a href ng-click="setLang('ar')">العربية - ({{'lang.Arabic'|translate}})</a></li>
@@ -171,11 +198,11 @@
               <li><a href ng-click="setLang('cs')">čeština, český jazyk - ({{'lang.Czech'|translate}})</a></li>
               <li><a href ng-click="setLang('da')">dansk - ({{'lang.Danish'|translate}})</a></li>
               <li><a href ng-click="setLang('nl')">Nederlands - ({{'lang.Dutch'|translate}})</a></li>
-              <li><a href ng-click="setLang('en')">English - ({{'lang.English'|translate}})</a></li>
+              <li><a href ng-click="setLang('en')"><b>English - ({{'lang.English'|translate}})</b></a></li>
               <li><a href ng-click="setLang('eo')">Esperanto - ({{'lang.Esperanto'|translate}})</a></li>
               <li><a href ng-click="setLang('et')">eesti - ({{'lang.Estonian'|translate}})</a></li>
               <li><a href ng-click="setLang('tl')">Wikang Filipino - ({{'lang.Filipino'|translate}})</a></li>
-              <li><a href ng-click="setLang('fi')">Suomi - ({{'lang.Finnish'|translate}})</a></li>
+              <li><a href ng-click="setLang('fi')"><b>Suomi - ({{'lang.Finnish'|translate}})</b></a></li>
               <li><a href ng-click="setLang('fr')">Français - ({{'lang.French'|translate}})</a></li>
               <li><a href ng-click="setLang('gl')">Galego - ({{'lang.Galician'|translate}})</a></li>
               <li><a href ng-click="setLang('ka')">ქართული - ({{'lang.Georgian'|translate}})</a></li>
@@ -219,7 +246,7 @@
               <li><a href ng-click="setLang('ur')">اردو - ({{'lang.Urdu'|translate}})</a></li>
               <li><a href ng-click="setLang('vi')">Việtnam - ({{'lang.Vietnamese'|translate}})</a></li>
               <li><a href ng-click="setLang('cy')">Cymraeg - ({{'lang.Welsh'|translate}})</a></li>
-              <li><a href ng-click="setLang('yi')">ייִדיש - ({{'lang.Yiddish'|translate}})</a></li>                
+              <li><a href ng-click="setLang('yi')">ייִדיש - ({{'lang.Yiddish'|translate}})</a></li>
             </ul>
           </li>           
         </ul>

@@ -19,17 +19,17 @@
                 </div>
                 <div class="form-control-static">
                   <label class="control-label text-muted" translate translate-cloak>translate.block_rewards_today</label>
-                  <div ng-if="!statistics['TYPE_FIM'].isLoading">{{statistics['TYPE_FIM'].rewardsToday}} {{symbol}}</div>
+                  <div ng-if="!statistics['TYPE_FIM'].isLoading">{{statistics['TYPE_FIM'].rewardsToday}} FIM</div>
                   <div ng-if="statistics['TYPE_FIM'].isLoading" class="text-muted"><small><i class="fa fa-refresh fa-spin"></i></small></div>
                 </div>
                 <div class="form-control-static">
                   <label class="control-label text-muted" translate translate-cloak>translate.block_rewards_week</label>
-                  <div ng-if="!statistics['TYPE_FIM'].isLoading">{{statistics['TYPE_FIM'].rewardsWeek}} {{symbol}}</div>
+                  <div ng-if="!statistics['TYPE_FIM'].isLoading">{{statistics['TYPE_FIM'].rewardsWeek}} FIM</div>
                   <div ng-if="statistics['TYPE_FIM'].isLoading" class="text-muted"><small><i class="fa fa-refresh fa-spin"></i></small></div>
                 </div>
                 <div class="form-control-static">
                   <label class="control-label text-muted" translate translate-cloak>translate.block_rewards_month</label>
-                  <div ng-if="!statistics['TYPE_FIM'].isLoading">{{statistics['TYPE_FIM'].rewardsMonth}} {{symbol}}</div>
+                  <div ng-if="!statistics['TYPE_FIM'].isLoading">{{statistics['TYPE_FIM'].rewardsMonth}} FIM</div>
                   <div ng-if="statistics['TYPE_FIM'].isLoading" class="text-muted"><small><i class="fa fa-refresh fa-spin"></i></small></div>
                 </div>
                 <div class="form-control-static">
@@ -70,17 +70,17 @@
                 </div>
                 <div class="form-control-static">
                   <label class="control-label text-muted" translate translate-cloak>translate.block_rewards_today</label>
-                  <div ng-if="!statistics['TYPE_NXT'].isLoading">{{statistics['TYPE_NXT'].rewardsToday}} {{symbol}}</div>
+                  <div ng-if="!statistics['TYPE_NXT'].isLoading">{{statistics['TYPE_NXT'].rewardsToday}} NXT</div>
                   <div ng-if="statistics['TYPE_NXT'].isLoading" class="text-muted"><small><i class="fa fa-refresh fa-spin"></i></small></div>
                 </div>
                 <div class="form-control-static">
                   <label class="control-label text-muted" translate translate-cloak>translate.block_rewards_week</label>
-                  <div ng-if="!statistics['TYPE_NXT'].isLoading">{{statistics['TYPE_NXT'].rewardsWeek}} {{symbol}}</div>
+                  <div ng-if="!statistics['TYPE_NXT'].isLoading">{{statistics['TYPE_NXT'].rewardsWeek}} NXT</div>
                   <div ng-if="statistics['TYPE_NXT'].isLoading" class="text-muted"><small><i class="fa fa-refresh fa-spin"></i></small></div>
                 </div>
                 <div class="form-control-static">
                   <label class="control-label text-muted" translate translate-cloak>translate.block_rewards_month</label>
-                  <div ng-if="!statistics['TYPE_NXT'].isLoading">{{statistics['TYPE_NXT'].rewardsMonth}} {{symbol}}</div>
+                  <div ng-if="!statistics['TYPE_NXT'].isLoading">{{statistics['TYPE_NXT'].rewardsMonth}} NXT</div>
                   <div ng-if="statistics['TYPE_NXT'].isLoading" class="text-muted"><small><i class="fa fa-refresh fa-spin"></i></small></div>
                 </div>
                 <div class="form-control-static">
@@ -287,7 +287,7 @@
             <span ng-if="b.period">
               <span translate translate-cloak>translate.show_results_before</span>&nbsp;<b>{{paramPeriod}}</b>
               <a href="#/activity/{{paramEngine}}/{{paramSection}}/latest">
-                <i class="fa fa-times"></i>&nbsp;<span translate translate-cloak>translate.show_latest</span>
+                <i class="fa fa-times"></i>&nbsp;<span translate="translate.show_latest"></span>
               </a>
             </span>
           </li>
@@ -321,7 +321,7 @@
                 </tbody>
               </table>
             </div>
-            <div class="load-more-button" ng-show="provider.hasMore">
+            <div class="load-more-button">
               <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
                 <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
                 <span translate-cloak>{{ 'translate.load_more_activities' | translate }}</span>
@@ -423,7 +423,7 @@
             <div class="load-more-button" ng-show="provider.hasMore">
               <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
                 <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-                <span translate-cloak>{{ 'translate.load_more_assets' | translate }}</span>
+                <span translate="translate.load_more_assets"></span>
               </a>
             </div>            
           </div>

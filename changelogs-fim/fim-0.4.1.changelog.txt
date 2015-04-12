@@ -1,0 +1,21 @@
+This is the FIMK server package, while you can run this on your computer it's
+not intended as such. Users of the FIMK server package generally install it 
+on a server.
+
+For people looking for the installable FIMK client please check out our 
+desktop client dubbed MofoWallet which can be found at our github repo which 
+is here https://github.com/fimkrypto/mofowallet/releases.
+
+http://fimkchat.com/2015/04/fimk-server-0-4-1-available-in-64-languages-baby/
+ 
+
+FIMK 0.4.1 is based on NXT 1.4.13 (plus the critical parts of 1.4.16)
+
+This release contains many bug fixes in both client and server. 
+
+1. Many bugs fixed
+2. Free text (instant) blockchain search
+3. Client translated in 64 languages
+4. Built into the client crowd-translator tool
+5. New Payments module that allows for sending many payments at once 
+  (basic income, dividends etc..)

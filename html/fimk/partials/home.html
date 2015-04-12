@@ -3,10 +3,10 @@
     <ul class="nav navbar-stacked">
 
       <li ng-if="enableDualEngines">
-        <a ng-href="#/home/fim/activity/latest" translate-cloak>{{ 'home.dashboard' | translate:"{symbol:'FIM'}" }}</a>
+        <a ng-href="#/home/fim/activity/latest" translate-cloak>{{ 'translate.dashboard' | translate:"{symbol:'FIM'}" }}</a>
       </li>
       <li ng-if="enableDualEngines">
-        <a ng-href="#/home/nxt/activity/latest" translate-cloak>{{ 'home.dashboard' | translate:"{symbol:'NXT'}" }}</a>
+        <a ng-href="#/home/nxt/activity/latest" translate-cloak>{{ 'translate.dashboard' | translate:"{symbol:'NXT'}" }}</a>
       </li>
       <li ng-if="enableDualEngines">
         <hr class="stacked-divider">
@@ -52,11 +52,11 @@
             <form class="navbar-form" role="search">
               <div class="form-group">
                 <span class="form-control-static">
-                  <label class="control-label" translate translate-cloak>activity.period</label>
+                  <label class="control-label" translate="translate.period"></label>
                   <div class="input-group">
                     <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt" is-open="opened" min-date="minDate" 
                         max-date="maxDate" datepicker-options="dateOptions" ng-required="true" translate-cloak 
-                        close-text="{{ 'home.close' | translate }}" placeholder="{{'home.period' | translate}}"/>
+                        close-text="{{ 'translate.close' | translate }}" placeholder="{{'translate.period' | translate}}"/>
                     <span class="input-group-btn">
                       <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -69,63 +69,60 @@
           <li ng-show="showTransactionFilter">
             <form class="navbar-form" role="search">
               <div class="form-group" style="width:100%">
-                <label class="control-label" translate translate-cloak>home.transaction_type</label>
+                <label class="control-label" translate="translate.transaction_type"></label>
                 <span class="form-control-static">
                   <div class="panel panel-default">
-                    <!-- <div class="panel-heading">
-                      <h3 class="panel-title">{{ 'home.transaction_type' | translate }}</h3>
-                    </div> -->
                     <div class="panel-body">
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.all" ng-change="filterAllChanged()">
-                          {{ 'home.filter.all' | translate }}</label>
+                          {{ 'filter.all' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.payments" ng-change="filterChanged()">
-                          {{ 'home.filter.payments' | translate }}</label>
+                          {{ 'filter.payments' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.messages" ng-change="filterChanged()">
-                          {{ 'home.filter.messages' | translate }}</label>
+                          {{ 'filter.messages' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.aliases" ng-change="filterChanged()">
-                          {{ 'home.filter.aliases' | translate }}</label>
+                          {{ 'filter.aliases' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.namespacedAliases" ng-change="filterChanged()">FIMKrypto</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.accountInfo" ng-change="filterChanged()">
-                          {{ 'home.filter.account_info' | translate }}</label>
+                          {{ 'filter.account_info' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.announceHub" ng-change="filterChanged()">
-                          {{ 'home.filter.announce_hub' | translate }}</label>
+                          {{ 'filter.announce_hub' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.polls" ng-change="filterChanged()">
-                          {{ 'home.filter.polls' | translate }}</label>
+                          {{ 'filter.polls' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.goodsStore" ng-change="filterChanged()">
-                          {{ 'home.filter.goods_store' | translate }}</label>
+                          {{ 'filter.goods_store' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.balanceLeasing" ng-change="filterChanged()">
-                          {{ 'home.filter.balanace_leasing' | translate }}</label>
+                          {{ 'filter.balanace_leasing' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.assetIssued" ng-change="filterChanged()">
-                          {{ 'home.filter.asset_issued' | translate }}</label>
+                          {{ 'filter.asset_issued' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.assetTransfer" ng-change="filterChanged()">
-                          {{ 'home.filter.asset_transfer' | translate }}</label>
+                          {{ 'filter.asset_transfer' | translate }}</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.assetOrder" ng-change="filterChanged()">
-                          {{ 'home.filter.asset_order' | translate }}</label>
+                          {{ 'filter.asset_order' | translate }}</label>
                       </div>
                     </div>
                   </div>
@@ -161,17 +158,17 @@
               <span ng-if="!b.href">{{ b.label }}</span>              
             </span>
             <span ng-if="b.period">
-              <span translate translate-cloak>home.show_results_before</span>&nbsp;<b>{{paramPeriod}}</b>
+              <span translate="translate.show_results_before"></span>&nbsp;<b>{{paramPeriod}}</b>
               <a href="#/home/{{paramEngine}}/{{paramSection}}/latest">
                 <small>
-                  <i class="fa fa-times"></i>&nbsp;<span translate translate-cloak>home.show_latest</span>
+                  <i class="fa fa-times"></i>&nbsp;<span translate="translate.show_latest"></span>
                 </small>
               </a>
             </span>
           </li>
 
           <a href ng-click="provider.reload()" class="pull-right">
-            {{ 'home.reload' | translate }}&nbsp;&nbsp;
+            {{ 'translate.reload' | translate }}&nbsp;&nbsp;
             <i class="fa fa-refresh" ng-class="{'fa-spin': provider.isLoading}"></i>
           </a>
         </ol>

@@ -1,4 +1,4 @@
-<div class="panel panel-primary">
+<div class="panel panel-primary" ng-init="items.initialize && items.initialize(items)">
   <div class="panel-heading">
     <h3 class="panel-title" ng-bind="items.title"></h3>
   </div>
@@ -26,7 +26,7 @@
           <div ng-if="items.editSender" class="input-group">
             <input class="form-control" ng-model="items.senderRS" type="text" 
                  required ui-validate=" 'validateAddress($value)' " ui-validate-watch=" 'items.senderRS' "
-                 name="senderField">
+                 name="senderField" ng-change="items.onRecipientChange && items.onRecipientChange(items)">
             <div class="input-group-btn">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
               <ul class="dropdown-menu dropdown-menu-right" role="menu">
@@ -44,21 +44,22 @@
 
       <!-- Show static recipient control -->
       <div class="form-group col-xs-12" ng-if="items.canHaveRecipient"
-           ng-class="{ 'has-error' : transactionCreateForm.recipientField.$invalid && ! transactionCreateForm.recipientField.$pristine }">
+           ng-class="{ 'has-error' : transactionCreateForm.recipientField.$invalid && ! transactionCreateForm.recipientField.$pristine }"
+           ng-init="items.onRecipientChange && iems.onRecipientChange(items)">
         <span class="form-control-static">
-          <label class="control-label">Recipient</label>
+          <label class="control-label" translate="translate.recipient"></label>
           <span ng-if="!items.editRecipient" class="form-control">
             <b>{{items.recipient}}</b>
           </span>
           <div ng-if="items.editRecipient" class="input-group">
             <input class="form-control" ng-model="items.recipient" type="text" 
                  required ui-validate=" 'validateAddress($value)' " ui-validate-watch=" 'items.recipient' "
-                 name="recipientField">
+                 name="recipientField" ng-change="items.onRecipientChange && items.onRecipientChange(items)">
             <div class="input-group-btn">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
               <ul class="dropdown-menu dropdown-menu-right" role="menu">
                 <li ng-repeat="a in items.accounts" class="input">
-                  <a href ng-click="items.recipient = a.id_rs">
+                  <a href ng-click="(items.recipient = a.id_rs) && (items.onRecipientChange && iems.onRecipientChange(items))">
                     <span style="font-family: monospace !important;">{{a.id_rs}}&nbsp;&nbsp;</span>
                     <span ng-if="a.name" class="badge"><b>{{a.name}}</b></span>
                   </a>
@@ -68,6 +69,30 @@
           </div>
         </span>
       </div>
+
+      <!-- Show static asset control -->
+      <div class="form-group col-xs-12" ng-if="items.editAsset" 
+           ng-init="items.onAssetChange && items.onAssetChange(items)"
+           ng-class="{ 'has-error' : transactionCreateForm.assetField.$invalid && ! transactionCreateForm.assetField.$pristine }">
+        <span class="form-control-static">
+          <label class="control-label" translate="translate.asset"></label>
+          <div class="input-group">
+            <input class="form-control" ng-model="items.asset" type="text" 
+                 required name="assetField" ng-change="items.onAssetChange && items.onAssetChange(items)">
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+              <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li ng-repeat="a in items.assets" class="input">
+                  <a href ng-click="(items.asset = a.asset) && (items.onAssetChange && items.onAssetChange(items))">
+                    <span style="font-family: monospace !important;">{{a.asset}}&nbsp;&nbsp;</span>
+                    <span ng-if="a.name" class="badge"><b>{{a.name}}</b></span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </span>
+      </div>      
 
       <div ng-repeat="f in items.fields" ng-show="f.__show">
         <ng-form name="userFieldForm">

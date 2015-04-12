@@ -1,12 +1,12 @@
 <div ng-init="offCanvas=false" class="row row-offcanvas row-offcanvas-left" ng-class="{active: offCanvas}">
   <div class="col-xs-6 col-sm-2 sidebar-offcanvas" id="sidebar">
     <ul class="nav navbar-stacked">
-      <li route-active="server/fim/console">
+      <li route-active="server/fim/console" ng-if="!forceLocalHost">
         <a href="#/server/fim/console">
           <i class="fa fa-desktop"></i>&nbsp;&nbsp;FIMK console
         </a>
       </li>  
-      <li route-active="server/fim/config">
+      <li route-active="server/fim/config" ng-if="!forceLocalHost">
         <a href="#/server/fim/config">
           <i class="fa fa-file-text-o"></i>&nbsp;&nbsp;FIMK config
         </a>
@@ -16,12 +16,12 @@
           <i class="fa fa-globe"></i>&nbsp;&nbsp;FIMK peers
         </a>
       </li>
-      <li ng-show="!isRunning['TYPE_FIM']">
+      <li ng-show="!isRunning['TYPE_FIM']" ng-if="!forceLocalHost">
         <a href ng-click="startServer('TYPE_FIM')">
           Start server
         </a>
       </li>
-      <li ng-show="isRunning['TYPE_FIM']">
+      <li ng-show="isRunning['TYPE_FIM']" ng-if="!forceLocalHost">
         <a href ng-click="stopServer('TYPE_FIM')">
           Stop server
         </a>
@@ -100,10 +100,10 @@
               <span ng-if="!b.href">{{ b.label }}</span>              
             </span>
             <span ng-if="b.period">
-              <span translate="home.show_results_before"></span>&nbsp;<b>{{paramPeriod}}</b>
+              <span translate="translate.show_results_before"></span>&nbsp;<b>{{paramPeriod}}</b>
               <a href="#/home/{{paramEngine}}/{{paramSection}}/latest">
                 <small>
-                  <i class="fa fa-times"></i>&nbsp;<span translate="home.show_latest"></span>
+                  <i class="fa fa-times"></i>&nbsp;<span translate="translate.show_latest"></span>
                 </small>
               </a>
             </span>

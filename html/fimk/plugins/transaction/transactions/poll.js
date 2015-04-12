@@ -1,2 +1,0 @@
-// create poll
-// cast vote

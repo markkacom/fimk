@@ -79,6 +79,12 @@
               <i class="fa fa-shopping-cart"></i>&nbsp;&nbsp;<span translate="translate.buy_orders"/>
             </a>
           </li>
+          <!-- mass pay -->
+          <li role="presentation" route-active="accounts/{{id_rs}}/payments">
+            <a ng-href="#/accounts/{{id_rs}}/payments/latest" role="menuitem">
+              <i class="fa fa-diamond"></i>&nbsp;&nbsp;<span translate="translate.payments"/>
+            </a>
+          </li>          
         </ul>
       </li>
       <li>
@@ -104,12 +110,12 @@
             <form class="navbar-form" role="search">
               <div class="form-group">
                 <span class="form-control-static">
-                  <label class="control-label" translate="activity.period"></label>
+                  <label class="control-label" translate="translate.period"></label>
                   <div class="input-group">
                     <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt" is-open="opened" 
                         min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" 
                         translate-cloak 
-                        close-text="{{ 'home.close' | translate }}" placeholder="{{'home.period' | translate}}"/>
+                        close-text="{{ 'translate.close' | translate }}" placeholder="{{'translate.period' | translate}}"/>
                     <span class="input-group-btn">
                       <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -121,77 +127,77 @@
           <li ng-show="showTransactionFilter">
             <form class="navbar-form" role="search">
               <div class="form-group" style="width:100%">
-                <label class="control-label" translate="home.transaction_type"></label>
+                <label class="control-label" translate="translate.transaction_type"></label>
                 <span class="form-control-static">
                   <div class="panel panel-default">
                     <div class="panel-body">
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.all" ng-change="filterAllChanged()">
-                          <span translate="home.filter.all"/></label>
+                          <span translate="filter.all"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.payments" ng-change="filterChanged()">
-                          <span translate="home.filter.payments"/></label>
+                          <span translate="filter.payments"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.messages" ng-change="filterChanged()">
-                          <span translate="home.filter.messages"/></label>
+                          <span translate="filter.messages"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.aliases" ng-change="filterChanged()">
-                          <span translate="home.filter.aliases"/></label>
+                          <span translate="filter.aliases"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.namespacedAliases" ng-change="filterChanged()">FIMKrypto</label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.accountInfo" ng-change="filterChanged()">
-                          <span translate="home.filter.account_info"/></label>
+                          <span translate="filter.account_info"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.announceHub" ng-change="filterChanged()">
-                          <span translate="home.filter.announce_hub"/></label>
+                          <span translate="filter.announce_hub"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.polls" ng-change="filterChanged()">
-                          <span translate="home.filter.polls"/></label>
+                          <span translate="filter.polls"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.goodsStore" ng-change="filterChanged()">
-                          <span translate="home.filter.goods_store"/></label>
+                          <span translate="filter.goods_store"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.balanceLeasing" ng-change="filterChanged()">
-                          <span translate="home.filter.balanace_leasing"/></label>
+                          <span translate="filter.balanace_leasing"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.trades" ng-change="filterChanged()">
-                          <span translate="home.filter.trades"/></label>
+                          <span translate="filter.trades"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.assetIssued" ng-change="filterChanged()">
-                          <span translate="home.filter.asset_issued"/></label>
+                          <span translate="filter.asset_issued"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.assetTransfer" ng-change="filterChanged()">
-                          <span translate="home.filter.asset_transfer"/></label>
+                          <span translate="filter.asset_transfer"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.assetOrder" ng-change="filterChanged()">
-                          <span translate="home.filter.asset_order"/></label>
+                          <span translate="filter.asset_order"/></label>
                       </div>
                       <!-- Currency -->
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.currencyIssued" ng-change="filterChanged()">
-                          <span translate="home.filter.currency_issued"/></label>
+                          <span translate="filter.currency_issued"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.currencyTransfer" ng-change="filterChanged()">
-                          <span translate="home.filter.currency_transfer"/></label>
+                          <span translate="filter.currency_transfer"/></label>
                       </div>
                       <div class="checkbox">
                         <label><input type="checkbox" ng-model="filter.currencyOther" ng-change="filterChanged()">
-                          <span translate="home.filter.currency_other"/></label>
+                          <span translate="filter.currency_other"/></label>
                       </div>    
                     </div>
                   </div>
@@ -229,7 +235,7 @@
               <span ng-if="!b.href">{{ b.label | translate }}</span>              
             </span>
             <span ng-if="b.period">
-              <span translate="home.show_results_before"></span>&nbsp;<b>{{paramPeriod}}</b>
+              <span translate="translate.show_results_before"></span>&nbsp;<b>{{paramPeriod}}</b>
               <a href="#/accounts/{{id_rs}}/{{paramSection}}/latest">
                 <small>
                   <i class="fa fa-times"></i>&nbsp;<span translate="home.show_latest"></span>
@@ -239,20 +245,17 @@
           </li>
 
           <a href ng-click="provider.reload()" class="pull-right">
-            <span translate="home.reload"/>&nbsp;&nbsp;
+            <span translate="translate.reload"/>&nbsp;&nbsp;
             <i class="fa fa-refresh" ng-class="{'fa-spin': provider.isLoading}"></i>
           </a>
         </ol>
       </div>
     </div>
-    <div class="row" ng-if="paramSection!='pulse'">
+    <div class="row">
       <div class="col-md-6">
         <div class="media">
           <a class="pull-left" style="width: 100px">
             <i class="fa fa-user fa-5x text-muted"></i>
-            <div class="pull-right">
-              <span ng-if="account.isForging" tooltip="Account is forging"><i class="fa fa-circle-o-notch fa-spin"></i></span>
-            </div>            
           </a>
           <div class="media-body" style="min-height: 120px">
             <h4 class="media-heading">{{account.name||id_rs}}<small ng-if="account.name"><br>{{id_rs}}</small></h4>
@@ -265,7 +268,19 @@
           <table class="table table-condensed">
             <tr><td>Balance</td><td><b>{{account.balanceNXT}}</b></td><td colspan="2"><a ng-href="#/accounts/{{id_rs}}/activity/latest">{{id_rs}}</a></td></tr>
             <tr><td>Forged</td><td>{{account.forgedBalanceNXT}}</td><td>Effective</td><td>{{account.effectiveBalanceNXT}}</td></tr>
-            <tr><td>Guranteed</td><td>{{account.guaranteedBalanceNXT}}</td><td>Unconfirmed</td><td>{{account.unconfirmedBalanceNXT}}</td></tr>
+            <tr><td>Guaranteed</td><td>{{account.guaranteedBalanceNXT}}</td><td>Unconfirmed</td><td>{{account.unconfirmedBalanceNXT}}</td></tr>
+            <tr ng-if="account.lesseeIdRS">
+              <td>Lease</td>
+              <td>{{account.leaseRemaining}} remain</td>
+              <td colspan="2">
+                <a href="#/accounts/{{account.lesseeIdRS}}/leasing/latest">{{account.lesseeIdRS}}</a>
+              </td>
+            </tr>
+            <tr ng-if="forger.isForging">
+              <td>Forging</td>
+              <td><i class="fa fa-circle-o-notch fa-spin text-success"></i></td>
+              <td colspan="2">Expected to forge block in {{forger.remaining}}&nbsp;|&nbsp;<a ng-href="#/accounts/{{id_rs}}/blocks/latest">history</a></td>
+            </tr>            
             <tr>
               <td colspan="2"><a href ng-click="sendMoney()">Send me {{symbol}}</a></td>
               <td colspan="2"><a href ng-click="sendMessage()">Send me a message</a></td>
@@ -281,35 +296,6 @@
         <!-- Pulse -->
 
         <div ng-if="paramSection=='pulse'">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="media">
-                <a class="pull-left" style="width: 100px">
-                  <i class="fa fa-user fa-5x text-muted"></i>
-                  <div class="pull-right">
-                    <span ng-if="account.isForging" tooltip="Account is forging"><i class="fa fa-circle-o-notch fa-spin"></i></span>
-                  </div>
-                </a>
-                <div class="media-body" style="min-height: 120px">
-                  <h4 class="media-heading">{{account.name||id_rs}}<small ng-if="account.name">&nbsp;&nbsp;|&nbsp;&nbsp;{{id_rs}}</small></h4>
-                  <p>{{account.description}}<span ng-if="!account.description">no description</span></p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div>
-                <table class="table table-condensed">
-                  <tr><td>Balance</td><td><b>{{account.balanceNXT}}</b></td><td colspan="2"><a ng-href="#/accounts/{{id_rs}}/activity/latest">{{id_rs}}</a></td></tr>
-                  <tr><td>Forged</td><td>{{account.forgedBalanceNXT}}</td><td>Effective</td><td>{{account.effectiveBalanceNXT}}</td></tr>
-                  <tr><td>Guranteed</td><td>{{account.guaranteedBalanceNXT}}</td><td>Unconfirmed</td><td>{{account.unconfirmedBalanceNXT}}</td></tr>
-                  <tr>
-                    <td colspan="2"><a href ng-click="sendMoney()">Send me {{symbol}}</a></td>
-                    <td colspan="2"><a href ng-click="sendMessage()">Send me a message</a></td>
-                  </tr>                  
-                </table>
-              </div>
-            </div>
-          </div>
           <div class="row">
             <div class="col-md-12">
               <div ng-if="provider.entities.length == 0">
@@ -407,7 +393,12 @@
 
         <div ng-if="paramSection=='activity'">
           <div ng-if="!provider.entities.length">
-            <span translate="translate.no_activities" translate-values="{user: (account.name||id_rs)}"/>
+            <div ng-if="provider.isLoading">
+              Loading please wait&nbsp;&nbsp;<i class="fa fa-refresh fa-spin"></i>
+            </div>
+            <div ng-if="!provider.isLoading">
+              <span translate="translate.no_activities" translate-values="{user: (account.name||id_rs)}"/>
+            </div>
           </div>
           <div ng-if="provider.entities.length > 0">
             <div infinite-scroll="provider.loadMore()" infinite-scroll-distance="0" infinite-scroll-immediate-check="false">
@@ -433,7 +424,7 @@
             <div class="load-more-button" ng-show="provider.hasMore">
               <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
                 <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-                <span translate-cloak>{{ 'home.load_more_activities' | translate }}</span>
+                <span translate="translate.load_more_activities"></span>
               </a>
             </div>
           </div>
@@ -458,7 +449,7 @@
           <div class="load-more-button" ng-show="provider.hasMore">
             <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
               <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_messages' | translate }}</span>
+              <span translate="translate.load_more_messages"></span>
             </a>
           </div>
         </div>
@@ -471,11 +462,11 @@
               <table class="table table-striped">
                 <thead>
                   <tr translate-cloak>
-                    <th>{{ 'activity.name' | translate }}</th>
-                    <th>{{ 'activity.identifier' | translate }}</th>
-                    <th>{{ 'activity.amount' | translate }}</th>
-                    <th>{{ 'activity.total_supply' | translate }}</th>
-                    <th>{{ 'activity.issuer' | translate }}</th>
+                    <th translate="translate.name"></th>
+                    <th translate="translate.identifier"></th>
+                    <th translate="translate.amount"></th>
+                    <th translate="translate.total_supply"></th>
+                    <th translate="translate.issuer"></th>
                     <th></th>
                     <th></th>
                   </tr>
@@ -487,9 +478,9 @@
                     <td>{{a.quantity}}</td>
                     <td>{{a.totalQuantity}}</td>
                     <td><a ng-href="#/accounts/{{a.issuer}}/activity/latest">{{a.issuer}}</a></td>
-                    <td><a href ng-click="buyAsset(a)">Buy</a></td>
-                    <td><a href ng-click="sellAsset(a)">Sell</a></td>
-                    <td><a href ng-click="transferAsset(a)">Transfer</a></td>
+                    <td><a href ng-click="buyAsset(a)" translate="translate.buy"></a></td>
+                    <td><a href ng-click="sellAsset(a)" translate="translate.sell"></a></td>
+                    <td><a href ng-click="transferAsset(a)" translate="translate.transfer"></a></td>
                   </tr>
                 </tbody>
               </table>
@@ -498,7 +489,7 @@
           <div class="load-more-button" ng-show="provider.hasMore">
             <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
               <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_assets' | translate }}</span>
+              <span translate="translate.load_more_assets"></span>
             </a>
           </div>
         </div>
@@ -511,10 +502,10 @@
               <table class="table table-striped">
                 <thead>
                   <tr translate-cloak>
-                    <th>{{ 'activity.name' | translate }}</th>
-                    <th>{{ 'activity.amount' | translate }}</th>
-                    <th>{{ 'activity.total_supply' | translate }}</th>
-                    <th>{{ 'activity.issuer' | translate }}</th>
+                    <th>{{ 'translate.name' | translate }}</th>
+                    <th>{{ 'translate.amount' | translate }}</th>
+                    <th>{{ 'translate.total_supply' | translate }}</th>
+                    <th>{{ 'translate.issuer' | translate }}</th>
                     <th></th>
                     <th></th>
                   </tr>
@@ -535,7 +526,7 @@
           <div class="load-more-button" ng-show="provider.hasMore">
             <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
               <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_currencies' | translate }}</span>
+              <span translate="translate.load_more_currencies"></span>
             </a>
           </div>           
         </div>
@@ -543,39 +534,42 @@
         <!-- Blocks -->
 
         <div ng-if="paramSection=='blocks'">
-          <div infinite-scroll="provider.loadMore()" infinite-scroll-distance="0" infinite-scroll-immediate-check="false">
-            <div class="table-responsive">
-              <table class="table table-striped">
-                <thead>
-                  <tr translate-cloak>
-                    <th>{{ 'activity.height' | translate }}</th>
-                    <th>{{ 'activity.date' | translate }}</th>
-                    <th>{{ 'activity.generator' | translate }}</th>
-                    <th>{{ 'activity.transactions' | translate }}</th>
-                    <th>{{ 'activity.amount' | translate }}</th>
-                    <th>{{ 'activity.fee' | translate }}</th>
-                    <th>{{ 'activity.block_reward' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="b in provider.entities">
-                    <td>{{b.height}}</td>
-                    <td>{{b.date}}</td>
-                    <td><a ng-href="#/accounts/{{b.generator}}/activity/latest">{{b.generator}}</a></td>
-                    <td>{{b.numberOfTransactions}}</td>
-                    <td>{{b.totalAmountNXT}}</td>
-                    <td>{{b.totalFeeNXT}}</td>
-                    <td>{{b.totalPOSRewardNXT}}</td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="well" translate="translate.blocks_explained"></div>
+          <div ng-if="provider.entities.length > 0">
+            <div infinite-scroll="provider.loadMore()" infinite-scroll-distance="0" infinite-scroll-immediate-check="false">
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr translate-cloak>
+                      <th>{{ 'translate.height' | translate }}</th>
+                      <th>{{ 'translate.date' | translate }}</th>
+                      <th>{{ 'translate.generator' | translate }}</th>
+                      <th>{{ 'translate.transactions' | translate }}</th>
+                      <th>{{ 'translate.amount' | translate }}</th>
+                      <th>{{ 'translate.fee' | translate }}</th>
+                      <th>{{ 'translate.block_reward' | translate }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="b in provider.entities">
+                      <td>{{b.height}}</td>
+                      <td>{{b.date}}</td>
+                      <td><a ng-href="#/accounts/{{b.generator}}/activity/latest">{{b.generator}}</a></td>
+                      <td>{{b.numberOfTransactions}}</td>
+                      <td>{{b.totalAmountNXT}}</td>
+                      <td>{{b.totalFeeNXT}}</td>
+                      <td>{{b.totalPOSRewardNXT}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-          <div class="load-more-button" ng-show="provider.hasMore">
-            <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
-              <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_blocks' | translate }}</span>
-            </a>
+            <div class="load-more-button" ng-show="provider.hasMore">
+              <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
+                <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
+                <span translate="translate.load_more_blocks"></span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -587,9 +581,9 @@
               <table class="table table-striped">
                 <thead>
                   <tr translate-cloak>
-                    <th style="padding-left: 0px">{{'account.last_update'|translate}}</th>
-                    <th>{{'account.name'|translate}}</th>
-                    <th colspan="5">{{'account.uri'|translate}}</th>
+                    <th style="padding-left: 0px" translate="translate.last_update"></th>
+                    <th translate="translate.name"></th>
+                    <th colspan="5" translate="translate.uri"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -601,12 +595,12 @@
                     <td><a href ng-click="transferAlias(a)">Transfer</a></td>
                     <!-- <td><a href ng-click="deleteAlias(a)">Delete</a></td> -->
                     <td>
-                      <a href ng-show="!a.priceNXT" ng-click="sellAlias(a)">{{'account.sell'|translate}}</a>
-                      <a href ng-show="a.priceNXT" ng-click="cancelSellAlias(a)">{{'account.cancel'|translate}}</a>
+                      <a href ng-show="!a.priceNXT" ng-click="sellAlias(a)" translate="translate.sell"></a>
+                      <a href ng-show="a.priceNXT" ng-click="cancelSellAlias(a)" translate="translate.cancel"></a>
                     </td>
                     <td nowrap>
                       <a ng-show="a.priceNXT" href ng-click="buyAlias(a)">
-                        {{ 'account.buy_alias' | translate:"{symbol: symbol, price: a.priceNXT}" }}
+                        {{ 'translate.buy_alias' | translate:"{symbol: symbol, price: a.priceNXT}" }}
                       </a>
                     </td>
                   </tr>
@@ -617,7 +611,7 @@
           <div class="load-more-button" ng-show="provider.hasMore">
             <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
               <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_aliases' | translate }}</span>
+              <span translate="translate.load_more_aliases"></span>
             </a>
           </div>
         </div>
@@ -635,6 +629,31 @@
         <!-- Balance Leasing -->
 
         <div ng-if="paramSection=='leasing'">
+          <div class="well" translate="translate.leasing_explained"></div>          
+          <div ng-if="provider.entities.length > 0">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th translate="translate.name"></th>
+                    <th translate="translate.account"></th>
+                    <th translate="translate.guaranteed_balance"></th>
+                    <th translate="translate.from"></th>
+                    <th translate="translate.to"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="a in provider.entities">
+                    <td><a ng-href="#/accounts/{{a.lessorRS}}/activity/latest">{{a.lessorName}}</a></td>
+                    <td><a ng-href="#/accounts/{{a.lessorRS}}/activity/latest">{{a.lessorRS}}</a></td>
+                    <td>{{a.guaranteedBalanceNXT}} {{symbol}}</a></td>
+                    <td>{{a.currentLeasingHeightFrom}}</a></td>
+                    <td>{{a.currentLeasingHeightTo}}</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <!-- Buy orders -->
@@ -645,12 +664,12 @@
               <table class="table table-striped">
                 <thead>
                   <tr translate-cloak>
-                    <th>{{ 'activity.name' | translate }}</th>
-                    <th>{{ 'activity.identifier' | translate }}</th>
-                    <th>{{ 'activity.order' | translate }}</th>
-                    <th>{{ 'activity.quantity' | translate }}</th>
-                    <th>{{ 'activity.price' | translate }}</th>
-                    <th>{{ 'activity.total' | translate }}</th>
+                    <th translate="translate.name"></th>
+                    <th translate="translate.identifier"></th>
+                    <th translate="translate.order"></th>
+                    <th translate="translate.quantity"></th>
+                    <th translate="translate.price"></th>
+                    <th translate="translate.total"></th>
                     <th></th>
                   </tr>
                 </thead>
@@ -670,7 +689,7 @@
           <div class="load-more-button" ng-show="provider.hasMore">
             <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
               <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_orders' | translate }}</span>
+              <span translate="translate.load_more_orders"></span>
             </a>
           </div>
         </div>
@@ -683,12 +702,12 @@
               <table class="table table-striped">
                 <thead>
                   <tr translate-cloak>
-                    <th>{{ 'activity.name' | translate }}</th>
-                    <th>{{ 'activity.identifier' | translate }}</th>
-                    <th>{{ 'activity.order' | translate }}</th>
-                    <th>{{ 'activity.quantity' | translate }}</th>
-                    <th>{{ 'activity.price' | translate }}</th>
-                    <th>{{ 'activity.total' | translate }}</th>
+                    <th>{{ 'translate.name' | translate }}</th>
+                    <th>{{ 'translate.identifier' | translate }}</th>
+                    <th>{{ 'translate.order' | translate }}</th>
+                    <th>{{ 'translate.quantity' | translate }}</th>
+                    <th>{{ 'translate.price' | translate }}</th>
+                    <th>{{ 'translate.total' | translate }}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -708,30 +727,75 @@
           <div class="load-more-button" ng-show="provider.hasMore">
             <a href ng-click="provider.loadMore()" class="text-lowercase text-muted">
               <span ng-show="provider.isLoading"><i class="fa fa-refresh fa-spin"></i></span>
-              <span translate-cloak>{{ 'account.load_more_orders' | translate }}</span>
+              <span translate="translate.load_more_orders"></span>
             </a>
           </div>
+        </div>
+
+        <!-- Payments (sends multiple payments) -->
+        <div ng-if="paramSection=='payments'">
+          <tabset>
+            <tab active="provider.PREPARE">
+              <tab-heading>
+                <!-- <i class="glyphicon glyphicon-bell"></i>&nbsp;&nbsp; --><span translate="translate.prepare" />
+              </tab-heading>
+              <div>
+                <br>
+                <div class="well well-sm">
+                  <p>Type or paste your payments in this field.<br>
+                    Payments must be in the following format:<br>
+                    <pre>RECIPIENT,AMOUNT,MESSAGE_IS_PUBLIC,MESSAGE</pre>
+                    Examples:<br>
+                    <pre>{{symbol}}-CMAS-K37J-8J22-77H9X,500.01,true,Basic income payment for march<br>{{symbol}}-CMAS-K37J-8J22-77H9X,100.02<br>{{symbol}}-CMAS-K37J-8J22-77H9X,3,false,This message is encrypted</pre>
+                    When done entering payments <a href ng-click="provider.load()">click here</a> to load them into the staging area.
+                  </p>
+                </div>
+                <textarea class="form-control monospace" rows="4" ng-model="provider.text_input"></textarea>
+              </div>
+            </tab>
+            <tab active="provider.STAGE">
+              <tab-heading>
+                <!-- <i class="glyphicon glyphicon-bell"></i>&nbsp;&nbsp; --><span translate="translate.staging" />
+              </tab-heading>
+              <div>
+                <br>
+                <div class="well well-sm">
+                  <p>Please evaluate the payments as they are shown in the table below.<br>
+                    If you consider the details to be correct <span ng-if="!provider.locked"><a href ng-click="provider.execute()">click here</a></span><span ng-if="provider.locked" class="text-primary"><s>click here</s></span> to execute them.<br><br>
+                    There are <b>{{provider.payments.length}}</b> valid payments totalling <big><b>{{provider.totalNXT||'0'}} {{symbol}}</b></big>
+                  </p>
+                </div>                
+                <table class="table">
+                  <tr>
+                    <th><i tooltip="confirmations" class="fa fa-cubes"></i></th>
+                    <th translate="translate.status"></th>
+                    <th translate="translate.recipient"></th>
+                    <th translate="translate.amount"></th>
+                    <th translate="translate.message"></th>
+                    <th translate="translate.is_public"></th>
+                  </tr>
+                  <tr ng-repeat="p in provider.payments" ng-class="{danger: p.error}">
+                    <td>
+                      <span ng-show="p.confirmations !== undefined">
+                        <span ng-if="p.confirmations <= 0"><i class="fa fa-spinner fa-spin text-muted"></i></span>
+                        <span ng-if="p.confirmations > 0 && p.confirmations <= 10" class="text-danger"><b>{{p.confirmations}}</b></span>
+                        <span ng-if="p.confirmations > 10" tooltip="{{p.confirmations}} confirmations">
+                          <i class="fa fa-check text-success"></i>
+                        </span>
+                      </span>
+                    </td>
+                    <td>{{p.status}}</td>
+                    <td nowrap><a href="#/accounts/{{p.recipientRS}}/activity/latest">{{p.recipientRS}}</a></td>
+                    <td>{{p.amountNXT}} {{symbol}}</td>
+                    <td>{{p.message}}</td>
+                    <td ng-class="{'text-success': p.ispublic, 'text-danger': !p.ispublic}">{{p.ispublic}}</td>
+                  </tr>
+                </table>
+              </div>
+            </tab>
+          </tabset>
         </div>
       </div>
     </div>
   </div>
 </div>
-
-    <!-- COMMENTS 
-          <div class="row">
-            <div class="col-md-12" style="padding-top:10px">
-              <div class="panel panel-default" ng-show="account.comments.length == 0">
-                <div class="panel-body">{{'account.leave_first_comment'|translate}}</div>
-              </div>        
-              <div class="panel panel-default" ng-repeat="c in account.comments">
-                <div class="panel-body">{{c.text}}</div>
-                <div class="panel-footer" style="padding-top: 5px; padding-bottom: 5px">
-                  <small class="text-muted"><sub>{{c.date}}</sub></small><br>
-                  <small><sub><a ng-href="#/accounts/{{c.senderRS}}/activity/latest">{{c.senderName || c.senderRS}}</a></sub></small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
- -->

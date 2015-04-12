@@ -198,7 +198,7 @@ public class MofoSocketServer {
     /**
      * Available topics..
      * 
-     * # lockPushedNew
+     * # blockPushedNew
      * 
      *  Forwards event BLOCK_PUSHED for blocks less than 1 day old
      * 
