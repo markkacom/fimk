@@ -32,9 +32,13 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
         return defaultSort;
     }
 
-    public final void checkAvailable(int height) {
+    protected void clearCache() {
+        db.getCache(table).clear();
+    }
+
+    public void checkAvailable(int height) {
         if (multiversion && height < Nxt.getBlockchainProcessor().getMinRollbackHeight()) {
-            throw new IllegalArgumentException("Historical data as of height " + height +" not available, set nxt.trimDerivedTables=false and re-scan");
+            throw new IllegalArgumentException("Historical data as of height " + height +" not available.");
         }
     }
 
@@ -210,7 +214,7 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
         Connection con = null;
         try {
             con = db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement("SELECT " + table + ".*, ft.score FROM " + table + ", ftl_search_data(?, 0, 0) ft "
+            PreparedStatement pstmt = con.prepareStatement("SELECT " + table + ".*, ft.score FROM " + table + ", ftl_search_data(?, 2147483647, 0) ft "
                     + " WHERE " + table + ".db_id = ft.keys[0] AND ft.table = ? " + (multiversion ? " AND " + table + ".latest = TRUE " : " ")
                     + " AND " + dbClause.getClause() + sort
                     + DbUtils.limitsClause(from, to));
@@ -369,7 +373,7 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     @Override
-    public final void truncate() {
+    public void truncate() {
         super.truncate();
         db.getCache(table).clear();
     }

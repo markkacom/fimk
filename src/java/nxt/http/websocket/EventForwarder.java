@@ -13,6 +13,8 @@ import nxt.Nxt;
 import nxt.Trade;
 import nxt.Transaction;
 import nxt.TransactionProcessor;
+import nxt.peer.Peer;
+import nxt.peer.Peers;
 import nxt.util.Convert;
 import nxt.util.Listener;
 
@@ -23,16 +25,20 @@ public final class EventForwarder {
 
     static Map<Long, List<Transaction>> groupTransactionsAccount(List<? extends Transaction> _transactions) {
         Map<Long, List<Transaction>> map = new HashMap<Long, List<Transaction>>();
-        for (Transaction transaction : _transactions) {                      
-            List<Transaction> recipient = map.get(Long.valueOf(transaction.getRecipientId()));
+        for (Transaction transaction : _transactions) {       
+            Long recipientKey = Long.valueOf(transaction.getRecipientId());
+            List<Transaction> recipient = map.get(recipientKey);
             if (recipient == null) {
                 recipient = new ArrayList<Transaction>();
+                map.put(recipientKey, recipient);
             }
             recipient.add(transaction);
           
-            List<Transaction> sender = map.get(Long.valueOf(transaction.getSenderId()));
+            Long senderKey = Long.valueOf(transaction.getSenderId());
+            List<Transaction> sender = map.get(senderKey);
             if (sender == null) {
-              sender = new ArrayList<Transaction>();
+                sender = new ArrayList<Transaction>();
+                map.put(senderKey, sender);
             }
             sender.add(transaction);
         }
@@ -42,15 +48,19 @@ public final class EventForwarder {
     static Map<Long, List<Trade>> groupTradesAccount(List<? extends Trade> trades) {
         Map<Long, List<Trade>> map = new HashMap<Long, List<Trade>>();
         for (Trade trade : trades) {                      
-            List<Trade> seller = map.get(Long.valueOf(trade.getSellerId()));
+            Long sellerKey = Long.valueOf(trade.getSellerId());
+            List<Trade> seller = map.get(sellerKey);
             if (seller == null) {
-              seller = new ArrayList<Trade>();
+                seller = new ArrayList<Trade>();
+                map.put(sellerKey, seller);
             }
             seller.add(trade);
           
-            List<Trade> buyer = map.get(Long.valueOf(trade.getBuyerId()));
+            Long buyerKey = Long.valueOf(trade.getBuyerId());
+            List<Trade> buyer = map.get(buyerKey);
             if (buyer == null) {
-              buyer = new ArrayList<Trade>();
+                buyer = new ArrayList<Trade>();
+                map.put(buyerKey, buyer);
             }
             buyer.add(trade);
         }
@@ -59,10 +69,12 @@ public final class EventForwarder {
     
     static Map<Long, List<Trade>> groupTradesAsset(List<? extends Trade> trades) {
         Map<Long, List<Trade>> map = new HashMap<Long, List<Trade>>();
-        for (Trade trade : trades) {                      
-            List<Trade> asset = map.get(Long.valueOf(trade.getAssetId()));
+        for (Trade trade : trades) {            
+            Long assetKey = Long.valueOf(trade.getAssetId());
+            List<Trade> asset = map.get(assetKey);
             if (asset == null) {
-              asset = new ArrayList<Trade>();
+                asset = new ArrayList<Trade>();
+                map.put(assetKey, asset);
             }
             asset.add(trade);
         }
@@ -211,6 +223,76 @@ public final class EventForwarder {
                 }
             }
         }, BlockchainProcessor.Event.BLOCK_PUSHED);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_BLACKLIST", peer);
+            }
+         }, Peers.Event.BLACKLIST);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_UNBLACKLIST", peer);
+            }
+         }, Peers.Event.UNBLACKLIST);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_DEACTIVATE", peer);
+            }
+         }, Peers.Event.DEACTIVATE);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_REMOVE", peer); 
+            }
+         }, Peers.Event.REMOVE);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_DOWNLOADED_VOLUME", peer);
+            }
+         }, Peers.Event.DOWNLOADED_VOLUME);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_UPLOADED_VOLUME", peer);
+            }
+         }, Peers.Event.UPLOADED_VOLUME);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_WEIGHT", peer);
+            }
+         }, Peers.Event.WEIGHT);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_ADDED_ACTIVE_PEER", peer);
+            }
+         }, Peers.Event.ADDED_ACTIVE_PEER);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_CHANGED_ACTIVE_PEER", peer);
+            }
+         }, Peers.Event.CHANGED_ACTIVE_PEER);
+        
+        Peers.addListener(new Listener<Peer>() {
+            @Override
+            public void notify(Peer peer) {
+                MofoSocketServer.notifyPeerEvent("PEER_NEW_PEER", peer);
+            }
+         }, Peers.Event.NEW_PEER);        
     }
     
     static void init() {}

@@ -209,6 +209,10 @@ public abstract class TransactionType {
         return false;
     }
 
+    boolean isUnconfirmedDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
+        return false;
+    }
+
     static boolean isDuplicate(TransactionType uniqueType, String key, Map<TransactionType, Map<String, Boolean>> duplicates, boolean exclusive) {
         Map<String,Boolean> typeDuplicates = duplicates.get(uniqueType);
         if (typeDuplicates == null) {
@@ -479,7 +483,7 @@ public abstract class TransactionType {
                 } else if (alias.getAccountId() != transaction.getSenderId()) {
                     throw new NxtException.NotCurrentlyValidException("Alias doesn't belong to sender: " + aliasName);
                 }
-                if (transaction.getRecipientId() == Genesis.CREATOR_ID && Nxt.getBlockchain().getHeight() > Constants.MONETARY_SYSTEM_BLOCK) {
+                if (transaction.getRecipientId() == Genesis.CREATOR_ID) {
                     throw new NxtException.NotCurrentlyValidException("Selling alias to Genesis not allowed");
                 }
             }
@@ -1345,7 +1349,7 @@ public abstract class TransactionType {
                 if (asset.getAccountId() != transaction.getSenderId() || attachment.getAmountNQTPerQNT() <= 0) {
                     throw new NxtException.NotValidException("Invalid dividend payment sender or amount " + attachment.getJSONObject());
                 }
-                if (attachment.getHeight() > Nxt.getBlockchain().getHeight() || attachment.getHeight() < Nxt.getBlockchain().getHeight() - Constants.MAX_ROLLBACK) {
+                if (attachment.getHeight() > Nxt.getBlockchain().getHeight() || attachment.getHeight() <= Nxt.getBlockchain().getHeight() - Constants.MAX_ROLLBACK) {
                     throw new NxtException.NotCurrentlyValidException("Invalid dividend payment height: " + attachment.getHeight());
                 }
             }
@@ -1899,11 +1903,11 @@ public abstract class TransactionType {
                             + transaction.getJSONObject() + " transaction " + transaction.getStringId());
                 }
                 if (recipientAccount == null
-                        || (recipientAccount.getPublicKey() == null && ! transaction.getStringId().equals("5081403377391821646"))) {
+                        || (recipientAccount.getKeyHeight() <= 0 /*&& ! transaction.getStringId().equals("5081403377391821646")*/)) {
                     throw new NxtException.NotCurrentlyValidException("Invalid effective balance leasing: "
                             + " recipient account " + transaction.getRecipientId() + " not found or no public key published");
                 }
-                if (transaction.getRecipientId() == Genesis.CREATOR_ID && Nxt.getBlockchain().getHeight() > Constants.MONETARY_SYSTEM_BLOCK) {
+                if (transaction.getRecipientId() == Genesis.CREATOR_ID) {
                     throw new NxtException.NotCurrentlyValidException("Leasing to Genesis account not allowed");
                 }
             }
