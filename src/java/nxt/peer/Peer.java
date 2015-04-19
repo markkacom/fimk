@@ -37,7 +37,7 @@ public interface Peer extends Comparable<Peer> {
 
     void blacklist(Exception cause);
 
-    void blacklist();
+    void blacklist(String cause);
 
     void unBlacklist();
 
@@ -51,6 +51,10 @@ public interface Peer extends Comparable<Peer> {
 
     int getLastUpdated();
 
+    String getBlacklistingCause();
+
     JSONObject send(JSONStreamAware request);
+
+    JSONObject send(JSONStreamAware request, int maxResponseSize);
 
 }

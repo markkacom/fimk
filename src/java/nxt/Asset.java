@@ -14,6 +14,9 @@ import java.sql.SQLException;
 import org.json.simple.JSONObject;
 
 public final class Asset {
+  
+    public final static byte TYPE_REGULAR_ASSET = (byte) 0;
+    public final static byte TYPE_PRIVATE_ASSET = (byte) 1;    
 
     private static final DbKey.LongKeyFactory<Asset> assetDbKeyFactory = new DbKey.LongKeyFactory<Asset>("id") {
 
@@ -68,6 +71,9 @@ public final class Asset {
             json.put("asset", Convert.toUnsignedLong(id));
             json.put("name", asset.getName());
             json.put("decimals", asset.getDecimals());
+            if (privateEnabled()) {
+                json.put("type", asset.getType());
+            }
         }
     }
 
@@ -81,6 +87,7 @@ public final class Asset {
     private final String description;
     private final long quantityQNT;
     private final byte decimals;
+    private final byte type;
 
     private Asset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
         this.assetId = transaction.getId();
@@ -90,6 +97,7 @@ public final class Asset {
         this.description = attachment.getDescription();
         this.quantityQNT = attachment.getQuantityQNT();
         this.decimals = attachment.getDecimals();
+        this.type = privateEnabled() ? attachment.getType() : 0;
     }
 
     private Asset(ResultSet rs) throws SQLException {
@@ -100,11 +108,12 @@ public final class Asset {
         this.description = rs.getString("description");
         this.quantityQNT = rs.getLong("quantity");
         this.decimals = rs.getByte("decimals");
+        this.type = privateEnabled() ? rs.getByte("type") : 0;
     }
 
     private void save(Connection con) throws SQLException {
         try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO asset (id, account_id, name, "
-                + "description, quantity, decimals, height) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                + "description, quantity, decimals, type, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
             int i = 0;
             pstmt.setLong(++i, this.getId());
             pstmt.setLong(++i, this.getAccountId());
@@ -112,6 +121,7 @@ public final class Asset {
             pstmt.setString(++i, this.getDescription());
             pstmt.setLong(++i, this.getQuantityQNT());
             pstmt.setByte(++i, this.getDecimals());
+            pstmt.setByte(++i, this.getType());
             pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
             pstmt.executeUpdate();
         }
@@ -141,6 +151,10 @@ public final class Asset {
         return decimals;
     }
 
+    public byte getType() {
+      return type;
+    }
+    
     public DbIterator<Account.AccountAsset> getAccounts(int from, int to) {
         return Account.getAssetAccounts(this.assetId, from, to);
     }
@@ -160,4 +174,10 @@ public final class Asset {
         return AssetTransfer.getAssetTransfers(this.assetId, from, to);
     }
 
+    public static boolean privateEnabled() {
+        if(Nxt.getBlockchain().getLastBlock().getHeight() >= Constants.PRIVATE_ASSETS_BLOCK) {
+            return true;
+        }
+        return false;
+    }
 }

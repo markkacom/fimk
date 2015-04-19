@@ -1,10 +1,12 @@
 package nxt.http;
 
 import nxt.Account;
+import nxt.Asset;
 import nxt.Attachment;
 import nxt.Constants;
 import nxt.NxtException;
 import nxt.util.Convert;
+
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import static nxt.http.JSONResponses.INCORRECT_ASSET_DESCRIPTION;
 import static nxt.http.JSONResponses.INCORRECT_ASSET_NAME;
 import static nxt.http.JSONResponses.INCORRECT_ASSET_NAME_LENGTH;
 import static nxt.http.JSONResponses.INCORRECT_DECIMALS;
+import static nxt.http.JSONResponses.INCORRECT_TYPE;
 import static nxt.http.JSONResponses.MISSING_NAME;
 
 public final class IssueAsset extends CreateTransaction {
@@ -29,6 +32,7 @@ public final class IssueAsset extends CreateTransaction {
         String name = req.getParameter("name");
         String description = req.getParameter("description");
         String decimalsValue = Convert.emptyToNull(req.getParameter("decimals"));
+        String typeValue = Asset.privateEnabled() ? Convert.emptyToNull(req.getParameter("type")) : null;
 
         if (name == null) {
             return MISSING_NAME;
@@ -61,9 +65,21 @@ public final class IssueAsset extends CreateTransaction {
             }
         }
 
+        byte type = 0;
+        if (typeValue != null) {
+            try {
+                type = Byte.parseByte(typeValue);
+                if (type < 0 || type > 1) {
+                    return INCORRECT_TYPE;
+                }
+            } catch (NumberFormatException e) {
+                return INCORRECT_TYPE;
+            }
+        }
+        
         long quantityQNT = ParameterParser.getQuantityQNT(req);
         Account account = ParameterParser.getSenderAccount(req);
-        Attachment attachment = new Attachment.ColoredCoinsAssetIssuance(name, description, quantityQNT, decimals);
+        Attachment attachment = new Attachment.ColoredCoinsAssetIssuance(name, description, quantityQNT, decimals, type);
         return createTransaction(req, account, attachment);
 
     }

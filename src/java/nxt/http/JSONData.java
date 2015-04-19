@@ -9,6 +9,7 @@ import nxt.Appendix;
 import nxt.AssetTransfer;
 import nxt.Attachment;
 import nxt.Block;
+import nxt.Constants;
 import nxt.Currency;
 import nxt.CurrencyExchangeOffer;
 import nxt.CurrencyFounder;
@@ -16,6 +17,7 @@ import nxt.CurrencyTransfer;
 import nxt.CurrencyType;
 import nxt.DigitalGoodsStore;
 import nxt.Exchange;
+import nxt.Generator;
 import nxt.Nxt;
 import nxt.Order;
 import nxt.Poll;
@@ -82,6 +84,18 @@ final class JSONData {
         return json;
     }
 
+    static JSONObject lessor(Account account) {
+        JSONObject json = new JSONObject();
+        json.put("currentLesseeRS", Convert.rsAccount(account.getCurrentLesseeId()));
+        json.put("currentHeightFrom", String.valueOf(account.getCurrentLeasingHeightFrom()));
+        json.put("currentHeightTo", String.valueOf(account.getCurrentLeasingHeightTo()));
+        json.put("nextLesseeRS", Convert.rsAccount(account.getNextLesseeId()));
+        json.put("nextHeightFrom", String.valueOf(account.getNextLeasingHeightFrom()));
+        json.put("nextHeightTo", String.valueOf(account.getNextLeasingHeightTo()));
+        json.put("effectiveBalanceNXT", String.valueOf(account.getGuaranteedBalanceNQT(1440) / Constants.ONE_NXT));
+        return json;
+    }
+
     static JSONObject asset(Asset asset, boolean includeCounts) {
         JSONObject json = new JSONObject();
         putAccount(json, "account", asset.getAccountId());
@@ -94,6 +108,9 @@ final class JSONData {
             json.put("numberOfTrades", Trade.getTradeCount(asset.getId()));
             json.put("numberOfTransfers", AssetTransfer.getTransferCount(asset.getId()));
             json.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
+        }
+        if (Asset.privateEnabled()) {
+            json.put("type", asset.getType());
         }
         return json;
     }
@@ -329,6 +346,9 @@ final class JSONData {
         json.put("platform", peer.getPlatform());
         json.put("blacklisted", peer.isBlacklisted());
         json.put("lastUpdated", peer.getLastUpdated());
+        if (peer.isBlacklisted()) {
+            json.put("blacklistingCause", peer.getBlacklistingCause());
+        }
         return json;
     }
 
@@ -536,6 +556,16 @@ final class JSONData {
         return json;
     }
 
+    static JSONObject generator(Generator generator, int elapsedTime) {
+        JSONObject response = new JSONObject();
+        long deadline = generator.getDeadline();
+        putAccount(response, "account", generator.getAccountId());
+        response.put("deadline", deadline);
+        response.put("hitTime", generator.getHitTime());
+        response.put("remaining", Math.max(deadline - elapsedTime, 0));
+        return response;
+    }
+
     static void putAccount(JSONObject json, String name, long accountId) {
         Account account = Account.getAccount(accountId);
         if (account != null) {
@@ -562,6 +592,9 @@ final class JSONData {
         Asset asset = Asset.getAsset(assetId);
         json.put("name", asset.getName());
         json.put("decimals", asset.getDecimals());
+        if (Asset.privateEnabled()) {
+            json.put("type", asset.getType());
+        }
     }
 
     private JSONData() {} // never

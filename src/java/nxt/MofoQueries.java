@@ -17,8 +17,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import nxt.Appendix.Message;
-import nxt.Attachment.AbstractAttachment;
-import nxt.TransactionType.Messaging;
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
 import nxt.util.Convert;
@@ -621,15 +619,19 @@ public final class MofoQueries {
             con = Db.db.getConnection();
             
             StringBuilder b = new StringBuilder();
+            
+            b.append("SELECT * FROM (");
             b.append("(SELECT * FROM transaction WHERE (timestamp BETWEEN ? AND ?) "
-                + "AND recipient_id = ? "
-                + filterClause(filters)
-                + "ORDER BY timestamp DESC LIMIT ?) ");
-            b.append("UNION ");
+                    + "AND recipient_id = ? AND sender_id <> ? "
+                    + filterClause(filters)
+                    + " ORDER BY timestamp DESC LIMIT ?) ");
+            b.append("UNION ALL ");
             b.append("(SELECT * FROM transaction WHERE (timestamp BETWEEN ? AND ?) "
-                + "AND sender_id = ? " 
-                + filterClause(filters)
-                + "ORDER BY timestamp DESC LIMIT ?)");
+                    + "AND sender_id = ? " 
+                    + filterClause(filters)
+                    + " ORDER BY timestamp DESC LIMIT ?)");
+            b.append(")");
+            b.append("ORDER BY timestamp DESC LIMIT ?");
 
             PreparedStatement pstmt = con.prepareStatement(b.toString());
             
@@ -637,12 +639,14 @@ public final class MofoQueries {
             pstmt.setInt(++i, 0 /*Math.max(timestamp - ONE_MONTH_SECONDS, 0)*/);
             pstmt.setInt(++i, timestamp);
             pstmt.setLong(++i, account.getId());
-            pstmt.setInt(++i, limit);            
+            pstmt.setLong(++i, account.getId());
+            pstmt.setInt(++i, limit);
             pstmt.setInt(++i, 0 /*Math.max(timestamp - ONE_MONTH_SECONDS, 0)*/);
             pstmt.setInt(++i, timestamp);
             pstmt.setLong(++i, account.getId());
-            pstmt.setInt(++i, limit);             
-
+            pstmt.setInt(++i, limit);
+            pstmt.setInt(++i, limit);
+            
             return Nxt.getBlockchain().getTransactions(con, pstmt);
         } catch (SQLException e) {
             DbUtils.close(con);
@@ -931,6 +935,27 @@ public final class MofoQueries {
             return response;        
         } 
         catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+    
+    public static DbIterator<? extends Alias> searchAlias(String query, int from, int to) {
+        Connection con = null;
+        try {
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM alias "
+                    + "WHERE alias_name_lower LIKE ? "
+                    + "ORDER BY alias_name_lower "
+                    +  DbUtils.limitsClause(from, to));
+            
+            int i = 0;
+            pstmt.setString(++i, query);
+            DbUtils.setLimits(++i, pstmt, from, to);
+            
+            return Alias.getTable().getManyBy(con, pstmt, true);
+            
+        } catch (SQLException e) {
+            DbUtils.close(con);
             throw new RuntimeException(e.toString(), e);
         }
     }

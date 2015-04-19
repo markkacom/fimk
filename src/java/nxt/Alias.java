@@ -217,6 +217,10 @@ public final class Alias {
         this.aliasURI = rs.getString("alias_uri");
         this.timestamp = rs.getInt("timestamp");
     }
+    
+    public static VersionedEntityDbTable<Alias> getTable() {
+      return aliasTable;
+    }
 
     private void save(Connection con) throws SQLException {
         try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO alias (id, account_id, alias_name, "

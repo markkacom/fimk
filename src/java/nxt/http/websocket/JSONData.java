@@ -1,5 +1,6 @@
 package nxt.http.websocket;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +18,7 @@ import nxt.Attachment.ColoredCoinsAskOrderCancellation;
 import nxt.Attachment.ColoredCoinsBidOrderCancellation;
 import nxt.Block;
 import nxt.Currency;
+import nxt.DigitalGoodsStore;
 import nxt.Nxt;
 import nxt.Order;
 import nxt.Order.Ask;
@@ -24,6 +26,7 @@ import nxt.Order.Bid;
 import nxt.RewardsImpl;
 import nxt.Trade;
 import nxt.Transaction;
+import nxt.peer.Peer;
 import nxt.util.Convert;
 
 import org.json.simple.JSONArray;
@@ -101,17 +104,17 @@ public class JSONData {
                 if (transaction.getType().getSubtype() == 0) { // SUBTYPE_COLORED_COINS_ASSET_ISSUANCE
                     assetId = transaction.getId();
                 }
-                else if (transaction.getType().getSubtype() == 1) { // SUBTYPE_COLORED_COINS_ASSET_TRANSFER
+                else if (transaction.getType().getSubtype() == 1 && appendage instanceof ColoredCoinsAssetTransfer) { // SUBTYPE_COLORED_COINS_ASSET_TRANSFER
                     assetId = ((ColoredCoinsAssetTransfer) appendage).getAssetId();
                 }
-                else if (transaction.getType().getSubtype() == 2) { // SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT
+                else if (transaction.getType().getSubtype() == 2 && appendage instanceof ColoredCoinsAskOrderPlacement) { // SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT
                     assetId = ((ColoredCoinsAskOrderPlacement) appendage).getAssetId();
                 }
-                else if (transaction.getType().getSubtype() == 3) { // SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT
+                else if (transaction.getType().getSubtype() == 3 && appendage instanceof ColoredCoinsBidOrderPlacement) { // SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT
                     assetId = ((ColoredCoinsBidOrderPlacement) appendage).getAssetId();
                 }
                 else {
-                    if (transaction.getType().getSubtype() == 4) { // SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION
+                    if (transaction.getType().getSubtype() == 4 && appendage instanceof ColoredCoinsAskOrderCancellation) { // SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION
                         final long orderId = ((ColoredCoinsAskOrderCancellation) appendage).getOrderId();
                         Order order = Order.Ask.getAskOrder(orderId);
                         if (order == null) {
@@ -119,7 +122,7 @@ public class JSONData {
                         }
                         assetId = order.getAssetId();
                     }
-                    else if (transaction.getType().getSubtype() == 5) { // SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION
+                    else if (transaction.getType().getSubtype() == 5 && appendage instanceof ColoredCoinsBidOrderCancellation) { // SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION
                         final long orderId = ((ColoredCoinsBidOrderCancellation) appendage).getOrderId();
                         Order order = Order.Bid.getBidOrder(orderId);
                         if (order == null) {
@@ -169,8 +172,10 @@ public class JSONData {
     @SuppressWarnings("unchecked")
     public static void putAssetInfo(JSONObject json, long assetId) {
         Asset asset = Asset.getAsset(assetId);
-        json.put("name", asset.getName());
-        json.put("decimals", asset.getDecimals());
+        if (asset != null) {
+            json.put("name", asset.getName());
+            json.put("decimals", asset.getDecimals());
+        }
     }    
    
     public static int generateTradeHash(Trade trade) {
@@ -273,6 +278,50 @@ public class JSONData {
         json.put("confirmations", Nxt.getBlockchain().getHeight() - order.getHeight());
         json.put("accountRS", Convert.rsAccount(order.getAccountId()));
         json.put("type", (order instanceof Order.Ask) ? "sell" : "buy");
+        return json;
+    }
+
+    static JSONObject peer(Peer peer) {
+        JSONObject json = new JSONObject();
+        json.put("address", peer.getPeerAddress());
+        json.put("state", peer.getState().ordinal());
+        json.put("announcedAddress", peer.getAnnouncedAddress());
+        json.put("shareAddress", peer.shareAddress());
+        if (peer.getHallmark() != null) {
+            json.put("hallmark", peer.getHallmark().getHallmarkString());
+        }
+        json.put("weight", peer.getWeight());
+        json.put("downloadedVolume", peer.getDownloadedVolume());
+        json.put("uploadedVolume", peer.getUploadedVolume());
+        json.put("application", peer.getApplication());
+        json.put("version", peer.getVersion());
+        json.put("platform", peer.getPlatform());
+        json.put("blacklisted", peer.isBlacklisted());
+        json.put("lastUpdated", peer.getLastUpdated());
+        if (peer.isBlacklisted()) {
+            json.put("blacklistingCause", peer.getBlacklistingCause());
+        }
+        return json;
+    }
+
+    public static JSONObject goods(DigitalGoodsStore.Goods goods, boolean includeCounts) {
+        JSONObject json = new JSONObject();
+        json.put("goods", Convert.toUnsignedLong(goods.getId()));
+        json.put("name", goods.getName());
+        json.put("description", goods.getDescription());
+        json.put("quantity", goods.getQuantity());
+        json.put("priceNQT", String.valueOf(goods.getPriceNQT()));
+        putAccount(json, "seller", goods.getSellerId());
+        json.put("tags", goods.getTags());
+        JSONArray tagsJSON = new JSONArray();
+        Collections.addAll(tagsJSON, goods.getParsedTags());
+        json.put("parsedTags", tagsJSON);
+        json.put("delisted", goods.isDelisted());
+        json.put("timestamp", goods.getTimestamp());
+        if (includeCounts) {
+            json.put("numberOfPurchases", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), false, true));
+            json.put("numberOfPublicFeedbacks", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), true, true));
+        }
         return json;
     }
 }

@@ -22,6 +22,7 @@ import nxt.http.rpc.CallAPIFunction;
 import nxt.http.rpc.GetAccount;
 import nxt.http.rpc.GetAccountAssets;
 import nxt.http.rpc.GetAccountCurrencies;
+import nxt.http.rpc.GetAccountLessors;
 import nxt.http.rpc.GetAccountPosts;
 import nxt.http.rpc.GetAccounts;
 import nxt.http.rpc.GetActivity;
@@ -39,6 +40,8 @@ import nxt.http.rpc.GetComments;
 import nxt.http.rpc.GetForgingStats;
 import nxt.http.rpc.GetMyOpenOrders;
 import nxt.http.rpc.GetRecentTransactions;
+import nxt.http.rpc.Search;
+import nxt.peer.Peer;
 import nxt.util.Convert;
 import nxt.util.JSON;
 import nxt.util.Logger;
@@ -98,6 +101,9 @@ public class MofoSocketServer {
         rpcCalls.put("getAssetTrades", GetAssetTrades.instance);
         rpcCalls.put("getMyOpenOrders", GetMyOpenOrders.instance);
         rpcCalls.put("getBlockchainState", GetBlockchainState.instance);
+        rpcCalls.put("getAccountLessors", GetAccountLessors.instance);
+        rpcCalls.put("search", Search.instance);
+        
     }
     
     static void socketClosed(MofoWebSocketAdapter socket) {
@@ -192,7 +198,7 @@ public class MofoSocketServer {
     /**
      * Available topics..
      * 
-     * # lockPushedNew
+     * # blockPushedNew
      * 
      *  Forwards event BLOCK_PUSHED for blocks less than 1 day old
      * 
@@ -309,7 +315,14 @@ public class MofoSocketServer {
             return;
         }
         MofoSocketServer.notify(topic, JSONData.minimalBlock(block));
-    }    
+    }
+    
+    static void notifyPeerEvent(String topic, Peer peer) {
+        if ( ! listeners.containsKey(topic)) {
+            return;
+        }
+        MofoSocketServer.notify(topic, JSONData.peer(peer));      
+    }
     
     static void rpcCall(final MofoWebSocketAdapter socket, final String call_id, final String method, final JSONObject arguments) {
         if ( ! rpcCalls.containsKey(method)) {
