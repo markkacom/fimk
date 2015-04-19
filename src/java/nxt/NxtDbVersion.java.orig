@@ -542,6 +542,27 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
                 apply(null);
             case 213:
+<<<<<<< HEAD
+                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
+            case 214:
+                apply("UPDATE asset SET type = 0");
+            case 215:
+                apply("CREATE TABLE IF NOT EXISTS private_asset (db_id IDENTITY, asset_id BIGINT NOT NULL, "
+                    + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
+                    + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
+            case 216:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_height_idx ON private_asset (asset_id, height DESC)");
+            case 217:
+                apply("CREATE TABLE IF NOT EXISTS private_asset_account (db_id IDENTITY, account_id BIGINT NOT NULL, "
+                    + "asset_id BIGINT NOT NULL, allowed BOOLEAN NOT NULL DEFAULT TRUE, height INT NOT NULL, "
+                    + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
+            case 218:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
+            case 219:
+                /* GROUP THIS CHANGE WITH private_asset creation */
+                apply("ALTER TABLE private_asset ADD FOREIGN KEY (asset_id) REFERENCES asset (id) ON DELETE CASCADE");
+            case 220:
+=======
                 apply("CREATE TABLE IF NOT EXISTS currency_supply (db_id IDENTITY, id BIGINT NOT NULL, "
                         + "current_supply BIGINT NOT NULL, current_reserve_per_unit_nqt BIGINT NOT NULL, height INT NOT NULL, "
                         + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
@@ -554,7 +575,7 @@ class NxtDbVersion extends DbVersion {
             case 217:
                 apply("ALTER TABLE currency DROP COLUMN IF EXISTS current_reserve_per_unit_nqt");
             case 218:
-                //BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
+                BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply(null);
             case 219:
                 apply(null);
@@ -627,23 +648,7 @@ class NxtDbVersion extends DbVersion {
             case 252:
                 apply("CALL FTL_REINDEX()");
             case 253:
-                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
-            case 254:
-                apply("UPDATE asset SET type = 0");
-            case 255:
-                apply("CREATE TABLE IF NOT EXISTS private_asset (db_id IDENTITY, asset_id BIGINT NOT NULL, "
-                    + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
-                    + "FOREIGN KEY (asset_id) REFERENCES asset (id) ON DELETE CASCADE, "
-                    + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
-            case 256:
-                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_height_idx ON private_asset (asset_id, height DESC)");
-            case 257:
-                apply("CREATE TABLE IF NOT EXISTS private_asset_account (db_id IDENTITY, account_id BIGINT NOT NULL, "
-                    + "asset_id BIGINT NOT NULL, allowed BOOLEAN NOT NULL DEFAULT TRUE, height INT NOT NULL, "
-                    + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
-            case 258:
-                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
-            case 259:
+>>>>>>> master
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");

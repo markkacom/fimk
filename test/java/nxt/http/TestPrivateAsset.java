@@ -14,6 +14,8 @@ import org.junit.Test;
 
 public class TestPrivateAsset extends BlockchainTest {
   
+    public long FEE_NQT = Constants.ONE_NXT / 10;
+  
     @Ignore
     public void issueAsset() {
         long quantityQNT = 1000 * Constants.ONE_NXT;
@@ -281,7 +283,7 @@ public class TestPrivateAsset extends BlockchainTest {
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1000, 2, 0);
         
         Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
-        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2));
+        Assert.assertEquals(bidderBalanceNQT-FEE_NQT, MofoHelper.getBalanceNQT(id2));
 
         Assert.assertEquals(1 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id2));
         Assert.assertEquals(999 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id1));
@@ -296,9 +298,6 @@ public class TestPrivateAsset extends BlockchainTest {
         // 1 FIMK in NQT is      100,000,000 (8 decimals)
         // 
         // Total cost will be 1,000,000,000 * 100,000,000 = 1,00,000,000,000,000,000
-        // 
-        //
-        //
         
 
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1000, 1, 0, "Insufficient \"orderFeeNQT\": minimum of 10 required");

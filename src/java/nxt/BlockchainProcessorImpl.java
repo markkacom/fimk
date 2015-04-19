@@ -1108,11 +1108,13 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                  PreparedStatement pstmtDone = con.prepareStatement("UPDATE scan SET rescan = FALSE, height = 0, validate = FALSE")) {
                 isScanning = true;
                 transactionProcessor.requeueAllUnconfirmedTransactions();
-                for (DerivedDbTable table : derivedTables) {
-                    if (height == 0) {
-                        table.truncate();
-                    } else {
-                        table.rollback(height - 1);
+                if (blockchainHeight != 0) { 
+                    for (DerivedDbTable table : derivedTables) {
+                        if (height == 0) {
+                            table.truncate();
+                        } else {
+                            table.rollback(height - 1);
+                        }
                     }
                 }
                 Db.db.commitTransaction();
