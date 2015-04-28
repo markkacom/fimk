@@ -799,11 +799,6 @@ final class TransactionImpl implements Transaction {
         if (blockchainHeight > Constants.PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK) {
             return false;
         }
-        
-        Alias alias = Alias.getAlias("publickeyannouncementrequired");
-        if(alias != null && alias.getAliasURI().equals("false")) {
-            return false;
-        }
         return true;
     }
     
