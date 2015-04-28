@@ -12,6 +12,13 @@ jar cf fim.jar -C classes . || exit 1
 
 echo "fim.jar generated successfully"
 
+if [ ! -d "html/fimk" ]; then
+  cd ./../mofowallet
+  sh ./compile4server.sh
+  cd ./../fimk
+  cp ./../mofowallet/dist/. ./html/fimk -R
+fi
+
 /bin/rm -f fim.zip
 zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar MIT-license.txt README.txt run.bat run.sh
 
@@ -21,7 +28,7 @@ echo "fim.zip generated successfully"
 # Package it all up
 # ==============================================================================
 
-VERSION=0.4.1
+VERSION=0.4.2
 BASE=fim
 DATE=`date +%Y-%m-%d`
 
@@ -43,10 +50,10 @@ BANNER=$(cat <<'END_HEREDOC'
  /$$$$$$$$ /$$$$$$ /$$      /$$          Release : #VERSION#          
 | $$_____/|_  $$_/| $$$    /$$$          Date    : #DATE#          
 | $$        | $$  | $$$$  /$$$$                  
-| $$$$$     | $$  | $$ $$/$$ $$          http://fimk.fi       
+| $$$$$     | $$  | $$ $$/$$ $$          http://fimk.fi
 | $$__/     | $$  | $$  $$$| $$          http://mofowallet.com
-| $$        | $$  | $$\  $ | $$          http://forum.fimk.fi          
-| $$       /$$$$$$| $$ \/  | $$          https://github.com/fimkrypto/mofowallet
+| $$        | $$  | $$\  $ | $$          http://forum.fimk.fi
+| $$       /$$$$$$| $$ \/  | $$          https://github.com/fimkrypto/fimk
 |__/      |______/|__/     |__/                 
                      /$$                                       /$$              
                     | $$                                      | $$              
