@@ -625,25 +625,29 @@ class NxtDbVersion extends DbVersion {
             case 251:
                 apply("CALL FTL_CREATE_INDEX('PUBLIC', 'ACCOUNT', 'NAME,DESCRIPTION')");
             case 252:
-                apply("CALL FTL_REINDEX()");
+                apply(null);
             case 253:
-                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
+                apply("CALL FTL_DROP_INDEX('PUBLIC', 'ACCOUNT')");
             case 254:
-                apply("UPDATE asset SET type = 0");
+                apply("CALL FTL_REINDEX()");
             case 255:
+                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
+            case 256:
+                apply("UPDATE asset SET type = 0");
+            case 257:
                 apply("CREATE TABLE IF NOT EXISTS private_asset (db_id IDENTITY, asset_id BIGINT NOT NULL, "
                     + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
                     + "FOREIGN KEY (asset_id) REFERENCES asset (id) ON DELETE CASCADE, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
-            case 256:
+            case 258:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_height_idx ON private_asset (asset_id, height DESC)");
-            case 257:
+            case 259:
                 apply("CREATE TABLE IF NOT EXISTS private_asset_account (db_id IDENTITY, account_id BIGINT NOT NULL, "
                     + "asset_id BIGINT NOT NULL, allowed BOOLEAN NOT NULL DEFAULT TRUE, height INT NOT NULL, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
-            case 258:
+            case 260:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
-            case 259:
+            case 261:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
