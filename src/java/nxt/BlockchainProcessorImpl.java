@@ -935,7 +935,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         }
     };
 
-    void generateBlock(String secretPhrase, int blockTimestamp) throws BlockNotAcceptedException {
+    public void generateBlock(String secretPhrase, int blockTimestamp) throws BlockNotAcceptedException {
 
         TransactionProcessorImpl transactionProcessor = TransactionProcessorImpl.getInstance();
         List<UnconfirmedTransaction> orderedUnconfirmedTransactions = new ArrayList<>();
@@ -1108,13 +1108,11 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                  PreparedStatement pstmtDone = con.prepareStatement("UPDATE scan SET rescan = FALSE, height = 0, validate = FALSE")) {
                 isScanning = true;
                 transactionProcessor.requeueAllUnconfirmedTransactions();
-                if (blockchainHeight != 0) { 
-                    for (DerivedDbTable table : derivedTables) {
-                        if (height == 0) {
-                            table.truncate();
-                        } else {
-                            table.rollback(height - 1);
-                        }
+                for (DerivedDbTable table : derivedTables) {
+                    if (height == 0) {
+                        table.truncate();
+                    } else {
+                        table.rollback(height - 1);
                     }
                 }
                 Db.db.commitTransaction();
