@@ -11,6 +11,7 @@
 /keystore
 /fim.jar
 /fim_test_db*
+/fim_unit_tests_db/
 /fim_db*
 *.trace
 /fim-trace.csv
