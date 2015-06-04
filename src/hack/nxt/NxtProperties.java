@@ -22,7 +22,7 @@ public class NxtProperties {
 
     Properties properties = loadProperties(new String[] {
         System.getProperty("user.home") + "/git/fimk/conf/nxt-default.properties",
-        System.getProperty("user.home") + "/git/fimk/conf/nxt.properties", 
+        System.getProperty("user.home") + "/git/fimk/conf/nxt.properties"
     });
 
     writeConfigFile(properties, propertiesFile);
