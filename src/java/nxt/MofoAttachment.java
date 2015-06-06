@@ -181,7 +181,7 @@ public class MofoAttachment {
             super(attachmentData);
             this.assetId = Convert.parseUnsignedLong((String) attachmentData.get("asset"));
             this.orderFeePercentage = ((Long)attachmentData.get("orderFeePercentage")).intValue();
-            this.tradeFeePercentage = ((Long)attachmentData.get("orderFeePercentage")).intValue();
+            this.tradeFeePercentage = ((Long)attachmentData.get("tradeFeePercentage")).intValue();
         }
     
         public PrivateAssetSetFeeAttachment(long assetId, int orderFeePercentage, int tradeFeePercentage) {
