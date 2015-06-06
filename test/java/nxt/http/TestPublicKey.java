@@ -7,7 +7,6 @@ import nxt.BlockchainTest;
 import nxt.Constants;
 import nxt.Nxt;
 import nxt.crypto.Crypto;
-import nxt.http.APICall.Builder;
 import nxt.util.Convert;
 
 public class TestPublicKey extends BlockchainTest {
