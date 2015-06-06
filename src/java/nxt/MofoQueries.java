@@ -1,6 +1,7 @@
 package nxt;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.sql.Connection;
@@ -19,6 +20,7 @@ import org.json.simple.JSONObject;
 import nxt.Appendix.Message;
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
+import nxt.http.websocket.JSONData;
 import nxt.util.Convert;
 
 public final class MofoQueries {
@@ -604,8 +606,6 @@ public final class MofoQueries {
             pstmt.setInt(++i, timestamp);
             pstmt.setInt(++i, limit);
             
-            System.out.println(pstmt.toString());
-            
             return Nxt.getBlockchain().getTransactions(con, pstmt);
         } catch (SQLException e) {
             DbUtils.close(con);
@@ -680,7 +680,7 @@ public final class MofoQueries {
                 Transaction transaction = iterator.next();
                 
                 /* skip those that are younger than timestamp */
-                if (transaction.getTimestamp() > timestamp) {
+                if (timestamp != 0 && transaction.getTimestamp() > timestamp) {
                     continue;
                 }
                 
@@ -872,9 +872,7 @@ public final class MofoQueries {
             for (int j=0; j<accounts.size(); j++) {
                 pstmt.setLong(++i, accounts.get(j));
             }
-            pstmt.setInt(++i, limit);    
-            
-            System.out.println(pstmt.toString());
+            pstmt.setInt(++i, limit);
             
             return Nxt.getBlockchain().getTransactions(con, pstmt);
         } catch (SQLException e) {
@@ -925,7 +923,7 @@ public final class MofoQueries {
                     order.put("priceNQT", String.valueOf(rs.getLong("price")));
                     order.put("quantityQNT", String.valueOf(rs.getLong("quantity")));
                     order.put("height", height);
-                    order.put("accountRS", Convert.rsAccount(rs.getLong("account_id")));
+                    JSONData.putAccount(order, "account", rs.getLong("account_id"));
                     order.put("type", rs.getString("TYPE"));
                     order.put("confirmations", Nxt.getBlockchain().getHeight() - height);
                     
@@ -956,6 +954,103 @@ public final class MofoQueries {
             
         } catch (SQLException e) {
             DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+    
+    static public class PrivateAccount {
+        public Account account;
+        public int height;
+        public boolean allowed;
+        PrivateAccount(Account account, int height, boolean allowed) {
+            this.account = account;
+            this.height = height;
+            this.allowed = allowed;
+        }
+    }
+    
+    public static List<PrivateAccount> getAssetPrivateAccounts(long assetId, boolean includeAllowed, boolean includeAll, int from, int to) {
+        StringBuilder b = new StringBuilder();
+        b.append("SELECT account_id, height, allowed ");
+        b.append("FROM private_asset_account ");
+        b.append("WHERE asset_id = ? AND latest = TRUE ");
+        b.append(includeAll ? "" : "AND allowed = ? "); 
+        b.append("ORDER BY height ");
+        b.append(DbUtils.limitsClause(from, to));
+        
+        try (Connection con = Db.db.getConnection();              
+            PreparedStatement pstmt = con.prepareStatement(b.toString());)
+        {
+            int i = 0;
+            pstmt.setLong(++i, assetId);
+            if (!includeAll) {
+                pstmt.setBoolean(++i, includeAllowed);
+            }
+            DbUtils.setLimits(++i, pstmt, from, to);
+            List<PrivateAccount> accounts = new ArrayList<PrivateAccount>();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    long accountId = rs.getLong("account_id");
+                    int height = rs.getInt("height");
+                    boolean allowed = rs.getBoolean("allowed");
+                    accounts.add(new PrivateAccount(Account.getAccount(accountId), height, allowed));
+                }               
+            }            
+            return accounts;        
+        } 
+        catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
+    /**
+     * volumeTotalQNT
+     * volumeTodayQNT
+     * numberOfTradesToday
+     * lastPriceNQT
+     * */
+    public static void getAssetMetrics(JSONObject json, long assetId) {
+        StringBuilder b = new StringBuilder();
+        b.append("SELECT "
+               + "  (SELECT SUM(CAST( quantity AS BIGINT )) FROM trade WHERE asset_id = ?) AS volumeTotal,"
+               + "  (SELECT SUM(CAST( quantity AS BIGINT )) FROM trade WHERE asset_id = ? AND timestamp > ?) AS volumeToday,"
+               + "  (SELECT COUNT(*) FROM trade WHERE asset_id = ? AND timestamp > ?) AS numberOfTradesToday, "
+               + "  (SELECT price FROM trade WHERE asset_id = ? ORDER BY timestamp DESC LIMIT 1) AS lastPrice "
+               + "FROM trade "
+               + "WHERE asset_id = ?");
+        
+        try (Connection con = Db.db.getConnection();              
+            PreparedStatement pstmt = con.prepareStatement(b.toString());)
+        {
+            int timestamp = Nxt.getEpochTime() - (24 * 60 * 60);          
+            int i = 0;
+            pstmt.setLong(++i, assetId);
+            pstmt.setLong(++i, assetId);
+            pstmt.setInt(++i, timestamp);
+            pstmt.setLong(++i, assetId);
+            pstmt.setInt(++i, timestamp);
+            pstmt.setLong(++i, assetId);
+            pstmt.setLong(++i, assetId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    BigDecimal volumeTotal = rs.getBigDecimal("volumeTotal");
+                    BigDecimal volumeToday = rs.getBigDecimal("volumeToday");
+                    int numberOfTradesToday = rs.getInt("numberOfTradesToday");
+                    long lastPrice = rs.getLong("lastPrice");
+                    
+                    if (volumeTotal != null) {
+                        json.put("volumeTotalQNT", volumeTotal.toString());
+                    }
+                    if (volumeToday != null) {
+                        json.put("volumeTodayQNT", volumeToday.toString());
+                    }
+                    json.put("numberOfTradesToday", numberOfTradesToday);
+                    json.put("lastPriceNQT", String.valueOf(lastPrice));
+                }
+            }            
+        } 
+        catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         }
     }
