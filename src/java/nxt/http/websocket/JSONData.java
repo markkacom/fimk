@@ -10,10 +10,8 @@ import nxt.Appendix;
 import nxt.Asset;
 import nxt.Attachment.MonetarySystemAttachment;
 import nxt.Attachment.ColoredCoinsAssetTransfer;
-import nxt.Attachment.ColoredCoinsOrderPlacement;
 import nxt.Attachment.ColoredCoinsAskOrderPlacement;
 import nxt.Attachment.ColoredCoinsBidOrderPlacement;
-import nxt.Attachment.ColoredCoinsOrderCancellation;
 import nxt.Attachment.ColoredCoinsAskOrderCancellation;
 import nxt.Attachment.ColoredCoinsBidOrderCancellation;
 import nxt.Block;
@@ -21,8 +19,6 @@ import nxt.Currency;
 import nxt.DigitalGoodsStore;
 import nxt.Nxt;
 import nxt.Order;
-import nxt.Order.Ask;
-import nxt.Order.Bid;
 import nxt.RewardsImpl;
 import nxt.Trade;
 import nxt.Transaction;
@@ -96,9 +92,21 @@ public class JSONData {
         if (transaction.getRecipientId() != 0) {
             JSONData.putAccount(json, "recipient", transaction.getRecipientId());
         }
+        boolean publicKeysIncluded = false;
         JSONObject attachmentJSON = new JSONObject();
         for (Appendix appendage : transaction.getAppendages()) {
             attachmentJSON.putAll(appendage.getJSONObject());
+            if (publicKeysIncluded == false && appendage instanceof Appendix.EncryptedMessage) {
+                publicKeysIncluded = true;
+                Account sender = Account.getAccount(transaction.getSenderId());
+                if (sender != null && sender.getPublicKey() != null) {
+                    attachmentJSON.put("senderPublicKey", Convert.toHexString(sender.getPublicKey()));
+                }
+                Account recipient = Account.getAccount(transaction.getRecipientId());
+                if (recipient != null && recipient.getPublicKey() != null) {
+                    attachmentJSON.put("recipientPublicKey", Convert.toHexString(recipient.getPublicKey()));
+                }
+            }
             if (transaction.getType().getType() == 2) {
                 long assetId = 0L;
                 if (transaction.getType().getSubtype() == 0) { // SUBTYPE_COLORED_COINS_ASSET_ISSUANCE
@@ -175,6 +183,9 @@ public class JSONData {
         if (asset != null) {
             json.put("name", asset.getName());
             json.put("decimals", asset.getDecimals());
+            if (Asset.privateEnabled()) {
+                json.put("type", asset.getType());
+            }            
         }
     }    
    
@@ -252,6 +263,9 @@ public class JSONData {
             json.put("decimals", asset.getDecimals());          
             json.put("totalQuantityQNT", asset.getQuantityQNT());
             json.put("issuer", Convert.rsAccount(asset.getAccountId()));
+            if (Asset.privateEnabled()) {
+                json.put("type", asset.getType());
+            }            
         }
         return json;
     }
