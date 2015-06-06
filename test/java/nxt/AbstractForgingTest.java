@@ -17,13 +17,13 @@ public abstract class AbstractForgingTest extends AbstractBlockchainTest {
         return properties;
     }
 
-    protected static void init(Properties properties) {
+    public static void init(Properties properties) {
         AbstractBlockchainTest.init(properties);
         startHeight = blockchain.getHeight();
         Assert.assertTrue(startHeight >= minStartHeight);
     }
 
-    protected static void shutdown() {
+    public static void shutdown() {
         blockchainProcessor.popOffTo(startHeight);
         AbstractBlockchainTest.shutdown();
     }

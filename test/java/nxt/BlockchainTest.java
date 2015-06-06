@@ -3,6 +3,7 @@ package nxt;
 import nxt.crypto.Crypto;
 import nxt.util.Logger;
 import nxt.util.Time;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
