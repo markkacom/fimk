@@ -7,6 +7,7 @@ import nxt.user.Users;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
 import nxt.util.Time;
+import nxt.virtualexchange.ExchangeObserver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -149,7 +150,7 @@ public final class Nxt {
         return time.getTime();
     }
 
-    static void setTime(Time time) {
+    public static void setTime(Time time) {
         Nxt.time = time;
     }
 
@@ -224,6 +225,7 @@ public final class Nxt {
                 MofoChart.init();
                 MofoMessaging.init();
                 MofoAsset.init();
+                ExchangeObserver.init();
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
