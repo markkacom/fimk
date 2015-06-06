@@ -190,7 +190,7 @@ public class GetActivity extends RPCCall {
             if (account != null) {
                 return MofoQueries.getUnconfirmedTransactions(account, timestamp, COUNT, filters);
             }
-            return MofoQueries.getUnconfirmedTransactions(COUNT, timestamp, filters);
+            return MofoQueries.getUnconfirmedTransactions(timestamp, COUNT, filters);
         }
         return null;
     }
