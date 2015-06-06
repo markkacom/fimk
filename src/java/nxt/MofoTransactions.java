@@ -3,6 +3,11 @@ package nxt;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import nxt.Order.Ask;
+import nxt.Order.Bid;
+import nxt.db.DbIterator;
+import nxt.util.Convert;
+
 import org.json.simple.JSONObject;
 
 public class MofoTransactions {
@@ -157,11 +162,7 @@ public class MofoTransactions {
                 if (asset.getAccountId() != senderAccount.getId()) {
                     throw new NxtException.NotValidException("Only asset issuer can add private accounts");
                 }
-                Account recipientAccount = Account.getAccount(transaction.getRecipientId());
-                if (recipientAccount == null) {
-                    throw new NxtException.NotValidException("Recipient account does not exist");
-                }
-                if (recipientAccount.getId() == senderAccount.getId()) {
+                if (transaction.getRecipientId() == senderAccount.getId()) {
                     throw new NxtException.NotValidException("Issuer account can not be added as private account");
                 }
                 if ( ! Asset.privateEnabled()) {
@@ -216,6 +217,21 @@ public class MofoTransactions {
             void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.RemovePrivateAssetAccountAttachment attachment = (MofoAttachment.RemovePrivateAssetAccountAttachment) transaction.getAttachment();
                 MofoAsset.setAccountAllowed(attachment.getAssetId(), transaction.getRecipientId(), false);
+                if (recipientAccount != null) {
+                    try (DbIterator<Bid> bids = Order.Bid.getBidOrdersByAccountAsset(transaction.getRecipientId(), attachment.getAssetId(), 0, Integer.MAX_VALUE);
+                         DbIterator<Ask> asks = Order.Ask.getAskOrdersByAccountAsset(transaction.getRecipientId(), attachment.getAssetId(), 0, Integer.MAX_VALUE);) {
+                        while (bids.hasNext()) {
+                            Order order = bids.next();
+                            Order.Bid.removeOrder(order.getId());
+                            recipientAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(order.getQuantityQNT(), order.getPriceNQT()));
+                        }
+                        while (asks.hasNext()) {
+                            Order order = asks.next();
+                            Order.Ask.removeOrder(order.getId());
+                            recipientAccount.addToUnconfirmedAssetBalanceQNT(order.getAssetId(), order.getQuantityQNT());
+                        }
+                    }
+                }
             }
   
             @Override
