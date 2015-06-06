@@ -38,7 +38,12 @@ public abstract class DerivedDbTable {
         }
         try (Connection con = db.getConnection();
              Statement stmt = con.createStatement()) {
-            stmt.executeUpdate("TRUNCATE TABLE " + table);
+            if (hasForeignKey()) {
+                stmt.executeUpdate("DELETE FROM " + table);
+            }
+            else {
+                stmt.executeUpdate("TRUNCATE TABLE " + table);
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.toString(), e);
         }
@@ -51,6 +56,11 @@ public abstract class DerivedDbTable {
     @Override
     public String toString() {
         return table;
+    }
+    
+    /* Must indicate if this table has any foreign keys pointing to it */
+    public boolean hasForeignKey() {
+        return false;
     }
 
 }

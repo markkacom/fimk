@@ -39,6 +39,9 @@ public final class Asset {
             asset.save(con);
         }
 
+        public boolean hasForeignKey() {
+            return true;
+        };
     };
 
     public static DbIterator<Asset> getAllAssets(int from, int to) {
