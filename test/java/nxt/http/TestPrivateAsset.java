@@ -1,5 +1,7 @@
 package nxt.http;
 
+import java.math.BigDecimal;
+
 import nxt.BlockchainTest;
 import nxt.Constants;
 import nxt.MofoAsset;
@@ -15,7 +17,28 @@ import org.junit.Test;
 public class TestPrivateAsset extends BlockchainTest {
   
     public long FEE_NQT = Constants.ONE_NXT / 10;
+    
+    static int getPercentage(String percentage) {
+        BigDecimal b = new BigDecimal(percentage); 
+        BigDecimal r = b.multiply(new BigDecimal("1000000"));
+        return r.intValueExact(); 
+    }
   
+    @Test
+    public void testGetPercentage() {
+        Assert.assertEquals(getPercentage("0.000001"), 1);
+        Assert.assertEquals(getPercentage("0.00001"), 10);
+        Assert.assertEquals(getPercentage("0.0001"), 100);
+        Assert.assertEquals(getPercentage("0.001"), 1000);
+        Assert.assertEquals(getPercentage("0.01"), 10000);
+        Assert.assertEquals(getPercentage("0.1"), 100000);
+        Assert.assertEquals(getPercentage("1"), 1000000);
+        Assert.assertEquals(getPercentage("10"), 10000000);
+        Assert.assertEquals(getPercentage("100"),  100000000);
+        Assert.assertEquals(getPercentage("1000"), 1000000000);
+        Assert.assertEquals(getPercentage("2000"), 2000000000);
+    }    
+    
     @Ignore
     public void issueAsset() {
         long quantityQNT = 1000 * Constants.ONE_NXT;
@@ -265,14 +288,16 @@ public class TestPrivateAsset extends BlockchainTest {
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1 * Constants.ONE_NXT, 200, 200);        
     }
     
-    @Test
-    public void feeIsPaidForOrder() {
+    @Ignore
+    public void feeIsPaidForPlacingBidOrder() {
+      
         MofoHelper.setSecretPhrase(secretPhrase1);
         long assetId = MofoHelper.createPrivateAsset(1000 * Constants.ONE_NXT, (short) 8);
         setAccountAllowed(assetId, id2, true);
         MofoHelper.transferAsset(secretPhrase1, assetId, id2, 1 * Constants.ONE_NXT);
         generateBlock();
         
+        // confirm asset balances
         Assert.assertEquals(1 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id2));
         Assert.assertEquals(999 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id1));
 
@@ -281,41 +306,96 @@ public class TestPrivateAsset extends BlockchainTest {
         
         // fee is 0
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1000, 2, 0);
+        bidderBalanceNQT -= FEE_NQT;
         
+        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2));
         Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
-        Assert.assertEquals(bidderBalanceNQT-FEE_NQT, MofoHelper.getBalanceNQT(id2));
 
         Assert.assertEquals(1 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id2));
         Assert.assertEquals(999 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id1));
 
         // set fee at 1%
-        setAssetFee(assetId, 1000000, 1000000);
+        int orderFeePercentage = getPercentage("1");
+        int tradeFeePercentage = getPercentage("1"); 
+        setAssetFee(assetId, orderFeePercentage, tradeFeePercentage);
+        issuerBalanceNQT -= FEE_NQT;
+        Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
         
         int height = Nxt.getBlockchain().getHeight();
-        
-        // account2 will place a buy order for 10 assets at 1 FIMK each
-        // 10 assets in QNT is 1,000,000,000 (8 decimals)
-        // 1 FIMK in NQT is      100,000,000 (8 decimals)
-        // 
-        // Total cost will be 1,000,000,000 * 100,000,000 = 1,00,000,000,000,000,000
-        
 
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1000, 1, 0, "Insufficient \"orderFeeNQT\": minimum of 10 required");
         MofoHelper.placeBidOrder(secretPhrase2, assetId, 1000, 1, 10);
         
-        Assert.assertEquals(issuerBalanceNQT + 10, MofoHelper.getBalanceNQT(id1));
-        Assert.assertEquals(bidderBalanceNQT - 10, MofoHelper.getBalanceNQT(id2));        
+        bidderBalanceNQT -= FEE_NQT;
+        bidderBalanceNQT -= 10;
+        issuerBalanceNQT += 10;
+        
+        Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
+        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2));        
         
         rollback(height);
+        
+        issuerBalanceNQT -= 10;
+        bidderBalanceNQT += 10;
+        bidderBalanceNQT += FEE_NQT;
 
         Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
-        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2));  
-        
+        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2)); 
     }
     
     @Test
-    public void feeIsPaidForBidOrder() {
+    public void feeIsPaidForPlacingAskOrder() {
       
+        MofoHelper.setSecretPhrase(secretPhrase1);
+        long assetId = MofoHelper.createPrivateAsset(1000 * Constants.ONE_NXT, (short) 8);
+        setAccountAllowed(assetId, id2, true);
+        MofoHelper.transferAsset(secretPhrase1, assetId, id2, 1 * Constants.ONE_NXT);
+        generateBlock();
+        
+        // confirm asset balances
+        Assert.assertEquals(1 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id2));
+        Assert.assertEquals(999 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id1));
+
+        long issuerBalanceNQT = MofoHelper.getBalanceNQT(id1);
+        long bidderBalanceNQT = MofoHelper.getBalanceNQT(id2);
+        
+        // fee is 0
+        MofoHelper.placeAskOrder(secretPhrase2, assetId, 1000, 2, 0);
+        bidderBalanceNQT -= FEE_NQT;
+        
+        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2));
+        Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
+
+        Assert.assertEquals(1 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id2));
+        Assert.assertEquals(999 * Constants.ONE_NXT, MofoHelper.getAssetBalance(assetId, id1));
+
+        // set fee at 1%
+        int orderFeePercentage = getPercentage("1");
+        int tradeFeePercentage = getPercentage("1"); 
+        setAssetFee(assetId, orderFeePercentage, tradeFeePercentage);
+        issuerBalanceNQT -= FEE_NQT;
+        Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
+        
+        int height = Nxt.getBlockchain().getHeight();
+
+        MofoHelper.placeAskOrder(secretPhrase2, assetId, 1000, 1, 0, "Insufficient \"orderFeeQNT\": minimum of 10 required");
+        MofoHelper.placeAskOrder(secretPhrase2, assetId, 1000, 1, 10);
+        
+        bidderBalanceNQT -= FEE_NQT;
+        bidderBalanceNQT -= 10;
+        issuerBalanceNQT += 10;
+        
+        Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
+        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2));        
+        
+        rollback(height);
+        
+        issuerBalanceNQT -= 10;
+        bidderBalanceNQT += 10;
+        bidderBalanceNQT += FEE_NQT;
+
+        Assert.assertEquals(issuerBalanceNQT, MofoHelper.getBalanceNQT(id1));
+        Assert.assertEquals(bidderBalanceNQT, MofoHelper.getBalanceNQT(id2)); 
     }
     
     public static void setAssetFee(long assetId, int orderFeePercentage, int tradeFeePercentage) {
