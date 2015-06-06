@@ -7,8 +7,8 @@ import nxt.MofoChart;
 import nxt.MofoChartWindow;
 import nxt.Nxt;
 import nxt.http.ParameterException;
-import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
+import nxt.virtualexchange.VirtualTrade;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -54,6 +54,17 @@ public class GetAssetChartData extends RPCCall {
             json.put("low", String.valueOf(d.getLowNQT()));
             json.put("avg", String.valueOf(d.getAverageNQT()));
             json.put("vol", String.valueOf(d.getVolumeQNT()));
+            chart_data.add(json);
+        }
+        
+        /* Always add the trades from the past hour */
+        List<VirtualTrade> recentTrades = VirtualTrade.getTrades(asset.getId(), 0, 30);
+        for (int i=recentTrades.size()-1; i>=0; i--) {
+            VirtualTrade d = recentTrades.get(i);
+            json = new JSONObject();
+            json.put("timestamp", d.getTimestamp());
+            json.put("open", String.valueOf(d.getPriceNQT()));
+            json.put("vol", String.valueOf(d.getQuantityQNT()));
             chart_data.add(json);
         }
         
