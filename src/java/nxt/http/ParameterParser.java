@@ -122,7 +122,7 @@ final class ParameterParser {
         if (aliasId != null) {
             alias = NamespacedAlias.getAlias(aliasId);
         } else if (aliasName != null) {
-            alias = NamespacedAlias.getAlias(getAccount(req).getId(), aliasName);
+            alias = NamespacedAlias.getAlias(getAccount(req).getId(), aliasName.toLowerCase());
         } else {
             throw new ParameterException(MISSING_ALIAS_OR_ALIAS_NAME);
         }
@@ -440,6 +440,20 @@ final class ParameterParser {
             }
         }
         return result;
+    }
+    
+    static long getAccountId(HttpServletRequest req) throws ParameterException {
+        String accountValue = Convert.emptyToNull(req.getParameter("account"));
+        if (accountValue == null) {
+            throw new ParameterException(MISSING_ACCOUNT);
+        }
+        long accountId;
+        try {
+            accountId = Convert.parseAccountId(accountValue);
+        } catch (RuntimeException e) {
+            throw new ParameterException(INCORRECT_ACCOUNT);
+        }
+        return accountId;
     }
 
     static int getTimestamp(HttpServletRequest req) throws ParameterException {
