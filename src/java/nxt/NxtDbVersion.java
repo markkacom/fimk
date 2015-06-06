@@ -554,7 +554,6 @@ class NxtDbVersion extends DbVersion {
             case 217:
                 apply("ALTER TABLE currency DROP COLUMN IF EXISTS current_reserve_per_unit_nqt");
             case 218:
-                //BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply(null);
             case 219:
                 apply(null);
