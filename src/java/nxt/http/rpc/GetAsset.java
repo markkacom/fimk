@@ -3,6 +3,9 @@ package nxt.http.rpc;
 import nxt.Account;
 import nxt.Asset;
 import nxt.AssetTransfer;
+import nxt.MofoAsset;
+import nxt.MofoQueries;
+import nxt.MofoAsset.AssetFee;
 import nxt.Trade;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
@@ -23,17 +26,38 @@ public class GetAsset extends RPCCall {
     @Override
     public JSONStreamAware call(JSONObject arguments) throws ParameterException {
       
+        boolean includeDetails = "true".equals((String) arguments.get("includeDetails"));
+        boolean includeVolumes = "true".equals((String) arguments.get("includeVolumes"));
+      
         Asset asset = ParameterParser.getAsset(arguments);
         JSONObject response = new JSONObject();
-        response.put("name", asset.getName());
         response.put("decimals", asset.getDecimals());
-        response.put("description", asset.getDescription());
-        response.put("quantityQNT", asset.getQuantityQNT());
-        JSONData.putAccount(response, "issuer", asset.getAccountId());
+        response.put("name", asset.getName());
         
-        response.put("numberOfTrades", Trade.getTradeCount(asset.getId()));
-        response.put("numberOfTransfers", AssetTransfer.getTransferCount(asset.getId()));
-        response.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
+        if (includeDetails) {
+            response.put("description", asset.getDescription());
+            JSONData.putAccount(response, "issuer", asset.getAccountId());
+            response.put("quantityQNT", asset.getQuantityQNT());
+            response.put("numberOfTrades", Trade.getTradeCount(asset.getId()));
+            response.put("numberOfTransfers", AssetTransfer.getTransferCount(asset.getId()));
+            response.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
+        }
+   
+        if (includeVolumes) {
+            // quantityQNTTotal
+            // quantityQNTToday
+            // numberOfTradesToday
+            MofoQueries.getAssetMetrics(response, asset.getId());
+        }
+        
+        if (Asset.privateEnabled()) {
+            response.put("type", asset.getType());
+            if (MofoAsset.isPrivateAsset(asset)) {
+                AssetFee fee = MofoAsset.getFee(asset.getId());
+                response.put("orderFeePercentage", fee.getOrderFeePercentage());
+                response.put("tradeFeePercentage", fee.getTradeFeePercentage());
+            }
+        }        
 
         return response;      
     }  
