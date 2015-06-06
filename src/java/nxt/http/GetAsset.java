@@ -1,6 +1,11 @@
 package nxt.http;
 
+import nxt.Asset;
+import nxt.MofoAsset;
+import nxt.MofoAsset.AssetFee;
 import nxt.NxtException;
+
+import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +21,14 @@ public final class GetAsset extends APIServlet.APIRequestHandler {
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
-        return JSONData.asset(ParameterParser.getAsset(req), includeCounts);
+        Asset asset = ParameterParser.getAsset(req);
+        JSONObject response = JSONData.asset(asset, includeCounts);
+        AssetFee fee = MofoAsset.getFee(asset.getId());
+        if (fee != null) {
+            response.put("orderFeePercentage", fee.getOrderFeePercentage());
+            response.put("tradeFeePercentage", fee.getTradeFeePercentage());
+        }
+        return response;
     }
 
 }
