@@ -5,6 +5,8 @@ import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
 import nxt.util.Convert;
+import nxt.util.Listener;
+import nxt.util.Listeners;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +14,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Order {
-
+  
+    public static enum Event {
+        CREATE, UPDATE, REMOVE
+    }    
+    
     private static void matchOrders(long assetId) {
 
         Order.Ask askOrder;
@@ -25,22 +31,54 @@ public abstract class Order {
                 break;
             }
 
-
             Trade trade = Trade.addTrade(assetId, Nxt.getBlockchain().getLastBlock(), askOrder, bidOrder);
+            
+            if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(askOrder.getAssetId())) {
+                /**
+                 * When a trade fee is imposed that fee (percentage) will be deducted from 
+                 * the amount of NQT which the asker receives and from the QNT of assets
+                 * that the bidder receives.
+                 * 
+                 * The NQT from the asker and the QNT from the bidder are transferred to the
+                 * asset issuer account.
+                 */
 
-            askOrder.updateQuantityQNT(Convert.safeSubtract(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
-            Account askAccount = Account.getAccount(askOrder.getAccountId());
-            askAccount.addToBalanceAndUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
-            askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
-
-            bidOrder.updateQuantityQNT(Convert.safeSubtract(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
-            Account bidAccount = Account.getAccount(bidOrder.getAccountId());
-            bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, trade.getQuantityQNT());
-            bidAccount.addToBalanceNQT(-Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
-            bidAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
-
+                askOrder.updateQuantityQNT(Convert.safeSubtract(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                
+                Account askAccount = Account.getAccount(askOrder.getAccountId());
+                long amountNQT = Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT());                
+                long feeNQT = MofoAsset.calculateTradeFee(assetId, amountNQT);
+                
+                askAccount.addToBalanceAndUnconfirmedBalanceNQT(Convert.safeSubtract(amountNQT, feeNQT));
+                askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
+    
+                bidOrder.updateQuantityQNT(Convert.safeSubtract(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                
+                Account bidAccount = Account.getAccount(bidOrder.getAccountId());
+                long quantityQNT = trade.getQuantityQNT();
+                long feeQNT = MofoAsset.calculateTradeFee(assetId, quantityQNT);
+                
+                bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, Convert.safeSubtract(quantityQNT, feeQNT));
+                bidAccount.addToBalanceNQT(-Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
+                bidAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
+                
+                Account issuerAccount = Account.getAccount(Asset.getAsset(assetId).getAccountId());
+                issuerAccount.addToBalanceAndUnconfirmedBalanceNQT(feeNQT);
+                issuerAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, feeQNT);
+            }
+            else {
+                askOrder.updateQuantityQNT(Convert.safeSubtract(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                Account askAccount = Account.getAccount(askOrder.getAccountId());
+                askAccount.addToBalanceAndUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
+                askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
+    
+                bidOrder.updateQuantityQNT(Convert.safeSubtract(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                Account bidAccount = Account.getAccount(bidOrder.getAccountId());
+                bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, trade.getQuantityQNT());
+                bidAccount.addToBalanceNQT(-Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
+                bidAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
+            }
         }
-
     }
 
     static void init() {
@@ -149,6 +187,16 @@ public abstract class Order {
     */
 
     public static final class Ask extends Order {
+      
+        private static final Listeners<Order,Event> listeners = new Listeners<>();
+        
+        public static boolean addListener(Listener<Order> listener, Event eventType) {
+            return listeners.addListener(listener, eventType);
+        }
+      
+        public static boolean removeListener(Listener<Order> listener, Event eventType) {
+            return listeners.removeListener(listener, eventType);
+        }      
 
         private static final DbKey.LongKeyFactory<Ask> askOrderDbKeyFactory = new DbKey.LongKeyFactory<Ask>("id") {
 
@@ -227,11 +275,22 @@ public abstract class Order {
         static void addOrder(Transaction transaction, Attachment.ColoredCoinsAskOrderPlacement attachment) {
             Ask order = new Ask(transaction, attachment);
             askOrderTable.insert(order);
-            matchOrders(attachment.getAssetId());
+            try {
+                listeners.notify(order, Event.CREATE);
+            } finally {
+                matchOrders(attachment.getAssetId());
+            }
         }
 
         static void removeOrder(long orderId) {
-            askOrderTable.delete(getAskOrder(orderId));
+            Ask order = getAskOrder(orderId);
+            try {
+                if (order != null) {
+                    listeners.notify(order, Event.REMOVE);
+                }
+            } finally {
+                askOrderTable.delete(order);
+            }
         }
 
         static void init() {}
@@ -257,8 +316,10 @@ public abstract class Order {
             super.setQuantityQNT(quantityQNT);
             if (quantityQNT > 0) {
                 askOrderTable.insert(this);
+                listeners.notify(this, Event.UPDATE);
             } else if (quantityQNT == 0) {
                 askOrderTable.delete(this);
+                listeners.notify(this, Event.REMOVE);
             } else {
                 throw new IllegalArgumentException("Negative quantity: " + quantityQNT
                         + " for order: " + Convert.toUnsignedLong(getId()));
@@ -281,6 +342,16 @@ public abstract class Order {
     }
 
     public static final class Bid extends Order {
+      
+        private static final Listeners<Order,Event> listeners = new Listeners<>();
+        
+        public static boolean addListener(Listener<Order> listener, Event eventType) {
+            return listeners.addListener(listener, eventType);
+        }
+      
+        public static boolean removeListener(Listener<Order> listener, Event eventType) {
+            return listeners.removeListener(listener, eventType);
+        }      
 
         private static final DbKey.LongKeyFactory<Bid> bidOrderDbKeyFactory = new DbKey.LongKeyFactory<Bid>("id") {
 
@@ -360,11 +431,22 @@ public abstract class Order {
         static void addOrder(Transaction transaction, Attachment.ColoredCoinsBidOrderPlacement attachment) {
             Bid order = new Bid(transaction, attachment);
             bidOrderTable.insert(order);
-            matchOrders(attachment.getAssetId());
+            try {
+                listeners.notify(order, Event.CREATE);
+            } finally {
+                matchOrders(attachment.getAssetId());
+            }
         }
 
         static void removeOrder(long orderId) {
-            bidOrderTable.delete(getBidOrder(orderId));
+            Bid order = getBidOrder(orderId);
+            try {
+                if (order != null) {
+                    listeners.notify(order, Event.REMOVE);
+                }
+            } finally {
+                bidOrderTable.delete(order);
+            }
         }
 
         static void init() {}
@@ -390,8 +472,10 @@ public abstract class Order {
             super.setQuantityQNT(quantityQNT);
             if (quantityQNT > 0) {
                 bidOrderTable.insert(this);
+                listeners.notify(this, Event.UPDATE);
             } else if (quantityQNT == 0) {
                 bidOrderTable.delete(this);
+                listeners.notify(this, Event.REMOVE);
             } else {
                 throw new IllegalArgumentException("Negative quantity: " + quantityQNT
                         + " for order: " + Convert.toUnsignedLong(getId()));
