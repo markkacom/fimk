@@ -45,20 +45,11 @@ public final class PlaceBidOrder extends CreateTransaction {
         }
         
         if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
-                
             long minOrderFeeNQT = MofoAsset.calculateOrderFee(asset.getId(), totalNQT);
             if (minOrderFeeNQT > orderFeeNQT) {
                 JSONObject response = new JSONObject();
                 response.put("error", "Insufficient \"orderFeeNQT\": minimum of " + Long.valueOf(minOrderFeeNQT) + " required");
                 return JSON.prepare(response);
-            }
-            
-            try {
-                if (Convert.safeAdd( Convert.safeAdd(feeNQT, totalNQT), orderFeeNQT) > account.getUnconfirmedBalanceNQT()) {
-                    return NOT_ENOUGH_FUNDS;
-                }
-            } catch (ArithmeticException e) {
-                return NOT_ENOUGH_FUNDS;
             }
         }
 

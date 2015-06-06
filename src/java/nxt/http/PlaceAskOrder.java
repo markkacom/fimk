@@ -39,14 +39,6 @@ public final class PlaceAskOrder extends CreateTransaction {
         }
 
         if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
-            try {
-                if (assetBalance < Convert.safeAdd(quantityQNT, orderFeeQNT)) {
-                    return NOT_ENOUGH_ASSETS;
-                }
-            } catch (ArithmeticException e) {
-                return NOT_ENOUGH_ASSETS;
-            }
-            
             long minOrderFeeQNT = MofoAsset.calculateOrderFee(asset.getId(), quantityQNT);
             if (minOrderFeeQNT > orderFeeQNT) {
                 JSONObject response = new JSONObject();
