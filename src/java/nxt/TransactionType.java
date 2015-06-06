@@ -1084,13 +1084,14 @@ public abstract class TransactionType {
 
             @Override
             void doValidateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                if (Asset.privateEnabled()) {
-                    Attachment.ColoredCoinsAskOrderPlacement attachment = (Attachment.ColoredCoinsAskOrderPlacement)transaction.getAttachment();                    
+                Attachment.ColoredCoinsAskOrderPlacement attachment = (Attachment.ColoredCoinsAskOrderPlacement)transaction.getAttachment();
+                if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(attachment.getAssetId())) {
                     if ( ! MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getSenderId())) {
                         throw new NxtException.NotValidException("Account not allowed to place ask order");
                     }
-                    if (MofoAsset.calculateOrderFee(attachment.getAssetId(), attachment.getQuantityQNT()) < attachment.getOrderFeeQNT()) {
-                        throw new NxtException.NotValidException("Insufficient \"orderFeeQNT\"");
+                    long orderFeeQNT = MofoAsset.calculateOrderFee(attachment.getAssetId(), attachment.getQuantityQNT()); 
+                    if (orderFeeQNT != attachment.getOrderFeeQNT()) {
+                        throw new NxtException.NotValidException("Incorrect \"orderFeeQNT\" should be "+String.valueOf(orderFeeQNT));
                     }                    
                 }
             }
@@ -1171,15 +1172,15 @@ public abstract class TransactionType {
 
             @Override
             void doValidateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                if (Asset.privateEnabled()) {
-                    Attachment.ColoredCoinsBidOrderPlacement attachment = (Attachment.ColoredCoinsBidOrderPlacement)transaction.getAttachment();
+                Attachment.ColoredCoinsBidOrderPlacement attachment = (Attachment.ColoredCoinsBidOrderPlacement)transaction.getAttachment();
+                if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(attachment.getAssetId())) {
                     if ( ! MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getSenderId())) {
                         throw new NxtException.NotValidException("Account not allowed to place bid order");
                     }
-                    
                     final long totalNQT = Convert.safeMultiply(attachment.getQuantityQNT(), attachment.getPriceNQT());
-                    if (MofoAsset.calculateOrderFee(attachment.getAssetId(), totalNQT) < attachment.getOrderFeeNQT()) {
-                        throw new NxtException.NotValidException("Insufficient \"orderFeeNQT\"");
+                    long orderFeeNQT = MofoAsset.calculateOrderFee(attachment.getAssetId(), totalNQT);
+                    if (orderFeeNQT != attachment.getOrderFeeNQT()) {
+                        throw new NxtException.NotValidException("Incorrect \"orderFeeNQT\" should be "+String.valueOf(orderFeeNQT));
                     }                    
                 }
             }            
