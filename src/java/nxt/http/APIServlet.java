@@ -1,10 +1,12 @@
 package nxt.http;
 
+import nxt.Constants;
 import nxt.Db;
 import nxt.Nxt;
 import nxt.NxtException;
 import nxt.util.JSON;
 import nxt.util.Logger;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -12,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -25,8 +28,6 @@ import java.util.Set;
 
 import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
 import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
-import static nxt.http.JSONResponses.INCORRECT_ADMIN_PASSWORD;
-import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
 import static nxt.http.JSONResponses.POST_REQUIRED;
 
 public final class APIServlet extends HttpServlet {
@@ -221,19 +222,6 @@ public final class APIServlet extends HttpServlet {
         map.put("searchDGSGoods", SearchDGSGoods.instance);
         map.put("searchAssets", SearchAssets.instance);
         map.put("searchCurrencies", SearchCurrencies.instance);
-        
-        /* XXX - NamespacedAlias */
-        map.put("getNamespacedAlias", GetNamespacedAlias.instance);
-        map.put("setNamespacedAlias", SetNamespacedAlias.instance);
-        map.put("getNamespacedAliases", GetNamespacedAliases.instance);
-        
-        /* XXX - MofoWallet specific extensions */
-        map.put("mofoCombine", MofoCombine.instance);
-        
-        map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
-        map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
-        map.put("setPrivateAssetFee", SetPrivateAssetFee.instance);
-
         map.put("clearUnconfirmedTransactions", ClearUnconfirmedTransactions.instance);
         map.put("fullReset", FullReset.instance);
         map.put("popOff", PopOff.instance);
@@ -242,9 +230,32 @@ public final class APIServlet extends HttpServlet {
         map.put("addPeer", AddPeer.instance);
         map.put("blacklistPeer", BlacklistPeer.instance);
         
+        registerFIMKAPI(map);
+        
         apiRequestHandlers = Collections.unmodifiableMap(map);
     }
 
+    static void registerFIMKAPI(Map<String,APIRequestHandler> map) {
+        map.put("getNamespacedAlias", GetNamespacedAlias.instance);
+        map.put("setNamespacedAlias", SetNamespacedAlias.instance);
+        map.put("getNamespacedAliases", GetNamespacedAliases.instance);
+        map.put("mofoCombine", MofoCombine.instance);
+        map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
+        map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
+        map.put("getPrivateAssetAccount", GetPrivateAssetAccount.instance);
+        map.put("setPrivateAssetFee", SetPrivateAssetFee.instance);      
+        map.put("getVirtualAskOrders", GetVirtualAskOrders.instance);
+        map.put("getVirtualBidOrders", GetVirtualBidOrders.instance);
+        map.put("getVirtualTrades", GetVirtualTrades.instance);
+        
+        if (Constants.isTestnet) {
+            map.put("getWebsocketEvents", GetWebsocketEvents.instance);
+            map.put("startCollectingWebsocketEvents", StartCollectingWebsocketEvents.instance);
+            map.put("stopCollectingWebsocketEvents", StopCollectingWebsocketEvents.instance);
+        }
+    }
+    
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         process(req, resp);
