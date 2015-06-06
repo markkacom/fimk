@@ -1,8 +1,6 @@
 package nxt;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +12,7 @@ import nxt.util.Convert;
 
 public final class MofoAsset {
 
-    final static int ONE_HUNDRED_PERCENT = 100000000;
+    final static BigInteger ONE_HUNDRED_PERCENT = new BigInteger("100000000");
   
     public static class AssetFee {
         public static AssetFee NULL_FEE = new AssetFee(0, 0);
@@ -262,11 +260,20 @@ public final class MofoAsset {
     public static long calculateOrderFee(long assetId, long amount) {
         AssetFee fee = getFee(assetId);
         if (AssetFee.NULL_FEE != fee) {
-            return BigDecimal.valueOf(amount).
-                              divide(BigDecimal.valueOf(ONE_HUNDRED_PERCENT)).
-                              multiply(BigDecimal.valueOf(fee.getOrderFeePercentage())).
-                              setScale(0, RoundingMode.CEILING).
-                              longValue();
+            return BigInteger.valueOf(amount).
+                              multiply(BigInteger.valueOf(fee.getOrderFeePercentage())).
+                              divide(ONE_HUNDRED_PERCENT).
+                              longValueExact();
+        }
+        return 0;
+    }
+    public static long calculateTradeFee(long assetId, long amount) {
+        AssetFee fee = getFee(assetId);
+        if (AssetFee.NULL_FEE != fee) {
+            return BigInteger.valueOf(amount).
+                              multiply(BigInteger.valueOf(fee.getTradeFeePercentage())).
+                              divide(ONE_HUNDRED_PERCENT).
+                              longValueExact();
         }
         return 0;
     }
