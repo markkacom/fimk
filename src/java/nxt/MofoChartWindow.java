@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MofoChartWindow {
   
-    static final int ONE_HOUR_SECONDS = 60 * 60;
+    static final int ONE_HOUR_SECONDS = Constants.isTestnet ? 1 : 60 * 60;
     static final int ONE_DAY_SECONDS  = 24 * ONE_HOUR_SECONDS;
     static final int ONE_WEEK_SECONDS = 7 * ONE_DAY_SECONDS;    
 
