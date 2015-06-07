@@ -647,6 +647,16 @@ class NxtDbVersion extends DbVersion {
             case 260:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
             case 261:
+                apply("CREATE TABLE IF NOT EXISTS email_id (db_id IDENTITY, transaction_id BIGINT NOT NULL, "
+                    + "account_id BIGINT NOT NULL, email VARCHAR NOT NULL, "
+                    + "email_lower VARCHAR AS LOWER (email) NOT NULL, height INT NOT NULL)");       
+            case 262:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS email_email_id_idx ON email_id (email_lower)");
+            case 263:  
+                apply("CREATE INDEX IF NOT EXISTS account_id_email_id_idx ON email_id (account_id)");
+            case 264:
+                apply("CREATE INDEX IF NOT EXISTS height_email_id_idx ON email_id (height)");
+            case 265:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
