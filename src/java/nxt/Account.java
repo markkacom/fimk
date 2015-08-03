@@ -24,17 +24,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@SuppressWarnings({"UnusedDeclaration", "SuspiciousNameCombination"})
 public final class Account {
 
     public static enum Event {
         BALANCE, UNCONFIRMED_BALANCE, ASSET_BALANCE, UNCONFIRMED_ASSET_BALANCE, CURRENCY_BALANCE, UNCONFIRMED_CURRENCY_BALANCE,
         LEASE_SCHEDULED, LEASE_STARTED, LEASE_ENDED
     }
-    
-    public static DbIterator<Account> searchAccounts(String query, int from, int to) {
-        return accountTable.search(query, DbClause.EMPTY_CLAUSE, from, to, " ORDER BY ft.score DESC" /*, account.height DESC "*/);
-    }    
 
     public static class AccountAsset {
 
@@ -203,6 +198,70 @@ public final class Account {
 
     }
 
+    public static class AccountIdentifier {
+
+        private final long accountId;
+        private final long transactionId;
+        private final DbKey dbKey;
+        private final String email;
+        
+        private AccountIdentifier(Transaction transaction, MofoAttachment.AccountIdAssignmentAttachment attachment) {
+            this.accountId = transaction.getRecipientId();
+            this.transactionId = transaction.getId();
+            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
+            this.email = attachment.getId();
+        }
+
+        private AccountIdentifier(long accountId, long transactionId, String email) {
+            this.accountId = accountId;
+            this.transactionId = transactionId;
+            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
+            this.email = email;
+        }
+
+        private AccountIdentifier(ResultSet rs) throws SQLException {
+            this.accountId = rs.getLong("account_id");
+            this.transactionId = rs.getLong("transaction_id");
+            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
+            this.email = rs.getString("email");
+        }
+
+        private void save(Connection con) throws SQLException {
+            try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO account_identifier "
+                    + "(account_id, transaction_id, email, height) "
+                    + "VALUES (?, ?, ?, ?)")) {
+                int i = 0;
+                pstmt.setLong(++i, this.accountId);
+                pstmt.setLong(++i, this.transactionId);
+                pstmt.setString(++i, this.email);
+                pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
+                pstmt.executeUpdate();
+            }
+        }
+
+        public long getAccountId() {
+            return accountId;
+        }
+
+        public long getTransactionId() {
+            return transactionId;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        @Override
+        public String toString() {
+            return "AccountIdentifier account_id: " + Convert.toUnsignedLong(accountId) + " transaction_id: " + 
+                    Convert.toUnsignedLong(transactionId) + " email: " + email;
+        }
+    }
+    
+    public static boolean getAccountIDsEnabled() {
+        return Nxt.getBlockchain().getHeight() > Constants.ACCOUNT_IDENTIFIER_BLOCK;
+    }
+    
     static {
 
         Nxt.getBlockchainProcessor().addListener(new Listener<Block>() {
@@ -397,6 +456,36 @@ public final class Account {
         }
 
     };
+    
+    private static final DbKey.LongKeyFactory<AccountIdentifier> accountIdentifierDbKeyFactory = new DbKey.LongKeyFactory<AccountIdentifier>("transaction_id") {
+
+        @Override
+        public DbKey newKey(AccountIdentifier accountIdentifier) {
+            return accountIdentifier.dbKey;
+        }
+    };
+
+    private static final EntityDbTable<AccountIdentifier> accountIdentifierTable = new EntityDbTable<AccountIdentifier>("account_identifier", accountIdentifierDbKeyFactory) {
+
+        @Override
+        protected AccountIdentifier load(Connection con, ResultSet rs) throws SQLException {
+            return new AccountIdentifier(rs);
+        }
+  
+        @Override
+        protected void save(Connection con, AccountIdentifier accountIdentifier) throws SQLException {
+            accountIdentifier.save(con);
+        }
+        
+        @Override
+        protected String defaultSort() {
+            return " ORDER BY height DESC, transaction_id ";
+        }
+        
+        public void rollback(int height) {
+            super.rollback(height);
+        };        
+    };
 
     private static final Listeners<Account,Event> listeners = new Listeners<>();
 
@@ -579,6 +668,89 @@ public final class Account {
     public static long getAssetBalanceQNT(final long accountId, final long assetId, final int height) {
         final AccountAsset accountAsset = accountAssetTable.get(accountAssetDbKeyFactory.newKey(accountId, assetId), height);
         return accountAsset == null ? 0 : accountAsset.quantityQNT;
+    }
+    
+    public static DbIterator<AccountIdentifier> searchAccountIdentifiers(String email, int from, int to) {
+        Connection con = null;
+        try {
+            String sql = "SELECT * "
+                       + "FROM account_identifier "
+                       + "WHERE email_lower LIKE ? "
+                       + "ORDER BY email_lower "
+                       +  DbUtils.limitsClause(from, to);
+          
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql.toString());
+            pstmt.setString(1, "%" + email.toLowerCase() + "%");
+            
+            return accountIdentifierTable.getManyBy(con, pstmt, false);
+            
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
+    public static DbIterator<AccountIdentifier> getAccountIdentifiers(long accountId, int from, int to) {
+        return accountIdentifierTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
+    }
+    
+    public static long getAccountIdByIdentifier(String identifier) {
+        if (identifier == null) {
+            return 0;
+        }
+        try ( 
+            Connection con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement("SELECT account_id "
+                + "FROM account_identifier "
+                + "WHERE email_lower = ?");
+        ) {
+            pstmt.setString(1, identifier.toLowerCase());
+          
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {              
+                    return rs.getLong("account_id");
+                }
+            }
+            return 0;
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+    
+    public static Account getAccountByIdentifier(String identifier) {
+        if (identifier == null) {
+            return null;
+        }
+        Connection con = null;
+        try {
+            String sql = "SELECT a.* "
+                       + "FROM account a "
+                       + "  LEFT JOIN account_identifier b "
+                       + "    ON a.id = b.account_id "
+                       + "WHERE b.email_lower = ? AND latest = TRUE "
+                       + "LIMIT 1";
+          
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql.toString());
+            pstmt.setString(1, identifier.toLowerCase());
+            
+            try (DbIterator<Account> iterator = accountTable.getManyBy(con, pstmt, false)) {
+                if (iterator.hasNext()) {
+                    return iterator.next();
+                }
+            }
+            return null;
+            
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+    
+    public static void addAccountIdentifier(Transaction transaction, MofoAttachment.AccountIdAssignmentAttachment attachment) {
+        accountIdentifierTable.insert(new AccountIdentifier(transaction, attachment));
     }
 
     static void init() {}
