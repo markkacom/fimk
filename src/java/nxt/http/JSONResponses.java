@@ -9,6 +9,9 @@ import java.util.Arrays;
 
 public final class JSONResponses {
 
+    public static final JSONStreamAware INCORRECT_SIGNATORY = incorrect("signatory");
+    public static final JSONStreamAware MISSING_IDENTIFIER = missing("identifier");
+    public static final JSONStreamAware UNKNOWN_IDENTIFIER = unknown("identifier");
     public static final JSONStreamAware INCORRECT_ALIAS = incorrect("alias");
     public static final JSONStreamAware INCORRECT_ALIAS_OWNER = incorrect("alias","(invalid alias owner)");
     public static final JSONStreamAware INCORRECT_ALIAS_LENGTH = incorrect("alias", "(length must be in [1.." + Constants.MAX_ALIAS_LENGTH + "] range)");
