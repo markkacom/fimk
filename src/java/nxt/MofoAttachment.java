@@ -92,7 +92,7 @@ public class MofoAttachment {
             super();
             this.assetId = assetId;
         }
-    
+
         @Override
         int getMySize() {
             return 8;
@@ -129,7 +129,7 @@ public class MofoAttachment {
 
         @Override
         String getAppendixName() {
-            return "PrivateAssetAddAccount";
+            return "AddPrivateAssetAccount";
         }
 
         @Override
@@ -155,7 +155,7 @@ public class MofoAttachment {
 
         @Override
         String getAppendixName() {
-            return "PrivateAssetRemoveAccount";
+            return "RemovePrivateAssetAccount";
         }
 
         @Override
@@ -232,5 +232,140 @@ public class MofoAttachment {
         public int getTradeFeePercentage() {
             return tradeFeePercentage;
         }
-  }
+    }
+
+    public final static class AccountIdAssignmentAttachment extends AbstractAttachment {
+
+        private final String id;
+        private final long signatory;
+        private final byte[] signature;
+
+        AccountIdAssignmentAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+            this.id = Convert.readString(buffer, buffer.get(), Constants.MAX_ACCOUNT_ID_LENGTH).trim().intern();
+            this.signatory = buffer.getLong();            
+            int signatureLength = buffer.get();
+            if (signatureLength != 64) {
+                signatureLength = 0;
+            }
+            if (signatureLength == 0) {
+                this.signature = null;
+            }
+            else {
+                this.signature = new byte[signatureLength];
+                buffer.get(this.signature);
+            }
+        }
+
+        AccountIdAssignmentAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+            this.id = (Convert.nullToEmpty((String) attachmentData.get("id"))).trim().intern();
+            this.signatory = Convert.parseUnsignedLong((String) attachmentData.get("signatory"));
+            this.signature = Convert.parseHexString((String) attachmentData.get("signature"));
+        }
+        
+        public AccountIdAssignmentAttachment(String id, long signatory, byte[] signature) {
+            this.id = id.trim();
+            this.signatory = signatory;
+            this.signature = signature;
+        }
+
+        @Override
+        String getAppendixName() {
+            return "AccountIdAssignment";
+        }
+
+        @Override
+        int getMySize() {
+            return 1 + 8 + Convert.toBytes(id).length + 1 + (signature != null ? signature.length : 0);
+        }
+
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            byte[] _id = Convert.toBytes(this.id);
+            buffer.put((byte)_id.length);
+            buffer.put(_id);
+            buffer.putLong(signatory);
+            buffer.put(signature != null ? (byte)signature.length : (byte)0);
+            if (signature != null) {
+              buffer.put(signature);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            attachment.put("id", id);
+            attachment.put("signatory", Convert.toUnsignedLong(signatory));
+            if (signature != null) {
+              attachment.put("signature", Convert.toHexString(signature));
+            }
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return MofoTransactions.AccountIdAssignmentTransaction.ACCOUNT_ID_ASSIGNMENT;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public long getSignatory() {
+            return signatory;
+        }
+
+        public byte[] getSignature() {
+            return signature;
+        }
+    }
+
+    public final static class VerificationAuthorityAssignmentAttachment extends AbstractAttachment {
+
+        private final int period;
+
+        VerificationAuthorityAssignmentAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+            this.period = buffer.getInt();
+        }
+
+        VerificationAuthorityAssignmentAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+            this.period = ((Long)attachmentData.get("period")).intValue();
+        }
+
+        public VerificationAuthorityAssignmentAttachment(int period) {
+            this.period = period;
+        }
+
+        @Override
+        String getAppendixName() {
+            return "VerificationAuthorityAssignment";
+        }
+
+        @Override
+        int getMySize() {
+            return 4;
+        }
+
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            buffer.putInt(period);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            attachment.put("period", period);
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return MofoTransactions.VerificationAuthorityAssignmentTransaction.VERIFICATION_AUTHORITY_ASSIGNMENT;
+        }
+
+        public int getPeriod() {
+            return period;
+        }
+    }
 }
