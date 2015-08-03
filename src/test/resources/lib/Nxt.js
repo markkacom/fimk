@@ -96,7 +96,7 @@ Nxt.getBlockchainProcessor = function () {
 }
 Nxt.createFundedAccount = function (secretPhrase, balanceNXT) {
   var account = new Account(secretPhrase);
-  accounts.forger.sendMoney(account.id_rs, balanceNXT);
+  accounts.forger.sendMoney(account.id_rs, balanceNXT, account.publicKey);
   return account;
 }
 Nxt.getWebsocketEvents = function (topic, prettyPrint) {
@@ -110,6 +110,11 @@ Nxt.getWebsocketEvents = function (topic, prettyPrint) {
 Nxt.clearWebsocketEvents = function () {
   Nxt.call('stopCollectingWebsocketEvents', {});
   Nxt.call('startCollectingWebsocketEvents', {});
+}
+Nxt.getAccountByIdentifier = function (identifier) {
+  var ret = Nxt.call('getAccountByIdentifier', {identifier:identifier});  
+  if (isError(ret)) { printError(ret); return ret; }
+  return ret;
 }
 
 function isError(obj) { return obj.errorCode || obj.error || obj.errorDescription };
@@ -125,6 +130,7 @@ function extend(dst, src) {
 function Account(secretPhrase) {
   this.secretPhrase=secretPhrase;
   this.id_rs=Nxt.util.getAccountId(secretPhrase, true);
+  this.publicKey = Nxt.util.secretPhraseToPublicKey(secretPhrase);
 }
 Account.prototype = {
   generateBlock: function () {
@@ -145,14 +151,18 @@ Account.prototype = {
     }
     assert.assertEquals(balanceNXT, this.getBalanceNXT());    
   },
-  sendMoney: function (recipientRS, amountNXT) {
-    var ret = Nxt.call('sendMoney', {
+  sendMoney: function (recipientRS, amountNXT, recipientPublicKey) {
+    var arg = {
       secretPhrase: this.secretPhrase,
       feeNQT: Nxt.util.convertToNQT('0.1'),
       deadline: '1440',
-      recipient: recipientRS, //Nxt.util.convertRSAddress(recipientRS),
       amountNQT: Nxt.util.convertToNQT(amountNXT)
-    });
+    };
+    if (typeof recipientPublicKey == 'string') { 
+      arg.recipientPublicKey = recipientPublicKey; 
+    }
+    arg.recipient = Nxt.util.convertRSAddress(recipientRS); 
+    var ret = Nxt.call('sendMoney', arg);
     if (isError(ret)) { printError(ret); return ret; }
     if (Nxt.enableAutoForge) { Nxt.generateBlock(); }
     return ret;
@@ -303,6 +313,30 @@ Account.prototype = {
     var ret = Nxt.call('getNamespacedAliases', arg);
     if (isError(ret)) { if (Nxt.verbose) { printError(ret); } return null; }    
     return ret;
+  },
+  setAccountIdentifier: function (identifier, signatory, signature, senderSecretPhrase) {
+    var arg = {
+      secretPhrase: senderSecretPhrase || this.secretPhrase,
+      feeNQT: Nxt.util.convertToNQT('0.1'),
+      deadline: '1440',      
+      recipient: Nxt.util.convertRSAddress(this.id_rs),
+      identifier: identifier
+    };
+    if (signatory) {
+      arg.signatory = Nxt.util.convertRSAddress(signatory);
+    }
+    if (signature) {
+      arg.signature = signature;
+    }
+    var ret = Nxt.call('setAccountIdentifier', arg);
+    if (isError(ret)) { if (Nxt.verbose) { printError(ret); } return null; }
+    if (Nxt.enableAutoForge) { Nxt.generateBlock(); }
+    return ret;
+  },
+  getAccountIdentifiers: function () {
+    var ret = Nxt.call('getAccountIdentifiers', { account: this.id_rs });
+    if (isError(ret)) { if (Nxt.verbose) { printError(ret); } return null; }    
+    return ret.identifiers;
   }
 };
 
