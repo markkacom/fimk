@@ -5,8 +5,10 @@ import java.util.Map;
 
 import nxt.Order.Ask;
 import nxt.Order.Bid;
+import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
+import nxt.util.JSON;
 
 import org.json.simple.JSONObject;
 
@@ -18,6 +20,8 @@ public class MofoTransactions {
     private static final byte SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_ADD_ACCOUNT = 1;
     private static final byte SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_REMOVE_ACCOUNT = 2;
     private static final byte SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE = 3;
+    private static final byte SUBTYPE_FIMKRYPTO_ACCOUNT_ID_ASSIGNMENT = 4;
+    private static final byte SUBTYPE_FIMKRYPTO_SET_VERIFICATION_AUTHORITY = 5;
     
     public static abstract class NamespacedAliasAssignmentTransaction extends TransactionType {
 
@@ -373,6 +377,215 @@ public class MofoTransactions {
         };
     }
 
+    public static abstract class AccountIdAssignmentTransaction extends TransactionType {
+        
+        private AccountIdAssignmentTransaction() {
+        }
+  
+        @Override
+        public final byte getType() {
+            return TYPE_FIMKRYPTO;
+        }
+  
+        @Override
+        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+            return true;
+        }
+  
+        @Override
+        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        }
+  
+        public static final TransactionType ACCOUNT_ID_ASSIGNMENT = new AccountIdAssignmentTransaction() {
+  
+            @Override
+            public final byte getSubtype() {
+                return SUBTYPE_FIMKRYPTO_ACCOUNT_ID_ASSIGNMENT;
+            }
+  
+            @Override
+            MofoAttachment.AccountIdAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.AccountIdAssignmentAttachment(buffer, transactionVersion);
+            }
+  
+            @Override
+            MofoAttachment.AccountIdAssignmentAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.AccountIdAssignmentAttachment(attachmentData);
+            }
+  
+            @Override
+            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+                MofoAttachment.AccountIdAssignmentAttachment attachment = (MofoAttachment.AccountIdAssignmentAttachment) transaction.getAttachment();
+                Account.addAccountIdentifier(transaction, attachment);
+            }
+  
+            @Override
+            boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
+                MofoAttachment.AccountIdAssignmentAttachment attachment = (MofoAttachment.AccountIdAssignmentAttachment) transaction.getAttachment();
+                StringBuilder key = new StringBuilder();
+                key.append(transaction.getSenderId());
+                key.append(transaction.getRecipientId());
+                key.append(attachment.getId());
+                key.append(attachment.getSignatory());
+                return isDuplicate(ACCOUNT_ID_ASSIGNMENT, key.toString(), duplicates, true);
+            }
+  
+            @Override
+            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+                MofoAttachment.AccountIdAssignmentAttachment attachment = (MofoAttachment.AccountIdAssignmentAttachment) transaction.getAttachment();
+
+                if (!Account.getAccountIDsEnabled()) {
+                    throw new NxtException.NotValidException("Not yet enabled");
+                }
+
+                MofoIdentifier wrapper;
+                try {
+                    wrapper = new MofoIdentifier(attachment.getId());
+                } catch (Exception ex) {
+                    throw new NxtException.NotValidException("Invalid identifier");        
+                }
+
+                long identifierId = Account.getAccountIdByIdentifier(wrapper.getNormalizedId());
+                if (identifierId != 0) {
+                    throw new NxtException.NotValidException("Duplicate identifier");
+                }
+
+                if (wrapper.getIsDefaultServer() && transaction.getRecipientId() == transaction.getSenderId()) {
+
+                    /* no validation required, account is assigning default id to itself */
+                    return;
+
+                }
+                else {
+
+                    /* validation might be required - try and get the public key first */
+
+                    byte[] publicKey = null;
+                    Account recipientAccount = Account.getAccount(transaction.getRecipientId());
+                    if (recipientAccount != null) {
+                        publicKey = recipientAccount.getPublicKey();
+                    }
+                    if (publicKey == null) {
+                        for (Appendix appendix : transaction.getAppendages()) {
+                            if (appendix instanceof Appendix.PublicKeyAnnouncement) {
+                                publicKey = ((Appendix.PublicKeyAnnouncement)appendix).getPublicKey();
+                                break;
+                            }
+                        }
+                    }
+                    
+                    /* assigning non default identifiers always require signatory to be a verification authority */
+            
+                    boolean signatorIsVerificationAuthority;
+                    byte[] signature = attachment.getSignature();
+                    byte[] message = Convert.toBytes(attachment.getId());
+                    long signatory = attachment.getSignatory();
+                    
+                    if (signatory == 0) {
+                        signatorIsVerificationAuthority = false;
+                    }
+                    else {
+                        signatorIsVerificationAuthority = MofoVerificationAuthority.getIsVerificationAuthority(signatory);
+                        publicKey = Account.getAccount(signatory).getPublicKey();
+                    }
+            
+                    if (!wrapper.getIsDefaultServer() && !signatorIsVerificationAuthority) {
+                        throw new NxtException.NotValidException("Operation requires verified authorizer signature");
+                    }
+            
+                    if (publicKey == null) {
+                        throw new NxtException.NotValidException("Operation requires publicKey of signatory");
+                    }
+                    
+                    if (!Crypto.verify(signature, message, publicKey, false)) {
+                        throw new NxtException.NotValidException("Could not verify signature");
+                    }
+                }                
+            }
+            
+            @Override
+            public boolean canHaveRecipient() {
+                return true;
+            }
+        };
+    }
+
+    public static abstract class VerificationAuthorityAssignmentTransaction extends TransactionType {
+        
+        private VerificationAuthorityAssignmentTransaction() {
+        }
+  
+        @Override
+        public final byte getType() {
+            return TYPE_FIMKRYPTO;
+        }
+  
+        @Override
+        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+            return true;
+        }
+  
+        @Override
+        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        }
+  
+        public static final TransactionType VERIFICATION_AUTHORITY_ASSIGNMENT = new VerificationAuthorityAssignmentTransaction() {
+  
+            @Override
+            public final byte getSubtype() {
+                return SUBTYPE_FIMKRYPTO_SET_VERIFICATION_AUTHORITY;
+            }
+  
+            @Override
+            MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.VerificationAuthorityAssignmentAttachment(buffer, transactionVersion);
+            }
+  
+            @Override
+            MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.VerificationAuthorityAssignmentAttachment(attachmentData);
+            }
+  
+            @Override
+            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+                MofoAttachment.VerificationAuthorityAssignmentAttachment attachment = (MofoAttachment.VerificationAuthorityAssignmentAttachment) transaction.getAttachment();
+                MofoVerificationAuthority.addOrUpdateVerificationAuthority(transaction, attachment);
+            }
+  
+            @Override
+            boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
+                MofoAttachment.VerificationAuthorityAssignmentAttachment attachment = (MofoAttachment.VerificationAuthorityAssignmentAttachment) transaction.getAttachment();
+                StringBuilder key = new StringBuilder();
+                key.append(transaction.getSenderId());
+                key.append(transaction.getRecipientId());
+                key.append(attachment.getPeriod());
+                return isDuplicate(VERIFICATION_AUTHORITY_ASSIGNMENT, key.toString(), duplicates, true);
+            }
+  
+            @Override
+            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+                MofoAttachment.VerificationAuthorityAssignmentAttachment attachment = (MofoAttachment.VerificationAuthorityAssignmentAttachment) transaction.getAttachment();
+                if (transaction.getSenderId() != Constants.MASTER_VERIFICATION_AUTHORITY_ACCOUNT) {
+                    throw new NxtException.NotValidException("Account not allowed to add verification authority");
+                }
+                if (transaction.getRecipientId() == Constants.MASTER_VERIFICATION_AUTHORITY_ACCOUNT) {
+                    throw new NxtException.NotValidException("Master verification authority account cannot be the recipient");
+                }
+                if (attachment.getPeriod() < Constants.MIN_VERIFICATION_AUTHORITY_PERIOD) {
+                    throw new NxtException.NotValidException("Min period is " + Constants.MIN_VERIFICATION_AUTHORITY_PERIOD);
+                }
+                if (attachment.getPeriod() > Constants.MAX_VERIFICATION_AUTHORITY_PERIOD) {
+                    throw new NxtException.NotValidException("Max period is " + Constants.MAX_VERIFICATION_AUTHORITY_PERIOD);
+                }
+            }
+  
+            @Override
+            public boolean canHaveRecipient() {
+                return true;
+            }
+        };
+    }
+
     public static TransactionType findTransactionType(byte subtype) {      
         switch (subtype) {
             case SUBTYPE_FIMKRYPTO_NAMESPACED_ALIAS_ASSIGNMENT:
@@ -383,6 +596,10 @@ public class MofoTransactions {
                 return PrivateAssetRemoveAccountTransaction.PRIVATE_ASSET_REMOVE_ACCOUNT;
             case SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE:
                 return PrivateAssetSetFeeTransaction.PRIVATE_ASSET_SET_FEE;
+            case SUBTYPE_FIMKRYPTO_ACCOUNT_ID_ASSIGNMENT:
+                return AccountIdAssignmentTransaction.ACCOUNT_ID_ASSIGNMENT;
+            case SUBTYPE_FIMKRYPTO_SET_VERIFICATION_AUTHORITY:
+                return VerificationAuthorityAssignmentTransaction.VERIFICATION_AUTHORITY_ASSIGNMENT;
             default:
                 return null;
         }
