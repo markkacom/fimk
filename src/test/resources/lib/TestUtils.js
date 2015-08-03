@@ -29,6 +29,16 @@ jsAssert.assertObjectEquals = function(a, b) {
   throw new Packages.org.junit.ComparisonFailure("Expected <" + JSON.stringify(a) + "> but was <" + JSON.stringify(b) + ">", a, b);
 }
 jsAssert.assertEquals = function (a,b) {
+  if (Array.isArray(a) && Array.isArray(b) && a.length == b.length) {
+    var error = 0;
+    for (var i=0; i<a.length; i++) {
+      if (a[i] != b[i]) {
+        error = 1;
+        break;
+      }
+    }
+    if (error == 0) return;
+  } 
   if (a==b) return;  
   throw new Packages.org.junit.ComparisonFailure("Expected <" + JSON.stringify(a) + "> but was <" + JSON.stringify(b) + ">", a, b);
 }
