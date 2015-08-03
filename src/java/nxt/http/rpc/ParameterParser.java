@@ -103,7 +103,7 @@ public class ParameterParser {
             }
         }
         return result;
-    }    
+    }
     
     static Account getAccount(JSONObject object) throws ParameterException {
         String accountValue = Convert.emptyToNull((String) object.get("account"));
