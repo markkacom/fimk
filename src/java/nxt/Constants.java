@@ -1,6 +1,7 @@
 package nxt;
 
 import java.util.ArrayList;
+
 import nxt.util.Logger;
 
 import java.util.Calendar;
@@ -118,10 +119,17 @@ public final class Constants {
     public static final int LAST_KNOWN_BLOCK = isTestnet ? 1 : 384000;
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
+    public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
     
     /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0; 
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
+    
+    public static final int MAX_ACCOUNT_ID_LENGTH = 100;    
+    
+    public static final long MASTER_VERIFICATION_AUTHORITY_ACCOUNT = Genesis.GENESIS_RECIPIENTS[0];
+    public static final int MAX_VERIFICATION_AUTHORITY_PERIOD = 100000;
+    public static final int MIN_VERIFICATION_AUTHORITY_PERIOD = 0;
     
     public static final int[] MIN_VERSION = new int[] {0, 3, 3};                
     
@@ -145,6 +153,8 @@ public final class Constants {
     public static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
     public static final String ALLOWED_CURRENCY_CODE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String NAMESPACED_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz!#$%&()*+-./:;<=>?@[]_{|}";
+    public static final String ALLOWED_ACCOUNT_ID_SERVER = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.";
+    public static final String ALLOWED_ACCOUNT_ID_NAME = ALLOWED_ACCOUNT_ID_SERVER + "!#$%&*+/=?^_{|}~";     
 
     public static final int EC_RULE_TERMINATOR = 600; /* cfb: This constant defines a straight edge when "longest chain"
                                                         rule is outweighed by "economic majority" rule; the terminator
@@ -169,7 +179,9 @@ public final class Constants {
         }
       }
     }
-    
+
+    public static final String TRANSIENT_FULL_HASH = "3030303030303030303030303030303030303030303030303030303030303030"; 
+
     private Constants() {} // never
 
 }
