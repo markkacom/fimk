@@ -6,6 +6,46 @@
   };
   
   /**
+   * @param message String
+   * @param secretPhrase String
+   * @return Hex String
+   */
+  function sign(message, secretPhrase) {
+    return signBytes(converters.stringToHexString(message), converters.stringToHexString(secretPhrase));
+  }
+  
+  /**
+   * @param message       Hex String
+   * @param secretPhrase  Hex String
+   * @returns Hex String
+   */
+  function signBytes(message, secretPhrase) {
+    var messageBytes      = converters.hexStringToByteArray(message);
+    var secretPhraseBytes = converters.hexStringToByteArray(secretPhrase);
+
+    var digest = simpleHash(secretPhraseBytes);
+    var s = curve25519.keygen(digest).s;
+    var m = simpleHash(messageBytes);
+
+    _hash.init();
+    _hash.update(m);
+    _hash.update(s);
+    var x = _hash.getBytes();
+
+    var y = curve25519.keygen(x).p;
+
+    _hash.init();
+    _hash.update(m);
+    _hash.update(y);
+    var h = _hash.getBytes();
+
+    var v = curve25519.sign(h, x, s);
+
+    return converters.byteArrayToHexString(v.concat(h));
+  }
+  
+  
+  /**
    * @param message ByteArray
    * @returns ByteArray
    */
@@ -328,6 +368,9 @@
     convertFromHex8:convertFromHex8,
     convertToEpochTimestamp: convertToEpochTimestamp,
     convertRSAddress: convertRSAddress,
+    signBytes: signBytes,
+    sign: sign,
+    secretPhraseToPublicKey: secretPhraseToPublicKey,   
 
     /**
      * @param nxtA String
