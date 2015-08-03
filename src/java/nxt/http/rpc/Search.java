@@ -97,7 +97,7 @@ public class Search extends RPCCall {
                 }
             } catch (Exception e) {}
           
-            try (DbIterator<Account> accounts = Account.searchAccounts(query, firstIndex, lastIndex)) {
+            /*try (DbIterator<Account> accounts = Account.searchAccounts(query, firstIndex, lastIndex)) {
                 while (accounts.hasNext()) {
                     Account account = accounts.next();
                     
@@ -110,7 +110,7 @@ public class Search extends RPCCall {
                   
                     results.add(json);
                 }
-            }
+            }*/
         }
         else if ("currencies".equalsIgnoreCase(category)) {
             try (DbIterator<Currency> currencies = Currency.searchCurrencies(query, firstIndex, lastIndex)) {
