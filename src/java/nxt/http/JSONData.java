@@ -512,6 +512,9 @@ final class JSONData {
         json.put("feeNQT", String.valueOf(transaction.getFeeNQT()));
         if (transaction.getReferencedTransactionFullHash() != null) {
             json.put("referencedTransactionFullHash", transaction.getReferencedTransactionFullHash());
+            if (Constants.TRANSIENT_FULL_HASH.equals(transaction.getReferencedTransactionFullHash())) {
+                json.put("transient", true);
+            }
         }
         byte[] signature = Convert.emptyToNull(transaction.getSignature());
         if (signature != null) {
