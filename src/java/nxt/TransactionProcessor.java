@@ -1,7 +1,9 @@
 package nxt;
 
 import nxt.db.DbIterator;
+import nxt.db.EntityDbTable;
 import nxt.util.Observable;
+
 import org.json.simple.JSONObject;
 
 import java.util.List;
