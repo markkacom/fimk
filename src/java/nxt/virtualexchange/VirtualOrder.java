@@ -108,8 +108,8 @@ public abstract class VirtualOrder {
     
             VirtualTrade trade = VirtualTrade.addTrade(assetId, timestamp, Nxt.getBlockchain().getHeight()+1, askOrder, bidOrder);
     
-            askOrder.updateQuantityQNT(Convert.safeSubtract(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
-            bidOrder.updateQuantityQNT(Convert.safeSubtract(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
+            askOrder.updateQuantityQNT(Math.subtractExact(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
+            bidOrder.updateQuantityQNT(Math.subtractExact(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
         }
     }  
 
@@ -163,7 +163,7 @@ public abstract class VirtualOrder {
     @SuppressWarnings("unchecked")
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
-        json.put("order", Convert.toUnsignedLong(getId()));
+        json.put("order", Long.toUnsignedString(getId()));
         json.put("quantityQNT", String.valueOf(getQuantityQNT()));
         json.put("priceNQT", String.valueOf(getPriceNQT()));
         json.put("height", getHeight());
@@ -176,7 +176,7 @@ public abstract class VirtualOrder {
     
     public static void notifyOrderAdded(VirtualOrder order) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
-            String asset = Convert.toUnsignedLong(order.getAssetId());
+            String asset = Long.toUnsignedString(order.getAssetId());
             String topic = order.getType().equals(VirtualBid.TYPE) ? "BID_ORDER_ADD*"+asset : "ASK_ORDER_ADD*"+asset;
             MofoSocketServer.notifyJSON(topic, order.toJSONObject());
         }
@@ -185,12 +185,12 @@ public abstract class VirtualOrder {
     @SuppressWarnings("unchecked")
     public static void notifyOrderUpdate(VirtualOrder order) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
-            String asset = Convert.toUnsignedLong(order.getAssetId());
+            String asset = Long.toUnsignedString(order.getAssetId());
             String topic = order.getType().equals(VirtualBid.TYPE) ? "BID_ORDER_UPDATE*"+asset : "ASK_ORDER_UPDATE*"+asset;
           
             JSONObject json = new JSONObject();
             json.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
-            json.put("order", Convert.toUnsignedLong(order.getId()));
+            json.put("order", Long.toUnsignedString(order.getId()));
             MofoSocketServer.notifyJSON(topic, json);
         }
     }    
@@ -198,11 +198,11 @@ public abstract class VirtualOrder {
     @SuppressWarnings("unchecked")
     public static void notifyOrderRemoved(VirtualOrder order) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
-            String asset = Convert.toUnsignedLong(order.getAssetId());
+            String asset = Long.toUnsignedString(order.getAssetId());
             String topic = order.getType().equals(VirtualBid.TYPE) ? "BID_ORDER_REMOVE*"+asset : "ASK_ORDER_REMOVE*"+asset;
           
             JSONObject json = new JSONObject();
-            json.put("order", Convert.toUnsignedLong(order.getId()));
+            json.put("order", Long.toUnsignedString(order.getId()));
             MofoSocketServer.notifyJSON(topic, json);
         }
     }
@@ -218,7 +218,7 @@ public abstract class VirtualOrder {
         } 
         else {
             throw new IllegalArgumentException("Negative quantity: " + quantityQNT
-                    + " for order: " + Convert.toUnsignedLong(getId()));
+                    + " for order: " + Long.toUnsignedString(getId()));
         }
     }
     
@@ -347,7 +347,11 @@ public abstract class VirtualOrder {
 
         private static List<VirtualAsk> getMergedAsks(long assetId, int firstIndex, int lastIndex, final long accountId) {
             List<VirtualAsk> sortedAsks = new ArrayList<VirtualAsk>();
-            sortedAsks.addAll(virtualAskMap.values());
+            for (VirtualAsk a : virtualAskMap.values()) {
+                if (a.getAssetId() == assetId) {
+                    sortedAsks.add(a);
+                }
+            }
             Collections.sort(sortedAsks, Collections.reverseOrder());
           
             List<VirtualAsk> result = new ArrayList<VirtualAsk>();
@@ -531,7 +535,11 @@ public abstract class VirtualOrder {
 
         private static List<VirtualBid> getMergedBids(long assetId, int firstIndex, int lastIndex, final long accountId) {
             List<VirtualBid> sortedBids = new ArrayList<VirtualBid>();
-            sortedBids.addAll(virtualBidMap.values());
+            for (VirtualBid b : virtualBidMap.values()) {
+                if (b.getAssetId() == assetId) {
+                  sortedBids.add(b);
+                }
+            }
             Collections.sort(sortedBids, Collections.reverseOrder());
           
             List<VirtualBid> result = new ArrayList<VirtualBid>();
