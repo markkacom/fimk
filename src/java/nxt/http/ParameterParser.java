@@ -384,8 +384,8 @@ final class ParameterParser {
         return account;
     }
 
-    static Account getAccount(HttpServletRequest req) throws ParameterException {
-        String accountValue = Convert.emptyToNull(req.getParameter("account"));
+    static Account getAccount(HttpServletRequest req, String name) throws ParameterException {
+        String accountValue = Convert.emptyToNull(req.getParameter(name));
         if (accountValue == null) {
             throw new ParameterException(MISSING_ACCOUNT);
         }
@@ -398,6 +398,10 @@ final class ParameterParser {
         } catch (RuntimeException e) {
             throw new ParameterException(INCORRECT_ACCOUNT);
         }
+    }    
+    
+    static Account getAccount(HttpServletRequest req) throws ParameterException {
+        return getAccount(req, "account");
     }
 
     static List<Account> getAccounts(HttpServletRequest req) throws ParameterException {
