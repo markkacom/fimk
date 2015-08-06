@@ -87,12 +87,11 @@ public class JSONData {
         
         if (unconfirmed) {
           json.put("confirmations", -1);
-          json.put("height", Nxt.getBlockchain().getHeight() + 1);
         }
         else {
           json.put("confirmations", Nxt.getBlockchain().getHeight() - transaction.getHeight());
-          json.put("height", transaction.getHeight());
-        }        
+        }
+        json.put("height", transaction.getHeight());
         JSONData.putAccount(json, "sender", transaction.getSenderId());
         if (transaction.getRecipientId() != 0) {
             JSONData.putAccount(json, "recipient", transaction.getRecipientId());
