@@ -12,7 +12,8 @@ import uk.co.benjiweber.junitjs.Tests;
     "src/test/resources/TradeFeeTest.js",
     "src/test/resources/RemoveAllowedTest.js",
     "src/test/resources/InstantExhange.js",
-    "src/test/resources/AccountIdentifierTest.js"
+    "src/test/resources/AccountIdentifierTest.js",
+    "src/test/resources/GossipTest.js"
 })
 @RunWith(JSRunner.class)
 public class JSTestSuite {
