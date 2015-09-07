@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 
 import nxt.Block;
 import nxt.Constants;
+import nxt.Gossip;
 import nxt.NxtException;
 import nxt.Trade;
 import nxt.Transaction;
@@ -348,7 +349,16 @@ public class MofoSocketServer {
         }
         MofoSocketServer.notify(topic, JSONData.peer(peer));      
     }
-    
+
+    static void notifyGossipEvent(String topic, Gossip gossip) {
+        if ( ! mustNotify(topic)) {
+            return;
+        }
+        JSONObject json = gossip.getJSONObject();
+        json.put("senderRS", Convert.rsAccount(gossip.getSenderId()));
+        MofoSocketServer.notify(topic, json);      
+    }    
+
     static void rpcCall(final MofoWebSocketAdapter socket, final String call_id, final String method, final JSONObject arguments) {
         if ( ! rpcCalls.containsKey(method)) {
             Logger.logDebugMessage("Calling non existing RPC method " + method);
