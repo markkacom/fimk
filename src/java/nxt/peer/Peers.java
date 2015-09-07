@@ -4,6 +4,7 @@ import nxt.Account;
 import nxt.Block;
 import nxt.Constants;
 import nxt.Db;
+import nxt.Gossip;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.util.Filter;
@@ -12,6 +13,7 @@ import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.FilterHolder;
@@ -88,6 +90,7 @@ public final class Peers {
     private static final boolean usePeersDb;
     private static final boolean savePeers;
     private static final String dumpPeersVersion;
+    public static final boolean gossipEnabled;
 
 
     static final JSONStreamAware myPeerInfoRequest;
@@ -102,7 +105,9 @@ public final class Peers {
 
     static final ExecutorService peersService = Executors.newCachedThreadPool();
     private static final ExecutorService sendingService = Executors.newFixedThreadPool(10);
-
+    
+    static final SendToPeersRequestQueue sendToPeersRequestQueue = new SendToPeersRequestQueue();
+    
     static {
 
         myPlatform = Nxt.getStringProperty("nxt.myPlatform");
@@ -160,6 +165,12 @@ public final class Peers {
         json.put("nxtversion", Nxt.NXT_VERSION);
         json.put("platform", Peers.myPlatform);
         json.put("shareAddress", Peers.shareMyAddress);
+        
+        gossipEnabled = Nxt.getBooleanProperty("nxt.gossipEnabled");
+        if (gossipEnabled) {
+            json.put("gossip", true);
+        }
+
         Logger.logDebugMessage("My peer info:\n" + json.toJSONString());
         myPeerInfoResponse = JSON.prepare(json);
         json.put("requestType", "getInfo");
@@ -743,20 +754,49 @@ public final class Peers {
         sendToSomePeers(request);
     }
 
+    public static void sendToSomePeers(Gossip gossip) {
+        JSONObject request = gossip.getJSONObject();
+        request.put("requestType", "processGossip");
+        
+        long priority = 0;
+        Account account = Account.getAccount(gossip.getSenderId());
+        if (account != null) {
+            priority = account.getGuaranteedBalanceNQT(1440);
+        }
+        sendToSomePeers(request, priority);
+    }
+
     private static void sendToSomePeers(final JSONObject request) {
+        sendToSomePeers(request, Long.MAX_VALUE);
+    }
+
+    private static void sendToSomePeers(final JSONObject request, long priority) {
+        sendToPeersRequestQueue.add(request, priority);
         sendingService.submit(new Runnable() {
             @Override
             public void run() {
+                
+                // final JSONStreamAware jsonRequest = JSON.prepareRequest(request);
+                final JSONObject request = sendToPeersRequestQueue.getNext();
                 final JSONStreamAware jsonRequest = JSON.prepareRequest(request);
-
+                if (jsonRequest == null) {
+                    return;
+                }
+  
+                boolean isGossip = "processGossip".equals(request.get("requestType"));
+                
                 int successful = 0;
                 List<Future<JSONObject>> expectedResponses = new ArrayList<>();
                 for (final Peer peer : peers.values()) {
-
+  
                     if (Peers.enableHallmarkProtection && peer.getWeight() < Peers.pushThreshold) {
                         continue;
                     }
 
+                    if (isGossip && !peer.getGossipEnabled()) {
+                        continue;
+                    }
+  
                     if (!peer.isBlacklisted() && peer.getState() == Peer.State.CONNECTED && peer.getAnnouncedAddress() != null) {
                         Future<JSONObject> futureResponse = peersService.submit(new Callable<JSONObject>() {
                             @Override
@@ -778,7 +818,7 @@ public final class Peers {
                             } catch (ExecutionException e) {
                                 Logger.logDebugMessage("Error in sendToSomePeers", e);
                             }
-
+  
                         }
                         expectedResponses.clear();
                     }
