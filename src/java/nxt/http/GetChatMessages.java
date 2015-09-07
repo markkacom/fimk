@@ -8,14 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import nxt.Account;
 import nxt.Appendix;
-import nxt.Constants;
 import nxt.MofoChat;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.UnconfirmedTransaction;
-import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
+import nxt.util.JSON;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -29,12 +28,41 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
         super(new APITag[] {APITag.MESSAGES}, "accountOne", "accountTwo", "firstIndex", "lastIndex");
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
-        Account accountOne = ParameterParser.getAccount(req, "accountOne");
-        Account accountTwo = ParameterParser.getAccount(req, "accountTwo");
+        long accountOneId;
+        String accountOneValue = Convert.emptyToNull(req.getParameter("accountOne"));
+        if (accountOneValue == null) {
+            accountOneId = 0;
+        }
+        else {
+            try {
+                accountOneId = Convert.parseAccountId(accountOneValue);
+            } catch (RuntimeException e) {
+                JSONObject response = new JSONObject();
+                response.put("errorCode", 4);
+                response.put("errorDescription", "Incorrect \"accountOne\"");
+                throw new ParameterException(JSON.prepare(response));
+            }
+        }
+        
+        long accountTwoId;
+        String accountTwoValue = Convert.emptyToNull(req.getParameter("accountTwo"));
+        if (accountTwoValue == null) {
+            accountTwoId = 0;
+        }
+        else {
+            try {
+                accountTwoId = Convert.parseAccountId(accountTwoValue);
+            } catch (RuntimeException e) {
+                JSONObject response = new JSONObject();
+                response.put("errorCode", 4);
+                response.put("errorDescription", "Incorrect \"accountTwo\"");
+                throw new ParameterException(JSON.prepare(response));
+            }
+        } 
         
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
@@ -45,8 +73,8 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                 while (iterator.hasNext()) {
                     Transaction transaction = iterator.next();
                     if (transaction.getType().getType() == 1 && transaction.getType().getSubtype() == 0) {
-                        if ((transaction.getSenderId() == accountOne.getId() && transaction.getRecipientId() == accountTwo.getId()) || 
-                             transaction.getSenderId() == accountTwo.getId() && transaction.getRecipientId() == accountOne.getId()) 
+                        if ((transaction.getSenderId() == accountOneId && transaction.getRecipientId() == accountTwoId) || 
+                             transaction.getSenderId() == accountTwoId && transaction.getRecipientId() == accountOneId) 
                         {
                             transactions.add(transaction);
                         }
@@ -55,7 +83,7 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
             }
         }
         
-        try (DbIterator<? extends Transaction> iterator = MofoChat.getChatTransactions(accountOne.getId(), accountTwo.getId(), firstIndex, lastIndex)) {
+        try (DbIterator<? extends Transaction> iterator = MofoChat.getChatTransactions(accountOneId, accountTwoId, firstIndex, lastIndex)) {
             while (iterator.hasNext()) {
                 transactions.add(iterator.next());
             }
@@ -76,10 +104,6 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
             json.put("timestamp", transaction.getTimestamp());
             json.put("transaction", transaction.getStringId());
             json.put("confirmations", Nxt.getBlockchain().getHeight() - transaction.getHeight());
-            
-            if (Constants.TRANSIENT_FULL_HASH.equals(transaction.getReferencedTransactionFullHash())) {
-                json.put("transient", true);
-            }
 
             JSONObject attachmentJSON = new JSONObject();
             for (Appendix appendage : transaction.getAppendages()) {
@@ -97,16 +121,22 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
         }
         
         JSONObject response = new JSONObject();
-        response.put("accountOneRS", Convert.rsAccount(accountOne.getId()));
-        response.put("accountOneName", accountOne.getName());
-        if (accountOne.getPublicKey() != null) {
-          response.put("accountOnePublicKey", Convert.toHexString(accountOne.getPublicKey()));
+        response.put("accountOneRS", Convert.rsAccount(accountOneId));
+        Account accountOne = Account.getAccount(accountOneId);
+        if (accountOne != null) {
+            response.put("accountOneName", accountOne.getName());
+            if (accountOne.getPublicKey() != null) {
+                response.put("accountOnePublicKey", Convert.toHexString(accountOne.getPublicKey()));
+            }
         }
         
-        response.put("accountTwoRS", Convert.rsAccount(accountTwo.getId()));
-        response.put("accountTwoName", accountTwo.getName());
-        if (accountOne.getPublicKey() != null) {
-          response.put("accountTwoPublicKey", Convert.toHexString(accountTwo.getPublicKey()));
+        response.put("accountTwoRS", Convert.rsAccount(accountTwoId));
+        Account accountTwo = Account.getAccount(accountTwoId);
+        if (accountTwo != null) {
+            response.put("accountTwoName", accountTwo.getName());
+            if (accountOne.getPublicKey() != null) {
+                response.put("accountTwoPublicKey", Convert.toHexString(accountTwo.getPublicKey()));
+            }
         }
         
         response.put("messages", list);

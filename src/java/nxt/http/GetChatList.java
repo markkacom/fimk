@@ -25,11 +25,11 @@ public class GetChatList extends APIServlet.APIRequestHandler{
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
-        Account account = ParameterParser.getAccount(req);
+        long accountId = ParameterParser.getAccountId(req);
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
-        
-        List<Chat> chatList = MofoChat.getChatList(account.getId(), firstIndex, lastIndex);
+
+        List<Chat> chatList = MofoChat.getChatList(accountId, firstIndex, lastIndex);
         JSONArray chats = new JSONArray();
 
         for (Chat c : chatList) {
@@ -44,8 +44,12 @@ public class GetChatList extends APIServlet.APIRequestHandler{
         }
 
         JSONObject response = new JSONObject();
-        response.put("accountRS",  Convert.rsAccount(account.getId()));
-        response.put("accountName", account.getName());
+        response.put("accountRS",  Convert.rsAccount(accountId));
+        
+        Account account = Account.getAccount(accountId);
+        if (account != null) {
+            response.put("accountName", account.getName());
+        }
         response.put("chats", chats);
         return response;
     }
