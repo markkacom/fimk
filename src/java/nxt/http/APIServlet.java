@@ -253,6 +253,7 @@ public final class APIServlet extends HttpServlet {
         map.put("getAccountByIdentifier", MofoGetAccountByIdentifier.instance);
         map.put("getChatList", GetChatList.instance);
         map.put("getChatMessages", GetChatMessages.instance);
+        map.put("sendGossip", SendGossip.instance);
         
         if (Constants.isTestnet) {
             map.put("getWebsocketEvents", GetWebsocketEvents.instance);
