@@ -23,7 +23,7 @@ public final class Nxt {
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.5.0";
+    public static final String VERSION = "0.5.1";
 
     private static volatile Time time = new Time.EpochTime();
 
@@ -142,6 +142,10 @@ public final class Nxt {
         return TransactionProcessorImpl.getInstance();
     }
 
+    public static GossipProcessor getGossipProcessor() {
+        return GossipProcessorImpl.getInstance();
+    }
+
     public static Transaction.Builder newTransactionBuilder(byte[] senderPublicKey, long amountNQT, long feeNQT, short deadline, Attachment attachment) {
         return new TransactionImpl.BuilderImpl((byte)1, senderPublicKey, amountNQT, feeNQT, deadline, (Attachment.AbstractAttachment)attachment);
     }
@@ -227,6 +231,7 @@ public final class Nxt {
                 MofoAsset.init();
                 ExchangeObserver.init();
                 MofoVerificationAuthority.init();
+                GossipProcessorImpl.getInstance();                
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
