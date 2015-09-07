@@ -2,6 +2,7 @@ var APICall = Java.type('nxt.http.APICall');
 var BlockchainTest = Java.type('nxt.BlockchainTest');
 var Nxt = {};
 var navigator = {}; // jsbn.js dependency
+var window = {};
 
 load("src/test/resources/lib/jsbn.js");
 load("src/test/resources/lib/jsbn2.js");
@@ -10,7 +11,9 @@ load("src/test/resources/lib/converters.js");
 load("src/test/resources/lib/curve25519_.js");
 load("src/test/resources/lib/curve25519.js");
 load("src/test/resources/lib/jssha256.js");
+load("src/test/resources/lib/pako.min.js");
 load("src/test/resources/lib/Nxt.util.js");
+load("src/test/resources/lib/gossip.js");
 
 var forgerSecretPhrase = "franz dark offer race fuel fake joust waste tensor jk sw 101st"; // FIM-9MAB-AXFN-XXL7-6BHU3
 var secretPhrase1 = "anion harp ere sandal cobol chink bunch tire clare power fogy hump"; // FIM-R4X4-KMHT-RCXD-CLGFZ
@@ -38,11 +41,11 @@ Step.prototype.execute = function () {
   return ret;
 }
 Step.prototype.toString = function () {
-    return JSON.stringify({
-        requestType: this.requestType,
-        argv: this.argv,
-        ret: this.ret 
-    });
+  return JSON.stringify({
+    requestType: this.requestType,
+    argv: this.argv,
+    ret: this.ret 
+  });
 }
 
 function SocketEvent(event, prettyPrint) {
@@ -117,7 +120,7 @@ Nxt.getAccountByIdentifier = function (identifier) {
   return ret;
 }
 
-function isError(obj) { return obj.errorCode || obj.error || obj.errorDescription };
+function isError(obj) { return (obj.errorCode || obj.error || obj.errorDescription) };
 function printError(obj) { print(JSON.stringify(obj)); }
 function extend(dst, src) {
   var names = Object.getOwnPropertyNames(src);
@@ -129,8 +132,9 @@ function extend(dst, src) {
 
 function Account(secretPhrase) {
   this.secretPhrase=secretPhrase;
+  this.id=Nxt.util.getAccountId(secretPhrase, false);
   this.id_rs=Nxt.util.getAccountId(secretPhrase, true);
-  this.publicKey = Nxt.util.secretPhraseToPublicKey(secretPhrase);
+  this.publicKey=Nxt.util.secretPhraseToPublicKey(secretPhrase);
 }
 Account.prototype = {
   generateBlock: function () {
@@ -337,6 +341,17 @@ Account.prototype = {
     var ret = Nxt.call('getAccountIdentifiers', { account: this.id_rs });
     if (isError(ret)) { if (Nxt.verbose) { printError(ret); } return null; }    
     return ret.identifiers;
+  },
+  sendGossip: function (recipientAccount, message, topic) {
+    var builder = new GossipBuilder();
+    var arg     = builder.setRecipientPublicKey(recipientAccount.publicKey)
+                         .setTopic(topic)
+                         .setMessage(message)
+                         .build(this.secretPhrase);
+    
+    var ret = Nxt.call('sendGossip', arg);  
+    if (isError(ret)) { printError(ret); return ret; }
+    return ret;
   }
 };
 
