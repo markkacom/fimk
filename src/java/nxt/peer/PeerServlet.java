@@ -4,6 +4,7 @@ import nxt.util.CountingInputStream;
 import nxt.util.CountingOutputStream;
 import nxt.util.JSON;
 import nxt.util.Logger;
+
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.servlets.gzip.CompressedResponseWrapper;
 import org.json.simple.JSONObject;
@@ -16,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("serial")
 public final class PeerServlet extends HttpServlet {
 
     abstract static class PeerRequestHandler {
@@ -45,6 +48,9 @@ public final class PeerServlet extends HttpServlet {
         map.put("getUnconfirmedTransactions", GetUnconfirmedTransactions.instance);
         map.put("processBlock", ProcessBlock.instance);
         map.put("processTransactions", ProcessTransactions.instance);
+        if (Peers.gossipEnabled) {
+            map.put("processGossip", ProcessGossip.instance);
+        }
         peerRequestHandlers = Collections.unmodifiableMap(map);
     }
 
