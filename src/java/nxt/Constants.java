@@ -179,8 +179,9 @@ public final class Constants {
         }
       }
     }
-
-    public static final String TRANSIENT_FULL_HASH = "3030303030303030303030303030303030303030303030303030303030303030"; 
+    
+    public static final int MAX_GOSSIP_MESSAGE_LENGTH = 1000;
+    public static final int MAX_GOSSIP_TIMEDRIFFT = 15;
 
     private Constants() {} // never
 
