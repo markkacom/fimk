@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 
 import nxt.Block;
 import nxt.BlockchainProcessor;
+import nxt.Constants;
+import nxt.Gossip;
+import nxt.GossipProcessor;
 import nxt.Nxt;
 import nxt.Trade;
 import nxt.Transaction;
@@ -229,70 +232,91 @@ public final class EventForwarder {
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_BLACKLIST", peer);
             }
-         }, Peers.Event.BLACKLIST);
+        }, Peers.Event.BLACKLIST);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_UNBLACKLIST", peer);
             }
-         }, Peers.Event.UNBLACKLIST);
+        }, Peers.Event.UNBLACKLIST);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_DEACTIVATE", peer);
             }
-         }, Peers.Event.DEACTIVATE);
+        }, Peers.Event.DEACTIVATE);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_REMOVE", peer); 
             }
-         }, Peers.Event.REMOVE);
+        }, Peers.Event.REMOVE);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_DOWNLOADED_VOLUME", peer);
             }
-         }, Peers.Event.DOWNLOADED_VOLUME);
+        }, Peers.Event.DOWNLOADED_VOLUME);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_UPLOADED_VOLUME", peer);
             }
-         }, Peers.Event.UPLOADED_VOLUME);
+        }, Peers.Event.UPLOADED_VOLUME);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_WEIGHT", peer);
             }
-         }, Peers.Event.WEIGHT);
+        }, Peers.Event.WEIGHT);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_ADDED_ACTIVE_PEER", peer);
             }
-         }, Peers.Event.ADDED_ACTIVE_PEER);
+        }, Peers.Event.ADDED_ACTIVE_PEER);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_CHANGED_ACTIVE_PEER", peer);
             }
-         }, Peers.Event.CHANGED_ACTIVE_PEER);
+        }, Peers.Event.CHANGED_ACTIVE_PEER);
         
         Peers.addListener(new Listener<Peer>() {
             @Override
             public void notify(Peer peer) {
                 MofoSocketServer.notifyPeerEvent("PEER_NEW_PEER", peer);
             }
-         }, Peers.Event.NEW_PEER);        
+        }, Peers.Event.NEW_PEER);
+
+
+        Nxt.getGossipProcessor().addListener(new Listener<Gossip> () {
+
+            @Override
+            public void notify(Gossip gossip) {
+                String senderId = Long.toUnsignedString(gossip.getSenderId());
+                String recipientId = Long.toUnsignedString(gossip.getRecipientId());
+                String topicId = Long.toUnsignedString(gossip.getTopic());
+              
+                if (Constants.isTestnet) {
+                    MofoSocketServer.notifyGossipEvent("ADDEDGOSSIP", gossip);
+                }
+                MofoSocketServer.notifyGossipEvent("ADDEDGOSSIP*"+senderId, gossip);
+                MofoSocketServer.notifyGossipEvent("ADDEDGOSSIP#"+recipientId, gossip);
+                MofoSocketServer.notifyGossipEvent("ADDEDGOSSIP-"+topicId, gossip);
+                MofoSocketServer.notifyGossipEvent("ADDEDGOSSIP*"+senderId+"-"+topicId, gossip);
+                MofoSocketServer.notifyGossipEvent("ADDEDGOSSIP#"+recipientId+"-"+topicId, gossip);
+            }
+          
+        }, GossipProcessor.Event.ADDED_GOSSIP);
     }
     
     static void init() {}
