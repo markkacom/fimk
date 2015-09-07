@@ -15,7 +15,6 @@ import nxt.Attachment.ColoredCoinsBidOrderPlacement;
 import nxt.Attachment.ColoredCoinsAskOrderCancellation;
 import nxt.Attachment.ColoredCoinsBidOrderCancellation;
 import nxt.Block;
-import nxt.Constants;
 import nxt.Currency;
 import nxt.DigitalGoodsStore;
 import nxt.Nxt;
@@ -28,7 +27,6 @@ import nxt.util.Convert;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
 
 public class JSONData {
 
@@ -80,10 +78,6 @@ public class JSONData {
         json.put("amountNQT", transaction.getAmountNQT());
         json.put("feeNQT", transaction.getFeeNQT());
         json.put("deadline", transaction.getDeadline());
-        
-        if (Constants.TRANSIENT_FULL_HASH.equals(transaction.getReferencedTransactionFullHash())) {
-            json.put("transient", true);
-        }
         
         if (unconfirmed) {
           json.put("confirmations", -1);
@@ -299,6 +293,7 @@ public class JSONData {
         return json;
     }
 
+    @SuppressWarnings("unchecked")
     static JSONObject peer(Peer peer) {
         JSONObject json = new JSONObject();
         json.put("address", peer.getPeerAddress());
@@ -322,6 +317,7 @@ public class JSONData {
         return json;
     }
 
+    @SuppressWarnings("unchecked")
     public static JSONObject goods(DigitalGoodsStore.Goods goods, boolean includeCounts) {
         JSONObject json = new JSONObject();
         json.put("goods", Convert.toUnsignedLong(goods.getId()));
