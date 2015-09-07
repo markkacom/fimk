@@ -44,6 +44,95 @@
     return converters.byteArrayToHexString(v.concat(h));
   }
   
+  /**
+   * Encrypts message data and adds that to data arg 
+   * 
+   * @param message             String
+   * @param secretPhrase        Hex String
+   * @param recipientPublicKey  Hex String
+   * @returns { message: HexString, nonce: HexString }
+   * */
+  function encryptData(message, secretPhrase, recipientPublicKey) {
+    var options = {
+      account: getAccountIdFromPublicKey(recipientPublicKey, false),
+      publicKey: converters.hexStringToByteArray(recipientPublicKey),
+      privateKey: converters.hexStringToByteArray(getPrivateKey(secretPhrase))
+    };
+    
+    var encrypted = encryptData2(converters.stringToByteArray(message), options);
+    return {
+      "message": converters.byteArrayToHexString(encrypted.data),
+      "nonce": converters.byteArrayToHexString(encrypted.nonce)
+    };    
+  }  
+    
+  /**
+   * @param plaintext   ByteArray
+   * @param options     { account: String, privateKey: ByteArray, publicKey: ByteArray }
+   * @returns { message: ByteArray, nonce: ByteArray }
+   */
+  function encryptData2(plaintext, options) {
+    if (!window.crypto && !window.msCrypto) {
+      throw {
+        "errorCode": -1,
+        "message": "Missing secure browser crypto support"
+      };
+    }
+
+    options.sharedKey = getSharedKey(options.privateKey, options.publicKey);
+    var compressedPlaintext = pako.gzip(new Uint8Array(plaintext));
+    options.nonce = new Uint8Array(32);
+
+    if (window.crypto) {
+      window.crypto.getRandomValues(options.nonce);
+    } else {
+      window.msCrypto.getRandomValues(options.nonce);
+    }
+
+    var data = aesEncrypt(compressedPlaintext, options);
+    return {
+      "nonce": options.nonce,
+      "data": data
+    };
+  }      
+  
+  /**
+   * @param key1 ByteArray
+   * @param key2 ByteArray
+   * @returns ByteArray 
+   */
+  function getSharedKey(key1, key2) {
+    return converters.shortArrayToByteArray(
+                curve25519_(converters.byteArrayToShortArray(key1), 
+                            converters.byteArrayToShortArray(key2), null));
+  }
+  
+  function aesEncrypt(plaintext, options) {
+    // CryptoJS likes WordArray parameters
+    var text = converters.byteArrayToWordArray(plaintext);
+    var sharedKey = options.sharedKey.slice(0); //clone
+    for (var i = 0; i < 32; i++) {
+      sharedKey[i] ^= options.nonce[i];
+    }
+
+    var key = CryptoJS.SHA256(converters.byteArrayToWordArray(sharedKey));
+    var tmp = new Uint8Array(16);
+
+    if (window.crypto) {
+      window.crypto.getRandomValues(tmp);
+    } else {
+      window.msCrypto.getRandomValues(tmp);
+    }
+
+    var iv = converters.byteArrayToWordArray(tmp);
+    var encrypted = CryptoJS.AES.encrypt(text, key, {
+      iv: iv
+    });
+
+    var ivOut = converters.wordArrayToByteArray(encrypted.iv);
+    var ciphertextOut = converters.wordArrayToByteArray(encrypted.ciphertext);
+    return ivOut.concat(ciphertextOut);
+  }
   
   /**
    * @param message ByteArray
@@ -353,7 +442,10 @@
       return convertNQT(amountNQT, 8);
     },
     
+    encryptData: encryptData,
+    
     getAccountId: getAccountId,
+    getAccountIdFromPublicKey: getAccountIdFromPublicKey,
     convertNQT: convertNQT,
     convertToNQT: convertToNQT,
     convertToQNTf: convertToQNTf,
