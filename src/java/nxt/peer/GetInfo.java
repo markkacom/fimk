@@ -46,6 +46,7 @@ final class GetInfo extends PeerServlet.PeerRequestHandler {
         peerImpl.setShareAddress(Boolean.TRUE.equals(request.get("shareAddress")));
         peerImpl.analyzeHallmark(peer.getPeerAddress(), (String)request.get("hallmark"));
         peerImpl.setLastUpdated(Nxt.getEpochTime());
+        peerImpl.setGossipEnabled(Boolean.TRUE.equals(request.get("gossip")));
 
         Peers.notifyListeners(peerImpl, Peers.Event.ADDED_ACTIVE_PEER);
 
