@@ -60,6 +60,7 @@ final class PeerImpl implements Peer {
     private volatile int lastConnectAttempt;
     private volatile long hallmarkBalance = -1;
     private volatile int hallmarkBalanceHeight;
+    private volatile boolean gossipEnabled;
 
     PeerImpl(String peerAddress, String announcedAddress) {
         this.peerAddress = peerAddress;
@@ -224,6 +225,15 @@ final class PeerImpl implements Peer {
     @Override
     public Hallmark getHallmark() {
         return hallmark;
+    }
+    
+    @Override
+    public boolean getGossipEnabled() {
+        return gossipEnabled;
+    }
+    
+    void setGossipEnabled(boolean gossipEnabled) {
+        this.gossipEnabled = gossipEnabled;
     }
 
     @Override
