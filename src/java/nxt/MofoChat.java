@@ -11,7 +11,6 @@ import java.util.Map;
 
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
-import nxt.util.Listener;
 
 
 public class MofoChat {
@@ -33,29 +32,6 @@ public class MofoChat {
         public int getTimestamp() {
             return timestamp;
         }
-    }
-
-    static {
-
-        /* Confirmed transactions are removed from the transient messages table
-         * since they now become available in the transaction table. */
-        Nxt.getTransactionProcessor().addListener(new Listener<List<? extends Transaction>>() {
-            @Override
-            public void notify(List<? extends Transaction> t) {
-            }
-        }, TransactionProcessor.Event.ADDED_CONFIRMED_TRANSACTIONS);
-
-        /* Unconfirmed transactions are added to the transient messages table, 
-         * this allows us to look up messages in this table instead of having  
-         *  */
-        Nxt.getTransactionProcessor().addListener(new Listener<List<? extends Transaction>>() {
-            @Override
-            public void notify(List<? extends Transaction> t) {
-            }
-        }, TransactionProcessor.Event.ADDED_UNCONFIRMED_TRANSACTIONS);
-
-        
-      
     }
 
     public static DbIterator<? extends Transaction> getChatTransactions(long accountOne, long accountTwo, int from, int to) {
@@ -97,7 +73,7 @@ public class MofoChat {
                     + "    UNION ALL "
                     + "    SELECT recipient_id AS account_id, timestamp "
                     + "    FROM transaction "
-                    + "    WHERE sender_id = ? AND type = 1 AND subtype = 0"
+                    + "    WHERE sender_id = ? AND type = 1 AND subtype = 0 "
                     + "  )"
                     + "  GROUP BY account_id " 
                     + ")"
@@ -171,5 +147,4 @@ public class MofoChat {
             throw new RuntimeException(e.toString(), e);
         }      
     }
-
 }
