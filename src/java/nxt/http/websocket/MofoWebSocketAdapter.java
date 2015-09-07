@@ -1,6 +1,7 @@
 package nxt.http.websocket;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import nxt.http.API;
 import nxt.util.Logger;
@@ -47,7 +48,12 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
     @Override
     public void onWebSocketConnect(Session sess) {
         super.onWebSocketConnect(sess);
-        Logger.logDebugMessage("Socket Connected: " + sess);
+        
+        InetSocketAddress address = sess.getRemoteAddress();
+        if (address != null) {
+            Logger.logDebugMessage("Socket Connected: " + address.getHostString());
+        }
+        
         if (API.allowedBotHosts != null && ! API.allowedBotHosts.contains(sess.getRemoteAddress().getHostName())) {
             try {
                 Logger.logDebugMessage("Disconnecting because of not-allowed bot host");
