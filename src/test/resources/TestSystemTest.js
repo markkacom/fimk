@@ -9,7 +9,7 @@ tests({
     );
   },
   "Test Public Key": function () {
-    assert.assertEquals(accounts.forger.publicKey(), '97d171fec9870d5ba98986e14c099c02f8e850ab188502a17bc0def21a6e392e');
+    assert.assertEquals("97d171fec9870d5ba98986e14c099c02f8e850ab188502a17bc0def21a6e392e", accounts.forger.publicKey);
   },
   "Test send money": function () {
     var account = new Account('123');
