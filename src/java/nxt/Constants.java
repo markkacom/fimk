@@ -180,6 +180,7 @@ public final class Constants {
       }
     }
     
+    public static final int MAX_GOSSIP_CACHE_LENGTH = 2000;
     public static final int MAX_GOSSIP_MESSAGE_LENGTH = 1000;
     public static final int MAX_GOSSIP_TIMEDRIFFT = 15;
 
