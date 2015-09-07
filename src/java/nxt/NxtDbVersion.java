@@ -622,47 +622,60 @@ class NxtDbVersion extends DbVersion {
             case 250:
                 apply("CREATE INDEX IF NOT EXISTS trade_height_idx ON trade(height)");
             case 251:
-                apply("CALL FTL_CREATE_INDEX('PUBLIC', 'ACCOUNT', 'NAME,DESCRIPTION')");
+                apply(null);
             case 252:
                 apply(null);
             case 253:
-                apply("CALL FTL_DROP_INDEX('PUBLIC', 'ACCOUNT')");
+                apply(null);
             case 254:
-                apply("CALL FTL_REINDEX()");
+                apply(null);
             case 255:
+                /* MOFO WALLET */
                 apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
             case 256:
+                /* MOFO WALLET */
                 apply("UPDATE asset SET type = 0");
             case 257:
+                /* MOFO WALLET */
                 apply("CREATE TABLE IF NOT EXISTS private_asset (db_id IDENTITY, asset_id BIGINT NOT NULL, "
                     + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
                     + "FOREIGN KEY (asset_id) REFERENCES asset (id) ON DELETE CASCADE, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 258:
+                /* MOFO WALLET */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_height_idx ON private_asset (asset_id, height DESC)");
             case 259:
+                /* MOFO WALLET */
                 apply("CREATE TABLE IF NOT EXISTS private_asset_account (db_id IDENTITY, account_id BIGINT NOT NULL, "
                     + "asset_id BIGINT NOT NULL, allowed BOOLEAN NOT NULL DEFAULT TRUE, height INT NOT NULL, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 260:
+                /* MOFO WALLET */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
             case 261:
+                /* MOFO WALLET */
                 apply("CREATE TABLE IF NOT EXISTS account_identifier (db_id IDENTITY, transaction_id BIGINT NOT NULL, "
                     + "account_id BIGINT NOT NULL, email VARCHAR NOT NULL, "
                     + "email_lower VARCHAR AS LOWER (email) NOT NULL, height INT NOT NULL)");       
             case 262:
+                /* MOFO WALLET */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS account_identifier_email_idx ON account_identifier (email_lower)");
-            case 263:  
+            case 263:
+                /* MOFO WALLET */
                 apply("CREATE INDEX IF NOT EXISTS account_identifier_account_id_idx ON account_identifier (account_id)");
             case 264:
+                /* MOFO WALLET */
                 apply("CREATE INDEX IF NOT EXISTS account_identifier_height_idx ON account_identifier (height DESC)");
             case 265:
+                /* MOFO WALLET */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS account_identifier_transaction_id_idx ON account_identifier (transaction_id)");
             case 266:
+                /* MOFO WALLET */
                 apply("CREATE TABLE IF NOT EXISTS verification_authority (db_id IDENTITY, "
                     + "account_id BIGINT NOT NULL, period INT NOT NULL, "
                     + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 267:
+                /* MOFO WALLET */
                 apply("CREATE INDEX IF NOT EXISTS verification_authority_account_id_idx ON verification_authority (account_id, height DESC)");
             case 268:
                 return;
