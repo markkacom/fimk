@@ -107,7 +107,7 @@ var newStub = function() {
 
 function createTestFunction(inner_test, before, after) {
   return function () {
-    ScriptHelper.rollback(50);
+    ScriptHelper.rollback(1);
     ScriptHelper.truncate("unconfirmed_transaction;");
     Nxt.generateBlock();
     Nxt.verbose = false;
