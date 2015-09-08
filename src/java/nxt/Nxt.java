@@ -19,7 +19,7 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.4.17";
+    public static final String NXT_VERSION = "1.4.18";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */

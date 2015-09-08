@@ -29,6 +29,7 @@
 /*.zip
 /announcements/
 *.csv
+/nxt.pro
 dist
 downloads
 fim_db.backup

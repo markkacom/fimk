@@ -814,7 +814,7 @@ public abstract class TransactionType {
         };
 
     }
-    
+
     public static abstract class ColoredCoins extends TransactionType {
 
         private ColoredCoins() {}
@@ -1048,7 +1048,7 @@ public abstract class TransactionType {
                         }
                     }
                 }
-                return false;              
+                return false;
             }
 
             @Override
@@ -1134,7 +1134,7 @@ public abstract class TransactionType {
                         return true;
                     }
                 }
-                return false;              
+                return false;
             }
 
             @Override
@@ -1902,8 +1902,7 @@ public abstract class TransactionType {
                     throw new NxtException.NotValidException("Invalid effective balance leasing: "
                             + transaction.getJSONObject() + " transaction " + transaction.getStringId());
                 }
-                if (recipientAccount == null
-                        || (recipientAccount.getKeyHeight() <= 0 /*&& ! transaction.getStringId().equals("5081403377391821646")*/)) {
+                if (recipientAccount == null || recipientAccount.getKeyHeight() <= 0) {
                     throw new NxtException.NotCurrentlyValidException("Invalid effective balance leasing: "
                             + " recipient account " + transaction.getRecipientId() + " not found or no public key published");
                 }
