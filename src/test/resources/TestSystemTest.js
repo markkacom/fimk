@@ -66,6 +66,6 @@ tests({
     var asset = accounts.a.issueAsset('asset1', true, '1000000', 8);
     assert.assertEquals(true, asset.isPrivate());
     assert.assertEquals(false, asset.getAccountAllowed(accounts.b.id_rs));
-    assert.assertEquals("Account not allowed to place bid order", accounts.b.placeBidOrder(asset.asset, '10', '1', '0').error);
+    assert.assertEquals("Account not allowed to place bid order", accounts.b.placeBidOrder(asset.asset, '10', '1', '0').errorDescription);
   }  
 });

@@ -15,11 +15,11 @@ tests({
     assert.assertEquals('20000', this.issuer.getBalanceNXT());
     assert.assertEquals('10000', this.account.getBalanceNXT());
     assert.assertEquals('Incorrect "orderFeeNQT" should be 1000000000', 
-                        this.account.placeBidOrder(this.asset.asset, '100', '1', '20').error);
+                        this.account.placeBidOrder(this.asset.asset, '100', '1', '20').errorDescription);
     assert.assertEquals('20000', this.issuer.getBalanceNXT());
     assert.assertEquals('10000', this.account.getBalanceNXT());                        
     assert.assertEquals(undefined, 
-                        this.account.placeBidOrder(this.asset.asset, '100', '1', '10').error);
+                        this.account.placeBidOrder(this.asset.asset, '100', '1', '10').errorDescription);
     assert.assertEquals('20010', this.issuer.getBalanceNXT());
     assert.assertEquals('9989.9', this.account.getBalanceNXT());
   },

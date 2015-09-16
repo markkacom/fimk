@@ -58,7 +58,7 @@ tests({
   "Test transfer": function () {
     var recipient = new Account('recipient');
     assert.assertEquals('1000000', this.account.getAssetBalance(this.asset.asset));
-    assert.assertEquals("Recipient not allowed to receive private asset", this.account.transferAsset(recipient.id_rs, this.asset.asset, "100").error);
+    assert.assertEquals("Recipient not allowed to receive private asset", this.account.transferAsset(recipient.id_rs, this.asset.asset, "100").errorDescription);
     assert.assertEquals('1000000', this.account.getAssetBalance(this.asset.asset));
     
     this.asset.setAccountAllowed(recipient.id_rs);
@@ -72,11 +72,11 @@ tests({
     this.asset.setAccountAllowed(asker.id_rs, true);
     this.account.transferAsset(asker.id_rs, this.asset.asset, '5');
     this.asset.setAccountAllowed(asker.id_rs, false);    
-    assert.assertEquals('Account not allowed to place ask order', asker.placeAskOrder(this.asset.asset, 2, '2', '0').error);
+    assert.assertEquals('Account not allowed to place ask order', asker.placeAskOrder(this.asset.asset, 2, '2', '0').errorDescription);
   },
   "Test placeBidOrder not allowed": function () {
     var bidder = Nxt.createFundedAccount('bidder', '100');
-    assert.assertEquals('Account not allowed to place bid order', bidder.placeBidOrder(this.asset.asset, 10, '2', '0').error);
+    assert.assertEquals('Account not allowed to place bid order', bidder.placeBidOrder(this.asset.asset, 10, '2', '0').errorDescription);
     
     this.asset.setAccountAllowed(bidder.id_rs, true);
     var order = bidder.placeBidOrder(this.asset.asset, 10, '2', '0').transaction;
@@ -84,7 +84,7 @@ tests({
     bidder.cancelBidOrder(order);
     
     this.asset.setAccountAllowed(bidder.id_rs, false);
-    assert.assertEquals('Account not allowed to place bid order', bidder.placeBidOrder(this.asset.asset, 10, '2', '0').error);    
+    assert.assertEquals('Account not allowed to place bid order', bidder.placeBidOrder(this.asset.asset, 10, '2', '0').errorDescription);    
   },  
   "Test rollback account-allowed": function () {
     var rollback = Nxt.getBlockchain().getHeight();    
