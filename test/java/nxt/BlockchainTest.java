@@ -5,8 +5,10 @@ import nxt.util.Logger;
 import nxt.util.Time;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import java.util.Properties;
 
@@ -34,22 +36,42 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
     protected static long id3;
     protected static long id4;
 
-    @Before
-    public void init() {
+    protected static boolean isNxtInitted = false;
+    protected static boolean needShutdownAfterClass = false;
+
+    public static void initNxt() {
+        if (!isNxtInitted) {
+            Properties properties = ManualForgingTest.newTestProperties();
+            properties.setProperty("nxt.isTestnet", "true");
+            properties.setProperty("nxt.isOffline", "true");
+            properties.setProperty("nxt.enableFakeForging", "true");
+            properties.setProperty("nxt.fakeForgingAccount", forgerAccountId);
+            properties.setProperty("nxt.timeMultiplier", "1");
+            AbstractForgingTest.init(properties);
+            isNxtInitted = true;
+        }
+    }
+    
+    @BeforeClass
+    public static void init() {
+        needShutdownAfterClass = !isNxtInitted;
+        initNxt();
+        
+        Nxt.setTime(new Time.CounterTime(Nxt.getEpochTime()));
+        baseHeight = blockchain.getHeight();
+        Logger.logMessage("baseHeight: " + baseHeight);
+        
         id1 = Account.getAccount(Crypto.getPublicKey(secretPhrase1)).getId();
         id2 = Account.getAccount(Crypto.getPublicKey(secretPhrase2)).getId();
         id3 = Account.getAccount(Crypto.getPublicKey(secretPhrase3)).getId();
         id4 = Account.getAccount(Crypto.getPublicKey(secretPhrase4)).getId();
+    }
 
-        Properties properties = ManualForgingTest.newTestProperties();
-        properties.setProperty("nxt.isTestnet", "true");
-        properties.setProperty("nxt.isOffline", "true");
-        properties.setProperty("nxt.enableFakeForging", "true");
-        properties.setProperty("nxt.timeMultiplier", "1");
-        AbstractForgingTest.init(properties);
-        Nxt.setTime(new Time.CounterTime(Nxt.getEpochTime()));
-        baseHeight = blockchain.getHeight();
-        Logger.logMessage("baseHeight: " + baseHeight);
+    @AfterClass
+    public static void shutdown() {
+        if (needShutdownAfterClass) {
+            Nxt.shutdown();
+        }
     }
 
     @After
@@ -65,6 +87,17 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
             Assert.fail();
         }
     }
+
+    public static void generateBlocks(int howMany) {
+        for (int i = 0; i < howMany; i++) {
+            generateBlock();
+        }
+    }
+
+    protected long balanceById(long id) {
+        return Account.getAccount(id).getBalanceNQT();
+    }
+
 
     public static void rollback(int height) {
         blockchainProcessor.popOffTo(height);

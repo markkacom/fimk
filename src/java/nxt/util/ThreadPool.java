@@ -84,8 +84,8 @@ public final class ThreadPool {
     public static void shutdown() {
         if (scheduledThreadPool != null) {
 	        Logger.logShutdownMessage("Stopping background jobs...");
-    	    shutdownExecutor(scheduledThreadPool);
-        	scheduledThreadPool = null;
+            shutdownExecutor(scheduledThreadPool);
+            scheduledThreadPool = null;
         	Logger.logShutdownMessage("...Done");
         }
     }

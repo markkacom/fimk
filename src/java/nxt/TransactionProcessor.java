@@ -9,10 +9,12 @@ import java.util.List;
 
 public interface TransactionProcessor extends Observable<List<? extends Transaction>,TransactionProcessor.Event> {
 
-    public static enum Event {
+    enum Event {
         REMOVED_UNCONFIRMED_TRANSACTIONS,
         ADDED_UNCONFIRMED_TRANSACTIONS,
-        ADDED_CONFIRMED_TRANSACTIONS
+        ADDED_CONFIRMED_TRANSACTIONS,
+        RELEASE_PHASED_TRANSACTION,
+        REJECT_PHASED_TRANSACTION
     }
 
     DbIterator<? extends Transaction> getAllUnconfirmedTransactions();
@@ -24,9 +26,5 @@ public interface TransactionProcessor extends Observable<List<? extends Transact
     void broadcast(Transaction transaction) throws NxtException.ValidationException;
 
     void processPeerTransactions(JSONObject request) throws NxtException.ValidationException;
-
-    Transaction parseTransaction(byte[] bytes) throws NxtException.ValidationException;
-
-    Transaction parseTransaction(JSONObject json) throws NxtException.ValidationException;
 
 }

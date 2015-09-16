@@ -4,7 +4,6 @@ import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
-import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
 
@@ -20,7 +19,7 @@ import java.util.List;
  */
 public final class CurrencyMint {
 
-    public static enum Event {
+    public enum Event {
         CURRENCY_MINT
     }
 
@@ -97,9 +96,9 @@ public final class CurrencyMint {
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO currency_mint (currency_id, account_id, counter, height, latest) "
                 + "KEY (currency_id, account_id, height) VALUES (?, ?, ?, ?, TRUE)")) {
             int i = 0;
-            pstmt.setLong(++i, this.getCurrencyId());
-            pstmt.setLong(++i, this.getAccountId());
-            pstmt.setLong(++i, this.getCounter());
+            pstmt.setLong(++i, this.currencyId);
+            pstmt.setLong(++i, this.accountId);
+            pstmt.setLong(++i, this.counter);
             pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
             pstmt.executeUpdate();
         }
@@ -144,28 +143,6 @@ public final class CurrencyMint {
         } else {
             return 0;
         }
-    }
-
-    static String debug(long currencyId, long accountId) {
-        StringBuilder buf = new StringBuilder();
-        CurrencyMint currencyMint = currencyMintTable.get(currencyMintDbKeyFactory.newKey(currencyId, accountId));
-        buf.append("CurrencyMint counter: ").append(currencyMint.counter).append('\n');
-        buf.append("blockchain height ").append(Nxt.getBlockchain().getHeight()).append('\n');
-        try (Connection con = Db.db.getConnection();
-             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM currency_mint WHERE currency_id = ? AND account_id = ?")) {
-            pstmt.setLong(1, currencyId);
-            pstmt.setLong(2, accountId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    buf.append("currency_id ").append(Convert.toUnsignedLong(rs.getLong("currency_id"))).append(" account_id ")
-                            .append(Convert.toUnsignedLong(rs.getLong("account_id"))).append(" counter ").append(rs.getLong("counter")).append(" height ")
-                            .append(rs.getInt("height")).append(" latest ").append(rs.getBoolean("latest")).append('\n');
-                }
-            }
-        } catch (SQLException e) {
-            buf.append(e.toString());
-        }
-        return buf.toString();
     }
 
     static void deleteCurrency(Currency currency) {

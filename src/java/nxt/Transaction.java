@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface Transaction {
 
-    public static interface Builder {
+    interface Builder {
 
         Builder recipientId(long recipientId);
 
@@ -26,7 +26,11 @@ public interface Transaction {
 
         Builder ecBlockId(long blockId);
 
+        Builder phasing(Appendix.Phasing phasing);
+
         Transaction build() throws NxtException.NotValidException;
+
+        Transaction build(String secretPhrase) throws NxtException.NotValidException;
 
     }
 
@@ -41,6 +45,8 @@ public interface Transaction {
     long getRecipientId();
 
     int getHeight();
+
+    int getValidationHeight();
 
     long getBlockId();
 
@@ -70,8 +76,6 @@ public interface Transaction {
 
     Attachment getAttachment();
 
-    void sign(String secretPhrase);
-
     boolean verifySignature();
 
     void validate() throws NxtException.ValidationException;
@@ -90,16 +94,11 @@ public interface Transaction {
 
     Appendix.EncryptToSelfMessage getEncryptToSelfMessage();
 
+    Appendix.Phasing getPhasing();
+
     List<? extends Appendix> getAppendages();
-
-    /*
-    Collection<TransactionType> getPhasingTransactionTypes();
-
-    Collection<TransactionType> getPhasedTransactionTypes();
-    */
 
     int getECBlockHeight();
 
     long getECBlockId();
-
 }

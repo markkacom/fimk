@@ -1,6 +1,8 @@
 package nxt.db;
 
 import nxt.Nxt;
+import nxt.util.Logger;
+import org.h2.fulltext.FullTextLucene;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,16 +14,22 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     private final boolean multiversion;
     protected final DbKey.Factory<T> dbKeyFactory;
     private final String defaultSort;
+    private final String fullTextSearchColumns;
 
     protected EntityDbTable(String table, DbKey.Factory<T> dbKeyFactory) {
-        this(table, dbKeyFactory, false);
+        this(table, dbKeyFactory, false, null);
     }
 
-    EntityDbTable(String table, DbKey.Factory<T> dbKeyFactory, boolean multiversion) {
+    protected EntityDbTable(String table, DbKey.Factory<T> dbKeyFactory, String fullTextSearchColumns) {
+        this(table, dbKeyFactory, false, fullTextSearchColumns);
+    }
+
+    EntityDbTable(String table, DbKey.Factory<T> dbKeyFactory, boolean multiversion, String fullTextSearchColumns) {
         super(table);
         this.dbKeyFactory = dbKeyFactory;
         this.multiversion = multiversion;
-        this.defaultSort = " ORDER BY " + (multiversion ? dbKeyFactory.getPKColumns() : " height DESC ");
+        this.defaultSort = " ORDER BY " + (multiversion ? dbKeyFactory.getPKColumns() : " height DESC, db_id DESC ");
+        this.fullTextSearchColumns = fullTextSearchColumns;
     }
 
     protected abstract T load(Connection con, ResultSet rs) throws SQLException;
@@ -39,6 +47,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     public void checkAvailable(int height) {
         if (multiversion && height < Nxt.getBlockchainProcessor().getMinRollbackHeight()) {
             throw new IllegalArgumentException("Historical data as of height " + height +" not available.");
+        }
+        if (height > Nxt.getBlockchain().getHeight()) {
+            throw new IllegalArgumentException("Height " + height + " exceeds blockchain height " + Nxt.getBlockchain().getHeight());
         }
     }
 
@@ -60,6 +71,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final T get(DbKey dbKey, int height) {
+        if (height < 0 || height == Nxt.getBlockchain().getHeight()) {
+            return get(dbKey);
+        }
         checkAvailable(height);
         try (Connection con = db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT * FROM " + table + dbKeyFactory.getPKClause()
@@ -89,6 +103,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final T getBy(DbClause dbClause, int height) {
+        if (height < 0 || height == Nxt.getBlockchain().getHeight()) {
+            return getBy(dbClause);
+        }
         checkAvailable(height);
         try (Connection con = db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT * FROM " + table + " AS a WHERE " + dbClause.getClause()
@@ -161,6 +178,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final DbIterator<T> getManyBy(DbClause dbClause, int height, int from, int to, String sort) {
+        if (height < 0 || height == Nxt.getBlockchain().getHeight()) {
+            return getManyBy(dbClause, from, to, sort);
+        }
         checkAvailable(height);
         Connection con = null;
         try {
@@ -189,23 +209,20 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
 
     public final DbIterator<T> getManyBy(Connection con, PreparedStatement pstmt, boolean cache) {
         final boolean doCache = cache && db.isInTransaction();
-        return new DbIterator<>(con, pstmt, new DbIterator.ResultSetReader<T>() {
-            @Override
-            public T get(Connection con, ResultSet rs) throws Exception {
-                T t = null;
-                DbKey dbKey = null;
-                if (doCache) {
-                    dbKey = dbKeyFactory.newKey(rs);
-                    t = (T) db.getCache(table).get(dbKey);
-                }
-                if (t == null) {
-                    t = load(con, rs);
-                    if (doCache) {
-                        db.getCache(table).put(dbKey, t);
-                    }
-                }
-                return t;
+        return new DbIterator<>(con, pstmt, (connection, rs) -> {
+            T t = null;
+            DbKey dbKey = null;
+            if (doCache) {
+                dbKey = dbKeyFactory.newKey(rs);
+                t = (T) db.getCache(table).get(dbKey);
             }
+            if (t == null) {
+                t = load(connection, rs);
+                if (doCache) {
+                    db.getCache(table).put(dbKey, t);
+                }
+            }
+            return t;
         });
     }
 
@@ -257,6 +274,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final DbIterator<T> getAll(int height, int from, int to, String sort) {
+        if (height < 0 || height == Nxt.getBlockchain().getHeight()) {
+            return getAll(from, to, sort);
+        }
         checkAvailable(height);
         Connection con = null;
         try {
@@ -303,6 +323,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final int getCount(DbClause dbClause, int height) {
+        if (height < 0 || height == Nxt.getBlockchain().getHeight()) {
+            return getCount(dbClause);
+        }
         checkAvailable(height);
         Connection con = null;
         try {
@@ -379,6 +402,14 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     public void truncate() {
         super.truncate();
         db.getCache(table).clear();
+    }
+
+    @Override
+    public final void createSearchIndex(Connection con) throws SQLException {
+        if (fullTextSearchColumns != null) {
+            Logger.logDebugMessage("Creating search index on " + table + " (" + fullTextSearchColumns + ")");
+            FullTextLucene.createIndex(con, "PUBLIC", table.toUpperCase(), fullTextSearchColumns.toUpperCase());
+        }
     }
 
 }

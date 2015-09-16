@@ -14,6 +14,8 @@ public interface Blockchain {
 
     int getHeight();
 
+    int getLastBlockTimestamp();
+
     Block getBlock(long blockId);
 
     Block getBlockAtHeight(int height);
@@ -53,7 +55,8 @@ public interface Blockchain {
     DbIterator<? extends Transaction> getTransactions(Account account, byte type, byte subtype, int blockTimestamp);
 
     DbIterator<? extends Transaction> getTransactions(Account account, int numberOfConfirmations, byte type, byte subtype,
-                                                      int blockTimestamp, boolean withMessage, int from, int to);
+                                                      int blockTimestamp, boolean withMessage, boolean phased,
+                                                      int from, int to);
 
     DbIterator<? extends Transaction> getTransactions(Connection con, PreparedStatement pstmt);
 

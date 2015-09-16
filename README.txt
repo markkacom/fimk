@@ -16,7 +16,7 @@ This is FIM version 0.4.0 which is based on NXT 1.4.16.
 
 Running the FIM software:
 
-Dependencies: Java 7 or later needs to be installed first. Only the Oracle JVM
+Dependencies: Java 8 or later needs to be installed first. Only the Oracle JVM
 has been tested and supported.
 
 There is no installation needed. Unpack the fim.zip package and open a

@@ -97,7 +97,7 @@ public final class PeerServlet extends HttpServlet {
         JSONStreamAware response;
 
         try {
-            peer = Peers.addPeer(req.getRemoteAddr(), -1, null);
+            peer = Peers.findOrCreatePeer(req.getRemoteAddr(), -1, null, true);
             if (peer == null) {
                 sendResponse(null, UNKNOWN_PEER, resp);
                 return;
@@ -108,6 +108,8 @@ public final class PeerServlet extends HttpServlet {
                 jsonObject.put("cause", peer.getBlacklistingCause());
                 sendResponse(peer, JSON.prepare(jsonObject), resp);
                 return;
+            } else {
+                Peers.addPeer(peer);
             }
 
             JSONObject request;
@@ -124,7 +126,7 @@ public final class PeerServlet extends HttpServlet {
             if (peer.getState() == Peer.State.DISCONNECTED) {
                 peer.setState(Peer.State.CONNECTED);
                 if (peer.getAnnouncedAddress() != null) {
-                    Peers.updateAddress(peer);
+                    Peers.addOrUpdate(peer);
                 }
             }
 

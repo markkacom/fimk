@@ -31,6 +31,7 @@
 *.csv
 /nxt.pro
 dist
+deploy.sh
 downloads
 fim_db.backup
 changelogs-fim/announcement*

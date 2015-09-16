@@ -1,7 +1,6 @@
 package nxt;
 
 import nxt.crypto.HashFunction;
-import nxt.util.Convert;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -66,15 +65,16 @@ public enum CurrencyType {
             if (transaction.getType() == MonetarySystem.CURRENCY_ISSUANCE) {
                 Attachment.MonetarySystemCurrencyIssuance attachment = (Attachment.MonetarySystemCurrencyIssuance) transaction.getAttachment();
                 int issuanceHeight = attachment.getIssuanceHeight();
-                if  (issuanceHeight <= Nxt.getBlockchain().getHeight()) {
+                int finishHeight = transaction.getValidationHeight();
+                if  (issuanceHeight <= finishHeight) {
                     throw new NxtException.NotCurrentlyValidException(
-                        String.format("Reservable currency activation height %d not higher than current height %d",
-                                issuanceHeight, Nxt.getBlockchain().getHeight()));
+                        String.format("Reservable currency activation height %d not higher than transaction apply height %d",
+                                issuanceHeight, finishHeight));
                 }
                 if (attachment.getMinReservePerUnitNQT() <= 0) {
                     throw new NxtException.NotValidException("Minimum reserve per unit must be > 0");
                 }
-                if (Convert.safeMultiply(attachment.getMinReservePerUnitNQT(), attachment.getReserveSupply()) > Constants.MAX_BALANCE_NQT) {
+                if (Math.multiplyExact(attachment.getMinReservePerUnitNQT(), attachment.getReserveSupply()) > Constants.MAX_BALANCE_NQT) {
                     throw new NxtException.NotValidException("Minimal reserve per unit is too large");
                 }
                 if (attachment.getReserveSupply() <= attachment.getInitialSupply()) {
@@ -85,7 +85,7 @@ public enum CurrencyType {
                 }
             }
             if (transaction.getType() == MonetarySystem.RESERVE_INCREASE) {
-                if (currency != null && currency.isActive()) {
+                if (currency != null && currency.getIssuanceHeight() <= transaction.getValidationHeight()) {
                     throw new NxtException.NotCurrentlyValidException("Cannot increase reserve for active currency");
                 }
             }
@@ -156,8 +156,11 @@ public enum CurrencyType {
             if (transaction.getType() == MonetarySystem.CURRENCY_ISSUANCE) {
                 Attachment.MonetarySystemCurrencyIssuance issuanceAttachment = (Attachment.MonetarySystemCurrencyIssuance) transaction.getAttachment();
                 try {
-                    HashFunction.getHashFunction(issuanceAttachment.getAlgorithm());
-                } catch(IllegalArgumentException e) {
+                    HashFunction hashFunction = HashFunction.getHashFunction(issuanceAttachment.getAlgorithm());
+                    if (!acceptedHashFunctions.contains(hashFunction)) {
+                        throw new NxtException.NotValidException("Invalid minting algorithm " + hashFunction);
+                    }
+                } catch (IllegalArgumentException e) {
                     throw new NxtException.NotValidException("Illegal algorithm code specified" , e);
                 }
                 if (issuanceAttachment.getMinDifficulty() < 1 || issuanceAttachment.getMaxDifficulty() > 255 ||
@@ -202,10 +205,11 @@ public enum CurrencyType {
 
     };
 
-    
+    private static final EnumSet<HashFunction> acceptedHashFunctions = EnumSet.of(HashFunction.SHA256, HashFunction.SHA3, HashFunction.SCRYPT, HashFunction.Keccak25);
+
     private final int code;
 
-    private CurrencyType(int code) {
+    CurrencyType(int code) {
         this.code = code;
     }
 

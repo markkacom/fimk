@@ -158,6 +158,7 @@ final class PeerImpl implements Peer {
             }
             if (isOldVersion) {
                 Logger.logDebugMessage(String.format("Blacklisting %s version %s", peerAddress, version));
+                blacklistingCause = "Old version: " + version;
                 setState(State.NON_CONNECTED);
                 Peers.notifyListeners(this, Peers.Event.BLACKLIST);
             }
@@ -215,11 +216,6 @@ final class PeerImpl implements Peer {
 
     int getPort() {
         return port;
-    }
-
-    @Override
-    public boolean isWellKnown() {
-        return announcedAddress != null && Peers.wellKnownPeers.contains(announcedAddress);
     }
 
     @Override
@@ -281,7 +277,7 @@ final class PeerImpl implements Peer {
                 Logger.logDebugMessage("Blacklisting " + peerAddress + " because of: " + cause.toString(), cause);
             }
         }
-        blacklist(cause.toString());
+        blacklist(cause.toString() == null ? cause.getClass().getName() : cause.toString());
     }
 
     @Override
@@ -427,9 +423,13 @@ final class PeerImpl implements Peer {
                 }
                 Logger.logDebugMessage("Peer " + peerAddress + " responded with HTTP " + connection.getResponseCode());
                 deactivate();
+                connection.disconnect();
             }
         } catch (NxtException.NxtIOException e) {
             blacklist(e);
+            if (connection != null) {
+                connection.disconnect();
+            }
         } catch (RuntimeException|ParseException|IOException e) {
             if (! (e instanceof UnknownHostException || e instanceof SocketTimeoutException || e instanceof SocketException || Errors.END_OF_FILE.equals(e.toString()))) {
                 Logger.logDebugMessage("Error sending JSON request: " + e.toString());
@@ -439,14 +439,13 @@ final class PeerImpl implements Peer {
                 showLog = true;
             }
             deactivate();
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
 
         if (showLog) {
             Logger.logMessage(log + "\n");
-        }
-
-        if (connection != null) {
-            connection.disconnect();
         }
 
         return response;
@@ -470,14 +469,21 @@ final class PeerImpl implements Peer {
             setVersion((String) response.get("version"));
             platform = (String)response.get("platform");
             shareAddress = Boolean.TRUE.equals(response.get("shareAddress"));
-            String newAnnouncedAddress = Convert.emptyToNull((String)response.get("announcedAddress"));
-            if (newAnnouncedAddress != null && ! (newAnnouncedAddress = Peers.addressWithPort(newAnnouncedAddress)).equals(announcedAddress)) {
-                // force verification of changed announced address
-                Logger.logDebugMessage("Peer " + peerAddress + " has new announced address " + newAnnouncedAddress + ", old is " + announcedAddress);
-                setState(Peer.State.NON_CONNECTED);
-                setAnnouncedAddress(newAnnouncedAddress);
-                return;
+
+            if (!Peers.ignorePeerAnnouncedAddress) {
+                String newAnnouncedAddress = Convert.emptyToNull((String) response.get("announcedAddress"));
+                if (newAnnouncedAddress != null) {
+                    newAnnouncedAddress = Peers.addressWithPort(newAnnouncedAddress);
+                    if (newAnnouncedAddress != null && !newAnnouncedAddress.equals(announcedAddress)) {
+                        // force verification of changed announced address
+                        Logger.logDebugMessage("Peer " + peerAddress + " has new announced address " + newAnnouncedAddress + ", old is " + announcedAddress);
+                        setState(Peer.State.NON_CONNECTED);
+                        setAnnouncedAddress(newAnnouncedAddress);
+                        return;
+                    }
+                }
             }
+
             if (announcedAddress == null) {
                 setAnnouncedAddress(peerAddress);
                 //Logger.logDebugMessage("Connected to peer without announced address, setting to " + peerAddress);
@@ -485,9 +491,9 @@ final class PeerImpl implements Peer {
             analyzeHallmark(announcedAddress, (String)response.get("hallmark"));
             if (!isOldVersion) {
                 setState(State.CONNECTED);
-                Peers.updateAddress(this);
+                Peers.addOrUpdate(this);
             } else if (!isBlacklisted()) {
-                blacklist("Old version");
+                blacklist("Old version: " + version);
             }
             lastUpdated = lastConnectAttempt;
         } else {

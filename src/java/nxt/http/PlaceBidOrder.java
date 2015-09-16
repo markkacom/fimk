@@ -5,7 +5,6 @@ import nxt.Asset;
 import nxt.Attachment;
 import nxt.MofoAsset;
 import nxt.NxtException;
-import nxt.util.Convert;
 import nxt.util.JSON;
 
 import org.json.simple.JSONObject;
@@ -34,10 +33,10 @@ public final class PlaceBidOrder extends CreateTransaction {
         long orderFeeNQT = Asset.privateEnabled() ? ParameterParser.getOrderFeeNQT(req) : 0;
         Account account = ParameterParser.getSenderAccount(req);
 
-        long totalNQT = Convert.safeMultiply(priceNQT, quantityQNT);
+        long totalNQT = Math.multiplyExact(priceNQT, quantityQNT);
         
         try {
-            if (Convert.safeAdd(feeNQT, totalNQT) > account.getUnconfirmedBalanceNQT()) {
+            if (Math.addExact(feeNQT, totalNQT) > account.getUnconfirmedBalanceNQT()) {
                 return NOT_ENOUGH_FUNDS;
             }
         } catch (ArithmeticException e) {

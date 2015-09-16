@@ -39,11 +39,14 @@ import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
 public final class API {
 
     public static final int TESTNET_API_PORT = 6886;
+    public static final int TESTNET_API_SSLPORT = 6877;
 
     public static final Set<String> allowedBotHosts;
     private static final List<NetworkAddress> allowedBotNets;
     static final String adminPassword = Nxt.getStringProperty("nxt.adminPassword", "", true);
     static final boolean disableAdminPassword;
+    static final int maxRecords = Nxt.getIntProperty("nxt.maxAPIRecords");
+
     private static final Server apiServer;
 
     static {
@@ -73,18 +76,32 @@ public final class API {
         boolean enableAPIServer = Nxt.getBooleanProperty("nxt.enableAPIServer");
         if (enableAPIServer) {
             final int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("nxt.apiServerPort");
+            final int sslPort = Constants.isTestnet ? TESTNET_API_SSLPORT : Nxt.getIntProperty("nxt.apiServerSSLPort");
             final String host = Nxt.getStringProperty("nxt.apiServerHost");
-            disableAdminPassword = Nxt.getBooleanProperty("nxt.disableAdminPassword") || "127.0.0.1".equals(host);
+            disableAdminPassword = Nxt.getBooleanProperty("nxt.disableAdminPassword") || ("127.0.0.1".equals(host) && adminPassword.isEmpty());
 
             apiServer = new Server();
             ServerConnector connector;
-
             boolean enableSSL = Nxt.getBooleanProperty("nxt.apiSSL");
+            //
+            // Create the HTTP connector
+            //
+            if (!enableSSL || port != sslPort) {
+                connector = new ServerConnector(apiServer);
+                connector.setPort(port);
+                connector.setHost(host);
+                connector.setIdleTimeout(Nxt.getIntProperty("nxt.apiServerIdleTimeout"));
+                connector.setReuseAddress(true);
+                apiServer.addConnector(connector);
+                Logger.logMessage("API server using HTTP port " + port);
+            }
+            //
+            // Create the HTTPS connector
+            //
             if (enableSSL) {
-                Logger.logMessage("Using SSL (https) for the API server");
                 HttpConfiguration https_config = new HttpConfiguration();
                 https_config.setSecureScheme("https");
-                https_config.setSecurePort(port);
+                https_config.setSecurePort(sslPort);
                 https_config.addCustomizer(new SecureRequestCustomizer());
                 SslContextFactory sslContextFactory = new SslContextFactory();
                 sslContextFactory.setKeyStorePath(Nxt.getStringProperty("nxt.keyStorePath"));
@@ -95,15 +112,13 @@ public final class API {
                 sslContextFactory.setExcludeProtocols("SSLv3");
                 connector = new ServerConnector(apiServer, new SslConnectionFactory(sslContextFactory, "http/1.1"),
                         new HttpConnectionFactory(https_config));
-            } else {
-                connector = new ServerConnector(apiServer);
+                connector.setPort(sslPort);
+                connector.setHost(host);
+                connector.setIdleTimeout(Nxt.getIntProperty("nxt.apiServerIdleTimeout"));
+                connector.setReuseAddress(true);
+                apiServer.addConnector(connector);
+                Logger.logMessage("API server using HTTPS port " + sslPort);
             }
-
-            connector.setPort(port);
-            connector.setHost(host);
-            connector.setIdleTimeout(Nxt.getIntProperty("nxt.apiServerIdleTimeout"));
-            connector.setReuseAddress(true);
-            apiServer.addConnector(connector);
 
             HandlerList apiHandlers = new HandlerList();
 
@@ -154,18 +169,15 @@ public final class API {
             apiServer.setHandler(apiHandlers);
             apiServer.setStopAtShutdown(true);
 
-            ThreadPool.runBeforeStart(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        apiServer.start();
-                        Logger.logMessage("Started API server at " + host + ":" + port);
-                    } catch (Exception e) {
-                        Logger.logErrorMessage("Failed to start API server", e);
-                        throw new RuntimeException(e.toString(), e);
-                    }
-
+            ThreadPool.runBeforeStart(() -> {
+                try {
+                    apiServer.start();
+                    Logger.logMessage("Started API server at " + host + ":" + port + (enableSSL && port != sslPort ? ", " + host + ":" + sslPort : ""));
+                } catch (Exception e) {
+                    Logger.logErrorMessage("Failed to start API server", e);
+                    throw new RuntimeException(e.toString(), e);
                 }
+
             }, true);
 
         } else {

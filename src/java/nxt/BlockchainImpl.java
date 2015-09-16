@@ -2,6 +2,7 @@ package nxt;
 
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
+import nxt.util.Convert;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,6 +43,12 @@ final class BlockchainImpl implements Blockchain {
     public int getHeight() {
         BlockImpl last = lastBlock.get();
         return last == null ? 0 : last.getHeight();
+    }
+
+    @Override
+    public int getLastBlockTimestamp() {
+        BlockImpl last = lastBlock.get();
+        return last == null ? 0 : last.getTimestamp();
     }
 
     @Override
@@ -138,24 +145,17 @@ final class BlockchainImpl implements Blockchain {
 
     @Override
     public DbIterator<BlockImpl> getBlocks(Connection con, PreparedStatement pstmt) {
-        return new DbIterator<>(con, pstmt, new DbIterator.ResultSetReader<BlockImpl>() {
-            @Override
-            public BlockImpl get(Connection con, ResultSet rs) throws NxtException.ValidationException {
-                return BlockDb.loadBlock(con, rs);
-            }
-        });
+        return new DbIterator<>(con, pstmt, BlockDb::loadBlock);
     }
 
     @Override
     public List<Long> getBlockIdsAfter(long blockId, int limit) {
-        if (limit > 1440) {
-            throw new IllegalArgumentException("Can't get more than 1440 blocks at a time");
-        }
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT id FROM block WHERE db_id > (SELECT db_id FROM block WHERE id = ?) ORDER BY db_id ASC LIMIT ?")) {
             List<Long> result = new ArrayList<>();
             pstmt.setLong(1, blockId);
             pstmt.setInt(2, limit);
+            pstmt.setFetchSize(100);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     result.add(rs.getLong("id"));
@@ -169,17 +169,15 @@ final class BlockchainImpl implements Blockchain {
 
     @Override
     public List<BlockImpl> getBlocksAfter(long blockId, int limit) {
-        if (limit > 1440) {
-            throw new IllegalArgumentException("Can't get more than 1440 blocks at a time");
-        }
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("SELECT * FROM block WHERE db_id > (SELECT db_id FROM block WHERE id = ?) ORDER BY db_id ASC LIMIT ?")) {
             List<BlockImpl> result = new ArrayList<>();
             pstmt.setLong(1, blockId);
             pstmt.setInt(2, limit);
+            pstmt.setFetchSize(100);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    result.add(BlockDb.loadBlock(con, rs));
+                    result.add(BlockDb.loadBlock(con, rs, true));
                 }
             }
             return result;
@@ -213,13 +211,13 @@ final class BlockchainImpl implements Blockchain {
     }
 
     @Override
-    public Transaction getTransaction(long transactionId) {
+    public TransactionImpl getTransaction(long transactionId) {
         return TransactionDb.findTransaction(transactionId);
     }
 
     @Override
-    public Transaction getTransactionByFullHash(String fullHash) {
-        return TransactionDb.findTransactionByFullHash(fullHash);
+    public TransactionImpl getTransactionByFullHash(String fullHash) {
+        return TransactionDb.findTransactionByFullHash(Convert.parseHexString(fullHash));
     }
 
     @Override
@@ -229,7 +227,7 @@ final class BlockchainImpl implements Blockchain {
 
     @Override
     public boolean hasTransactionByFullHash(String fullHash) {
-        return TransactionDb.hasTransactionByFullHash(fullHash);
+        return TransactionDb.hasTransactionByFullHash(Convert.parseHexString(fullHash));
     }
 
     @Override
@@ -258,12 +256,13 @@ final class BlockchainImpl implements Blockchain {
 
     @Override
     public DbIterator<TransactionImpl> getTransactions(Account account, byte type, byte subtype, int blockTimestamp) {
-        return getTransactions(account, 0, type, subtype, blockTimestamp, false, 0, -1);
+        return getTransactions(account, 0, type, subtype, blockTimestamp, false, false, 0, -1);
     }
 
     @Override
     public DbIterator<TransactionImpl> getTransactions(Account account, int numberOfConfirmations, byte type, byte subtype,
-                                                       int blockTimestamp, boolean withMessage, int from, int to) {
+                                                       int blockTimestamp, boolean withMessage, boolean phased,
+                                                       int from, int to) {
         int height = numberOfConfirmations > 0 ? getHeight() - numberOfConfirmations : Integer.MAX_VALUE;
         if (height < 0) {
             throw new IllegalArgumentException("Number of confirmations required " + numberOfConfirmations
@@ -288,6 +287,10 @@ final class BlockchainImpl implements Blockchain {
             if (withMessage) {
                 buf.append("AND (has_message = TRUE OR has_encrypted_message = TRUE) ");
             }
+            if (phased) {
+                buf.append("AND phased = TRUE ");
+            }
+
             buf.append("UNION ALL SELECT * FROM transaction WHERE sender_id = ? ");
             if (blockTimestamp > 0) {
                 buf.append("AND block_timestamp >= ? ");
@@ -303,6 +306,9 @@ final class BlockchainImpl implements Blockchain {
             }
             if (withMessage) {
                 buf.append("AND (has_message = TRUE OR has_encrypted_message = TRUE OR has_encrypttoself_message = TRUE) ");
+            }
+            if (phased) {
+                buf.append("AND phased = TRUE ");
             }
             buf.append("ORDER BY block_timestamp DESC, transaction_index DESC");
             buf.append(DbUtils.limitsClause(from, to));
@@ -347,12 +353,7 @@ final class BlockchainImpl implements Blockchain {
 
     @Override
     public DbIterator<TransactionImpl> getTransactions(Connection con, PreparedStatement pstmt) {
-        return new DbIterator<>(con, pstmt, new DbIterator.ResultSetReader<TransactionImpl>() {
-            @Override
-            public TransactionImpl get(Connection con, ResultSet rs) throws NxtException.ValidationException {
-                return TransactionDb.loadTransaction(con, rs);
-            }
-        });
+        return new DbIterator<TransactionImpl>(con, pstmt, TransactionDb::loadTransaction);
     }
 
 }

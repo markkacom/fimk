@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 public final class CurrencyTransfer {
 
-    public static enum Event {
+    public enum Event {
         TRANSFER
     }
 
@@ -69,7 +69,7 @@ public final class CurrencyTransfer {
         try {
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM currency_transfer WHERE sender_id = ?"
-                    + " UNION ALL SELECT * FROM currency_transfer WHERE recipient_id = ? AND sender_id <> ? ORDER BY height DESC"
+                    + " UNION ALL SELECT * FROM currency_transfer WHERE recipient_id = ? AND sender_id <> ? ORDER BY height DESC, db_id DESC"
                     + DbUtils.limitsClause(from, to));
             int i = 0;
             pstmt.setLong(++i, accountId);
@@ -88,7 +88,7 @@ public final class CurrencyTransfer {
         try {
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM currency_transfer WHERE sender_id = ? AND currency_id = ?"
-                    + " UNION ALL SELECT * FROM currency_transfer WHERE recipient_id = ? AND sender_id <> ? AND currency_id = ? ORDER BY height DESC"
+                    + " UNION ALL SELECT * FROM currency_transfer WHERE recipient_id = ? AND sender_id <> ? AND currency_id = ? ORDER BY height DESC, db_id DESC"
                     + DbUtils.limitsClause(from, to));
             int i = 0;
             pstmt.setLong(++i, accountId);
@@ -130,12 +130,12 @@ public final class CurrencyTransfer {
     private CurrencyTransfer(Transaction transaction, Attachment.MonetarySystemCurrencyTransfer attachment) {
         this.id = transaction.getId();
         this.dbKey = currencyTransferDbKeyFactory.newKey(this.id);
-        this.height = transaction.getHeight();
+        this.height = Nxt.getBlockchain().getHeight();
         this.currencyId = attachment.getCurrencyId();
         this.senderId = transaction.getSenderId();
         this.recipientId = transaction.getRecipientId();
         this.units = attachment.getUnits();
-        this.timestamp = transaction.getBlockTimestamp();
+        this.timestamp = Nxt.getBlockchain().getLastBlockTimestamp();
     }
 
     private CurrencyTransfer(ResultSet rs) throws SQLException {
@@ -154,13 +154,13 @@ public final class CurrencyTransfer {
                 + "sender_id, recipient_id, units, timestamp, height) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
             int i = 0;
-            pstmt.setLong(++i, this.getId());
-            pstmt.setLong(++i, this.getCurrencyId());
-            pstmt.setLong(++i, this.getSenderId());
-            pstmt.setLong(++i, this.getRecipientId());
-            pstmt.setLong(++i, this.getUnits());
-            pstmt.setInt(++i, this.getTimestamp());
-            pstmt.setInt(++i, this.getHeight());
+            pstmt.setLong(++i, this.id);
+            pstmt.setLong(++i, this.currencyId);
+            pstmt.setLong(++i, this.senderId);
+            pstmt.setLong(++i, this.recipientId);
+            pstmt.setLong(++i, this.units);
+            pstmt.setInt(++i, this.timestamp);
+            pstmt.setInt(++i, this.height);
             pstmt.executeUpdate();
         }
     }

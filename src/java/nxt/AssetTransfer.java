@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 public final class AssetTransfer {
 
-    public static enum Event {
+    public enum Event {
         ASSET_TRANSFER
     }
 
@@ -69,7 +69,7 @@ public final class AssetTransfer {
         try {
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM asset_transfer WHERE sender_id = ?"
-                    + " UNION ALL SELECT * FROM asset_transfer WHERE recipient_id = ? AND sender_id <> ? ORDER BY height DESC"
+                    + " UNION ALL SELECT * FROM asset_transfer WHERE recipient_id = ? AND sender_id <> ? ORDER BY height DESC, db_id DESC"
                     + DbUtils.limitsClause(from, to));
             int i = 0;
             pstmt.setLong(++i, accountId);
@@ -88,7 +88,7 @@ public final class AssetTransfer {
         try {
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM asset_transfer WHERE sender_id = ? AND asset_id = ?"
-                    + " UNION ALL SELECT * FROM asset_transfer WHERE recipient_id = ? AND sender_id <> ? AND asset_id = ? ORDER BY height DESC"
+                    + " UNION ALL SELECT * FROM asset_transfer WHERE recipient_id = ? AND sender_id <> ? AND asset_id = ? ORDER BY height DESC, db_id DESC"
                     + DbUtils.limitsClause(from, to));
             int i = 0;
             pstmt.setLong(++i, accountId);
@@ -130,12 +130,12 @@ public final class AssetTransfer {
     private AssetTransfer(Transaction transaction, Attachment.ColoredCoinsAssetTransfer attachment) {
         this.id = transaction.getId();
         this.dbKey = transferDbKeyFactory.newKey(this.id);
-        this.height = transaction.getHeight();
+        this.height = Nxt.getBlockchain().getHeight();
         this.assetId = attachment.getAssetId();
         this.senderId = transaction.getSenderId();
         this.recipientId = transaction.getRecipientId();
         this.quantityQNT = attachment.getQuantityQNT();
-        this.timestamp = transaction.getBlockTimestamp();
+        this.timestamp = Nxt.getBlockchain().getLastBlockTimestamp();
     }
 
     private AssetTransfer(ResultSet rs) throws SQLException {
@@ -154,13 +154,13 @@ public final class AssetTransfer {
                 + "sender_id, recipient_id, quantity, timestamp, height) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
             int i = 0;
-            pstmt.setLong(++i, this.getId());
-            pstmt.setLong(++i, this.getAssetId());
-            pstmt.setLong(++i, this.getSenderId());
-            pstmt.setLong(++i, this.getRecipientId());
-            pstmt.setLong(++i, this.getQuantityQNT());
-            pstmt.setInt(++i, this.getTimestamp());
-            pstmt.setInt(++i, this.getHeight());
+            pstmt.setLong(++i, this.id);
+            pstmt.setLong(++i, this.assetId);
+            pstmt.setLong(++i, this.senderId);
+            pstmt.setLong(++i, this.recipientId);
+            pstmt.setLong(++i, this.quantityQNT);
+            pstmt.setInt(++i, this.timestamp);
+            pstmt.setInt(++i, this.height);
             pstmt.executeUpdate();
         }
     }

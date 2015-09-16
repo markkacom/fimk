@@ -8,6 +8,7 @@ import nxt.util.Logger;
 import nxt.util.ThreadPool;
 import nxt.util.Time;
 import nxt.virtualexchange.ExchangeObserver;
+import org.json.simple.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,11 +20,11 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.4.18";
+    public static final String NXT_VERSION = "1.5.0e";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
-    public static final String VERSION = "0.5.1";
+    public static final String VERSION = "0.5.2";
 
     private static volatile Time time = new Time.EpochTime();
 
@@ -150,6 +151,14 @@ public final class Nxt {
         return new TransactionImpl.BuilderImpl((byte)1, senderPublicKey, amountNQT, feeNQT, deadline, (Attachment.AbstractAttachment)attachment);
     }
 
+    public static Transaction.Builder newTransactionBuilder(byte[] transactionBytes) throws NxtException.NotValidException {
+        return TransactionImpl.newTransactionBuilder(transactionBytes);
+    }
+
+    public static Transaction.Builder newTransactionBuilder(JSONObject transactionJSON) throws NxtException.NotValidException {
+        return TransactionImpl.newTransactionBuilder(transactionJSON);
+    }
+
     public static int getEpochTime() {
         return time.getTime();
     }
@@ -160,15 +169,11 @@ public final class Nxt {
 
     public static void main(String[] args) {
         try {
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Nxt.shutdown();
-                }
-            }));
+            Runtime.getRuntime().addShutdownHook(new Thread(Nxt::shutdown));
             init();
         } catch (Throwable t) {
             System.out.println("Fatal error: " + t.toString());
+            t.printStackTrace();
         }
     }
 
@@ -194,6 +199,8 @@ public final class Nxt {
 
     private static class Init {
 
+        private static volatile boolean initialized = false;
+
         static {
             try {
                 long startTime = System.currentTimeMillis();
@@ -210,9 +217,11 @@ public final class Nxt {
                 Hub.init();
                 Order.init();
                 Poll.init();
+                PhasingPoll.init();
                 Trade.init();
                 AssetTransfer.init();
                 Vote.init();
+                PhasingVote.init();
                 Currency.init();
                 CurrencyBuyOffer.init();
                 CurrencySellOffer.init();
@@ -251,7 +260,12 @@ public final class Nxt {
             }
         }
 
-        private static void init() {}
+        private static void init() {
+            if (initialized) {
+                throw new RuntimeException("Nxt.init has already been called");
+            }
+            initialized = true;
+        }
 
         private Init() {} // never
 
