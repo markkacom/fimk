@@ -31,136 +31,136 @@ public class JSRunner extends Runner implements Filterable, Sortable  {
 	private final Class<?> cls;
 
 	public JSRunner(Class<?> cls) {
-		this.cls = cls;
-		List<String> testNames = asList(cls.getAnnotation(Tests.class).value());
-		this.tests = findJSTests(testNames);
+  		this.cls = cls;
+  		List<String> testNames = asList(cls.getAnnotation(Tests.class).value());
+  		this.tests = findJSTests(testNames);
 	}
 	
 	@Override
 	public Description getDescription() {
-		Description suite = Description.createSuiteDescription(cls);
-		for (TestClass testClass : tests) {
-			List<TestCase> tests = testClass.testCases;
-			Description desc = Description.createTestDescription(testClass.junitName(), testClass.junitName());
-			suite.addChild(desc);
-			for (TestCase test : tests) {
-				Description methodDesc = Description.createTestDescription(testClass.junitName(), test.name);
-				desc.addChild(methodDesc);
-			}
-		}
-		return suite;
+  		Description suite = Description.createSuiteDescription(cls);
+  		for (TestClass testClass : tests) {
+    			List<TestCase> tests = testClass.testCases;
+    			Description desc = Description.createTestDescription(testClass.junitName(), testClass.junitName());
+    			suite.addChild(desc);
+    			for (TestCase test : tests) {
+      				Description methodDesc = Description.createTestDescription(testClass.junitName(), test.name);
+      				desc.addChild(methodDesc);
+    			}
+  		}
+  		return suite;
 	}
 
 	@Override
 	public void run(RunNotifier notifier) {
-    try {
-      ScriptHelper.init();
-  	  for (TestClass testClass : tests) {
-  			List<TestCase> tests = testClass.testCases;
-  			for (TestCase test : tests) {
-  				Description desc = Description.createTestDescription(testClass.junitName(), test.name);
-  				notifier.fireTestStarted(desc);
-  				try {
-  				  System.out.println("Running test: '"+test.name+"'");  				  
-  					test.testCase.run();
-  					notifier.fireTestFinished(desc);
-  				} catch (Exception | Error e) {
-  					notifier.fireTestFailure(new Failure(desc, bestException(e)));
-  				}
-  			}
-  		}
-    } finally {
-      ScriptHelper.destroy();
-    }
+      try {
+          ScriptHelper.init();
+      	  for (TestClass testClass : tests) {
+        			List<TestCase> tests = testClass.testCases;
+        			for (TestCase test : tests) {
+          				Description desc = Description.createTestDescription(testClass.junitName(), test.name);
+          				notifier.fireTestStarted(desc);
+          				try {
+            				  System.out.println("Running test: '"+test.name+"'");  				  
+            					test.testCase.run();
+            					notifier.fireTestFinished(desc);
+          				} catch (Exception | Error e) {
+          					  notifier.fireTestFailure(new Failure(desc, bestException(e)));
+          				}
+        			}
+      		}
+      } finally {
+          ScriptHelper.destroy();
+      }
   }
 	
 	private List<TestClass> findJSTests(List<String> testNames) {
-		try {
-			ScriptEngine engine = getBestJavaScriptEngine();
-			List<TestClass> testClasses = new ArrayList<TestClass>();
-			for (String name : testNames) {
-				testClasses.add(new TestClass(name, load(engine, name)));
-			}
-			return testClasses;
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+  		try {
+    			ScriptEngine engine = getBestJavaScriptEngine();
+    			List<TestClass> testClasses = new ArrayList<TestClass>();
+    			for (String name : testNames) {
+    				testClasses.add(new TestClass(name, load(engine, name)));
+    			}
+    			return testClasses;
+  			
+  		} catch (Exception e) {
+  			  throw new RuntimeException(e);
+  		}
 	}
 
 	public static class Loader {
 		
-		private final ScriptEngine rhino;
-
-		public Loader(ScriptEngine rhino) {
-			this.rhino = rhino;
-		}
-		
-		public void load(String filename) {
-			try {
-				rhino.eval(new FileReader(filename));
-			} catch (FileNotFoundException | ScriptException e) {
-				throw new RuntimeException(e);
-			}
-		}
+  		private final ScriptEngine rhino;
+  
+  		public Loader(ScriptEngine rhino) {
+  			  this.rhino = rhino;
+  		}
+  		
+  		public void load(String filename) {
+    			try {
+    				  rhino.eval(new FileReader(filename));
+    			} catch (FileNotFoundException | ScriptException e) {
+    				  throw new RuntimeException(e);
+    			}
+  		}
 	}
 	
 	private ScriptEngine getBestJavaScriptEngine() throws ScriptException {
-		ScriptEngineManager factory = new ScriptEngineManager();
-		ScriptEngine nashorn = factory.getEngineByName("nashorn");
-		
-		if (nashorn != null) return nashorn;
-		
-		final ScriptEngine rhino = factory.getEngineByName("JavaScript");
-		
-		rhino.put("Loader", new Loader(rhino));
-		rhino.eval("function load(filename) { Loader.load(filename); }");
-		
-		return rhino; 
+  		ScriptEngineManager factory = new ScriptEngineManager();
+  		ScriptEngine nashorn = factory.getEngineByName("nashorn");
+  		
+  		if (nashorn != null) return nashorn;
+  		
+  		final ScriptEngine rhino = factory.getEngineByName("JavaScript");
+  		
+  		rhino.put("Loader", new Loader(rhino));
+  		rhino.eval("function load(filename) { Loader.load(filename); }");
+  		
+  		return rhino; 
 	}
 	
 	@SuppressWarnings("unchecked")
 	private List<TestCase> load(ScriptEngine engine, String name) throws ScriptException, IOException{
-	  return (List<TestCase>) engine.eval(new FileReader(name));
+	    return (List<TestCase>) engine.eval(new FileReader(name));
   }
 
 	public void sort(Sorter sorter) {
-		//
+		  //
 	}
 
 	public void filter(Filter filter) throws NoTestsRemainException {
-		//
+		  //
 	}
 
 	private Throwable bestException(Throwable e) {
-		if (nashornException(e))
-			return e.getCause() != null ? e.getCause() : e;
-		if (rhinoException(e)) {
-			return extractActualExceptionFromRhino(e);
-		}
-		return e;
+  		if (nashornException(e))
+  			  return e.getCause() != null ? e.getCause() : e;
+  		if (rhinoException(e)) {
+  			  return extractActualExceptionFromRhino(e);
+  		}
+  		return e;
 	}
 
 	private boolean rhinoException(Throwable e) {
-		return e.getClass().getSimpleName().contains("JavaScript");
+		  return e.getClass().getSimpleName().contains("JavaScript");
 	}
 
 	private boolean nashornException(Throwable e) {
-		return e.getClass().getSimpleName().contains("ECMA");
+		  return e.getClass().getSimpleName().contains("ECMA");
 	}
 
 	private Throwable extractActualExceptionFromRhino(Throwable e) {
-		try {
-			Field f = e.getClass().getDeclaredField("value");
-			f.setAccessible(true);
-			Object javascriptWrapper = f.get(e);
-			Field javaThrowable = javascriptWrapper.getClass().getDeclaredField("javaObject");
-			javaThrowable.setAccessible(true);
-			Throwable t = (Throwable) javaThrowable.get(javascriptWrapper);
-			return t;
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e1) {
-			throw new RuntimeException(e);
-		}
+  		try {
+    			Field f = e.getClass().getDeclaredField("value");
+    			f.setAccessible(true);
+    			Object javascriptWrapper = f.get(e);
+    			Field javaThrowable = javascriptWrapper.getClass().getDeclaredField("javaObject");
+    			javaThrowable.setAccessible(true);
+    			Throwable t = (Throwable) javaThrowable.get(javascriptWrapper);
+    			return t;
+  		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e1) {
+  			  throw new RuntimeException(e);
+  		}
 	}
 	
 }

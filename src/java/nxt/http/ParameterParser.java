@@ -2,6 +2,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Alias;
+import nxt.Appendix;
 import nxt.MofoQueries.TransactionFilter;
 import nxt.NamespacedAlias;
 import nxt.Asset;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 import static nxt.http.JSONResponses.INCORRECT_ALIAS;
+import static nxt.http.JSONResponses.INCORRECT_ARBITRARY_MESSAGE;
 import static nxt.http.JSONResponses.INCORRECT_DGS_ENCRYPTED_GOODS;
 import static nxt.http.JSONResponses.INCORRECT_ENCRYPTED_MESSAGE;
 import static nxt.http.JSONResponses.INCORRECT_HEIGHT;
@@ -49,6 +51,7 @@ import static nxt.http.JSONResponses.UNKNOWN_CURRENCY;
 import static nxt.http.JSONResponses.UNKNOWN_GOODS;
 import static nxt.http.JSONResponses.UNKNOWN_OFFER;
 import static nxt.http.JSONResponses.UNKNOWN_POLL;
+import static nxt.http.JSONResponses.either;
 import static nxt.http.JSONResponses.incorrect;
 import static nxt.http.JSONResponses.missing;
 
@@ -517,21 +520,17 @@ final class ParameterParser {
         }
         return -1;
     }
-    static Transaction.Builder parseTransaction(String transactionBytes, String transactionJSON) throws ParameterException {
+    static Transaction.Builder parseTransaction(String transactionJSON, String transactionBytes, String prunableAttachmentJSON) throws ParameterException {
         if (transactionBytes == null && transactionJSON == null) {
             throw new ParameterException(MISSING_TRANSACTION_BYTES_OR_JSON);
         }
-        if (transactionBytes != null) {
-            try {
-                byte[] bytes = Convert.parseHexString(transactionBytes);
-                return Nxt.newTransactionBuilder(bytes);
-            } catch (NxtException.ValidationException|RuntimeException e) {
-                Logger.logDebugMessage(e.getMessage(), e);
-                JSONObject response = new JSONObject();
-                JSONData.putException(response, e, "Incorrect transactionBytes");
-                throw new ParameterException(response);
-            }
-        } else {
+        if (transactionBytes != null && transactionJSON != null) {
+            throw new ParameterException(either("transactionBytes", "transactionJSON"));
+        }
+        if (prunableAttachmentJSON != null && transactionBytes == null) {
+            throw new ParameterException(JSONResponses.missing("transactionBytes"));
+        }
+        if (transactionJSON != null) {
             try {
                 JSONObject json = (JSONObject) JSONValue.parseWithException(transactionJSON);
                 return Nxt.newTransactionBuilder(json);
@@ -541,7 +540,46 @@ final class ParameterParser {
                 JSONData.putException(response, e, "Incorrect transactionJSON");
                 throw new ParameterException(response);
             }
+        } else {
+            try {
+                byte[] bytes = Convert.parseHexString(transactionBytes);
+                JSONObject prunableAttachments = prunableAttachmentJSON == null ? null : (JSONObject)JSONValue.parseWithException(prunableAttachmentJSON);
+                return Nxt.newTransactionBuilder(bytes, prunableAttachments);
+            } catch (NxtException.ValidationException|RuntimeException | ParseException e) {
+                Logger.logDebugMessage(e.getMessage(), e);
+                JSONObject response = new JSONObject();
+                JSONData.putException(response, e, "Incorrect transactionBytes");
+                throw new ParameterException(response);
+            }
         }
+    }
+
+    static Appendix.PrunablePlainMessage getPrunablePlainMessage(HttpServletRequest req) throws ParameterException {
+        String messageValue = Convert.emptyToNull(req.getParameter("message"));
+        if (messageValue != null) {
+            boolean messageIsText = !"false".equalsIgnoreCase(req.getParameter("messageIsText"));
+            boolean messageIsPrunable = "true".equalsIgnoreCase(req.getParameter("messageIsPrunable"));
+            if (messageIsPrunable) {
+                try {
+                    return new Appendix.PrunablePlainMessage(messageValue, messageIsText);
+                } catch (RuntimeException e) {
+                    throw new ParameterException(INCORRECT_ARBITRARY_MESSAGE);
+                }
+            }
+        }
+        return null;
+    }
+
+    static Appendix.PrunableEncryptedMessage getPrunableEncryptedMessage(HttpServletRequest req) throws ParameterException {
+        EncryptedData encryptedData = ParameterParser.getEncryptedMessage(req, null);
+        boolean encryptedDataIsText = !"false".equalsIgnoreCase(req.getParameter("messageToEncryptIsText"));
+        boolean isCompressed = !"false".equalsIgnoreCase(req.getParameter("compressMessageToEncrypt"));
+        if (encryptedData != null) {
+            if ("true".equalsIgnoreCase(req.getParameter("encryptedMessageIsPrunable"))) {
+                return new Appendix.PrunableEncryptedMessage(encryptedData, encryptedDataIsText, isCompressed);
+            }
+        }
+        return null;
     }
 
     static List<TransactionFilter> getTransactionFilter(HttpServletRequest req) throws ParameterException {

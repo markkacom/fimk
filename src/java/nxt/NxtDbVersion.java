@@ -843,6 +843,22 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply(null);
             case 335:
+                apply("ALTER TABLE prunable_message ALTER COLUMN expiration RENAME TO transaction_timestamp");
+            case 336:
+                apply("UPDATE prunable_message SET transaction_timestamp = SELECT timestamp FROM transaction WHERE prunable_message.id = transaction.id");
+            case 337:
+                apply("ALTER INDEX prunable_message_expiration_idx RENAME TO prunable_message_transaction_timestamp_idx");
+            case 338:
+                apply("ALTER TABLE prunable_message ALTER COLUMN timestamp RENAME TO block_timestamp");
+            case 339:
+                apply("DROP INDEX IF EXISTS prunable_message_timestamp_idx");
+            case 340:
+                apply("CREATE INDEX IF NOT EXISTS prunable_message_block_timestamp_dbid_idx ON prunable_message (block_timestamp DESC, db_id DESC)");
+            case 341:
+                apply("DROP INDEX IF EXISTS prunable_message_height_idx");
+            case 342:
+                apply("DROP INDEX IF EXISTS public_key_height_idx");
+            case 343:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");

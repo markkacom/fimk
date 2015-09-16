@@ -20,7 +20,7 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.5.1e";
+    public static final String NXT_VERSION = "1.5.2e";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
@@ -157,6 +157,10 @@ public final class Nxt {
 
     public static Transaction.Builder newTransactionBuilder(JSONObject transactionJSON) throws NxtException.NotValidException {
         return TransactionImpl.newTransactionBuilder(transactionJSON);
+    }
+
+    public static Transaction.Builder newTransactionBuilder(byte[] transactionBytes, JSONObject prunableAttachments) throws NxtException.NotValidException {
+        return TransactionImpl.newTransactionBuilder(transactionBytes, prunableAttachments);
     }
 
     public static int getEpochTime() {

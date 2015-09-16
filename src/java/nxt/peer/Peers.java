@@ -59,7 +59,7 @@ public final class Peers {
     static final int LOGGING_MASK_EXCEPTIONS = 1;
     static final int LOGGING_MASK_NON200_RESPONSES = 2;
     static final int LOGGING_MASK_200_RESPONSES = 4;
-    static final int communicationLoggingMask;
+    static volatile int communicationLoggingMask;
 
     static final Set<String> knownBlacklistedPeers;
     static final Set<String> knownWhitelistedPeers;
@@ -336,7 +336,7 @@ public final class Peers {
                 Logger.logDebugMessage("Error un-blacklisting peer", e);
             }
         } catch (Throwable t) {
-            Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
+            Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
             t.printStackTrace();
             System.exit(1);
         }
@@ -388,7 +388,7 @@ public final class Peers {
                     Logger.logDebugMessage("Error connecting to peer", e);
                 }
             } catch (Throwable t) {
-                Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
+                Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
                 t.printStackTrace();
                 System.exit(1);
             }
@@ -464,7 +464,7 @@ public final class Peers {
                     Logger.logDebugMessage("Error requesting peers from a peer", e);
                 }
             } catch (Throwable t) {
-                Logger.logMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
+                Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
                 t.printStackTrace();
                 System.exit(1);
             }
@@ -686,7 +686,7 @@ public final class Peers {
         peer.unBlacklist();
         ((PeerImpl)peer).connect();
     }
-    
+
     public static void sendToSomePeers(Block block) {
         JSONObject request = block.getJSONObject();
         request.put("requestType", "processBlock");
@@ -851,6 +851,39 @@ public final class Peers {
     private static boolean hasEnoughConnectedPublicPeers(int limit) {
         return getPeers(peer -> !peer.isBlacklisted() && peer.getState() == Peer.State.CONNECTED && peer.getAnnouncedAddress() != null
                 && (! Peers.enableHallmarkProtection || peer.getWeight() > 0), limit).size() >= limit;
+    }
+
+    /**
+     * Set the communication logging mask
+     *
+     * @param   events              Communication event list or null to reset communications logging
+     * @return                      TRUE if the communication logging mask was updated
+     */
+    public static boolean setCommunicationLoggingMask(String[] events) {
+        boolean updated = true;
+        int mask = 0;
+        if (events != null) {
+            for (String event : events) {
+                switch (event) {
+                    case "EXCEPTION":
+                        mask |= LOGGING_MASK_EXCEPTIONS;
+                        break;
+                    case "HTTP-ERROR":
+                        mask |= LOGGING_MASK_NON200_RESPONSES;
+                        break;
+                    case "HTTP-OK":
+                        mask |= LOGGING_MASK_200_RESPONSES;
+                        break;
+                    default:
+                        updated = false;
+                }
+                if (!updated)
+                    break;
+            }
+        }
+        if (updated)
+            communicationLoggingMask = mask;
+        return updated;
     }
 
     private Peers() {} // never

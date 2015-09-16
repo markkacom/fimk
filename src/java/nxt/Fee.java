@@ -4,7 +4,7 @@ public interface Fee {
 
     long getFee(TransactionImpl transaction, Appendix appendage);
 
-    Fee DEFAULT_FEE = new Fee.ConstantFee(Constants.ONE_NXT);
+    Fee DEFAULT_FEE = new Fee.ConstantFee(Constants.ONE_NXT / 10);
 
     Fee NONE = (transaction, appendage) -> 0;
 

@@ -50,8 +50,6 @@ final class GetInfo extends PeerServlet.PeerRequestHandler {
         peerImpl.setLastUpdated(Nxt.getEpochTime());
         peerImpl.setGossipEnabled(Boolean.TRUE.equals(request.get("gossip")));
 
-        Peers.notifyListeners(peerImpl, Peers.Event.ADDED_ACTIVE_PEER);
-
         return Peers.myPeerInfoResponse;
 
     }

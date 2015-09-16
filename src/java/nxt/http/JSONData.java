@@ -693,8 +693,8 @@ final class JSONData {
         json.put("isCompressed", prunableMessage.isCompressed());
         putAccount(json, "sender", prunableMessage.getSenderId());
         putAccount(json, "recipient", prunableMessage.getRecipientId());
-        json.put("expiration", prunableMessage.getExpiration());
-        json.put("timestamp", prunableMessage.getTimestamp());
+        json.put("transactionTimestamp", prunableMessage.getTransactionTimestamp());
+        json.put("blockTimestamp", prunableMessage.getBlockTimestamp());
         EncryptedData encryptedData = prunableMessage.getEncryptedData();
         if (encryptedData != null) {
             json.put("encryptedMessage", encryptedData(prunableMessage.getEncryptedData()));
@@ -714,6 +714,13 @@ final class JSONData {
             json.put("message", prunableMessage.toString());
         }
         return json;
+    }
+
+    static void putPrunableAttachment(JSONObject json, Transaction transaction) {
+        JSONObject prunableAttachment = transaction.getPrunableAttachmentJSON();
+        if (prunableAttachment != null) {
+            json.put("prunableAttachmentJSON", prunableAttachment);
+        }
     }
 
     static void putException(JSONObject json, Exception e) {
