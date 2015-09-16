@@ -8,6 +8,7 @@ import java.util.Objects;
 import nxt.Account;
 import nxt.Appendix;
 import nxt.Asset;
+import nxt.Account.AccountInfo;
 import nxt.Attachment.MonetarySystemAttachment;
 import nxt.Attachment.ColoredCoinsAssetTransfer;
 import nxt.Attachment.ColoredCoinsAskOrderPlacement;
@@ -44,7 +45,7 @@ public class JSONData {
             json.put("unconfirmedBalanceNQT", String.valueOf(account.getUnconfirmedBalanceNQT()));
             json.put("effectiveBalanceNXT", account.getEffectiveBalanceNXT());
             json.put("forgedBalanceNQT", String.valueOf(account.getForgedBalanceNQT()));
-            json.put("guaranteedBalanceNQT", String.valueOf(account.getGuaranteedBalanceNQT(1440)));
+            json.put("guaranteedBalanceNQT", String.valueOf(account.getGuaranteedBalanceNQT()));
         }
         return json;
     }
@@ -53,9 +54,12 @@ public class JSONData {
     public static void putAccount(JSONObject json, String name, long accountId) {
         Account account = Account.getAccount(accountId);
         if (account != null) {
-            json.put(name + "Name", account.getName());
+            AccountInfo info = account.getAccountInfo();
+            if (info != null) {
+                json.put(name + "Name", info.getName());
+            }
         }    
-        json.put(name, Convert.toUnsignedLong(accountId));
+        json.put(name, Long.toUnsignedString(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));      
     }
     
@@ -206,14 +210,14 @@ public class JSONData {
         json.put("timestamp", trade.getTimestamp());
         json.put("quantityQNT", String.valueOf(trade.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(trade.getPriceNQT()));
-        json.put("asset", Convert.toUnsignedLong(trade.getAssetId()));
-        json.put("askOrder", Convert.toUnsignedLong(trade.getAskOrderId()));
-        json.put("bidOrder", Convert.toUnsignedLong(trade.getBidOrderId()));
+        json.put("asset", Long.toUnsignedString(trade.getAssetId()));
+        json.put("askOrder", Long.toUnsignedString(trade.getAskOrderId()));
+        json.put("bidOrder", Long.toUnsignedString(trade.getBidOrderId()));
         json.put("askOrderHeight", trade.getAskOrderHeight());
         json.put("bidOrderHeight", trade.getBidOrderHeight());
         putAccount(json, "seller", trade.getSellerId());
         putAccount(json, "buyer", trade.getBuyerId());
-        json.put("block", Convert.toUnsignedLong(trade.getBlockId()));
+        json.put("block", Long.toUnsignedString(trade.getBlockId()));
         json.put("height", trade.getHeight());
         json.put("tradeType", trade.isBuy() ? "buy" : "sell");
         json.put("confirmations", Nxt.getBlockchain().getHeight() - trade.getHeight());
@@ -252,7 +256,7 @@ public class JSONData {
         if (includeAccount) {
             putAccount(json, "account", accountAsset.getAccountId());
         }
-        json.put("asset", Convert.toUnsignedLong(accountAsset.getAssetId()));
+        json.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
         json.put("quantityQNT", String.valueOf(accountAsset.getQuantityQNT()));
         json.put("unconfirmedQuantityQNT", String.valueOf(accountAsset.getUnconfirmedQuantityQNT()));
         if (includeAssetInfo) {
@@ -271,7 +275,7 @@ public class JSONData {
     @SuppressWarnings("unchecked")
     public static JSONObject accountCurrency(Account.AccountCurrency accountCurrency, boolean includeCurrencyInfo) {
         JSONObject json = new JSONObject();
-        json.put("currency", Convert.toUnsignedLong(accountCurrency.getCurrencyId()));
+        json.put("currency", Long.toUnsignedString(accountCurrency.getCurrencyId()));
         json.put("units", String.valueOf(accountCurrency.getUnits()));
         json.put("unconfirmedUnits", String.valueOf(accountCurrency.getUnconfirmedUnits()));
         if (includeCurrencyInfo) {
@@ -283,7 +287,7 @@ public class JSONData {
     @SuppressWarnings("unchecked")
     public static JSONObject order(Order order) {
         JSONObject json = new JSONObject();
-        json.put("order", Convert.toUnsignedLong(order.getId()));
+        json.put("order", Long.toUnsignedString(order.getId()));
         json.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(order.getPriceNQT()));
         json.put("height", order.getHeight());
@@ -320,7 +324,7 @@ public class JSONData {
     @SuppressWarnings("unchecked")
     public static JSONObject goods(DigitalGoodsStore.Goods goods, boolean includeCounts) {
         JSONObject json = new JSONObject();
-        json.put("goods", Convert.toUnsignedLong(goods.getId()));
+        json.put("goods", Long.toUnsignedString(goods.getId()));
         json.put("name", goods.getName());
         json.put("description", goods.getDescription());
         json.put("quantity", goods.getQuantity());

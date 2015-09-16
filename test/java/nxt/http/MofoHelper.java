@@ -27,36 +27,36 @@ public class MofoHelper {
         }
   
         public MofoBuilder asset(long assetId) {
-            return this.asset(Convert.toUnsignedLong(assetId));
+            return this.asset(Long.toUnsignedString(assetId));
         }
         
         public MofoBuilder recipient(long accountId) {
-            param("recipient", Convert.toUnsignedLong(accountId));
+            param("recipient", Long.toUnsignedString(accountId));
             return this;
         }
 
         public MofoBuilder account(long accountId) {
-            param("account", Convert.toUnsignedLong(accountId));
+            param("account", Long.toUnsignedString(accountId));
             return this;
         }
         
         public MofoBuilder quantityQNT(long quantityQNT) {
-            param("quantityQNT", Convert.toUnsignedLong(quantityQNT));
+            param("quantityQNT", Long.toUnsignedString(quantityQNT));
             return this;
         }
 
         public MofoBuilder priceNQT(long priceNQT) {
-            param("priceNQT", Convert.toUnsignedLong(priceNQT));
+            param("priceNQT", Long.toUnsignedString(priceNQT));
             return this;
         }
 
         public MofoBuilder orderFeeNQT(long orderFeeNQT) {
-            param("orderFeeNQT", Convert.toUnsignedLong(orderFeeNQT));
+            param("orderFeeNQT", Long.toUnsignedString(orderFeeNQT));
             return this;
         }
         
         public MofoBuilder orderFeeQNT(long orderFeeQNT) {
-            param("orderFeeQNT", Convert.toUnsignedLong(orderFeeQNT));
+            param("orderFeeQNT", Long.toUnsignedString(orderFeeQNT));
             return this;
         }
     }    

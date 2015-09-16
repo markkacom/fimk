@@ -129,7 +129,7 @@ public final class Generator implements Comparable<Generator> {
             }
           }
           if (found == false) {
-            Logger.logDebugMessage("Account " + Convert.toUnsignedLong(generator.getAccountId()) + 
+            Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) + 
                 " is not allowed to forge. See nxt.allowedToForge property.");
             return null;
           }

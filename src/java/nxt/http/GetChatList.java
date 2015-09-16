@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import nxt.Account;
+import nxt.Account.AccountInfo;
 import nxt.MofoChat;
 import nxt.MofoChat.Chat;
 import nxt.util.Convert;
@@ -37,7 +38,10 @@ public class GetChatList extends APIServlet.APIRequestHandler{
             chat.put("accountRS", Convert.rsAccount(c.getAccountId()));
             Account other = Account.getAccount(c.getAccountId());
             if (other != null) {
-                chat.put("accountName", other.getName());
+                AccountInfo info = other.getAccountInfo();
+                if (info != null) {
+                    chat.put("accountName", info.getName());
+                }
             }
             chat.put("timestamp", c.getTimestamp());
             chats.add(chat);
@@ -48,7 +52,10 @@ public class GetChatList extends APIServlet.APIRequestHandler{
         
         Account account = Account.getAccount(accountId);
         if (account != null) {
-            response.put("accountName", account.getName());
+            AccountInfo info = account.getAccountInfo();
+            if (info != null) {          
+                response.put("accountName", info.getName());
+            }
         }
         response.put("chats", chats);
         return response;

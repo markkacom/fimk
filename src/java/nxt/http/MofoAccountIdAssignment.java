@@ -34,7 +34,7 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             return JSONResponses.FEATURE_NOT_AVAILABLE;
         }
       
-        long recipient = ParameterParser.getRecipientId(req);
+        long recipient = ParameterParser.getAccountId(req, "recipient", true);
         Account account = ParameterParser.getSenderAccount(req);
         String identifier = Convert.emptyToNull(req.getParameter("identifier"));
         long signatory;

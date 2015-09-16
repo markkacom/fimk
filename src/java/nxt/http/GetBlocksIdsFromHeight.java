@@ -51,7 +51,7 @@ public final class GetBlocksIdsFromHeight extends APIServlet.APIRequestHandler {
         try {
           for (int i=fromHeight; i<=toHeight; i++) {
             Long id = Nxt.getBlockchain().getBlockIdAtHeight(i);
-            blockIds.add(Convert.toUnsignedLong(id));            
+            blockIds.add(Long.toUnsignedString(id));            
           }
         } catch (RuntimeException e) {
           return INCORRECT_BLOCK;

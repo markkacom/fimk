@@ -62,7 +62,7 @@ public class GetAssetOrders extends RPCCall {
                     ColoredCoinsAskOrderPlacement attachment = (ColoredCoinsAskOrderPlacement) transaction.getAttachment();
                   
                     JSONObject json = new JSONObject();
-                    json.put("order", Convert.toUnsignedLong(transaction.getId()));
+                    json.put("order", Long.toUnsignedString(transaction.getId()));
                     json.put("quantityQNT", String.valueOf(attachment.getQuantityQNT()));
                     json.put("priceNQT", String.valueOf(attachment.getPriceNQT()));
                     json.put("height", Nxt.getBlockchain().getHeight() + 1);
@@ -88,7 +88,7 @@ public class GetAssetOrders extends RPCCall {
                     ColoredCoinsBidOrderPlacement attachment = (ColoredCoinsBidOrderPlacement) transaction.getAttachment();
                     
                     JSONObject json = new JSONObject();
-                    json.put("order", Convert.toUnsignedLong(transaction.getId()));
+                    json.put("order", Long.toUnsignedString(transaction.getId()));
                     json.put("quantityQNT", String.valueOf(attachment.getQuantityQNT()));
                     json.put("priceNQT", String.valueOf(attachment.getPriceNQT()));
                     json.put("height", Nxt.getBlockchain().getHeight() + 1);

@@ -1,13 +1,9 @@
 package nxt.http.rpc;
 
 import nxt.MofoQueries;
-import nxt.Transaction;
-import nxt.db.DbIterator;
 import nxt.http.ParameterException;
-import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 

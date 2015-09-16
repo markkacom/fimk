@@ -2,6 +2,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.NxtException;
+import nxt.Account.AccountInfo;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
 
@@ -22,6 +23,7 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
         super(new APITag[] {APITag.ACCOUNTS}, "identifier", "includeLessors", "includeAssets", "includeCurrencies");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         if (!Account.getAccountIDsEnabled()) {
@@ -47,15 +49,14 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
         if (account.getPublicKey() != null) {
             response.put("publicKey", Convert.toHexString(account.getPublicKey()));
         }
-        if (account.getName() != null) {
-            response.put("name", account.getName());
-        }
-        if (account.getDescription() != null) {
-            response.put("description", account.getDescription());
-        }
-        if (account.getMessagePattern() != null) {
-            response.put("messagePatternRegex", account.getMessagePattern().pattern());
-            response.put("messagePatternFlags", account.getMessagePattern().flags());
+        AccountInfo info = account.getAccountInfo();
+        if (info != null) {
+            if (info.getName() != null) {
+                response.put("name", info.getName());
+            }
+            if (info.getDescription() != null) {
+                response.put("description", info.getDescription());
+            }
         }
         if (account.getCurrentLesseeId() != 0) {
             JSONData.putAccount(response, "currentLessee", account.getCurrentLesseeId());
@@ -76,7 +77,7 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
                     JSONArray lessorInfo = new JSONArray();
                     while (lessors.hasNext()) {
                         Account lessor = lessors.next();
-                        lessorIds.add(Convert.toUnsignedLong(lessor.getId()));
+                        lessorIds.add(Long.toUnsignedString(lessor.getId()));
                         lessorIdsRS.add(Convert.rsAccount(lessor.getId()));
                         lessorInfo.add(JSONData.lessor(lessor));
                     }
@@ -94,11 +95,11 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
                 while (accountAssets.hasNext()) {
                     Account.AccountAsset accountAsset = accountAssets.next();
                     JSONObject assetBalance = new JSONObject();
-                    assetBalance.put("asset", Convert.toUnsignedLong(accountAsset.getAssetId()));
+                    assetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
                     assetBalance.put("balanceQNT", String.valueOf(accountAsset.getQuantityQNT()));
                     assetBalances.add(assetBalance);
                     JSONObject unconfirmedAssetBalance = new JSONObject();
-                    unconfirmedAssetBalance.put("asset", Convert.toUnsignedLong(accountAsset.getAssetId()));
+                    unconfirmedAssetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
                     unconfirmedAssetBalance.put("unconfirmedBalanceQNT", String.valueOf(accountAsset.getUnconfirmedQuantityQNT()));
                     unconfirmedAssetBalances.add(unconfirmedAssetBalance);
                 }

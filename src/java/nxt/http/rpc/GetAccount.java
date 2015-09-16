@@ -1,6 +1,7 @@
 package nxt.http.rpc;
 
 import nxt.Account;
+import nxt.Account.AccountInfo;
 import nxt.Generator;
 import nxt.Nxt;
 import nxt.http.ParameterException;
@@ -31,16 +32,19 @@ public class GetAccount extends RPCCall {
         if (account != null) {
             if (account.getPublicKey() != null) {
                 response.put("publicKey", Convert.toHexString(account.getPublicKey()));              
-            }          
-            response.put("description", account.getDescription());
-            
+            }
+            AccountInfo info = account.getAccountInfo();
+            if (info != null) {
+                response.put("description", info.getDescription());
+            }
+
             if (account.getCurrentLeasingHeightFrom() != Integer.MAX_VALUE) {
                 response.put("leasingHeightFrom", account.getCurrentLeasingHeightFrom());
                 response.put("leasingHeightTo", account.getCurrentLeasingHeightTo());
                 response.put("height", Nxt.getBlockchain().getHeight());
                 response.put("lesseeIdRS", Convert.rsAccount(account.getCurrentLesseeId()));
             }
-            
+
             if (includeForging) {
                 Generator generator = Generator.getGenerator(account.getId());
                 if (generator == null) {

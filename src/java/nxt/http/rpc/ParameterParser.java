@@ -3,10 +3,7 @@ package nxt.http.rpc;
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 import static nxt.http.JSONResponses.INCORRECT_ASSET;
 import static nxt.http.JSONResponses.INCORRECT_FILTER;
-import static nxt.http.JSONResponses.INCORRECT_ORDER;
 import static nxt.http.JSONResponses.MISSING_ACCOUNT;
-import static nxt.http.JSONResponses.MISSING_ASSET;
-import static nxt.http.JSONResponses.MISSING_ORDER;
 import static nxt.http.JSONResponses.UNKNOWN_ACCOUNT;
 import static nxt.http.JSONResponses.UNKNOWN_ASSET;
 
@@ -125,7 +122,7 @@ public class ParameterParser {
     static Asset getAsset(JSONObject object) throws ParameterException {
         String assetValue = Convert.emptyToNull((String) object.get("asset"));
         if (assetValue == null) {
-            throw new ParameterException(MISSING_ASSET);
+            throw new ParameterException(missing("asset"));
         }
         Asset asset;
         try {
@@ -252,12 +249,12 @@ public class ParameterParser {
     public static long getOrderId(JSONObject object) throws ParameterException {
         String orderValue = Convert.emptyToNull((String) object.get("order"));
         if (orderValue == null) {
-            throw new ParameterException(MISSING_ORDER);
+            throw new ParameterException(missing("order"));
         }
         try {
             return Convert.parseUnsignedLong(orderValue);
         } catch (RuntimeException e) {
-            throw new ParameterException(INCORRECT_ORDER);
+            throw new ParameterException(incorrect("order"));
         }
     }
 }

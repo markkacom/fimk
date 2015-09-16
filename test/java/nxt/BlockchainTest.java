@@ -7,7 +7,6 @@ import nxt.util.Time;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 
 import java.util.Properties;
@@ -18,6 +17,7 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
     
     // FIM-9MAB-AXFN-XXL7-6BHU3
     protected static final String forgerSecretPhrase = "franz dark offer race fuel fake joust waste tensor jk sw 101st";
+    private static final String forgerAccountId = "FIM-9MAB-AXFN-XXL7-6BHU3";
     
     // FIM-R4X4-KMHT-RCXD-CLGFZ
     protected static final String secretPhrase1 = "anion harp ere sandal cobol chink bunch tire clare power fogy hump";

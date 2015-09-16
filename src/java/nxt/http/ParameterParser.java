@@ -212,7 +212,7 @@ final class ParameterParser {
     static String getFilter(HttpServletRequest req) throws ParameterException {
         String filter = Convert.emptyToNull(req.getParameter("filter"));
         if (filter != null && filter.length() > Constants.MAX_ALIAS_LENGTH) {
-            throw new ParameterException(INCORRECT_FILTER);
+            throw new ParameterException(incorrect("filter"));
         }
         return filter;
     }  
@@ -569,7 +569,7 @@ final class ParameterParser {
             
             String[] pair = p.split(":");
             if (pair.length != 2) {
-                throw new ParameterException(INCORRECT_FILTER);
+                throw new ParameterException(incorrect("filter"));
             }
             
             try {
@@ -579,7 +579,7 @@ final class ParameterParser {
                 ));
             }
             catch (NumberFormatException e) {
-                throw new ParameterException(INCORRECT_FILTER);
+                throw new ParameterException(incorrect("filter"));
             }
         }
         

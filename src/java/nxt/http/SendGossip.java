@@ -27,7 +27,7 @@ public class SendGossip extends APIServlet.APIRequestHandler {
         try {
   
             long id = Long.parseUnsignedLong(Convert.emptyToNull(req.getParameter("id")));
-            long recipientId = ParameterParser.getRecipientId(req);
+            long recipientId = ParameterParser.getAccountId(req, "recipient", false);
             String messageValue = Convert.emptyToNull(req.getParameter("message"));
             String senderPublicKeyValue = Convert.emptyToNull(req.getParameter("senderPublicKey"));
             String topicValue = Convert.emptyToNull(req.getParameter("topic"));

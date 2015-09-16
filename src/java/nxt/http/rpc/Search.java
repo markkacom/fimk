@@ -5,6 +5,7 @@ import nxt.Alias;
 import nxt.Asset;
 import nxt.Currency;
 import nxt.DigitalGoodsStore;
+import nxt.Account.AccountInfo;
 import nxt.DigitalGoodsStore.Goods;
 import nxt.MofoQueries;
 import nxt.db.DbIterator;
@@ -55,7 +56,7 @@ public class Search extends RPCCall {
                         json.put("name", asset.getName());
                         json.put("decimals", asset.getDecimals());
                         json.put("description", asset.getDescription());
-                        json.put("asset", Convert.toUnsignedLong(asset.getId()));
+                        json.put("asset", Long.toUnsignedString(asset.getId()));
                         json.put("accountRS", Convert.rsAccount(asset.getAccountId()));
                       
                         results.add(json);
@@ -70,7 +71,7 @@ public class Search extends RPCCall {
                     json.put("name", asset.getName());
                     json.put("decimals", asset.getDecimals());
                     json.put("description", asset.getDescription());
-                    json.put("asset", Convert.toUnsignedLong(asset.getId()));
+                    json.put("asset", Long.toUnsignedString(asset.getId()));
                     json.put("accountRS", Convert.rsAccount(asset.getAccountId()));
                   
                     results.add(json);
@@ -86,10 +87,13 @@ public class Search extends RPCCall {
                     Account account = Account.getAccount(account_id);
                     if (account != null) {
                         JSONObject json = new JSONObject();
-                        json.put("name", account.getName());
+                        AccountInfo info = account.getAccountInfo();
+                        if (info != null) {
+                            json.put("name", info.getName());
+                            json.put("description", info.getDescription());
+                        }
                         json.put("balanceNQT", account.getBalanceNQT());
                         json.put("effectiveNXT", account.getEffectiveBalanceNXT());
-                        json.put("description", account.getDescription());
                         json.put("accountRS", Convert.rsAccount(account.getId()));
                       
                         results.add(json);                      
@@ -97,20 +101,23 @@ public class Search extends RPCCall {
                 }
             } catch (Exception e) {}
           
-            /*try (DbIterator<Account> accounts = Account.searchAccounts(query, firstIndex, lastIndex)) {
-                while (accounts.hasNext()) {
-                    Account account = accounts.next();
-                    
-                    JSONObject json = new JSONObject();
-                    json.put("name", account.getName());
-                    json.put("balanceNQT", account.getBalanceNQT());
-                    json.put("effectiveNXT", account.getEffectiveBalanceNXT());
-                    json.put("description", account.getDescription());
-                    json.put("accountRS", Convert.rsAccount(account.getId()));
-                  
-                    results.add(json);
+            try (DbIterator<AccountInfo> infos = Account.searchAccounts(query, firstIndex, lastIndex)) {
+                while (infos.hasNext()) {
+                    AccountInfo info = infos.next();
+                    if (info != null) {
+                        Account account = Account.getAccount(info.getAccountId());
+                        if (account != null) {
+                            JSONObject json = new JSONObject();
+                            json.put("name", info.getName());
+                            json.put("description", info.getDescription());
+                            json.put("balanceNQT", account.getBalanceNQT());
+                            json.put("effectiveNXT", account.getEffectiveBalanceNXT());
+                            json.put("accountRS", Convert.rsAccount(account.getId()));
+                            results.add(json);
+                        }
+                    }
                 }
-            }*/
+            }
         }
         else if ("currencies".equalsIgnoreCase(category)) {
             try (DbIterator<Currency> currencies = Currency.searchCurrencies(query, firstIndex, lastIndex)) {

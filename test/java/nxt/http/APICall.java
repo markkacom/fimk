@@ -43,7 +43,7 @@ public class APICall {
         public Builder(String requestType) {
             params.put("requestType", Arrays.asList(requestType));
             params.put("deadline", Arrays.asList("1440"));
-            params.put("feeNQT", String.valueOf(Constants.ONE_NXT / 10));
+            params.put("feeNQT", Arrays.asList(String.valueOf(Constants.ONE_NXT / 10)));
         }
 
         public Builder param(String key, String value) {

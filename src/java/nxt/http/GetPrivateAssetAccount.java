@@ -32,7 +32,10 @@ public final class GetPrivateAssetAccount extends CreateTransaction {
         JSONObject response = new JSONObject();
         String allowed = MofoAsset.getAccountAllowed(asset.getId(), ParameterParser.getAccountId(req)) ? "true" : "false";
         response.put("allowed", allowed);
-        JSONData.putAssetInfo(response, asset.getId());
+        response.put("name", asset.getName());
+        response.put("decimals", asset.getDecimals());
+        response.put("quantityQNT", String.valueOf(asset.getQuantityQNT()));
+        response.put("asset", Long.toUnsignedString(asset.getId()));
         return response;
     }
 }

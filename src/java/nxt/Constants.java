@@ -129,6 +129,7 @@ public final class Constants {
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
+    public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     
     /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0; 
@@ -174,19 +175,19 @@ public final class Constants {
     /* XXX - List of Account ID's that are allowed to forge (or null to allow all) */
     public static final List<Long> allowedToForge; 
     static {
-      List<String> allowed = Nxt.getStringListProperty("nxt.allowedToForge");
-      if (allowed.size() == 0) {
-        allowedToForge = Collections.emptyList();
-      }
-      else if (allowed.size() == 1 && "*".equals(allowed.get(0))) {
-        allowedToForge = null;
-      }
-      else {
-        allowedToForge = new ArrayList<Long>();
-        for (String account : allowed) {
-          allowedToForge.add(Convert.parseAccountId(account));
+        List<String> allowed = Nxt.getStringListProperty("nxt.allowedToForge");
+        if (allowed.size() == 0) {
+            allowedToForge = Collections.emptyList();
         }
-      }
+        else if (allowed.size() == 1 && "*".equals(allowed.get(0))) {
+            allowedToForge = null;
+        }
+        else {
+            allowedToForge = new ArrayList<Long>();
+            for (String account : allowed) {
+                allowedToForge.add(Convert.parseAccountId(account));
+            }
+        }
     }
     
     public static final int MAX_GOSSIP_CACHE_LENGTH = 2000;

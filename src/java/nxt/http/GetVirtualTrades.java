@@ -3,8 +3,6 @@ package nxt.http;
 import java.util.List;
 
 import nxt.NxtException;
-import nxt.Order;
-import nxt.db.DbIterator;
 import nxt.virtualexchange.VirtualTrade;
 
 import org.json.simple.JSONArray;

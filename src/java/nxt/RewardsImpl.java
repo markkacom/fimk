@@ -1,12 +1,10 @@
 package nxt;
 
-import nxt.util.Convert;
-
 public class RewardsImpl {
   
     static public long augmentFee(Block block , long totalFeeNQT) {    
         long rewardNQT = calculatePOSRewardNQT(block);
-        long totalRewardNQT = Convert.safeAdd(rewardNQT, totalFeeNQT);
+        long totalRewardNQT = Math.addExact(rewardNQT, totalFeeNQT);
         return totalRewardNQT;
     }
     

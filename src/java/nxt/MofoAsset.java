@@ -74,7 +74,7 @@ public final class MofoAsset {
 
         @Override
         public String toString() {
-            return "PrivateAsset asset_id: " + Convert.toUnsignedLong(assetId)
+            return "PrivateAsset asset_id: " + Long.toUnsignedString(assetId)
                     + " order fee: " + orderFeePercentage + " trade fee: " + tradeFeePercentage;
         }    
     }
@@ -119,7 +119,7 @@ public final class MofoAsset {
 
         @Override
         public String toString() {
-            return "PrivateAssetAccount asset_id: " + Convert.toUnsignedLong(assetId) 
+            return "PrivateAssetAccount asset_id: " + Long.toUnsignedString(assetId) 
                     + " account_id: " + Convert.rsAccount(accountId)
                     + " allowed: " + allowed;
         }

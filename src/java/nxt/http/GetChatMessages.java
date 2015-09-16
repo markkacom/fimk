@@ -12,6 +12,7 @@ import nxt.MofoChat;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.UnconfirmedTransaction;
+import nxt.Account.AccountInfo;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
 import nxt.util.JSON;
@@ -124,7 +125,10 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
         response.put("accountOneRS", Convert.rsAccount(accountOneId));
         Account accountOne = Account.getAccount(accountOneId);
         if (accountOne != null) {
-            response.put("accountOneName", accountOne.getName());
+            AccountInfo info = accountOne.getAccountInfo();
+            if (info != null) {
+                response.put("accountOneName", info.getName());
+            }
             if (accountOne.getPublicKey() != null) {
                 response.put("accountOnePublicKey", Convert.toHexString(accountOne.getPublicKey()));
             }
@@ -133,7 +137,10 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
         response.put("accountTwoRS", Convert.rsAccount(accountTwoId));
         Account accountTwo = Account.getAccount(accountTwoId);
         if (accountTwo != null) {
-            response.put("accountTwoName", accountTwo.getName());
+            AccountInfo info = accountTwo.getAccountInfo();
+            if (info != null) {
+                response.put("accountTwoName", info.getName());
+            }
             if (accountOne.getPublicKey() != null) {
                 response.put("accountTwoPublicKey", Convert.toHexString(accountTwo.getPublicKey()));
             }

@@ -10,7 +10,6 @@ import nxt.Trade;
 import nxt.db.DbIterator;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.MofoSocketServer;
-import nxt.util.Convert;
 import nxt.virtualexchange.VirtualOrder.VirtualAsk;
 import nxt.virtualexchange.VirtualOrder.VirtualBid;
 
@@ -73,7 +72,7 @@ public class VirtualTrade {
 
     public static void notifyTradeAdded(VirtualTrade trade) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
-            String asset = Convert.toUnsignedLong(trade.getAssetId());
+            String asset = Long.toUnsignedString(trade.getAssetId());
             String topic = "TRADE_ADDED*"+asset;
             MofoSocketServer.notifyJSON(topic, trade.toJSONObject());
         }
@@ -82,13 +81,13 @@ public class VirtualTrade {
     @SuppressWarnings("unchecked")
     public static void notifyTradeRemoved(VirtualTrade trade) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
-            String asset = Convert.toUnsignedLong(trade.getAssetId());
+            String asset = Long.toUnsignedString(trade.getAssetId());
             String topic = "TRADE_REMOVED*"+asset;
             
             JSONObject json = new JSONObject();
-            json.put("asset", Convert.toUnsignedLong(trade.getAssetId()));
-            json.put("askOrder", Convert.toUnsignedLong(trade.getAskOrderId()));
-            json.put("bidOrder", Convert.toUnsignedLong(trade.getBidOrderId()));
+            json.put("asset", Long.toUnsignedString(trade.getAssetId()));
+            json.put("askOrder", Long.toUnsignedString(trade.getAskOrderId()));
+            json.put("bidOrder", Long.toUnsignedString(trade.getBidOrderId()));
             MofoSocketServer.notifyJSON(topic, json);
         }
     }
@@ -96,14 +95,14 @@ public class VirtualTrade {
     @SuppressWarnings("unchecked")
     public static void notifyTradeUpdated(Trade trade) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
-            String asset = Convert.toUnsignedLong(trade.getAssetId());
+            String asset = Long.toUnsignedString(trade.getAssetId());
             String topic = "TRADE_UPDATED*"+asset;
             
             JSONObject json = new JSONObject();
-            json.put("asset", Convert.toUnsignedLong(trade.getAssetId()));
-            json.put("askOrder", Convert.toUnsignedLong(trade.getAskOrderId()));
-            json.put("bidOrder", Convert.toUnsignedLong(trade.getBidOrderId()));
-            json.put("quantityQNT", Convert.toUnsignedLong(trade.getQuantityQNT()));
+            json.put("asset", Long.toUnsignedString(trade.getAssetId()));
+            json.put("askOrder", Long.toUnsignedString(trade.getAskOrderId()));
+            json.put("bidOrder", Long.toUnsignedString(trade.getBidOrderId()));
+            json.put("quantityQNT", Long.toUnsignedString(trade.getQuantityQNT()));
             json.put("timestamp", trade.getTimestamp());
             MofoSocketServer.notifyJSON(topic, json);
         }
@@ -143,10 +142,10 @@ public class VirtualTrade {
         JSONObject json = new JSONObject();
         json.put("quantityQNT", String.valueOf(getQuantityQNT()));
         json.put("priceNQT", String.valueOf(getPriceNQT()));
-        json.put("asset", Convert.toUnsignedLong(getAssetId()));
+        json.put("asset", Long.toUnsignedString(getAssetId()));
         json.put("timestamp", timestamp);
-        json.put("askOrder", Convert.toUnsignedLong(getAskOrderId()));
-        json.put("bidOrder", Convert.toUnsignedLong(getBidOrderId()));
+        json.put("askOrder", Long.toUnsignedString(getAskOrderId()));
+        json.put("bidOrder", Long.toUnsignedString(getBidOrderId()));
         JSONData.putAccount(json, "seller", sellerId);
         JSONData.putAccount(json, "buyer", buyerId);
         json.put("height", height);

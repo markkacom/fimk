@@ -711,19 +711,23 @@ public final class Peers {
         long priority = 0;
         Account account = Account.getAccount(gossip.getSenderId());
         if (account != null) {
-            priority = account.getGuaranteedBalanceNQT(1440);
+            priority = account.getGuaranteedBalanceNQT();
         }
         sendToSomePeers(request, priority);
     }
 
+    private static void sendToSomePeers(final JSONObject request) {
+        sendToSomePeers(request, Long.MAX_VALUE);
+    }
+    
     private static void sendToSomePeers(final JSONObject request, long priority) {
         sendToPeersRequestQueue.add(request, priority);
         sendingService.submit(() -> {
-            final JSONObject request = sendToPeersRequestQueue.getNext();
-            if (request == null) {
-              return;
+            final JSONObject req = sendToPeersRequestQueue.getNext();
+            if (req == null) {
+                return;
             }
-            final JSONStreamAware jsonRequest = JSON.prepareRequest(request);
+            final JSONStreamAware jsonRequest = JSON.prepareRequest(req);
   
             boolean isGossip = "processGossip".equals(request.get("requestType"));
 

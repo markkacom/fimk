@@ -4,7 +4,6 @@ import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
 import nxt.MofoAsset;
-import nxt.util.Convert;
 import nxt.util.JSON;
 import nxt.NxtException;
 

@@ -1,6 +1,7 @@
 package nxt.http;
 
 import nxt.Account;
+import nxt.Account.AccountInfo;
 import nxt.Alias;
 import nxt.Asset;
 import nxt.Attachment.MonetarySystemAttachment;
@@ -702,7 +703,10 @@ final class JSONData {
     static void putAccount(JSONObject json, String name, long accountId) {
         Account account = Account.getAccount(accountId);
         if (account != null) {
-            json.put(name + "Name", account.getName());
+            AccountInfo info = account.getAccountInfo();
+            if (info != null) {
+                json.put(name + "Name", info.getName());  
+            }  
         }    
         json.put(name, Long.toUnsignedString(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));

@@ -496,60 +496,60 @@ class NxtDbVersion extends DbVersion {
             case 195:
                 apply(null);
             case 196:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS transaction_timestamp_desc_idx ON transaction (timestamp DESC)");
             case 197:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS trade_timestamp_desc_idx ON trade (timestamp DESC)");
             case 198:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS mofo_asset_chart (asset_id BIGINT NOT NULL, timestamp INT NOT NULL, "
                     + "window TINYINT NOT NULL, openNQT BIGINT NOT NULL, highNQT BIGINT NOT NULL, lowNQT BIGINT NOT NULL, "
                     + "closeNQT BIGINT NOT NULL, averageNQT BIGINT NOT NULL, volumeQNT BIGINT NOT NULL, height INT NOT NULL)");
             case 199:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_asset_id_idx ON mofo_asset_chart (asset_id)");
             case 200:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_window_idx ON mofo_asset_chart (window)");
             case 201:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_timestamp_desc_idx ON mofo_asset_chart (timestamp DESC)");
             case 202:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_height_idx ON mofo_asset_chart (height)");
             case 203:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS mofo_post ( "
                     + "type TINYINT NOT NULL, timestamp INT NOT NULL, sender_account_id BIGINT NOT NULL, "
                     + "referenced_entity_id BIGINT NOT NULL, transaction_id BIGINT NOT NULL, "
                     + "FOREIGN KEY (transaction_id) REFERENCES transaction (id) ON DELETE CASCADE)");
             case 204:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_post_timestamp_desc_idx ON mofo_post (timestamp DESC)");
             case 205:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_post_type_idx ON mofo_post (type)");
             case 206:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_post_sender_account_id_idx ON mofo_post (sender_account_id)");
             case 207:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_post_referenced_entity_id_idx ON mofo_post (referenced_entity_id)");
             case 208:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS mofo_comment ( "
                     + "timestamp INT NOT NULL, post_transaction_id BIGINT NOT NULL, transaction_id BIGINT NOT NULL, "
                     + "sender_account_id BIGINT NOT NULL, "
                     + "FOREIGN KEY (transaction_id) REFERENCES transaction (id) ON DELETE CASCADE)");
             case 209:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_comment_timestamp_idx ON mofo_comment (timestamp)");
             case 210:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_comment_sender_account_id_idx ON mofo_comment (sender_account_id)");
             case 211:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS mofo_comment_post_transaction_id_idx ON mofo_comment (post_transaction_id)");
             case 212:
                 apply(null);
@@ -642,52 +642,52 @@ class NxtDbVersion extends DbVersion {
             case 254:
                 apply(null);
             case 255:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS type TINYINT");
             case 256:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("UPDATE asset SET type = 0");
             case 257:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS private_asset (db_id IDENTITY, asset_id BIGINT NOT NULL, "
                     + "order_fee_percentage INT NOT NULL, trade_fee_percentage INT NOT NULL, height INT NOT NULL, "
                     + "FOREIGN KEY (asset_id) REFERENCES asset (id) ON DELETE CASCADE, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 258:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_height_idx ON private_asset (asset_id, height DESC)");
             case 259:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS private_asset_account (db_id IDENTITY, account_id BIGINT NOT NULL, "
                     + "asset_id BIGINT NOT NULL, allowed BOOLEAN NOT NULL DEFAULT TRUE, height INT NOT NULL, "
                     + "latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 260:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
             case 261:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS account_identifier (db_id IDENTITY, transaction_id BIGINT NOT NULL, "
                     + "account_id BIGINT NOT NULL, email VARCHAR NOT NULL, "
                     + "email_lower VARCHAR AS LOWER (email) NOT NULL, height INT NOT NULL)");       
             case 262:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS account_identifier_email_idx ON account_identifier (email_lower)");
             case 263:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS account_identifier_account_id_idx ON account_identifier (account_id)");
             case 264:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS account_identifier_height_idx ON account_identifier (height DESC)");
             case 265:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS account_identifier_transaction_id_idx ON account_identifier (transaction_id)");
             case 266:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS verification_authority (db_id IDENTITY, "
                     + "account_id BIGINT NOT NULL, period INT NOT NULL, "
                     + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 267:
-                /* MOFO WALLET */
+                /* FIMKrypto */
                 apply("CREATE INDEX IF NOT EXISTS verification_authority_account_id_idx ON verification_authority (account_id, height DESC)");
             case 268:
                 apply("DROP TABLE IF EXISTS poll");

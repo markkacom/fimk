@@ -39,7 +39,7 @@ import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
 public final class API {
 
     public static final int TESTNET_API_PORT = 6886;
-    public static final int TESTNET_API_SSLPORT = 6877;
+    public static final int TESTNET_API_SSLPORT = 6887;
 
     public static final Set<String> allowedBotHosts;
     private static final List<NetworkAddress> allowedBotNets;

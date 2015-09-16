@@ -26,7 +26,7 @@ public final class AddPrivateAssetAccount extends CreateTransaction {
         if ( ! Asset.privateEnabled()) {
             return FEATURE_NOT_AVAILABLE;
         }      
-        long recipientId = ParameterParser.getRecipientId(req);
+        long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Asset asset = ParameterParser.getAsset(req);
         if ( ! MofoAsset.isPrivateAsset(asset)) {
             return INCORRECT_ASSET;

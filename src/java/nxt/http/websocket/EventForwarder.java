@@ -18,7 +18,6 @@ import nxt.Transaction;
 import nxt.TransactionProcessor;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
-import nxt.util.Convert;
 import nxt.util.Listener;
 
 public final class EventForwarder {
@@ -113,7 +112,7 @@ public final class EventForwarder {
                     
                     Map<Long, List<Transaction>> grouped = groupTransactionsAccount(_transactions);
                     for (Entry<Long, List<Transaction>> entry : grouped.entrySet()) {
-                        String topic = "REMOVEDUNCONFIRMEDTRANSACTIONS-" + Convert.toUnsignedLong(entry.getKey());
+                        String topic = "REMOVEDUNCONFIRMEDTRANSACTIONS-" + Long.toUnsignedString(entry.getKey());
                         MofoSocketServer.notifyTransactions(topic, entry.getValue(), true);
                     }
                     /*Map<TypeFilter, List<Transaction>> grouped2 = groupTransactionsType(_transactions);
@@ -138,7 +137,7 @@ public final class EventForwarder {
                     
                     Map<Long, List<Transaction>> grouped = groupTransactionsAccount(_transactions);
                     for (Long accountId : grouped.keySet()) {
-                        String topic = "ADDEDUNCONFIRMEDTRANSACTIONS-" + Convert.toUnsignedLong(accountId);
+                        String topic = "ADDEDUNCONFIRMEDTRANSACTIONS-" + Long.toUnsignedString(accountId);
                         MofoSocketServer.notifyTransactions(topic, grouped.get(accountId), true);
                     }
                 }              
@@ -158,7 +157,7 @@ public final class EventForwarder {
                     
                     Map<Long, List<Transaction>> grouped = groupTransactionsAccount(_transactions);
                     for (Long accountId : grouped.keySet()) {
-                        String topic = "ADDEDCONFIRMEDTRANSACTIONS-" + Convert.toUnsignedLong(accountId);
+                        String topic = "ADDEDCONFIRMEDTRANSACTIONS-" + Long.toUnsignedString(accountId);
                         MofoSocketServer.notifyTransactions(topic, grouped.get(accountId), false);
                     }
                 }
@@ -174,7 +173,7 @@ public final class EventForwarder {
               
                 MofoSocketServer.notifyBlockMinimal("BLOCKPOPPED", block);
                 
-                String topic = "BLOCKPOPPED-" + Convert.toUnsignedLong(block.getGeneratorId());
+                String topic = "BLOCKPOPPED-" + Long.toUnsignedString(block.getGeneratorId());
                 MofoSocketServer.notifyBlock(topic, block);
             }
         }, BlockchainProcessor.Event.BLOCK_POPPED);        
@@ -207,20 +206,20 @@ public final class EventForwarder {
               
                 MofoSocketServer.notifyBlockMinimal("BLOCKPUSHED", block);
                 
-                String topic = "BLOCKPUSHED-" + Convert.toUnsignedLong(block.getGeneratorId());
+                String topic = "BLOCKPUSHED-" + Long.toUnsignedString(block.getGeneratorId());
                 MofoSocketServer.notifyBlock(topic, block);              
                 
                 if ( ! currentBlockTradeCache.isEmpty()) {
                   
                     Map<Long, List<Trade>> grouped = groupTradesAccount(currentBlockTradeCache);
                     for (Long accountId : grouped.keySet()) {
-                        topic = "ADDEDTRADES-" + Convert.toUnsignedLong(accountId);
+                        topic = "ADDEDTRADES-" + Long.toUnsignedString(accountId);
                         MofoSocketServer.notifyTrades(topic, grouped.get(accountId));
                     }
                     
                     grouped = groupTradesAsset(currentBlockTradeCache);
                     for (Long assetId : grouped.keySet()) {
-                        topic = "ADDEDTRADES*" + Convert.toUnsignedLong(assetId);
+                        topic = "ADDEDTRADES*" + Long.toUnsignedString(assetId);
                         MofoSocketServer.notifyTrades(topic, grouped.get(assetId));
                     }
                 }

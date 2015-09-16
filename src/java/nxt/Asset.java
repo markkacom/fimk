@@ -4,8 +4,6 @@ import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.EntityDbTable;
-import nxt.util.Convert;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -71,7 +69,7 @@ public final class Asset {
     public static void putAsset(JSONObject json, long id) {
         Asset asset = getAsset(id);
         if (asset != null) {
-            json.put("asset", Convert.toUnsignedLong(id));
+            json.put("asset", Long.toUnsignedString(id));
             json.put("name", asset.getName());
             json.put("decimals", asset.getDecimals());
             if (privateEnabled()) {

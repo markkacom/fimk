@@ -30,6 +30,7 @@ import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
 import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
 import static nxt.http.JSONResponses.POST_REQUIRED;
 
+@SuppressWarnings("serial")
 public final class APIServlet extends HttpServlet {
 
     abstract static class APIRequestHandler {
@@ -263,7 +264,7 @@ public final class APIServlet extends HttpServlet {
         map.put("getNamespacedAlias", GetNamespacedAlias.instance);
         map.put("setNamespacedAlias", SetNamespacedAlias.instance);
         map.put("getNamespacedAliases", GetNamespacedAliases.instance);
-        map.put("mofoCombine", MofoCombine.instance);
+        //map.put("mofoCombine", MofoCombine.instance);
         map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
         map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
         map.put("getPrivateAssetAccount", GetPrivateAssetAccount.instance);

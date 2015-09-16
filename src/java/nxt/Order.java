@@ -42,40 +42,40 @@ public abstract class Order {
                  * asset issuer account.
                  */
 
-                askOrder.updateQuantityQNT(Convert.safeSubtract(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                askOrder.updateQuantityQNT(Math.subtractExact(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
                 
                 Account askAccount = Account.getAccount(askOrder.getAccountId());
-                long amountNQT = Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT());                
+                long amountNQT = Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT());                
                 long feeNQT = MofoAsset.calculateTradeFee(assetId, amountNQT);
                 
-                askAccount.addToBalanceAndUnconfirmedBalanceNQT(Convert.safeSubtract(amountNQT, feeNQT));
+                askAccount.addToBalanceAndUnconfirmedBalanceNQT(Math.subtractExact(amountNQT, feeNQT));
                 askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
     
-                bidOrder.updateQuantityQNT(Convert.safeSubtract(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                bidOrder.updateQuantityQNT(Math.subtractExact(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
                 
                 Account bidAccount = Account.getAccount(bidOrder.getAccountId());
                 long quantityQNT = trade.getQuantityQNT();
                 long feeQNT = MofoAsset.calculateTradeFee(assetId, quantityQNT);
                 
-                bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, Convert.safeSubtract(quantityQNT, feeQNT));
-                bidAccount.addToBalanceNQT(-Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
-                bidAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
+                bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, Math.subtractExact(quantityQNT, feeQNT));
+                bidAccount.addToBalanceNQT(-Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT()));
+                bidAccount.addToUnconfirmedBalanceNQT(Math.multiplyExact(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
                 
                 Account issuerAccount = Account.getAccount(Asset.getAsset(assetId).getAccountId());
                 issuerAccount.addToBalanceAndUnconfirmedBalanceNQT(feeNQT);
                 issuerAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, feeQNT);
             }
             else {
-                askOrder.updateQuantityQNT(Convert.safeSubtract(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                askOrder.updateQuantityQNT(Math.subtractExact(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
                 Account askAccount = Account.getAccount(askOrder.getAccountId());
-                askAccount.addToBalanceAndUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
+                askAccount.addToBalanceAndUnconfirmedBalanceNQT(Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT()));
                 askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
     
-                bidOrder.updateQuantityQNT(Convert.safeSubtract(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
+                bidOrder.updateQuantityQNT(Math.subtractExact(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
                 Account bidAccount = Account.getAccount(bidOrder.getAccountId());
                 bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, trade.getQuantityQNT());
-                bidAccount.addToBalanceNQT(-Convert.safeMultiply(trade.getQuantityQNT(), trade.getPriceNQT()));
-                bidAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
+                bidAccount.addToBalanceNQT(-Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT()));
+                bidAccount.addToUnconfirmedBalanceNQT(Math.multiplyExact(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
             }
         }
     }

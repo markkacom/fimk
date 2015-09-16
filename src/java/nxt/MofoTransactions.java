@@ -8,8 +8,6 @@ import nxt.Order.Bid;
 import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
-import nxt.util.JSON;
-
 import org.json.simple.JSONObject;
 
 public class MofoTransactions {
@@ -49,6 +47,10 @@ public class MofoTransactions {
                 return SUBTYPE_FIMKRYPTO_NAMESPACED_ALIAS_ASSIGNMENT;
             }
   
+            public String getName() {
+                return "NamespacedAliasAssignment";
+            };
+            
             @Override
             MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
                 return new MofoAttachment.NamespacedAliasAssignmentAttachment(buffer, transactionVersion);
@@ -96,6 +98,11 @@ public class MofoTransactions {
             @Override
             public boolean canHaveRecipient() {
                 return false;
+            }
+
+            @Override
+            public boolean isPhasingSafe() {
+                return false;
             }  
         };
     }
@@ -124,6 +131,11 @@ public class MofoTransactions {
             @Override
             public final byte getSubtype() {
                 return SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_ADD_ACCOUNT;
+            }
+
+            @Override
+            public String getName() {
+                return "AddPrivateAssetAccount";
             }
   
             @Override
@@ -177,6 +189,11 @@ public class MofoTransactions {
             @Override
             public boolean canHaveRecipient() {
                 return true;
+            }
+
+            @Override
+            public boolean isPhasingSafe() {
+                return false;
             }  
         };
     }
@@ -208,6 +225,11 @@ public class MofoTransactions {
             }
   
             @Override
+            public String getName() {
+                return "RemovePrivateAssetAccount";
+            }
+            
+            @Override
             MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
                 return new MofoAttachment.RemovePrivateAssetAccountAttachment(buffer, transactionVersion);
             }
@@ -227,7 +249,7 @@ public class MofoTransactions {
                         while (bids.hasNext()) {
                             Order order = bids.next();
                             Order.Bid.removeOrder(order.getId());
-                            recipientAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(order.getQuantityQNT(), order.getPriceNQT()));
+                            recipientAccount.addToUnconfirmedBalanceNQT(Math.multiplyExact(order.getQuantityQNT(), order.getPriceNQT()));
                         }
                         while (asks.hasNext()) {
                             Order order = asks.next();
@@ -282,6 +304,11 @@ public class MofoTransactions {
             @Override
             public boolean canHaveRecipient() {
                 return true;
+            }
+
+            @Override
+            public boolean isPhasingSafe() {
+                return false;
             }  
         };
     }
@@ -311,7 +338,12 @@ public class MofoTransactions {
             public final byte getSubtype() {
                 return SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE;
             }
-  
+
+            @Override
+            public String getName() {
+                return "PrivateAssetSetFee";
+            }
+
             @Override
             MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
                 return new MofoAttachment.PrivateAssetSetFeeAttachment(buffer, transactionVersion);
@@ -374,6 +406,11 @@ public class MofoTransactions {
             public boolean canHaveRecipient() {
                 return false;
             }
+
+            @Override
+            public boolean isPhasingSafe() {
+                return false;
+            }
         };
     }
 
@@ -403,6 +440,11 @@ public class MofoTransactions {
                 return SUBTYPE_FIMKRYPTO_ACCOUNT_ID_ASSIGNMENT;
             }
   
+            @Override
+            public String getName() {
+                return "AccountIdAssignment";              
+            }
+
             @Override
             MofoAttachment.AccountIdAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountIdAssignmentAttachment(buffer, transactionVersion);
@@ -507,6 +549,11 @@ public class MofoTransactions {
             public boolean canHaveRecipient() {
                 return true;
             }
+
+            @Override
+            public boolean isPhasingSafe() {
+                return false;
+            }
         };
     }
 
@@ -536,6 +583,11 @@ public class MofoTransactions {
                 return SUBTYPE_FIMKRYPTO_SET_VERIFICATION_AUTHORITY;
             }
   
+            @Override
+            public String getName() {
+                return "VerificationAuthorityAssignment";              
+            }
+
             @Override
             MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
                 return new MofoAttachment.VerificationAuthorityAssignmentAttachment(buffer, transactionVersion);
@@ -582,6 +634,11 @@ public class MofoTransactions {
             @Override
             public boolean canHaveRecipient() {
                 return true;
+            }
+
+            @Override
+            public boolean isPhasingSafe() {
+                return false;
             }
         };
     }

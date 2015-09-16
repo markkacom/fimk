@@ -34,11 +34,6 @@ public class MofoAttachment {
         }
     
         @Override
-        String getAppendixName() {
-            return "NamespacedAliasAssignment";
-        }
-    
-        @Override
         int getMySize() {
             return 1 + Convert.toBytes(aliasName).length + 2 + Convert.toBytes(aliasURI).length;
         }
@@ -125,11 +120,6 @@ public class MofoAttachment {
       
         public AddPrivateAssetAccountAttachment(long assetId) {
             super(assetId);
-        }        
-
-        @Override
-        String getAppendixName() {
-            return "AddPrivateAssetAccount";
         }
 
         @Override
@@ -151,11 +141,6 @@ public class MofoAttachment {
     
         public RemovePrivateAssetAccountAttachment(long assetId) {
             super(assetId);
-        } 
-
-        @Override
-        String getAppendixName() {
-            return "RemovePrivateAssetAccount";
         }
 
         @Override
@@ -190,12 +175,7 @@ public class MofoAttachment {
             this.orderFeePercentage = orderFeePercentage;
             this.tradeFeePercentage = tradeFeePercentage;
         }
-    
-        @Override
-        String getAppendixName() {
-            return "PrivateAssetSetFee";
-        }
-    
+
         @Override
         int getMySize() {
             return 8 + 4 + 4;
@@ -271,11 +251,6 @@ public class MofoAttachment {
         }
 
         @Override
-        String getAppendixName() {
-            return "AccountIdAssignment";
-        }
-
-        @Override
         int getMySize() {
             return 1 + 8 + Convert.toBytes(id).length + 1 + (signature != null ? signature.length : 0);
         }
@@ -296,7 +271,7 @@ public class MofoAttachment {
         @Override
         void putMyJSON(JSONObject attachment) {
             attachment.put("id", id);
-            attachment.put("signatory", Convert.toUnsignedLong(signatory));
+            attachment.put("signatory", Long.toUnsignedString(signatory));
             if (signature != null) {
               attachment.put("signature", Convert.toHexString(signature));
             }
@@ -336,11 +311,6 @@ public class MofoAttachment {
 
         public VerificationAuthorityAssignmentAttachment(int period) {
             this.period = period;
-        }
-
-        @Override
-        String getAppendixName() {
-            return "VerificationAuthorityAssignment";
         }
 
         @Override

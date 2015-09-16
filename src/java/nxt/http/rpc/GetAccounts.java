@@ -3,6 +3,7 @@ package nxt.http.rpc;
 import java.util.List;
 
 import nxt.Account;
+import nxt.Account.AccountInfo;
 import nxt.Block;
 import nxt.MofoQueries;
 import nxt.MofoQueries.RewardsStruct;
@@ -38,7 +39,7 @@ public class GetAccounts extends RPCCall {
         for (Long id : account_ids) {
 
           JSONObject json = new JSONObject();
-          json.put("account", Convert.toUnsignedLong(id));    
+          json.put("account", Long.toUnsignedString(id));    
           json.put("accountRS", Convert.rsAccount(id));          
           
           Account account = Account.getAccount(id);
@@ -64,8 +65,12 @@ public class GetAccounts extends RPCCall {
               json.put("unconfirmedBalanceNQT", String.valueOf(account.getUnconfirmedBalanceNQT()));
               json.put("effectiveBalanceNXT", account.getEffectiveBalanceNXT());
               json.put("forgedBalanceNQT", String.valueOf(account.getForgedBalanceNQT()));
-              json.put("guaranteedBalanceNQT", String.valueOf(account.getGuaranteedBalanceNQT(1440)));          
-              json.put("name", account.getName());
+              json.put("guaranteedBalanceNQT", String.valueOf(account.getGuaranteedBalanceNQT()));
+              
+              AccountInfo info = account.getAccountInfo();
+              if (info != null) {
+                  json.put("name", info.getName());
+              }
               json.put("numberOfBlocks", Nxt.getBlockchain().getBlockCount(account));
               
               if (!exludeForging) {

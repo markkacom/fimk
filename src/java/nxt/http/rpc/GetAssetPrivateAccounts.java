@@ -3,9 +3,9 @@ package nxt.http.rpc;
 import java.util.Iterator;
 
 import nxt.Asset;
-import nxt.MofoAsset;
 import nxt.MofoQueries;
 import nxt.Nxt;
+import nxt.Account.AccountInfo;
 import nxt.MofoQueries.PrivateAccount;
 import nxt.http.ParameterException;
 import nxt.http.websocket.RPCCall;
@@ -46,10 +46,15 @@ public class GetAssetPrivateAccounts extends RPCCall {
             obj.put("index", (index++)+firstIndex);
             obj.put("confirmations", Nxt.getBlockchain().getHeight() - a.height);
             obj.put("id_rs", Convert.rsAccount(a.account.getId()));
-            obj.put("name", a.account.getName());
-            obj.put("description", a.account.getDescription());
+            
+            AccountInfo info = a.account.getAccountInfo();
+            if (info != null) {
+                obj.put("name", info.getName());
+                obj.put("description", info.getDescription());
+            }
+
             obj.put("quantityQNT", a.account.getAssetBalanceQNT(asset.getId()));
-            obj.put("asset", Convert.toUnsignedLong(asset.getId()));
+            obj.put("asset", Long.toUnsignedString(asset.getId()));
             obj.put("decimals", asset.getDecimals());
             obj.put("allowed", a.allowed);
             accounts.add(obj);

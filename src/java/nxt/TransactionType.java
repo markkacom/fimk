@@ -1348,7 +1348,7 @@ public abstract class TransactionType {
                 if (unconfirmedAssetBalance >= 0 && unconfirmedAssetBalance >= attachment.getQuantityQNT()) {
                     if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(attachment.getAssetId())) {
                         try {
-                            long totalAndOrderFeeQNT = Convert.safeAdd(attachment.getQuantityQNT(), attachment.getOrderFeeQNT());
+                            long totalAndOrderFeeQNT = Math.addExact(attachment.getQuantityQNT(), attachment.getOrderFeeQNT());
                             if (unconfirmedAssetBalance > totalAndOrderFeeQNT && MofoAsset.calculateOrderFee(attachment.getAssetId(), attachment.getQuantityQNT()) >= attachment.getOrderFeeQNT()) {
                                 senderAccount.addToUnconfirmedAssetBalanceQNT(attachment.getAssetId(), -totalAndOrderFeeQNT);
                                 return true;
@@ -1390,7 +1390,7 @@ public abstract class TransactionType {
             void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
                 Attachment.ColoredCoinsAskOrderPlacement attachment = (Attachment.ColoredCoinsAskOrderPlacement) transaction.getAttachment();
                 if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(attachment.getAssetId())) {
-                    senderAccount.addToUnconfirmedAssetBalanceQNT(attachment.getAssetId(), Convert.safeAdd(attachment.getQuantityQNT(), attachment.getOrderFeeQNT()));
+                    senderAccount.addToUnconfirmedAssetBalanceQNT(attachment.getAssetId(), Math.addExact(attachment.getQuantityQNT(), attachment.getOrderFeeQNT()));
                 }
                 else {
                     senderAccount.addToUnconfirmedAssetBalanceQNT(attachment.getAssetId(), attachment.getQuantityQNT());
@@ -1439,15 +1439,15 @@ public abstract class TransactionType {
                 Attachment.ColoredCoinsBidOrderPlacement attachment = (Attachment.ColoredCoinsBidOrderPlacement) transaction.getAttachment();
                 if (senderAccount.getUnconfirmedBalanceNQT() >= Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT())) {
                     if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(attachment.getAssetId())) {
-                        final long totalNQT = Convert.safeMultiply(attachment.getQuantityQNT(), attachment.getPriceNQT());
-                        long totalAndOrderFeeNQT = Convert.safeAdd(totalNQT, attachment.getOrderFeeNQT());
+                        final long totalNQT = Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT());
+                        long totalAndOrderFeeNQT = Math.addExact(totalNQT, attachment.getOrderFeeNQT());
                         if (senderAccount.getUnconfirmedBalanceNQT() > totalAndOrderFeeNQT && MofoAsset.calculateOrderFee(attachment.getAssetId(), totalNQT) >= attachment.getOrderFeeNQT()) {
                             senderAccount.addToUnconfirmedBalanceNQT(- totalAndOrderFeeNQT);
                             return true;
                         }
                     }
                     else {                  
-                        senderAccount.addToUnconfirmedBalanceNQT(-Convert.safeMultiply(attachment.getQuantityQNT(), attachment.getPriceNQT()));
+                        senderAccount.addToUnconfirmedBalanceNQT(-Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT()));
                         return true;
                     }
                 }
@@ -1477,11 +1477,11 @@ public abstract class TransactionType {
             void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
                 Attachment.ColoredCoinsBidOrderPlacement attachment = (Attachment.ColoredCoinsBidOrderPlacement) transaction.getAttachment();
                 if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(attachment.getAssetId())) {
-                    final long totalNQT = Convert.safeMultiply(attachment.getQuantityQNT(), attachment.getPriceNQT());
-                    senderAccount.addToUnconfirmedBalanceNQT(Convert.safeAdd(totalNQT, attachment.getOrderFeeNQT()));
+                    final long totalNQT = Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT());
+                    senderAccount.addToUnconfirmedBalanceNQT(Math.addExact(totalNQT, attachment.getOrderFeeNQT()));
                 }
                 else {
-                    senderAccount.addToUnconfirmedBalanceNQT(Convert.safeMultiply(attachment.getQuantityQNT(), attachment.getPriceNQT()));
+                    senderAccount.addToUnconfirmedBalanceNQT(Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT()));
                 }
             }
 
@@ -1492,7 +1492,7 @@ public abstract class TransactionType {
                     if ( ! MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getSenderId())) {
                         throw new NxtException.NotValidException("Account not allowed to place bid order");
                     }
-                    final long totalNQT = Convert.safeMultiply(attachment.getQuantityQNT(), attachment.getPriceNQT());
+                    final long totalNQT = Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT());
                     long orderFeeNQT = MofoAsset.calculateOrderFee(attachment.getAssetId(), totalNQT);
                     if (orderFeeNQT != attachment.getOrderFeeNQT()) {
                         throw new NxtException.NotValidException("Incorrect \"orderFeeNQT\" should be "+String.valueOf(orderFeeNQT));
@@ -1561,11 +1561,11 @@ public abstract class TransactionType {
                 Attachment.ColoredCoinsAskOrderCancellation attachment = (Attachment.ColoredCoinsAskOrderCancellation) transaction.getAttachment();
                 Order ask = Order.Ask.getAskOrder(attachment.getOrderId());
                 if (ask == null) {
-                    throw new NxtException.NotCurrentlyValidException("Invalid ask order: " + Convert.toUnsignedLong(attachment.getOrderId()));
+                    throw new NxtException.NotCurrentlyValidException("Invalid ask order: " + Long.toUnsignedString(attachment.getOrderId()));
                 }
                 if (ask.getAccountId() != transaction.getSenderId()) {
-                    throw new NxtException.NotValidException("Order " + Convert.toUnsignedLong(attachment.getOrderId()) + " was created by account "
-                            + Convert.toUnsignedLong(ask.getAccountId()));
+                    throw new NxtException.NotValidException("Order " + Long.toUnsignedString(attachment.getOrderId()) + " was created by account "
+                            + Long.toUnsignedString(ask.getAccountId()));
                 }
             }
 
@@ -1608,11 +1608,11 @@ public abstract class TransactionType {
                 Attachment.ColoredCoinsBidOrderCancellation attachment = (Attachment.ColoredCoinsBidOrderCancellation) transaction.getAttachment();
                 Order bid = Order.Bid.getBidOrder(attachment.getOrderId());
                 if (bid == null) {
-                    throw new NxtException.NotCurrentlyValidException("Invalid bid order: " + Convert.toUnsignedLong(attachment.getOrderId()));
+                    throw new NxtException.NotCurrentlyValidException("Invalid bid order: " + Long.toUnsignedString(attachment.getOrderId()));
                 }
                 if (bid.getAccountId() != transaction.getSenderId()) {
-                    throw new NxtException.NotValidException("Order " + Convert.toUnsignedLong(attachment.getOrderId()) + " was created by account "
-                            + Convert.toUnsignedLong(bid.getAccountId()));
+                    throw new NxtException.NotValidException("Order " + Long.toUnsignedString(attachment.getOrderId()) + " was created by account "
+                            + Long.toUnsignedString(bid.getAccountId()));
                 }
             }
 
