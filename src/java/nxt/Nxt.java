@@ -20,7 +20,7 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.5.0e";
+    public static final String NXT_VERSION = "1.5.1e";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
@@ -229,6 +229,7 @@ public final class Nxt {
                 CurrencyMint.init();
                 CurrencyTransfer.init();
                 Exchange.init();
+                PrunableMessage.init();
                 Peers.init();
                 Generator.init();
                 API.init();

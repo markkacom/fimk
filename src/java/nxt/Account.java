@@ -8,6 +8,7 @@ import nxt.db.DbKey;
 import nxt.db.DbUtils;
 import nxt.db.DerivedDbTable;
 import nxt.db.EntityDbTable;
+import nxt.db.PersistentDbTable;
 import nxt.db.VersionedEntityDbTable;
 import nxt.util.Convert;
 import nxt.util.Listener;
@@ -373,7 +374,7 @@ public final class Account {
 
     };
 
-    private static final EntityDbTable<byte[]> publicKeyTable = new EntityDbTable<byte[]>("public_key", publicKeyDbKeyFactory) {
+    private static final PersistentDbTable<byte[]> publicKeyTable = new PersistentDbTable<byte[]>("public_key", publicKeyDbKeyFactory) {
 
         @Override
         protected byte[] load(Connection con, ResultSet rs) throws SQLException {
@@ -390,17 +391,6 @@ public final class Account {
                 pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
                 pstmt.executeUpdate();
             }
-        }
-
-        // this table is special, rollback and truncate is handled by the BlockDb delete
-        @Override
-        public void rollback(int height) {
-            clearCache();
-        }
-
-        @Override
-        public void truncate() {
-            clearCache();
         }
 
     };
@@ -897,18 +887,18 @@ public final class Account {
                 + "height, latest) "
                 + "KEY (id, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
             int i = 0;
-            pstmt.setLong(++i, this.getId());
-            pstmt.setInt(++i, this.getCreationHeight());
-            pstmt.setInt(++i, this.getKeyHeight());
-            pstmt.setLong(++i, this.getBalanceNQT());
-            pstmt.setLong(++i, this.getUnconfirmedBalanceNQT());
-            pstmt.setLong(++i, this.getForgedBalanceNQT());
-            DbUtils.setIntZeroToNull(pstmt, ++i, this.getCurrentLeasingHeightFrom());
-            DbUtils.setIntZeroToNull(pstmt, ++i, this.getCurrentLeasingHeightTo());
-            DbUtils.setLongZeroToNull(pstmt, ++i, this.getCurrentLesseeId());
-            DbUtils.setIntZeroToNull(pstmt, ++i, this.getNextLeasingHeightFrom());
-            DbUtils.setIntZeroToNull(pstmt, ++i, this.getNextLeasingHeightTo());
-            DbUtils.setLongZeroToNull(pstmt, ++i, this.getNextLesseeId());
+            pstmt.setLong(++i, this.id);
+            pstmt.setInt(++i, this.creationHeight);
+            pstmt.setInt(++i, this.keyHeight);
+            pstmt.setLong(++i, this.balanceNQT);
+            pstmt.setLong(++i, this.unconfirmedBalanceNQT);
+            pstmt.setLong(++i, this.forgedBalanceNQT);
+            DbUtils.setIntZeroToNull(pstmt, ++i, this.currentLeasingHeightFrom);
+            DbUtils.setIntZeroToNull(pstmt, ++i, this.currentLeasingHeightTo);
+            DbUtils.setLongZeroToNull(pstmt, ++i, this.currentLesseeId);
+            DbUtils.setIntZeroToNull(pstmt, ++i, this.nextLeasingHeightFrom);
+            DbUtils.setIntZeroToNull(pstmt, ++i, this.nextLeasingHeightTo);
+            DbUtils.setLongZeroToNull(pstmt, ++i, this.nextLesseeId);
             pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
             pstmt.executeUpdate();
         }
@@ -950,18 +940,25 @@ public final class Account {
         return keyHeight;
     }
 
-    public EncryptedData encryptTo(byte[] data, String senderSecretPhrase) {
+    public EncryptedData encryptTo(byte[] data, String senderSecretPhrase, boolean compress) {
         if (getPublicKey() == null) {
             throw new IllegalArgumentException("Recipient account doesn't have a public key set");
+        }
+        if (compress && data.length > 0) {
+            data = Convert.compress(data);
         }
         return EncryptedData.encrypt(data, Crypto.getPrivateKey(senderSecretPhrase), getPublicKey());
     }
 
-    public byte[] decryptFrom(EncryptedData encryptedData, String recipientSecretPhrase) {
+    public byte[] decryptFrom(EncryptedData encryptedData, String recipientSecretPhrase, boolean uncompress) {
         if (getPublicKey() == null) {
             throw new IllegalArgumentException("Sender account doesn't have a public key set");
         }
-        return encryptedData.decrypt(Crypto.getPrivateKey(recipientSecretPhrase), getPublicKey());
+        byte[] decrypted = encryptedData.decrypt(Crypto.getPrivateKey(recipientSecretPhrase), getPublicKey());
+        if (uncompress && decrypted.length > 0) {
+            decrypted = Convert.uncompress(decrypted);
+        }
+        return decrypted;
     }
 
     public long getBalanceNQT() {

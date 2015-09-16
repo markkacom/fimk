@@ -24,6 +24,7 @@ import nxt.Order;
 import nxt.PhasingPoll;
 import nxt.PhasingVote;
 import nxt.Poll;
+import nxt.PrunableMessage;
 import nxt.RewardsImpl;
 import nxt.Token;
 import nxt.Trade;
@@ -229,7 +230,7 @@ final class JSONData {
         json.put("supply", String.valueOf(offer.getSupply()));
         return json;
     }
-    
+
     static JSONObject minimalBlock(Block block) {
         JSONObject json = new JSONObject();
         json.put("block", block.getStringId());
@@ -376,21 +377,19 @@ final class JSONData {
         json.put("maxRangeValue", poll.getMaxRangeValue());
         putVoteWeighting(json, poll.getVoteWeighting());
         json.put("finished", poll.isFinished());
+        json.put("timestamp", poll.getTimestamp());
         return json;
     }
 
-    static JSONObject pollResults(Poll poll, List<Poll.OptionResult> results) {
+    static JSONObject pollResults(Poll poll, List<Poll.OptionResult> results, VoteWeighting voteWeighting) {
         JSONObject json = new JSONObject();
         json.put("poll", Long.toUnsignedString(poll.getId()));
-        if (poll.getVoteWeighting().getMinBalanceModel() == VoteWeighting.MinBalanceModel.ASSET) {
-            long holdingId = poll.getVoteWeighting().getHoldingId();
-            json.put("holding", Long.toUnsignedString(holdingId));
-            json.put("decimals", Asset.getAsset(holdingId).getDecimals());
-        } else if(poll.getVoteWeighting().getMinBalanceModel() == VoteWeighting.MinBalanceModel.CURRENCY) {
-            long holdingId = poll.getVoteWeighting().getHoldingId();
-            json.put("holding", Long.toUnsignedString(holdingId));
-            json.put("decimals", Currency.getCurrency(holdingId).getDecimals());
+        if (voteWeighting.getMinBalanceModel() == VoteWeighting.MinBalanceModel.ASSET) {
+            json.put("decimals", Asset.getAsset(voteWeighting.getHoldingId()).getDecimals());
+        } else if(voteWeighting.getMinBalanceModel() == VoteWeighting.MinBalanceModel.CURRENCY) {
+            json.put("decimals", Currency.getCurrency(voteWeighting.getHoldingId()).getDecimals());
         }
+        putVoteWeighting(json, voteWeighting);
         json.put("finished", poll.isFinished());
         JSONArray options = new JSONArray();
         Collections.addAll(options, poll.getOptions());
@@ -404,7 +403,7 @@ final class JSONData {
                 optionJSON.put("weight", String.valueOf(option.getWeight()));
             } else {
                 optionJSON.put("result", "");
-                optionJSON.put("weight", 0);
+                optionJSON.put("weight", "0");
             }
             resultsJson.add(optionJSON);
         }
@@ -687,6 +686,36 @@ final class JSONData {
         return response;
     }
 
+    static JSONObject prunableMessage(PrunableMessage prunableMessage, long readerAccountId, String secretPhrase) {
+        JSONObject json = new JSONObject();
+        json.put("transaction", Long.toUnsignedString(prunableMessage.getId()));
+        json.put("isText", prunableMessage.isText());
+        json.put("isCompressed", prunableMessage.isCompressed());
+        putAccount(json, "sender", prunableMessage.getSenderId());
+        putAccount(json, "recipient", prunableMessage.getRecipientId());
+        json.put("expiration", prunableMessage.getExpiration());
+        json.put("timestamp", prunableMessage.getTimestamp());
+        EncryptedData encryptedData = prunableMessage.getEncryptedData();
+        if (encryptedData != null) {
+            json.put("encryptedMessage", encryptedData(prunableMessage.getEncryptedData()));
+            if (secretPhrase != null) {
+                Account account = prunableMessage.getSenderId() == readerAccountId
+                        ? Account.getAccount(prunableMessage.getRecipientId()) : Account.getAccount(prunableMessage.getSenderId());
+                if (account != null) {
+                    try {
+                        byte[] decrypted = account.decryptFrom(encryptedData, secretPhrase, prunableMessage.isCompressed());
+                        json.put("decryptedMessage", prunableMessage.isText() ? Convert.toString(decrypted) : Convert.toHexString(decrypted));
+                    } catch (RuntimeException e) {
+                        putException(json, e, "Decryption failed");
+                    }
+                }
+            }
+        } else {
+            json.put("message", prunableMessage.toString());
+        }
+        return json;
+    }
+
     static void putException(JSONObject json, Exception e) {
         putException(json, e, "");
     }
@@ -711,7 +740,7 @@ final class JSONData {
         json.put(name, Long.toUnsignedString(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));
     }
-    
+
     private static void putCurrencyInfo(JSONObject json, long currencyId) {
         Currency currency = Currency.getCurrency(currencyId);
         if (currency == null) {
