@@ -60,9 +60,9 @@ public final class Constants {
     static {
         int maxPrunableLifetime = Nxt.getIntProperty("nxt.maxPrunableLifetime");
         ENABLE_PRUNING = maxPrunableLifetime >= 0;
-        MAX_PRUNABLE_LIFETIME = Math.max(maxPrunableLifetime, MIN_PRUNABLE_LIFETIME);
+        MAX_PRUNABLE_LIFETIME = ENABLE_PRUNING ? Math.max(maxPrunableLifetime, MIN_PRUNABLE_LIFETIME) : Integer.MAX_VALUE;
     }
-    public static final boolean INCLUDE_EXPIRED_PRUNABLES = Nxt.getBooleanProperty("nxt.includeExpiredPrunables");
+    public static final boolean INCLUDE_EXPIRED_PRUNABLE = Nxt.getBooleanProperty("nxt.includeExpiredPrunable");
 
     public static final int MAX_ACCOUNT_NAME_LENGTH = 100;
     public static final int MAX_ACCOUNT_DESCRIPTION_LENGTH = 1000;
@@ -89,6 +89,7 @@ public final class Constants {
     public static final int MAX_DGS_LISTING_DESCRIPTION_LENGTH = 1000;
     public static final int MAX_DGS_LISTING_TAGS_LENGTH = 100;
     public static final int MAX_DGS_GOODS_LENGTH = 10240;
+    public static final int MAX_DGS_GOODS_LENGTH_2 = 1000;
 
     public static final int MAX_HUB_ANNOUNCEMENT_URIS = 100;
     public static final int MAX_HUB_ANNOUNCEMENT_URI_LENGTH = 1000;
@@ -112,6 +113,13 @@ public final class Constants {
     public static final short MIN_SHUFFLING_DELAY = 5;
     public static final short MAX_SHUFFLING_DELAY = 1440;
     public static final int MAX_SHUFFLING_RECIPIENTS_LENGTH = 10000;
+
+    public static final int MAX_TAGGED_DATA_NAME_LENGTH = 100;
+    public static final int MAX_TAGGED_DATA_DESCRIPTION_LENGTH = 1000;
+    public static final int MAX_TAGGED_DATA_TAGS_LENGTH = 100;
+    public static final int MAX_TAGGED_DATA_TYPE_LENGTH = 100;
+    public static final int MAX_TAGGED_DATA_FILENAME_LENGTH = 100;
+    public static final int MAX_TAGGED_DATA_DATA_LENGTH = 42 * 1024;
 
     public static final int ALIAS_SYSTEM_BLOCK = SECOND_BIRTH_BLOCK;
     public static final int TRANSPARENT_FORGING_BLOCK = SECOND_BIRTH_BLOCK;
@@ -144,7 +152,7 @@ public final class Constants {
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0; 
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
     
-    public static final int MAX_ACCOUNT_ID_LENGTH = 100;    
+    public static final int MAX_ACCOUNT_ID_LENGTH = 100;
     
     public static final long MASTER_VERIFICATION_AUTHORITY_ACCOUNT = Genesis.GENESIS_RECIPIENTS[0];
     public static final int MAX_VERIFICATION_AUTHORITY_PERIOD = 100000;

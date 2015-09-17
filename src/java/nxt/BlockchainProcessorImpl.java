@@ -515,7 +515,9 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 doTrimDerivedTables();
                 Db.db.commitTransaction();
             } catch (Exception e) {
+                Logger.logMessage(e.toString(), e);
                 Db.db.rollbackTransaction();
+                throw e;
             } finally {
                 Db.db.endTransaction();
             }
@@ -789,12 +791,10 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             if (transaction.getTimestamp() > block.getTimestamp() + Constants.MAX_TIMEDRIFT
                             || transaction.getExpiration() < block.getTimestamp() ) {
                 throw new TransactionNotAcceptedException("Invalid transaction timestamp " + transaction.getTimestamp()
-                        + " for transaction " + transaction.getStringId() + ", current time is " + curTime
-                        + ", block timestamp is " + block.getTimestamp(), transaction);
+                        + ", current time is " + curTime + ", block timestamp is " + block.getTimestamp(), transaction);
             }
             if (TransactionDb.hasTransaction(transaction.getId(), previousLastBlock.getHeight())) {
-                throw new TransactionNotAcceptedException("Transaction " + transaction.getStringId()
-                        + " is already in the blockchain", transaction);
+                throw new TransactionNotAcceptedException("Transaction is already in the blockchain", transaction);
             }
             //TODO: check that referenced transaction, if phased, has been applied?
             if (transaction.referencedTransactionFullHash() != null) {
@@ -803,8 +803,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                         || (previousLastBlock.getHeight() >= Constants.REFERENCED_TRANSACTION_FULL_HASH_BLOCK
                         && !hasAllReferencedTransactions(transaction, transaction.getTimestamp(), 0))) {
                     throw new TransactionNotAcceptedException("Missing or invalid referenced transaction "
-                            + transaction.getReferencedTransactionFullHash()
-                            + " for transaction " + transaction.getStringId(), transaction);
+                            + transaction.getReferencedTransactionFullHash(), transaction);
                 }
             }
             if (transaction.getVersion() != getTransactionVersion(previousLastBlock.getHeight())) {
@@ -812,8 +811,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                         + " at height " + previousLastBlock.getHeight(), transaction);
             }
             if (!transaction.verifySignature()) {
-                throw new TransactionNotAcceptedException("Signature verification failed for transaction "
-                        + transaction.getStringId() + " at height " + previousLastBlock.getHeight(), transaction);
+                throw new TransactionNotAcceptedException("Transaction signature verification failed at height " + previousLastBlock.getHeight(), transaction);
             }
                     /*
                     if (!EconomicClustering.verifyFork(transaction)) {
@@ -833,8 +831,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 throw new TransactionNotAcceptedException(e.getMessage(), transaction);
             }
             if (transaction.getPhasing() == null && transaction.isDuplicate(duplicates)) {
-                throw new TransactionNotAcceptedException("Transaction is a duplicate: "
-                        + transaction.getStringId(), transaction);
+                throw new TransactionNotAcceptedException("Transaction is a duplicate", transaction);
             }
             calculatedTotalAmount += transaction.getAmountNQT();
             calculatedTotalFee += transaction.getFeeNQT();
@@ -855,7 +852,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     private void accept(BlockImpl block, List<TransactionImpl> validPhasedTransactions, List<TransactionImpl> invalidPhasedTransactions) throws TransactionNotAcceptedException {
         for (TransactionImpl transaction : block.getTransactions()) {
             if (! transaction.applyUnconfirmed()) {
-                throw new TransactionNotAcceptedException("Double spending transaction: " + transaction.getStringId(), transaction);
+                throw new TransactionNotAcceptedException("Double spending", transaction);
             }
         }
         blockListeners.notify(block, Event.BEFORE_BLOCK_APPLY);
@@ -1100,7 +1097,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             block = new BlockImpl(getBlockVersion(previousBlock.getHeight()), blockTimestamp, previousBlock.getId(), totalAmountNQT, totalFeeNQT, payloadLength,
                     payloadHash, publicKey, generationSignature, previousBlockHash, blockTransactions, secretPhrase);
 
-        } catch (NxtException.ValidationException e) {
+        } catch (NxtException.NotValidException e) {
             // shouldn't happen because all transactions are already validated
             Logger.logMessage("Error generating block", e);
             return;
@@ -1113,6 +1110,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     + " at height " + block.getHeight() + " timestamp " + block.getTimestamp() + " fee " + ((float)block.getTotalFeeNQT())/Constants.ONE_NXT);
         } catch (TransactionNotAcceptedException e) {
             Logger.logDebugMessage("Generate block failed: " + e.getMessage());
+            TransactionProcessorImpl.getInstance().processWaitingTransactions();
             TransactionImpl transaction = e.getTransaction();
             Logger.logDebugMessage("Removing invalid transaction: " + transaction.getStringId());
             TransactionProcessorImpl.getInstance().removeUnconfirmedTransaction(transaction);
@@ -1176,7 +1174,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }
             scheduleScan(height, validate);
             if (height > 0 && height < getMinRollbackHeight()) {
-                Logger.logMessage("Rollback of more than " + getMinRollbackHeight() + " blocks not supported, will do a full scan");
+                Logger.logMessage("Rollback to height less than " + getMinRollbackHeight() + " not supported, will do a full scan");
                 height = 0;
             }
             if (height < 0) {

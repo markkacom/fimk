@@ -859,6 +859,40 @@ class NxtDbVersion extends DbVersion {
             case 342:
                 apply("DROP INDEX IF EXISTS public_key_height_idx");
             case 343:
+                apply("CREATE TABLE IF NOT EXISTS tagged_data (db_id IDENTITY, id BIGINT NOT NULL, account_id BIGINT NOT NULL, "
+                        + "name VARCHAR NOT NULL, description VARCHAR, tags VARCHAR, parsed_tags ARRAY, type VARCHAR, data VARBINARY NOT NULL, "
+                        + "is_text BOOLEAN NOT NULL, filename VARCHAR, block_timestamp INT NOT NULL, transaction_timestamp INT NOT NULL, "
+                        + "height INT NOT NULL, FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE, latest BOOLEAN NOT NULL DEFAULT TRUE)");
+            case 344:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS tagged_data_id_height_idx ON tagged_data (id, height DESC)");
+            case 345:
+                apply("CREATE INDEX IF NOT EXISTS tagged_data_expiration_idx ON tagged_data (transaction_timestamp DESC)");
+            case 346:
+                apply("CREATE INDEX IF NOT EXISTS tagged_data_account__height_idx ON tagged_data (account_id, height DESC)");
+            case 347:
+                apply("CREATE INDEX IF NOT EXISTS tagged_data_block_timestamp_height_db_id_idx ON tagged_data (block_timestamp DESC, height DESC, db_id DESC)");
+            case 348:
+                apply("CALL FTL_CREATE_INDEX('PUBLIC', 'TAGGED_DATA', 'NAME,DESCRIPTION,TAGS')");
+            case 349:
+                apply("CREATE TABLE IF NOT EXISTS data_tag (db_id IDENTITY, tag VARCHAR NOT NULL, tag_count INT NOT NULL, "
+                        + "height INT NOT NULL, FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE, latest BOOLEAN NOT NULL DEFAULT TRUE)");
+            case 350:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS data_tag_tag_height_idx ON data_tag (tag, height DESC)");
+            case 351:
+                apply("CREATE INDEX IF NOT EXISTS data_tag_count_height_idx ON data_tag (tag_count DESC, height DESC)");
+            case 352:
+                apply("CREATE TABLE IF NOT EXISTS tagged_data_timestamp (db_id IDENTITY, id BIGINT NOT NULL, timestamp INT NOT NULL, "
+                        + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");
+            case 353:
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS tagged_data_timestamp_id_height_idx ON tagged_data_timestamp (id, height DESC)");
+            case 354:
+                apply("CREATE INDEX IF NOT EXISTS tagged_data_timestamp_height_idx ON tagged_data_timestamp (height)");
+            case 355:
+                if (Constants.isTestnet) {
+                    BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
+                }
+                apply(null);
+            case 356:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
