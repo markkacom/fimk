@@ -886,13 +886,15 @@ class NxtDbVersion extends DbVersion {
             case 353:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS tagged_data_timestamp_id_height_idx ON tagged_data_timestamp (id, height DESC)");
             case 354:
-                apply("CREATE INDEX IF NOT EXISTS tagged_data_timestamp_height_idx ON tagged_data_timestamp (height)");
+                apply(null);
             case 355:
+                apply(null);
+            case 356:
                 if (Constants.isTestnet) {
                     BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
                 }
                 apply(null);
-            case 356:
+            case 357:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");

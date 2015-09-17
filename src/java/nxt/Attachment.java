@@ -2548,11 +2548,11 @@ public interface Attachment extends Appendix {
 
         @Override
         final int getMyFullSize() {
-            if (data == null) {
+            if (getData() == null) {
                 return 0;
             }
-            return Convert.toBytes(name).length + Convert.toBytes(description).length + Convert.toBytes(type).length
-                    + Convert.toBytes(tags).length + Convert.toBytes(filename).length + data.length;
+            return Convert.toBytes(getName()).length + Convert.toBytes(getDescription()).length + Convert.toBytes(getType()).length
+                    + Convert.toBytes(getTags()).length + Convert.toBytes(getFilename()).length + getData().length;
         }
 
         @Override
@@ -2735,26 +2735,26 @@ public interface Attachment extends Appendix {
         }
 
         private volatile byte[] hash;
-        private /*final*/ long taggedDataId;
+        private final long taggedDataId;
+        private final boolean jsonIsPruned;
 
         TaggedDataExtend(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
             this.taggedDataId = buffer.getLong();
+            this.jsonIsPruned = false;
         }
 
         TaggedDataExtend(JSONObject attachmentData) {
             super(attachmentData);
             this.taggedDataId = Convert.parseUnsignedLong((String)attachmentData.get("taggedData"));
-            //TODO: remove
-            if (this.taggedDataId == 0) {
-                this.taggedDataId = Convert.parseUnsignedLong((String)attachmentData.get("taggedDataId"));
-            }
+            this.jsonIsPruned = attachmentData.get("data") == null;
         }
 
         public TaggedDataExtend(TaggedData taggedData) {
             super(taggedData.getName(), taggedData.getDescription(), taggedData.getTags(), taggedData.getType(),
                     taggedData.isText(), taggedData.getFilename(), taggedData.getData());
             this.taggedDataId = taggedData.getId();
+            this.jsonIsPruned = false;
         }
 
         @Override
@@ -2771,8 +2771,6 @@ public interface Attachment extends Appendix {
         void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             attachment.put("taggedData", Long.toUnsignedString(taggedDataId));
-            //TODO: remove
-            attachment.put("taggedDataId", Long.toUnsignedString(taggedDataId));
         }
 
         @Override
@@ -2799,6 +2797,10 @@ public interface Attachment extends Appendix {
         @Override
         long getTaggedDataId(Transaction transaction) {
             return taggedDataId;
+        }
+
+        boolean jsonIsPruned() {
+            return jsonIsPruned;
         }
 
     }
