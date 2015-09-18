@@ -110,6 +110,8 @@ function createTestFunction(inner_test, before, after) {
     ScriptHelper.rollback(1);
     ScriptHelper.truncate("unconfirmed_transaction;");
     Nxt.generateBlock();
+    Nxt.generateBlock();
+    Nxt.generateBlock();
     Nxt.verbose = false;
     var global = {};
     try {
