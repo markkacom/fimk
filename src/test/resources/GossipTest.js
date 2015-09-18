@@ -3,7 +3,6 @@ load("src/test/resources/lib/Nxt.js");
 
 tests({
   Before: function () {
-    Nxt.verbose = true;
     this.sender = Nxt.createFundedAccount('sender', '10000');
     this.recipient = Nxt.createFundedAccount('recipient', '10000');
   },

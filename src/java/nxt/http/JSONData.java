@@ -328,6 +328,7 @@ final class JSONData {
         JSONObject json = new JSONObject();
         putAccount(json, "account", Account.getId(hallmark.getPublicKey()));
         json.put("host", hallmark.getHost());
+        json.put("port", hallmark.getPort());
         json.put("weight", hallmark.getWeight());
         String dateString = Hallmark.formatDate(hallmark.getDate());
         json.put("date", dateString);
@@ -345,7 +346,8 @@ final class JSONData {
 
     static JSONObject peer(Peer peer) {
         JSONObject json = new JSONObject();
-        json.put("address", peer.getPeerAddress());
+        json.put("address", peer.getHost());
+        json.put("port", peer.getPort());
         json.put("state", peer.getState().ordinal());
         json.put("announcedAddress", peer.getAnnouncedAddress());
         json.put("shareAddress", peer.shareAddress());
@@ -730,7 +732,11 @@ final class JSONData {
         json.put("name", taggedData.getName());
         json.put("description", taggedData.getDescription());
         json.put("tags", taggedData.getTags());
+        JSONArray tagsJSON = new JSONArray();
+        Collections.addAll(tagsJSON, taggedData.getParsedTags());
+        json.put("parsedTags", tagsJSON);
         json.put("type", taggedData.getType());
+        json.put("channel", taggedData.getChannel());
         json.put("filename", taggedData.getFilename());
         json.put("isText", taggedData.isText());
         json.put("data", taggedData.isText() ? Convert.toString(taggedData.getData()) : Convert.toHexString(taggedData.getData()));

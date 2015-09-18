@@ -3,7 +3,6 @@ load("src/test/resources/lib/Nxt.js");
 
 tests({
   Before: function () {
-      Nxt.verbose = true;
     this.master = new Account(forgerSecretPhrase);
     this.verified1 = Nxt.createFundedAccount('verified1', '10000');
     this.verified2 = Nxt.createFundedAccount('verified2', '10000');
@@ -33,8 +32,6 @@ tests({
     jsAssert.assertEquals(['name@fimk.fi'], this.account1.getAccountIdentifiers());
   },
   "Other account can not set ID when providing signature for different ID": function () {
-    Nxt.verbose = true;
-    
     var signature = Nxt.util.sign('name1@fimk.fi', this.account1.secretPhrase);
     var ret = this.account1.setAccountIdentifier('name2@fimk.fi', this.account1.id_rs, signature, this.account2.secretPhrase);
     
