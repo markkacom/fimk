@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright © 2013-2015 The Nxt Core Developers.                             *
+ *                                                                            *
+ * See the AUTHORS.txt, DEVELOPER-AGREEMENT.txt and LICENSE.txt files at      *
+ * the top-level directory of this distribution for the individual copyright  *
+ * holder information and the developer policies on copyright and licensing.  *
+ *                                                                            *
+ * Unless otherwise agreed in a custom licensing agreement, no part of the    *
+ * Nxt software, including this file, may be copied, modified, propagated,    *
+ * or distributed except according to the terms contained in the LICENSE.txt  *
+ * file.                                                                      *
+ *                                                                            *
+ * Removal or modification of this copyright notice is prohibited.            *
+ *                                                                            *
+ ******************************************************************************/
+
 package nxt;
 
 import nxt.http.API;
@@ -20,7 +36,7 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.5.8e";
+    public static final String NXT_VERSION = "1.5.9";
     public static final String APPLICATION = "FIMK";
     
     /* XXX - This tracks the FIM version */
@@ -74,13 +90,17 @@ public final class Nxt {
     }
     
     public static int getIntProperty(String name) {
+        return getIntProperty(name, 0);
+    }
+
+    public static int getIntProperty(String name, int defaultValue) {
         try {
             int result = Integer.parseInt(properties.getProperty(name));
             if (getDisplayProperties()) Logger.logMessage(name + " = \"" + result + "\"");
             return result;
         } catch (NumberFormatException e) {
-            if (getDisplayProperties()) Logger.logMessage(name + " not defined, assuming 0");
-            return 0;
+            Logger.logMessage(name + " not defined or not numeric, using default value " + defaultValue);
+            return defaultValue;
         }
     }
 

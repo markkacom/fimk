@@ -1,9 +1,23 @@
+/******************************************************************************
+ * Copyright © 2013-2015 The Nxt Core Developers.                             *
+ *                                                                            *
+ * See the AUTHORS.txt, DEVELOPER-AGREEMENT.txt and LICENSE.txt files at      *
+ * the top-level directory of this distribution for the individual copyright  *
+ * holder information and the developer policies on copyright and licensing.  *
+ *                                                                            *
+ * Unless otherwise agreed in a custom licensing agreement, no part of the    *
+ * Nxt software, including this file, may be copied, modified, propagated,    *
+ * or distributed except according to the terms contained in the LICENSE.txt  *
+ * file.                                                                      *
+ *                                                                            *
+ * Removal or modification of this copyright notice is prohibited.            *
+ *                                                                            *
+ ******************************************************************************/
+
 package nxt;
 
-import nxt.crypto.Crypto;
 import nxt.util.Logger;
 import nxt.util.Time;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -12,6 +26,12 @@ import org.junit.BeforeClass;
 import java.util.Properties;
 
 public abstract class BlockchainTest extends AbstractBlockchainTest {
+
+    protected static Tester FORGY;
+    protected static Tester ALICE;
+    protected static Tester BOB;
+    protected static Tester CHUCK;
+    protected static Tester DAVE;
 
     protected static int baseHeight;
     
@@ -31,10 +51,10 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
     // FIM-LJ94-SPJZ-QHQM-B3VFF
     protected static final String secretPhrase4 = "dublin janus spout lykes tacky gland nice bigot rubric 4v vb peace";
 
-    protected static long id1;
-    protected static long id2;
-    protected static long id3;
-    protected static long id4;
+    private static final String aliceSecretPhrase = "hope peace happen touch easy pretend worthless talk them indeed wheel state";
+    private static final String bobSecretPhrase2 = "rshw9abtpsa2";
+    private static final String chuckSecretPhrase = "eOdBVLMgySFvyiTy8xMuRXDTr45oTzB7L5J";
+    private static final String daveSecretPhrase = "t9G2ymCmDsQij7VtYinqrbGCOAtDDA3WiNr";
 
     protected static boolean isNxtInitted = false;
     protected static boolean needShutdownAfterClass = false;
@@ -47,6 +67,9 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
             properties.setProperty("nxt.enableFakeForging", "true");
             properties.setProperty("nxt.fakeForgingAccount", forgerAccountId);
             properties.setProperty("nxt.timeMultiplier", "1");
+            properties.setProperty("nxt.testnetGuaranteedBalanceConfirmations", "1");
+            properties.setProperty("nxt.testnetLeasingDelay", "1");
+            properties.setProperty("nxt.disableProcessTransactionsThread", "true");
             AbstractForgingTest.init(properties);
             isNxtInitted = true;
         }
@@ -61,10 +84,16 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
         baseHeight = blockchain.getHeight();
         Logger.logMessage("baseHeight: " + baseHeight);
         
-        id1 = Account.getAccount(Crypto.getPublicKey(secretPhrase1)).getId();
-        id2 = Account.getAccount(Crypto.getPublicKey(secretPhrase2)).getId();
-        id3 = Account.getAccount(Crypto.getPublicKey(secretPhrase3)).getId();
-        id4 = Account.getAccount(Crypto.getPublicKey(secretPhrase4)).getId();
+        // id1 = Account.getAccount(Crypto.getPublicKey(secretPhrase1)).getId();
+        // id2 = Account.getAccount(Crypto.getPublicKey(secretPhrase2)).getId();
+        // id3 = Account.getAccount(Crypto.getPublicKey(secretPhrase3)).getId();
+        // id4 = Account.getAccount(Crypto.getPublicKey(secretPhrase4)).getId();
+        
+        FORGY = new Tester(forgerSecretPhrase);
+        ALICE = new Tester(aliceSecretPhrase);
+        BOB = new Tester(bobSecretPhrase2);
+        CHUCK = new Tester(chuckSecretPhrase);
+        DAVE = new Tester(daveSecretPhrase);
     }
 
     @AfterClass
@@ -93,12 +122,6 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
             generateBlock();
         }
     }
-
-    protected long balanceById(long id) {
-        return Account.getAccount(id).getBalanceNQT();
-    }
-
-
     public static void rollback(int height) {
         blockchainProcessor.popOffTo(height);
     }
