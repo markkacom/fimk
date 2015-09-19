@@ -916,7 +916,7 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS tagged_data_channel_idx ON tagged_data (channel, height DESC)");
             case 359:
                 apply("ALTER TABLE peer ADD COLUMN IF NOT EXISTS last_updated INT");
-            case 324:
+            case 360:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, probably trying to run older code on newer database");
