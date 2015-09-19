@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings({"UnusedDeclaration", "SuspiciousNameCombination"})
 public final class Account {
 
     public enum Event {
@@ -102,7 +101,6 @@ public final class Account {
 
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     public static final class AccountCurrency {
 
         private final long accountId;

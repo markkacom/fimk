@@ -43,7 +43,7 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
         boolean includeAssets = !"false".equalsIgnoreCase(req.getParameter("includeAssets"));
         boolean includeCurrencies = !"false".equalsIgnoreCase(req.getParameter("includeCurrencies"));
 
-        JSONObject response = JSONData.accountBalance(account);
+        JSONObject response = JSONData.accountBalance(account, false);
         JSONData.putAccount(response, "account", account.getId());
 
         if (account.getPublicKey() != null) {
@@ -79,7 +79,7 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
                         Account lessor = lessors.next();
                         lessorIds.add(Long.toUnsignedString(lessor.getId()));
                         lessorIdsRS.add(Convert.rsAccount(lessor.getId()));
-                        lessorInfo.add(JSONData.lessor(lessor));
+                        lessorInfo.add(JSONData.lessor(lessor, false));
                     }
                     response.put("lessors", lessorIds);
                     response.put("lessorsRS", lessorIdsRS);
