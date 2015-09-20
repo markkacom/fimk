@@ -1,12 +1,8 @@
 package nxt;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 import nxt.crypto.Crypto;
-import nxt.db.DbIterator;
 import nxt.util.Listener;
 import nxt.util.Logger;
 import nxt.util.Time;
@@ -63,23 +59,14 @@ public class ScriptHelper {
   
     @After
     public static void destroy() {
-        TransactionProcessorImpl transactionProcessor = TransactionProcessorImpl.getInstance();
-        DbIterator<UnconfirmedTransaction> allUnconfirmedTransactions = transactionProcessor.getAllUnconfirmedTransactions();
-        for (UnconfirmedTransaction unconfirmedTransaction : allUnconfirmedTransactions) {
-            transactionProcessor.removeUnconfirmedTransaction(unconfirmedTransaction.getTransaction());
-        }
+        Nxt.getTransactionProcessor().clearUnconfirmedTransactions();
         Assert.assertEquals(0, Helper.getCount("unconfirmed_transaction"));
         Nxt.shutdown(); 
     }
-  
-    public static void truncate(String table) {
-        try (Connection con = Db.db.getConnection();
-             Statement statement = con.createStatement()) {
-            statement.executeUpdate("delete from " + table);
-        } catch (SQLException e) {
-            throw new RuntimeException(e.toString(), e);
-        }
-    }    
+    
+    public static void clearUnconfirmedTransactions() {
+        Nxt.getTransactionProcessor().clearUnconfirmedTransactions();
+    }
     
     public static void generateBlock(String secretPhrase) {
         try {

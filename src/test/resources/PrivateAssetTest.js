@@ -30,9 +30,9 @@ tests({
     assert.assertEquals(this.asset.orderFeePercentageHuman, '0');
   },
   "Test set order fee percentage fails": function () {
-    assert.assertEquals('Incorrect "orderFeePercentage"', this.asset.setFeeInternal('111000000001', '0').errorDescription);
+    assert.assertEquals('Incorrect "orderFeePercentage" value 111000000001 is not numeric', this.asset.setFeeInternal('111000000001', '0').errorDescription);
     assert.assertEquals(undefined, this.asset.setFeeInternal('2000000000', '0').errorDescription);    
-    assert.assertEquals('Incorrect "orderFeePercentage"', this.asset.setFeeInternal('2000000001', '0').errorDescription);
+    assert.assertEquals('Incorrect "orderFeePercentage" value 2000000001 not in range [0-2000000000]', this.asset.setFeeInternal('2000000001', '0').errorDescription);
   },
   "Test set trade fee percentage": function () {
     this.asset.setTradeFeePercentage('0.000001');
@@ -51,9 +51,9 @@ tests({
     assert.assertEquals(this.asset.tradeFeePercentageHuman, '0');
   },
   "Test set trade fee percentage fails": function () {
-    assert.assertEquals('Incorrect "tradeFeePercentage"', this.asset.setFeeInternal('0', '111000000001').errorDescription);
+    assert.assertEquals('Incorrect "tradeFeePercentage" value 111000000001 is not numeric', this.asset.setFeeInternal('0', '111000000001').errorDescription);
     assert.assertEquals(undefined, this.asset.setFeeInternal('0', '2000000000').errorDescription);    
-    assert.assertEquals('Incorrect "tradeFeePercentage"', this.asset.setFeeInternal('0', '2000000001').errorDescription);
+    assert.assertEquals('Incorrect "tradeFeePercentage" value 2000000001 not in range [0-2000000000]', this.asset.setFeeInternal('0', '2000000001').errorDescription);
   },
   "Test transfer": function () {
     var recipient = new Account('recipient');
