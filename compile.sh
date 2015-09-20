@@ -20,7 +20,7 @@ if [ ! -d "html/fimk" ]; then
 fi
 
 /bin/rm -f fim.zip
-zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar MIT-license.txt README.txt run.bat run.sh
+zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar LICENSE.txt README.txt run.bat run.sh
 
 echo "fim.zip generated successfully"
 
@@ -28,7 +28,7 @@ echo "fim.zip generated successfully"
 # Package it all up
 # ==============================================================================
 
-VERSION=0.5.0
+VERSION=0.5.2
 BASE=fim
 DATE=`date +%Y-%m-%d`
 

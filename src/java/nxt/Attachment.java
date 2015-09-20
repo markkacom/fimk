@@ -673,9 +673,7 @@ public interface Attachment extends Appendix {
             super(attachmentData);
             JSONArray hashes = (JSONArray) attachmentData.get("transactionFullHashes");
             transactionFullHashes = new ArrayList<>(hashes.size());
-            for (Object hash : hashes) {
-                transactionFullHashes.add(Convert.parseHexString((String) hash));
-            }
+            hashes.forEach(hash -> transactionFullHashes.add(Convert.parseHexString((String) hash)));
             String revealedSecret = Convert.emptyToNull((String) attachmentData.get("revealedSecret"));
             this.revealedSecret = revealedSecret != null ? Convert.parseHexString(revealedSecret) : Convert.EMPTY_BYTE;
         }
@@ -693,9 +691,7 @@ public interface Attachment extends Appendix {
         @Override
         void putMyBytes(ByteBuffer buffer) {
             buffer.put((byte) transactionFullHashes.size());
-            for (byte[] hash : transactionFullHashes) {
-                buffer.put(hash);
-            }
+            transactionFullHashes.forEach(buffer::put);
             buffer.putInt(revealedSecret.length);
             buffer.put(revealedSecret);
         }
@@ -703,9 +699,7 @@ public interface Attachment extends Appendix {
         @Override
         void putMyJSON(JSONObject attachment) {
             JSONArray jsonArray = new JSONArray();
-            for (byte[] hash : transactionFullHashes) {
-                jsonArray.add(Convert.toHexString(hash));
-            }
+            transactionFullHashes.forEach(hash -> jsonArray.add(Convert.toHexString(hash)));
             attachment.put("transactionFullHashes", jsonArray);
             if (revealedSecret.length > 0) {
                 attachment.put("revealedSecret", Convert.toHexString(revealedSecret));
@@ -2683,8 +2677,8 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void loadPrunable(Transaction transaction) {
-            if (data == null && taggedData == null && shouldLoadPrunable(transaction)) {
+        void loadPrunable(Transaction transaction, boolean includeExpiredPrunable) {
+            if (data == null && taggedData == null && shouldLoadPrunable(transaction, includeExpiredPrunable)) {
                 taggedData = TaggedData.getData(getTaggedDataId(transaction));
             }
         }

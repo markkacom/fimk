@@ -13,6 +13,6 @@ jar cf fim.jar -C classes . || exit 1
 echo "fim.jar generated successfully"
 
 /bin/rm -f fim.zip
-zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar keystore MIT-license.txt README.txt run.bat run.sh
+zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar keystore LICENSE.txt README.txt run.bat run.sh
 
 echo "fim.zip generated successfully"

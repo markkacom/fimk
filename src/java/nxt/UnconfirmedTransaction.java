@@ -265,6 +265,11 @@ public class UnconfirmedTransaction implements Transaction {
     }
 
     @Override
+    public List<? extends Appendix> getAppendages(boolean includeExpiredPrunable) {
+        return transaction.getAppendages(includeExpiredPrunable);
+    }
+
+    @Override
     public int getECBlockHeight() {
         return transaction.getECBlockHeight();
     }

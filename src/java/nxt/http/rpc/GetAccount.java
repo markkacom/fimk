@@ -38,11 +38,12 @@ public class GetAccount extends RPCCall {
                 response.put("description", info.getDescription());
             }
 
-            if (account.getCurrentLeasingHeightFrom() != Integer.MAX_VALUE) {
-                response.put("leasingHeightFrom", account.getCurrentLeasingHeightFrom());
-                response.put("leasingHeightTo", account.getCurrentLeasingHeightTo());
+            Account.AccountLease accountLease = account.getAccountLease();
+            if (accountLease.getCurrentLesseeId() != 0) {
+                response.put("leasingHeightFrom", accountLease.getCurrentLeasingHeightFrom());
+                response.put("leasingHeightTo", accountLease.getCurrentLeasingHeightTo());
                 response.put("height", Nxt.getBlockchain().getHeight());
-                response.put("lesseeIdRS", Convert.rsAccount(account.getCurrentLesseeId()));
+                response.put("lesseeIdRS", Convert.rsAccount(accountLease.getCurrentLesseeId()));
             }
 
             if (includeForging) {

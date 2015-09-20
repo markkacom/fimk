@@ -39,8 +39,11 @@ public class GetAccountLessors extends RPCCall {
                   JSONObject lessorJSON = new JSONObject();
                   JSONData.putAccount(lessorJSON, "lessor", lessor.getId());
                   lessorJSON.put("guaranteedBalanceNQT", String.valueOf(lessor.getGuaranteedBalanceNQT(1440, height)));
-                  lessorJSON.put("currentLeasingHeightFrom", lessor.getCurrentLeasingHeightFrom());
-                  lessorJSON.put("currentLeasingHeightTo", lessor.getCurrentLeasingHeightTo());
+                  Account.AccountLease accountLease = account.getAccountLease();
+                  if (accountLease.getCurrentLesseeId() != 0) {
+                      lessorJSON.put("currentLeasingHeightFrom", accountLease.getCurrentLeasingHeightFrom());
+                      lessorJSON.put("currentLeasingHeightTo", accountLease.getCurrentLeasingHeightTo());
+                  }
                   lessorsJSON.add(lessorJSON);
               }
           }

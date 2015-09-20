@@ -35,3 +35,6 @@ deploy.sh
 downloads
 fim_db.backup
 changelogs-fim/announcement*
+/fimservice.jar
+/fim.exe
+/fimservice.exe
