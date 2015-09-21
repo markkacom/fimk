@@ -4,9 +4,9 @@
 		<property file="conf/nxt-default.properties" prefix="runtime"/>
 	</properties>
 	<info>
-        <appname>FIMK</appname>
+        <appname>NXT</appname>
         <appversion>@{runtime.nxt.version}</appversion>
-        <url>http://fimk.fi</url>
+        <url>http://nxt.org</url>
         <run-privileged condition="izpack.windowsinstall"/>
     </info>
 	
@@ -83,9 +83,9 @@
     </locale>
 
     <resources>
-		<res id="InfoPanel.info" src="changelogs-fim/fimk-client-@{runtime.nxt.version}.changelog.txt" parse="yes"/>
+		<res id="InfoPanel.info" src="changelogs/nxt-client-@{runtime.nxt.version}.changelog.txt" parse="yes"/>
 		<res id="LicencePanel.licence" src="LICENSE.txt"/>
-		<res id="Installer.image" src="html/fimk/images/fimk.png"/>
+		<res id="Installer.image" src="html/ui/img/installer_left_pane.png"/>
 		<res id="shortcutSpec.xml" src="../installer/shortcutSpec.xml"/>
         <res id="RegistrySpec.xml" src="../installer/RegistrySpec.xml"/>
     </resources>
@@ -110,11 +110,13 @@
     <packs>
         <pack name="server" required="yes">
             <description>Common Server Files</description>
-            <file src="fim.jar" targetdir="${INSTALL_PATH}" override="true"/>
+            <file src="nxt.jar" targetdir="${INSTALL_PATH}" override="true"/>
 			<file src="README.txt" targetdir="${INSTALL_PATH}" override="true"/>
-			<file src="FIM_Wallet.url" targetdir="${INSTALL_PATH}" override="true"/>
+			<file src="NXT_Wallet.url" targetdir="${INSTALL_PATH}" override="true"/>
 			<file src="3RD-PARTY-LICENSES.txt" targetdir="${INSTALL_PATH}" override="true"/>
+            <file src="AUTHORS.txt" targetdir="${INSTALL_PATH}" override="true"/>
             <file src="COPYING.txt" targetdir="${INSTALL_PATH}" override="true"/>
+            <file src="DEVELOPER-AGREEMENT.txt" targetdir="${INSTALL_PATH}" override="true"/>
             <file src="LICENSE.txt" targetdir="${INSTALL_PATH}" override="true"/>
             <file src="DEVELOPERS-GUIDE.md" targetdir="${INSTALL_PATH}" override="true"/>
             <file src="OPERATORS-GUIDE.md" targetdir="${INSTALL_PATH}" override="true"/>
@@ -124,8 +126,7 @@
 			<file src="conf/logging-default.properties" targetdir="${INSTALL_PATH}/conf" override="true"/>
 			<fileset dir="lib" targetdir="${INSTALL_PATH}/lib" override="true" excludes=".gitignore"/>
 			<fileset dir="changelogs" targetdir="${INSTALL_PATH}/changelogs" override="true" excludes=".gitignore"/>
-			<fileset dir="changelogs-fim" targetdir="${INSTALL_PATH}/changelogs-fim" override="true" excludes=".gitignore"/>
-			<!-- <fileset dir="classes" targetdir="${INSTALL_PATH}/classes" override="true" excludes=".gitignore"/> -->
+			<fileset dir="classes" targetdir="${INSTALL_PATH}/classes" override="true" excludes=".gitignore"/>
 			<fileset dir="html" targetdir="${INSTALL_PATH}/html" override="true" excludes=".gitignore"/>
 			<fileset dir="src" targetdir="${INSTALL_PATH}/src" override="true" excludes=".gitignore nxt-private.iml"/>
             <fileset dir="contrib" targetdir="${INSTALL_PATH}/contrib" override="true" excludes=".gitignore"/>
@@ -134,9 +135,9 @@
         <pack name="server.windows" os="windows" required="yes">
             <description>Windows Specific Resources</description>
 			<os family="windows"/>
-            <file src="fim.exe" targetdir="${INSTALL_PATH}" override="true"/>
-            <file src="fimservice.exe" targetdir="${INSTALL_PATH}" override="true"/>
-            <file src="fimservice.jar" targetdir="${INSTALL_PATH}" override="true"/>
+            <file src="nxt.exe" targetdir="${INSTALL_PATH}" override="true"/>
+            <file src="nxtservice.exe" targetdir="${INSTALL_PATH}" override="true"/>
+            <file src="nxtservice.jar" targetdir="${INSTALL_PATH}" override="true"/>
             <file src="run.bat" targetdir="${INSTALL_PATH}" override="false"/>
             <file src="mint.bat" targetdir="${INSTALL_PATH}" override="false"/>
             <parsable targetfile="${INSTALL_PATH}/run.bat"/>

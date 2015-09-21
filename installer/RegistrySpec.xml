@@ -22,11 +22,11 @@
         <value name="DisplayIcon"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
-               string="$INSTALL_PATH\html\fimk\favicon.ico"/>
+               string="$INSTALL_PATH\html\ui\favicon.ico"/>
         <value name="HelpLink"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
-               string="http://forum.fimk.fi"/>
+               string="https://nxtforum.org/nxt-helpdesk"/>
         <value name="URLInfoAbout"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
@@ -34,7 +34,7 @@
        <value name="Publisher"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"
-               string="FIMKrypto"/>
+               string="nxt.org"/>
        <value name="Version"
                keypath="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$UNINSTALL_NAME"
                root="HKLM"

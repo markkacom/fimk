@@ -1,14 +1,14 @@
 <shortcuts>
 	<skipIfNotSupported/>
 	<defaultCurrentUser/>
-	<programGroup defaultName="FIMK" location="startMenu"/>
+	<programGroup defaultName="NXT" location="startMenu"/>
 	<shortcut
-		name="FIMK Server"
-		target="$INSTALL_PATH\fimk.exe"
+		name="Nxt Server"
+		target="$INSTALL_PATH\nxt.exe"
 		commandLine=""
 		workingDirectory="$INSTALL_PATH"
-        description="Start FIMK server"
-		iconFile="$INSTALL_PATH\html\fimk\favicon.ico"
+        description="Start NXT server"
+		iconFile="$INSTALL_PATH\html\ui\favicon.ico"
         iconIndex="0"
         initialState="normal"
         programGroup="yes"
@@ -18,12 +18,12 @@
 		startup="no">
 	</shortcut>	
 	<shortcut
-		name="Lompsa Wallet"
-		target="http://localhost:7886/index.html"
+		name="Nxt Wallet"
+		target="http://localhost:7876/index.html"
 		commandLine=""
 		workingDirectory="$INSTALL_PATH"
-        description="Launch FIMK wallet in browser"
-		iconFile="$INSTALL_PATH\html\fimk\favicon.ico"
+        description="Launch NXT wallet in browser"
+		iconFile="$INSTALL_PATH\html\ui\favicon.ico"
         iconIndex="0"
         initialState="normal"
         programGroup="yes"
