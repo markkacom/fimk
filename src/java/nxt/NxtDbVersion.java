@@ -179,9 +179,8 @@ class NxtDbVersion extends DbVersion {
                 if (!Constants.isTestnet) {
                     apply("INSERT INTO peer (address) VALUES " +
                         "('5.101.102.194'), ('5.101.102.195'), ('5.101.102.196'), ('5.101.102.197'), " +
-                        "('5.101.102.199'), ('5.101.102.200'), ('5.101.102.201'), ('5.101.102.202'), " +
-                        "('5.101.102.203'), ('5.101.102.204'), ('5.101.102.205'), ('107.170.73.9'), " + 
-                        "('107.170.123.54'), ('107.170.138.55')");
+                        "('5.101.102.199'), ('5.101.102.200'), ('5.101.102.201'), " +
+                        "('107.170.73.9'), ('107.170.123.54')");
                 } else {
                     apply("INSERT INTO peer (address) VALUES " + "('188.166.36.203'), ('188.166.0.145')");
                 }
@@ -204,7 +203,7 @@ class NxtDbVersion extends DbVersion {
             case 77:              
                 apply("CREATE INDEX IF NOT EXISTS transaction_block_timestamp_idx ON transaction (block_timestamp DESC)");
             case 78:  
-                apply("DROP INDEX transaction_timestamp_idx");
+                apply("DROP INDEX IF EXISTS transaction_timestamp_idx");
             case 79:  
                 apply("CREATE TABLE IF NOT EXISTS alias (db_id IDENTITY, id BIGINT NOT NULL, "
                     + "account_id BIGINT NOT NULL, alias_name VARCHAR NOT NULL, "
@@ -515,21 +514,19 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS trade_timestamp_desc_idx ON trade (timestamp DESC)");
             case 198:
                 /* FIMKrypto */
-                apply("CREATE TABLE IF NOT EXISTS mofo_asset_chart (asset_id BIGINT NOT NULL, timestamp INT NOT NULL, "
-                    + "window TINYINT NOT NULL, openNQT BIGINT NOT NULL, highNQT BIGINT NOT NULL, lowNQT BIGINT NOT NULL, "
-                    + "closeNQT BIGINT NOT NULL, averageNQT BIGINT NOT NULL, volumeQNT BIGINT NOT NULL, height INT NOT NULL)");
+                apply(null);
             case 199:
                 /* FIMKrypto */
-                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_asset_id_idx ON mofo_asset_chart (asset_id)");
+                apply(null);
             case 200:
                 /* FIMKrypto */
-                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_window_idx ON mofo_asset_chart (window)");
+                apply(null);
             case 201:
                 /* FIMKrypto */
-                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_timestamp_desc_idx ON mofo_asset_chart (timestamp DESC)");
+                apply(null);
             case 202:
                 /* FIMKrypto */
-                apply("CREATE INDEX IF NOT EXISTS mofo_asset_chart_height_idx ON mofo_asset_chart (height)");
+                apply(null);
             case 203:
                 /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS mofo_post ( "
