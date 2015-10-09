@@ -59,12 +59,12 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
         }
         
         Account.AccountLease accountLease = account.getAccountLease();
-        if (accountLease.getCurrentLesseeId() != 0) {
+        if (accountLease != null && accountLease.getCurrentLesseeId() != 0) {
             JSONData.putAccount(response, "currentLessee", accountLease.getCurrentLesseeId());
             response.put("currentLeasingHeightFrom", accountLease.getCurrentLeasingHeightFrom());
             response.put("currentLeasingHeightTo", accountLease.getCurrentLeasingHeightTo());
         }
-        if (accountLease.getNextLesseeId() != 0) {
+        if (accountLease != null && accountLease.getNextLesseeId() != 0) {
             JSONData.putAccount(response, "nextLessee", accountLease.getNextLesseeId());
             response.put("nextLeasingHeightFrom", accountLease.getNextLeasingHeightFrom());
             response.put("nextLeasingHeightTo", accountLease.getNextLeasingHeightTo());

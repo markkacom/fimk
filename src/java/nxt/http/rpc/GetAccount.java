@@ -39,7 +39,7 @@ public class GetAccount extends RPCCall {
             }
 
             Account.AccountLease accountLease = account.getAccountLease();
-            if (accountLease.getCurrentLesseeId() != 0) {
+            if (accountLease != null && accountLease.getCurrentLesseeId() != 0) {
                 response.put("leasingHeightFrom", accountLease.getCurrentLeasingHeightFrom());
                 response.put("leasingHeightTo", accountLease.getCurrentLeasingHeightTo());
                 response.put("height", Nxt.getBlockchain().getHeight());
