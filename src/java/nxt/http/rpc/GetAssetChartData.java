@@ -1,15 +1,9 @@
 package nxt.http.rpc;
 
-import java.util.List;
-
 import nxt.Asset;
-import nxt.MofoChart;
-import nxt.MofoChartWindow;
-import nxt.Nxt;
+import nxt.MofoQueries;
 import nxt.http.ParameterException;
 import nxt.http.websocket.RPCCall;
-import nxt.virtualexchange.VirtualTrade;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -22,51 +16,35 @@ public class GetAssetChartData extends RPCCall {
     public GetAssetChartData(String identifier) {
         super(identifier);
     }
+    
+    static final byte HOUR = 1;
+    static final byte DAY  = 2;
+    static final byte WEEK = 3;    
   
+    private int windowToSeconds(byte window) {
+        switch (window) {
+        case HOUR: return 3600;
+        case DAY: return 86400;
+        case WEEK: return 604800;
+        }
+        throw new RuntimeException("Invalid window");
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public JSONStreamAware call(JSONObject arguments) throws ParameterException {
       
         Asset asset = ParameterParser.getAsset(arguments);
-        byte window = (byte) ParameterParser.getInt(arguments, "window", MofoChartWindow.HOUR, MofoChartWindow.WEEK, true);
-        int timestamp = ParameterParser.getTimestamp(arguments);        
-        if (timestamp == 0) {
-            timestamp = Nxt.getEpochTime();
-        }       
-        
-        List<MofoChartWindow> data = MofoChart.getChartData(asset.getId(), window, timestamp, COUNT);
-        
+        byte window = (byte) ParameterParser.getInt(arguments, "window", HOUR, WEEK, true);
+
         JSONObject response = new JSONObject();
         JSONObject json = new JSONObject();
         json.put("name", asset.getName());
         json.put("decimals", asset.getDecimals());
         
         response.put("asset", json);
-        JSONArray chart_data = new JSONArray();
-        response.put("data", chart_data);        
-        
-        for (MofoChartWindow d : data) {
-            json = new JSONObject();
-            json.put("timestamp", d.getTimestamp());
-            json.put("open", String.valueOf(d.getOpenNQT()));
-            json.put("close", String.valueOf(d.getCloseNQT()));
-            json.put("high", String.valueOf(d.getHighNQT()));
-            json.put("low", String.valueOf(d.getLowNQT()));
-            json.put("avg", String.valueOf(d.getAverageNQT()));
-            json.put("vol", String.valueOf(d.getVolumeQNT()));
-            chart_data.add(json);
-        }
-        
-        /* Always add the trades from the past hour */
-        List<VirtualTrade> recentTrades = VirtualTrade.getTrades(asset.getId(), 0, 30);
-        for (int i=recentTrades.size()-1; i>=0; i--) {
-            VirtualTrade d = recentTrades.get(i);
-            json = new JSONObject();
-            json.put("timestamp", d.getTimestamp());
-            json.put("open", String.valueOf(d.getPriceNQT()));
-            json.put("vol", String.valueOf(d.getQuantityQNT()));
-            chart_data.add(json);
-        }
+        JSONArray chart_data = MofoQueries.getAssetChartData(asset.getId(), windowToSeconds(window));
+        response.put("data", chart_data);
         
         return response;      
     }  
