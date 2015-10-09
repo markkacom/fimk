@@ -1053,4 +1053,49 @@ public final class MofoQueries {
             throw new RuntimeException(e.toString(), e);
         }
     }
+    
+    public static JSONArray getAssetChartData(long assetId, int window_seconds) {
+      StringBuilder b = new StringBuilder();
+      b.append("SELECT MIN(timestamp) t, "
+             + "ROUND(timestamp/?) r, "
+             + "AVG(price) avg, "
+             + "MIN(price) low, "
+             + "MAX(price) high, "
+             + "SUM(quantity) vol, "
+             + "GROUP_CONCAT(price ORDER BY timestamp, ',') as price_concat "
+             + "FROM trade "
+             + "WHERE asset_id = ? GROUP BY r ORDER BY r;");
+        
+        try (Connection con = Db.db.getConnection();              
+            PreparedStatement pstmt = con.prepareStatement(b.toString());)
+        {
+            int i = 0;
+            pstmt.setDouble(++i, window_seconds);
+            pstmt.setLong(++i, assetId);
+            JSONArray list = new JSONArray();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+
+                    JSONArray json = new JSONArray();
+                    list.add(json);
+                    json.add(String.valueOf(rs.getInt("t")));
+                    json.add(String.valueOf(rs.getLong("avg")));
+                    json.add(String.valueOf(rs.getLong("low")));
+                    json.add(String.valueOf(rs.getLong("high")));
+                    json.add(String.valueOf(rs.getLong("vol")));
+                    
+                    String price_concat = rs.getString("price_concat");
+                    String[] prices = price_concat.split(",");
+                    if (prices.length > 0) {
+                        json.add(prices[0]);
+                        json.add(prices[prices.length-1]);
+                    }                  
+                }               
+            }            
+            return list;        
+        } 
+        catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
 }
