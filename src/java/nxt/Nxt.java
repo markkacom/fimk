@@ -365,7 +365,6 @@ public final class Nxt {
                 WebsocketServer.init();
                 Users.init();
                 DebugTrace.init();
-                MofoChart.init();
                 MofoMessaging.init();
                 MofoAsset.init();
                 ExchangeObserver.init();
