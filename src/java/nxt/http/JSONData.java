@@ -115,7 +115,7 @@ final class JSONData {
     static JSONObject lessor(Account account, boolean includeEffectiveBalance) {
         JSONObject json = new JSONObject();
         Account.AccountLease accountLease = account.getAccountLease();
-        if (accountLease.getCurrentLesseeId() != 0) {
+        if (accountLease != null && accountLease.getCurrentLesseeId() != 0) {
             putAccount(json, "currentLessee", accountLease.getCurrentLesseeId());
             json.put("currentHeightFrom", String.valueOf(accountLease.getCurrentLeasingHeightFrom()));
             json.put("currentHeightTo", String.valueOf(accountLease.getCurrentLeasingHeightTo()));
@@ -123,7 +123,7 @@ final class JSONData {
                 json.put("effectiveBalanceNXT", String.valueOf(account.getGuaranteedBalanceNQT() / Constants.ONE_NXT));
             }
         }
-        if (accountLease.getNextLesseeId() != 0) {
+        if (accountLease != null && accountLease.getNextLesseeId() != 0) {
             putAccount(json, "nextLessee", accountLease.getNextLesseeId());
             json.put("nextHeightFrom", String.valueOf(accountLease.getNextLeasingHeightFrom()));
             json.put("nextHeightTo", String.valueOf(accountLease.getNextLeasingHeightTo()));
