@@ -80,7 +80,7 @@ final class PeerImpl implements Peer {
     private volatile int lastInboundRequest;
     private volatile long hallmarkBalance = -1;
     private volatile int hallmarkBalanceHeight;
-    private volatile boolean gossipEnabled;
+    private volatile boolean gossipEnabled = false;
 
     PeerImpl(String host, String announcedAddress) {
         this.host = host;
@@ -596,6 +596,7 @@ final class PeerImpl implements Peer {
                 setPlatform((String) response.get("platform"));
                 shareAddress = Boolean.TRUE.equals(response.get("shareAddress"));
                 analyzeHallmark((String) response.get("hallmark"));
+                setGossipEnabled(Boolean.TRUE.equals(response.get("gossip")));
 
                 if (!Peers.ignorePeerAnnouncedAddress) {
                     String newAnnouncedAddress = Convert.emptyToNull((String) response.get("announcedAddress"));
