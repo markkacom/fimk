@@ -20,9 +20,9 @@ import nxt.Account;
 import nxt.Block;
 import nxt.Constants;
 import nxt.Db;
-import nxt.Gossip;
 import nxt.Nxt;
 import nxt.Transaction;
+import nxt.gossip.Gossip;
 import nxt.util.Convert;
 import nxt.util.Filter;
 import nxt.util.JSON;
@@ -896,7 +896,7 @@ public final class Peers {
         sendToSomePeers(request, Long.MAX_VALUE);
     }
     
-    private static void sendToSomePeers(final JSONObject request, long priority) {
+    private static void sendToSomePeers(JSONObject request, long priority) {
         sendToPeersRequestQueue.add(request, priority);
         sendingService.submit(() -> {
             final JSONObject req = sendToPeersRequestQueue.getNext();
@@ -905,7 +905,8 @@ public final class Peers {
             }
             final JSONStreamAware jsonRequest = JSON.prepareRequest(req);
   
-            boolean isGossip = "processGossip".equals(request.get("requestType"));
+            boolean isGossip = "processGossip".equals(req.get("requestType"));
+            int gossipEnabledCount = 0;
 
             int successful = 0;
             List<Future<JSONObject>> expectedResponses = new ArrayList<>();
@@ -920,6 +921,9 @@ public final class Peers {
                 if (!peer.isBlacklisted() && peer.getState() == Peer.State.CONNECTED && peer.getAnnouncedAddress() != null) {
                     Future<JSONObject> futureResponse = peersService.submit(() -> peer.send(jsonRequest));
                     expectedResponses.add(futureResponse);
+                    if (isGossip) {
+                        gossipEnabledCount++;
+                    }
                 }
                 if (expectedResponses.size() >= Peers.sendToPeersLimit - successful) {
                     for (Future<JSONObject> future : expectedResponses) {
@@ -940,6 +944,18 @@ public final class Peers {
                 if (successful >= Peers.sendToPeersLimit) {
                     return;
                 }
+            }
+            
+            if (isGossip && gossipEnabledCount == 0) {
+                StringBuilder b = new StringBuilder();
+                b.append("Could not send gossip message. No gossip enabled peers found.\n");
+                b.append("Connected non-blacklisted peers:\n");
+                for (final Peer peer : peers.values()) {
+                    if (!peer.isBlacklisted() && peer.getState() == Peer.State.CONNECTED) {
+                        b.append("  "+peer.getHost()+"\n");
+                    }
+                }
+                Logger.logDebugMessage(b.toString());
             }
         });
     }
