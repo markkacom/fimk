@@ -15,11 +15,11 @@ import java.util.concurrent.Executors;
 
 import nxt.Block;
 import nxt.Constants;
-import nxt.Gossip;
 import nxt.NxtException;
 import nxt.Trade;
 import nxt.Transaction;
 import nxt.crypto.Crypto;
+import nxt.gossip.Gossip;
 import nxt.http.ParameterException;
 import nxt.http.rpc.CallAPIFunction;
 import nxt.http.rpc.GetAccount;
