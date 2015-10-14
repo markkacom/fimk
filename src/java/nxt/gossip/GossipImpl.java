@@ -1,13 +1,13 @@
-package nxt;
+package nxt.gossip;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
+import nxt.Account;
+import nxt.Constants;
+import nxt.Nxt;
+import nxt.NxtException;
 import nxt.NxtException.NotValidException;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
+
 import org.json.simple.JSONObject;
 
 public class GossipImpl implements Gossip {
@@ -20,18 +20,8 @@ public class GossipImpl implements Gossip {
     private long topic;
     private int timestamp;
     private byte[] signature = null;
-
-    @SuppressWarnings("serial")
-    private static final Set<Long> existingIds = Collections.newSetFromMap(new LinkedHashMap<Long, Boolean>(){
-        
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Long, Boolean> eldest) {
-            return size() > Constants.MAX_GOSSIP_CACHE_LENGTH;
-        }
-    });    
-
     
-    public GossipImpl(long id, long sender, long recipient, byte[] message, long topic, 
+    public GossipImpl(long id, long sender, long recipient, byte[] message, long topic,
           int timestamp, byte[] senderPublicKey, byte[] signature) throws NotValidException {
         this.id = id;
         this.sender = sender;
@@ -42,19 +32,19 @@ public class GossipImpl implements Gossip {
         this.senderPublicKey = senderPublicKey;
         this.signature = signature;
     }
-    
+
     @Override
     public void remember() {
-        existingIds.add(id);
+        Nxt.getGossipProcessor().getExistingIds().add(id);
     }
 
     static GossipImpl parseGossip(JSONObject gossipData) throws NxtException.NotValidException {
         long id = Long.parseUnsignedLong((String) gossipData.get("id"));
         byte[] senderPublicKey = Convert.parseHexString((String) gossipData.get("senderPublicKey"));
-        long sender = Account.getId(senderPublicKey);      
+        long sender = Account.getId(senderPublicKey);
         long recipient = Long.parseUnsignedLong((String) gossipData.get("recipient"));
-     
-        byte[] message = Convert.parseHexString((String) gossipData.get("message"));        
+
+        byte[] message = Convert.parseHexString((String) gossipData.get("message"));
         long topic;
         String topicValue = Convert.emptyToNull((String) gossipData.get("topic"));
         if (topicValue == null) {
@@ -86,28 +76,22 @@ public class GossipImpl implements Gossip {
         if (senderPublicKey == null) {
             throw new NxtException.NotValidException("Gossip senderPublicKey cannot be empty");
         }
-        
         if (signature == null) {
             throw new NxtException.NotValidException("Gossip signature cannot be empty");
         }
-        
         if (message == null) {
             throw new NxtException.NotValidException("Gossip message cannot be empty");
         }
-
         if (id != getId(signature)) {
             throw new NxtException.NotValidException("Invalid gossip id");
-        }        
-
+        }
         if (message.length > Constants.MAX_GOSSIP_MESSAGE_LENGTH) {
             throw new NxtException.NotValidException("Invalid gossip message length: " + message.length);
         }
-
         if (new_gossip) {
-            if (existingIds.contains(id)) {
+            if (Nxt.getGossipProcessor().getExistingIds().contains(id)) {
                 throw new NxtException.NotValidException("Gossip id exists");
             }
-    
             int curTime = Nxt.getEpochTime();
             if (timestamp > curTime + Constants.MAX_GOSSIP_TIMEDRIFFT) {
                 throw new NxtException.NotValidException("Invalid gossip timestamp");
@@ -119,7 +103,7 @@ public class GossipImpl implements Gossip {
 
         if (!Crypto.verify(signature, signatureSeed, senderPublicKey, false)) {
             throw new NxtException.NotValidException("Invalid gossip signature");
-        }      
+        }
     }
 
     public static byte[] createSignatureSeed(int timestamp, String recipient, String message, String topic) {
@@ -134,13 +118,13 @@ public class GossipImpl implements Gossip {
     static long getId(byte[] signature) {
         byte[] signatureHash = Crypto.sha256().digest(signature);
         return Convert.fullHashToId(signatureHash);
-    }    
+    }
 
     @Override
     public byte[] getSignature() {
         return signature;
     }
-    
+
     @Override
     public byte[] getSenderPublicKey() {
         return senderPublicKey;
@@ -155,12 +139,12 @@ public class GossipImpl implements Gossip {
     public byte[] getMessage() {
         return message;
     }
-    
+
     @Override
     public long getRecipientId() {
         return recipient;
     }
-    
+
     @Override
     public long getSenderId() {
         return sender;

@@ -3,9 +3,9 @@ package nxt.http;
 import javax.servlet.http.HttpServletRequest;
 
 import nxt.Account;
-import nxt.GossipImpl;
-import nxt.GossipProcessorImpl;
 import nxt.NxtException.NotValidException;
+import nxt.gossip.GossipImpl;
+import nxt.gossip.GossipProcessorImpl;
 import nxt.util.Convert;
 
 import org.json.simple.JSONObject;

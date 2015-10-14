@@ -19,6 +19,8 @@ package nxt;
 import nxt.env.DirProvider;
 import nxt.env.RuntimeEnvironment;
 import nxt.env.RuntimeMode;
+import nxt.gossip.GossipProcessor;
+import nxt.gossip.GossipProcessorImpl;
 import nxt.http.API;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
@@ -28,6 +30,7 @@ import nxt.util.Logger;
 import nxt.util.ThreadPool;
 import nxt.util.Time;
 import nxt.virtualexchange.ExchangeObserver;
+
 import org.json.simple.JSONObject;
 
 import java.io.FileInputStream;
