@@ -16,12 +16,10 @@ final class ProcessGossip extends PeerServlet.PeerRequestHandler {
     @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(JSONObject request, Peer peer) {
-
         try {
             Nxt.getGossipProcessor().processPeerGossip(request);
             return JSON.emptyJSON;
         } catch (RuntimeException | NxtException.ValidationException e) {
-            //Logger.logDebugMessage("Failed to parse peer transactions: " + request.toJSONString());
             peer.blacklist(e);
             JSONObject response = new JSONObject();
             response.put("error", e.toString());
