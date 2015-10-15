@@ -160,7 +160,7 @@ public final class Constants {
     public static final int PUBLIC_KEY_ANNOUNCEMENT_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : THIRD_BIRTH_BLOCK;
     public static final int MONETARY_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int PHASING_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
-    public static final int LAST_KNOWN_BLOCK = isTestnet ? 1 : 384000;
+    public static final int LAST_KNOWN_BLOCK = isTestnet ? 0 : 384000;
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
