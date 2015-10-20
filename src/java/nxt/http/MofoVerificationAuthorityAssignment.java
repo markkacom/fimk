@@ -28,18 +28,20 @@ public final class MofoVerificationAuthorityAssignment extends CreateTransaction
             return JSONResponses.FEATURE_NOT_AVAILABLE;
         }
 
-        Account account = ParameterParser.getSenderAccount(req);
+        Account senderAccount = ParameterParser.getSenderAccount(req);
         int period = ParameterParser.getInt(req, "period", Constants.MIN_VERIFICATION_AUTHORITY_PERIOD, Constants.MAX_VERIFICATION_AUTHORITY_PERIOD, true);
         
-        if (account.getId() != Constants.MASTER_VERIFICATION_AUTHORITY_ACCOUNT) {
+        if (senderAccount.getId() != Constants.MASTER_VERIFICATION_AUTHORITY_ACCOUNT) {
             JSONObject response = new JSONObject();
             response.put("errorCode", 4);
             response.put("errorDescription", "Account not allowed to set verified authority");
             return JSON.prepare(response);            
         }
 
+        long recipientId = ParameterParser.getAccountId(req, "recipient", true);
+        
         Attachment attachment = new MofoAttachment.VerificationAuthorityAssignmentAttachment(period);
-        return createTransaction(req, account, attachment);
+        return createTransaction(req, senderAccount, recipientId, 0, attachment);
     }
 
 }
