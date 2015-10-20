@@ -252,14 +252,14 @@ public class MofoAttachment {
 
         @Override
         int getMySize() {
-            return 1 + 8 + Convert.toBytes(identifier).length + 1 + (signature != null ? signature.length : 0);
+            return 1 + 8 + Convert.toBytes(identifier).length + 2 + (signature != null ? signature.length : 0);
         }
 
         @Override
         void putMyBytes(ByteBuffer buffer) {
-            byte[] _id = Convert.toBytes(this.identifier);
-            buffer.put((byte)_id.length);
-            buffer.put(_id);
+            byte[] identifier = Convert.toBytes(this.identifier);
+            buffer.put((byte)identifier.length);
+            buffer.put(identifier);
             buffer.putLong(signatory);
             buffer.put(signature != null ? (byte)signature.length : (byte)0);
             if (signature != null) {
