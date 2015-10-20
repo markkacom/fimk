@@ -17,7 +17,7 @@ public class MofoIdentifier {
     public MofoIdentifier(String id) {
         normalizedId = id.toLowerCase();
         
-        if (normalizedId.length() > Constants.MAX_ACCOUNT_ID_LENGTH) {
+        if (normalizedId.length() > Constants.MAX_ACCOUNT_IDENTIFIER_LENGTH) {
             throw new InvalidAccountIdentifier();
         }
         

@@ -169,7 +169,7 @@ public final class Constants {
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0;  /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
     
-    public static final int MAX_ACCOUNT_ID_LENGTH = 100;
+    public static final int MAX_ACCOUNT_IDENTIFIER_LENGTH = 100;
     
     public static final long MASTER_VERIFICATION_AUTHORITY_ACCOUNT = Genesis.GENESIS_RECIPIENTS[0];
     public static final int MAX_VERIFICATION_AUTHORITY_PERIOD = 100000;

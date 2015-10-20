@@ -216,13 +216,13 @@ public class MofoAttachment {
 
     public final static class AccountIdAssignmentAttachment extends AbstractAttachment {
 
-        private final String id;
+        private final String identifier;
         private final long signatory;
         private final byte[] signature;
 
         AccountIdAssignmentAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
-            this.id = Convert.readString(buffer, buffer.get(), Constants.MAX_ACCOUNT_ID_LENGTH).trim().intern();
+            this.identifier = Convert.readString(buffer, buffer.get(), Constants.MAX_ACCOUNT_IDENTIFIER_LENGTH).trim().intern();
             this.signatory = buffer.getLong();            
             int signatureLength = buffer.get();
             if (signatureLength != 64) {
@@ -239,25 +239,25 @@ public class MofoAttachment {
 
         AccountIdAssignmentAttachment(JSONObject attachmentData) {
             super(attachmentData);
-            this.id = (Convert.nullToEmpty((String) attachmentData.get("id"))).trim().intern();
+            this.identifier = (Convert.nullToEmpty((String) attachmentData.get("identifier"))).trim().intern();
             this.signatory = Convert.parseUnsignedLong((String) attachmentData.get("signatory"));
             this.signature = Convert.parseHexString((String) attachmentData.get("signature"));
         }
         
-        public AccountIdAssignmentAttachment(String id, long signatory, byte[] signature) {
-            this.id = id.trim();
+        public AccountIdAssignmentAttachment(String identifier, long signatory, byte[] signature) {
+            this.identifier = identifier.trim();
             this.signatory = signatory;
             this.signature = signature;
         }
 
         @Override
         int getMySize() {
-            return 1 + 8 + Convert.toBytes(id).length + 1 + (signature != null ? signature.length : 0);
+            return 1 + 8 + Convert.toBytes(identifier).length + 1 + (signature != null ? signature.length : 0);
         }
 
         @Override
         void putMyBytes(ByteBuffer buffer) {
-            byte[] _id = Convert.toBytes(this.id);
+            byte[] _id = Convert.toBytes(this.identifier);
             buffer.put((byte)_id.length);
             buffer.put(_id);
             buffer.putLong(signatory);
@@ -270,7 +270,7 @@ public class MofoAttachment {
         @SuppressWarnings("unchecked")
         @Override
         void putMyJSON(JSONObject attachment) {
-            attachment.put("id", id);
+            attachment.put("identifier", identifier);
             attachment.put("signatory", Long.toUnsignedString(signatory));
             if (signature != null) {
               attachment.put("signature", Convert.toHexString(signature));
@@ -283,7 +283,7 @@ public class MofoAttachment {
         }
 
         public String getId() {
-            return id;
+            return identifier;
         }
 
         public long getSignatory() {
