@@ -728,7 +728,7 @@ public final class Account {
         if (account == null) {
             account = new Account(id);
             accountTable.insert(account);
-            accountIdentifierTable.insert(new AccountIdentifier(id, Convert.rsAccount(id)));
+            accountIdentifierTable.insert(new AccountIdentifier(id, Crypto.rsEncode(id)));
         }
         return account;
     }
