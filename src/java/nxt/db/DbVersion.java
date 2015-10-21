@@ -45,6 +45,12 @@ public abstract class DbVersion {
                 if (! rs.isLast()) {
                     throw new RuntimeException("Invalid version table");
                 }
+                int overrideDbVersion = Nxt.getIntProperty("nxt.debugOverrideDbVersion");
+                if (overrideDbVersion != 0) {
+                    Logger.logMessage("Overriding db version "+nextUpdate+" with "+overrideDbVersion);
+                    nextUpdate = overrideDbVersion;
+                    stmt.executeUpdate("UPDATE version SET next_update = " + nextUpdate);
+                }
                 rs.close();
                 Logger.logMessage("Database update may take a while if needed, current db version " + (nextUpdate - 1) + "...");
             } catch (SQLException e) {
@@ -52,11 +58,6 @@ public abstract class DbVersion {
                 stmt.executeUpdate("CREATE TABLE version (next_update INT NOT NULL)");
                 stmt.executeUpdate("INSERT INTO version VALUES (1)");
                 con.commit();
-            }
-            int overrideDbVersion = Nxt.getIntProperty("nxt.debugOverrideDbVersion");
-            if (overrideDbVersion != 0) {
-                Logger.logMessage("Overriding db version "+nextUpdate+" with "+overrideDbVersion);
-                nextUpdate = overrideDbVersion;
             }
             update(nextUpdate);
         } catch (SQLException e) {
