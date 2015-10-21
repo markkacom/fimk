@@ -868,6 +868,7 @@ public final class Account {
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql.toString());
             pstmt.setString(1, "%" + email.toLowerCase() + "%");
+            DbUtils.setLimits(2, pstmt, from, to);
             
             return accountIdentifierTable.getManyBy(con, pstmt, false);
             
