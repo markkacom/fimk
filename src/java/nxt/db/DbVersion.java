@@ -16,6 +16,7 @@
 
 package nxt.db;
 
+import nxt.Nxt;
 import nxt.util.Logger;
 
 import java.sql.Connection;
@@ -51,6 +52,11 @@ public abstract class DbVersion {
                 stmt.executeUpdate("CREATE TABLE version (next_update INT NOT NULL)");
                 stmt.executeUpdate("INSERT INTO version VALUES (1)");
                 con.commit();
+            }
+            int overrideDbVersion = Nxt.getIntProperty("nxt.debugOverrideDbVersion");
+            if (overrideDbVersion != 0) {
+                Logger.logMessage("Overriding db version "+nextUpdate+" with "+overrideDbVersion);
+                nextUpdate = overrideDbVersion;
             }
             update(nextUpdate);
         } catch (SQLException e) {
