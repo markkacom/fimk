@@ -595,7 +595,7 @@ public final class Account {
         
         @Override
         protected String defaultSort() {
-            return " ORDER BY height DESC, transaction_id ";
+            return " ORDER BY height DESC, email_lower ";
         }
         
         public void rollback(int height) {
