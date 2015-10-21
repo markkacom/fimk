@@ -674,7 +674,7 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_id_account_id_height_idx ON private_asset_account (asset_id, account_id, height DESC)");
             case 261:
                 /* FIMKrypto */
-                apply("CREATE TABLE IF NOT EXISTS account_identifier (db_id IDENTITY, transaction_id BIGINT NOT NULL, "
+                apply("CREATE TABLE IF NOT EXISTS account_identifier (db_id IDENTITY, "
                     + "account_id BIGINT NOT NULL, email VARCHAR NOT NULL, "
                     + "email_lower VARCHAR AS LOWER (email) NOT NULL, height INT NOT NULL)");       
             case 262:
@@ -688,7 +688,7 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS account_identifier_height_idx ON account_identifier (height DESC)");
             case 265:
                 /* FIMKrypto */
-                apply("CREATE UNIQUE INDEX IF NOT EXISTS account_identifier_transaction_id_idx ON account_identifier (transaction_id)");
+                apply(null);
             case 266:
                 /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS verification_authority (db_id IDENTITY, "
@@ -1034,9 +1034,15 @@ class NxtDbVersion extends DbVersion {
             case 421:
                 apply("CREATE INDEX IF NOT EXISTS exchange_height_db_id_idx ON exchange (height DESC, db_id DESC)");
             case 422:
+                /* FIMKrypto */
+                apply("ALTER TABLE account_identifier DROP COLUMN IF EXISTS transaction_id");
+            case 423:
+                /* FIMKrypto */
+                apply("DROP INDEX IF EXISTS account_identifier_transaction_id_idx");
+            case 424:
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply(null);
-            case 423:
+            case 425:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");

@@ -334,38 +334,33 @@ public final class Account {
     public static class AccountIdentifier {
 
         private final long accountId;
-        private final long transactionId;
         private final DbKey dbKey;
         private final String email;
         
         private AccountIdentifier(Transaction transaction, MofoAttachment.SetAccountIdentifierAttachment attachment) {
             this.accountId = transaction.getRecipientId();
-            this.transactionId = transaction.getId();
-            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
             this.email = attachment.getIdentifier();
+            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.email);
         }
 
-        private AccountIdentifier(long accountId, long transactionId, String email) {
+        private AccountIdentifier(long accountId, String email) {
             this.accountId = accountId;
-            this.transactionId = transactionId;
-            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
             this.email = email;
+            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.email);
         }
 
         private AccountIdentifier(ResultSet rs) throws SQLException {
             this.accountId = rs.getLong("account_id");
-            this.transactionId = rs.getLong("transaction_id");
-            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
             this.email = rs.getString("email");
+            this.dbKey = accountIdentifierDbKeyFactory.newKey(this.email);
         }
 
         private void save(Connection con) throws SQLException {
             try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO account_identifier "
-                    + "(account_id, transaction_id, email, height) "
-                    + "VALUES (?, ?, ?, ?)")) {
+                    + "(account_id, email, height) "
+                    + "VALUES (?, ?, ?)")) {
                 int i = 0;
                 pstmt.setLong(++i, this.accountId);
-                pstmt.setLong(++i, this.transactionId);
                 pstmt.setString(++i, this.email);
                 pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
                 pstmt.executeUpdate();
@@ -376,18 +371,13 @@ public final class Account {
             return accountId;
         }
 
-        public long getTransactionId() {
-            return transactionId;
-        }
-
         public String getEmail() {
             return email;
         }
 
         @Override
         public String toString() {
-            return "AccountIdentifier account_id: " + Long.toUnsignedString(accountId) + " transaction_id: " + 
-                  Long.toUnsignedString(transactionId) + " email: " + email;
+            return "AccountIdentifier account_id: " + Long.toUnsignedString(accountId) + " email: " + email;
         }
     }
     
@@ -583,7 +573,7 @@ public final class Account {
 
     };
     
-    private static final DbKey.LongKeyFactory<AccountIdentifier> accountIdentifierDbKeyFactory = new DbKey.LongKeyFactory<AccountIdentifier>("transaction_id") {
+    private static final DbKey.StringKeyFactory<AccountIdentifier> accountIdentifierDbKeyFactory = new DbKey.StringKeyFactory<AccountIdentifier>("email") {
 
         @Override
         public DbKey newKey(AccountIdentifier accountIdentifier) {
@@ -738,6 +728,7 @@ public final class Account {
         if (account == null) {
             account = new Account(id);
             accountTable.insert(account);
+            accountIdentifierTable.insert(new AccountIdentifier(id, Convert.rsAccount(id)));
         }
         return account;
     }
