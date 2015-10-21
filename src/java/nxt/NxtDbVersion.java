@@ -1035,14 +1035,17 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS exchange_height_db_id_idx ON exchange (height DESC, db_id DESC)");
             case 422:
                 /* FIMKrypto */
-                apply("ALTER TABLE account_identifier DROP COLUMN IF EXISTS transaction_id");
+                apply(null);
             case 423:
                 /* FIMKrypto */
-                apply("DROP INDEX IF EXISTS account_identifier_transaction_id_idx");
+                apply("ALTER TABLE account_identifier DROP COLUMN IF EXISTS transaction_id");
             case 424:
+                /* FIMKrypto */
+                apply("DROP INDEX IF EXISTS account_identifier_transaction_id_idx");
+            case 425:
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply(null);
-            case 425:
+            case 426:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
