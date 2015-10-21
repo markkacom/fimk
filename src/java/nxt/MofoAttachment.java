@@ -214,13 +214,13 @@ public class MofoAttachment {
         }
     }
 
-    public final static class AccountIdAssignmentAttachment extends AbstractAttachment {
+    public final static class SetAccountIdentifierAttachment extends AbstractAttachment {
 
         private final String identifier;
         private final long signatory;
         private final byte[] signature;
 
-        AccountIdAssignmentAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        SetAccountIdentifierAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
             this.identifier = Convert.readString(buffer, buffer.get(), Constants.MAX_ACCOUNT_IDENTIFIER_LENGTH).trim().intern();
             this.signatory = buffer.getLong();            
@@ -237,14 +237,14 @@ public class MofoAttachment {
             }
         }
 
-        AccountIdAssignmentAttachment(JSONObject attachmentData) {
+        SetAccountIdentifierAttachment(JSONObject attachmentData) {
             super(attachmentData);
             this.identifier = (Convert.nullToEmpty((String) attachmentData.get("identifier"))).trim().intern();
             this.signatory = Convert.parseUnsignedLong((String) attachmentData.get("signatory"));
             this.signature = Convert.parseHexString((String) attachmentData.get("signature"));
         }
         
-        public AccountIdAssignmentAttachment(String identifier, long signatory, byte[] signature) {
+        public SetAccountIdentifierAttachment(String identifier, long signatory, byte[] signature) {
             this.identifier = identifier.trim();
             this.signatory = signatory;
             this.signature = signature;

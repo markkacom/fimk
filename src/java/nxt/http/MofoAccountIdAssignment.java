@@ -126,7 +126,7 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             }
         }
 
-        Attachment attachment = new MofoAttachment.AccountIdAssignmentAttachment(identifier, signatory, signature);
+        Attachment attachment = new MofoAttachment.SetAccountIdentifierAttachment(identifier, signatory, signature);
         return createTransaction(req, account, recipient, 0, attachment);
     }
 

@@ -446,24 +446,24 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.AccountIdAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
-                return new MofoAttachment.AccountIdAssignmentAttachment(buffer, transactionVersion);
+            MofoAttachment.SetAccountIdentifierAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+                return new MofoAttachment.SetAccountIdentifierAttachment(buffer, transactionVersion);
             }
   
             @Override
-            MofoAttachment.AccountIdAssignmentAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
-                return new MofoAttachment.AccountIdAssignmentAttachment(attachmentData);
+            MofoAttachment.SetAccountIdentifierAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+                return new MofoAttachment.SetAccountIdentifierAttachment(attachmentData);
             }
   
             @Override
             void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
-                MofoAttachment.AccountIdAssignmentAttachment attachment = (MofoAttachment.AccountIdAssignmentAttachment) transaction.getAttachment();
+                MofoAttachment.SetAccountIdentifierAttachment attachment = (MofoAttachment.SetAccountIdentifierAttachment) transaction.getAttachment();
                 Account.addAccountIdentifier(transaction, attachment);
             }
   
             @Override
             boolean isDuplicate(Transaction transaction, Map<TransactionType, Map<String,Boolean>> duplicates) {
-                MofoAttachment.AccountIdAssignmentAttachment attachment = (MofoAttachment.AccountIdAssignmentAttachment) transaction.getAttachment();
+                MofoAttachment.SetAccountIdentifierAttachment attachment = (MofoAttachment.SetAccountIdentifierAttachment) transaction.getAttachment();
                 StringBuilder key = new StringBuilder();
                 key.append(transaction.getSenderId());
                 key.append(transaction.getRecipientId());
@@ -474,7 +474,7 @@ public class MofoTransactions {
   
             @Override
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                MofoAttachment.AccountIdAssignmentAttachment attachment = (MofoAttachment.AccountIdAssignmentAttachment) transaction.getAttachment();
+                MofoAttachment.SetAccountIdentifierAttachment attachment = (MofoAttachment.SetAccountIdentifierAttachment) transaction.getAttachment();
 
                 if (!Account.getAccountIDsEnabled()) {
                     throw new NxtException.NotValidException("Not yet enabled");

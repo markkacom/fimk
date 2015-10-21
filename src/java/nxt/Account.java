@@ -338,7 +338,7 @@ public final class Account {
         private final DbKey dbKey;
         private final String email;
         
-        private AccountIdentifier(Transaction transaction, MofoAttachment.AccountIdAssignmentAttachment attachment) {
+        private AccountIdentifier(Transaction transaction, MofoAttachment.SetAccountIdentifierAttachment attachment) {
             this.accountId = transaction.getRecipientId();
             this.transactionId = transaction.getId();
             this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
@@ -936,7 +936,7 @@ public final class Account {
         }
     }
     
-    public static void addAccountIdentifier(Transaction transaction, MofoAttachment.AccountIdAssignmentAttachment attachment) {
+    public static void addAccountIdentifier(Transaction transaction, MofoAttachment.SetAccountIdentifierAttachment attachment) {
         accountIdentifierTable.insert(new AccountIdentifier(transaction, attachment));
     }
     
