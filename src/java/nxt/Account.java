@@ -342,7 +342,7 @@ public final class Account {
             this.accountId = transaction.getRecipientId();
             this.transactionId = transaction.getId();
             this.dbKey = accountIdentifierDbKeyFactory.newKey(this.transactionId);
-            this.email = attachment.getId();
+            this.email = attachment.getIdentifier();
         }
 
         private AccountIdentifier(long accountId, long transactionId, String email) {

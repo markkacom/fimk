@@ -467,7 +467,7 @@ public class MofoTransactions {
                 StringBuilder key = new StringBuilder();
                 key.append(transaction.getSenderId());
                 key.append(transaction.getRecipientId());
-                key.append(attachment.getId());
+                key.append(attachment.getIdentifier());
                 key.append(attachment.getSignatory());
                 return isDuplicate(ACCOUNT_ID_ASSIGNMENT, key.toString(), duplicates, true);
             }
@@ -482,7 +482,7 @@ public class MofoTransactions {
 
                 MofoIdentifier wrapper;
                 try {
-                    wrapper = new MofoIdentifier(attachment.getId());
+                    wrapper = new MofoIdentifier(attachment.getIdentifier());
                 } catch (Exception ex) {
                     throw new NxtException.NotValidException("Invalid identifier");        
                 }
@@ -520,7 +520,7 @@ public class MofoTransactions {
             
                     boolean signatorIsVerificationAuthority;
                     byte[] signature = attachment.getSignature();
-                    byte[] message = Convert.toBytes(attachment.getId());
+                    byte[] message = Convert.toBytes(attachment.getIdentifier());
                     long signatory = attachment.getSignatory();
                     
                     if (signatory == 0) {

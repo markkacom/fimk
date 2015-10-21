@@ -282,7 +282,7 @@ public class MofoAttachment {
             return MofoTransactions.AccountIdAssignmentTransaction.ACCOUNT_ID_ASSIGNMENT;
         }
 
-        public String getId() {
+        public String getIdentifier() {
             return identifier;
         }
 
