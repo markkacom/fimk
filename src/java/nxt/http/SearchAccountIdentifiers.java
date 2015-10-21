@@ -46,7 +46,7 @@ public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler
         try (DbIterator<Account.AccountIdentifier> identifiers = Account.searchAccountIdentifiers(query, firstIndex, lastIndex)) {
             for (Account.AccountIdentifier identifier : identifiers) {
                 JSONObject accountJSON = new JSONObject();
-                JSONData.putAccount(accountJSON, "account", identifier.getAccountId());
+                accountJSON.put("accountRS", Convert.rsAccount(identifier.getAccountId()));
                 accountJSON.put("identifier", identifier.getEmail());
                 accountsJSONArray.add(accountJSON);
             }
