@@ -187,10 +187,11 @@ public abstract class VirtualOrder {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
             String asset = Long.toUnsignedString(order.getAssetId());
             String topic = order.getType().equals(VirtualBid.TYPE) ? "BID_ORDER_UPDATE*"+asset : "ASK_ORDER_UPDATE*"+asset;
-          
+
             JSONObject json = new JSONObject();
             json.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
             json.put("order", Long.toUnsignedString(order.getId()));
+            json.put("priceNQT", String.valueOf(order.getPriceNQT()));
             MofoSocketServer.notifyJSON(topic, json);
         }
     }    
@@ -200,9 +201,11 @@ public abstract class VirtualOrder {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
             String asset = Long.toUnsignedString(order.getAssetId());
             String topic = order.getType().equals(VirtualBid.TYPE) ? "BID_ORDER_REMOVE*"+asset : "ASK_ORDER_REMOVE*"+asset;
-          
+
             JSONObject json = new JSONObject();
+            json.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
             json.put("order", Long.toUnsignedString(order.getId()));
+            json.put("priceNQT", String.valueOf(order.getPriceNQT()));
             MofoSocketServer.notifyJSON(topic, json);
         }
     }
