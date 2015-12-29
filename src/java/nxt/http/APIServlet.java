@@ -338,6 +338,11 @@ public final class APIServlet extends HttpServlet {
         map.put("getChatList", GetChatList.instance);
         map.put("getChatMessages", GetChatMessages.instance);
         map.put("sendGossip", SendGossip.instance);
+        map.put("accountColorCreate", AccountColorCreate.instance);
+        map.put("accountColorAssign", AccountColorAssign.instance);
+        map.put("accountColorList", AccountColorList.instance);
+        map.put("accountColorSearch", AccountColorSearch.instance);
+        map.put("accountColorGet", AccountColorGet.instance);
         
         if (Constants.isTestnet) {
             map.put("getWebsocketEvents", GetWebsocketEvents.instance);
