@@ -29,48 +29,48 @@ import java.util.Map;
 
 public abstract class TransactionType {
 
-    private static final byte TYPE_PAYMENT = 0;
-    private static final byte TYPE_MESSAGING = 1;
-    private static final byte TYPE_COLORED_COINS = 2;
-    private static final byte TYPE_DIGITAL_GOODS = 3;
-    private static final byte TYPE_ACCOUNT_CONTROL = 4;
+    static final byte TYPE_PAYMENT = 0;
+    static final byte TYPE_MESSAGING = 1;
+    static final byte TYPE_COLORED_COINS = 2;
+    static final byte TYPE_DIGITAL_GOODS = 3;
+    static final byte TYPE_ACCOUNT_CONTROL = 4;
     static final byte TYPE_MONETARY_SYSTEM = 5;
-    private static final byte TYPE_DATA = 6;
+    static final byte TYPE_DATA = 6;
 
-    private static final byte SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0;
+    static final byte SUBTYPE_PAYMENT_ORDINARY_PAYMENT = 0;
 
-    private static final byte SUBTYPE_MESSAGING_ARBITRARY_MESSAGE = 0;
-    private static final byte SUBTYPE_MESSAGING_ALIAS_ASSIGNMENT = 1;
-    private static final byte SUBTYPE_MESSAGING_POLL_CREATION = 2;
-    private static final byte SUBTYPE_MESSAGING_VOTE_CASTING = 3;
-    private static final byte SUBTYPE_MESSAGING_HUB_ANNOUNCEMENT = 4;
-    private static final byte SUBTYPE_MESSAGING_ACCOUNT_INFO = 5;
-    private static final byte SUBTYPE_MESSAGING_ALIAS_SELL = 6;
-    private static final byte SUBTYPE_MESSAGING_ALIAS_BUY = 7;
-    private static final byte SUBTYPE_MESSAGING_ALIAS_DELETE = 8;
-    private static final byte SUBTYPE_MESSAGING_PHASING_VOTE_CASTING = 9;
+    static final byte SUBTYPE_MESSAGING_ARBITRARY_MESSAGE = 0;
+    static final byte SUBTYPE_MESSAGING_ALIAS_ASSIGNMENT = 1;
+    static final byte SUBTYPE_MESSAGING_POLL_CREATION = 2;
+    static final byte SUBTYPE_MESSAGING_VOTE_CASTING = 3;
+    static final byte SUBTYPE_MESSAGING_HUB_ANNOUNCEMENT = 4;
+    static final byte SUBTYPE_MESSAGING_ACCOUNT_INFO = 5;
+    static final byte SUBTYPE_MESSAGING_ALIAS_SELL = 6;
+    static final byte SUBTYPE_MESSAGING_ALIAS_BUY = 7;
+    static final byte SUBTYPE_MESSAGING_ALIAS_DELETE = 8;
+    static final byte SUBTYPE_MESSAGING_PHASING_VOTE_CASTING = 9;
 
-    private static final byte SUBTYPE_COLORED_COINS_ASSET_ISSUANCE = 0;
-    private static final byte SUBTYPE_COLORED_COINS_ASSET_TRANSFER = 1;
-    private static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT = 2;
-    private static final byte SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT = 3;
-    private static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION = 4;
-    private static final byte SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION = 5;
-    private static final byte SUBTYPE_COLORED_COINS_DIVIDEND_PAYMENT = 6;
+    static final byte SUBTYPE_COLORED_COINS_ASSET_ISSUANCE = 0;
+    static final byte SUBTYPE_COLORED_COINS_ASSET_TRANSFER = 1;
+    static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT = 2;
+    static final byte SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT = 3;
+    static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION = 4;
+    static final byte SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION = 5;
+    static final byte SUBTYPE_COLORED_COINS_DIVIDEND_PAYMENT = 6;
 
-    private static final byte SUBTYPE_DIGITAL_GOODS_LISTING = 0;
-    private static final byte SUBTYPE_DIGITAL_GOODS_DELISTING = 1;
-    private static final byte SUBTYPE_DIGITAL_GOODS_PRICE_CHANGE = 2;
-    private static final byte SUBTYPE_DIGITAL_GOODS_QUANTITY_CHANGE = 3;
-    private static final byte SUBTYPE_DIGITAL_GOODS_PURCHASE = 4;
-    private static final byte SUBTYPE_DIGITAL_GOODS_DELIVERY = 5;
-    private static final byte SUBTYPE_DIGITAL_GOODS_FEEDBACK = 6;
-    private static final byte SUBTYPE_DIGITAL_GOODS_REFUND = 7;
+    static final byte SUBTYPE_DIGITAL_GOODS_LISTING = 0;
+    static final byte SUBTYPE_DIGITAL_GOODS_DELISTING = 1;
+    static final byte SUBTYPE_DIGITAL_GOODS_PRICE_CHANGE = 2;
+    static final byte SUBTYPE_DIGITAL_GOODS_QUANTITY_CHANGE = 3;
+    static final byte SUBTYPE_DIGITAL_GOODS_PURCHASE = 4;
+    static final byte SUBTYPE_DIGITAL_GOODS_DELIVERY = 5;
+    static final byte SUBTYPE_DIGITAL_GOODS_FEEDBACK = 6;
+    static final byte SUBTYPE_DIGITAL_GOODS_REFUND = 7;
 
-    private static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0; 
+    static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0; 
 
-    private static final byte SUBTYPE_DATA_TAGGED_DATA_UPLOAD = 0;
-    private static final byte SUBTYPE_DATA_TAGGED_DATA_EXTEND = 1;
+    static final byte SUBTYPE_DATA_TAGGED_DATA_UPLOAD = 0;
+    static final byte SUBTYPE_DATA_TAGGED_DATA_EXTEND = 1;
 
     public static TransactionType findTransactionType(byte type, byte subtype) {
         switch (type) {
