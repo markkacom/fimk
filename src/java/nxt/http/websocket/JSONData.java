@@ -15,6 +15,7 @@ import nxt.Attachment.ColoredCoinsAskOrderPlacement;
 import nxt.Attachment.ColoredCoinsBidOrderPlacement;
 import nxt.Attachment.ColoredCoinsAskOrderCancellation;
 import nxt.Attachment.ColoredCoinsBidOrderCancellation;
+import nxt.AccountColor;
 import nxt.Block;
 import nxt.Currency;
 import nxt.DigitalGoodsStore;
@@ -57,6 +58,13 @@ public class JSONData {
             AccountInfo info = account.getAccountInfo();
             if (info != null) {
                 json.put(name + "Name", info.getName());
+            }
+            if (account.getAccountColorId() != 0) {
+                AccountColor accountColor = AccountColor.getAccountColor(account.getAccountColorId());
+                if (accountColor != null) {
+                    json.put(name + "ColorId", Long.toUnsignedString(accountColor.getId()));
+                    json.put(name + "ColorName", accountColor.getName());
+                }
             }
         }    
         json.put(name, Long.toUnsignedString(accountId));
@@ -264,7 +272,7 @@ public class JSONData {
             json.put("name", asset.getName());
             json.put("decimals", asset.getDecimals());          
             json.put("totalQuantityQNT", asset.getQuantityQNT());
-            json.put("issuer", Convert.rsAccount(asset.getAccountId()));
+            putAccount(json, "issuer", asset.getAccountId());
             if (Asset.privateEnabled()) {
                 json.put("type", asset.getType());
             }            
