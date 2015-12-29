@@ -380,11 +380,11 @@ public final class Account {
             return "AccountIdentifier account_id: " + Long.toUnsignedString(accountId) + " email: " + email;
         }
     }
-    
+
     public static boolean getAccountIDsEnabled() {
         return Nxt.getBlockchain().getHeight() > Constants.ACCOUNT_IDENTIFIER_BLOCK;
     }
-    
+
     private static final DbKey.LongKeyFactory<Account> accountDbKeyFactory = new DbKey.LongKeyFactory<Account>("id") {
 
         @Override
@@ -721,14 +721,21 @@ public final class Account {
     }
 
     static Account addOrGetAccount(long id) {
+        return addOrGetAccount(id, 0);
+    }
+
+    static Account addOrGetAccount(long id, long accountColorId) {
         if (id == 0) {
             throw new IllegalArgumentException("Invalid accountId 0");
         }
         Account account = accountTable.get(accountDbKeyFactory.newKey(id));
         if (account == null) {
-            account = new Account(id);
+            account = new Account(id, accountColorId);
             accountTable.insert(account);
             accountIdentifierTable.insert(new AccountIdentifier(id, Crypto.rsEncode(id)));
+        }
+        else if (accountColorId != 0) {
+            throw new IllegalArgumentException("Cannot assign account color to existing account");
         }
         return account;
     }
@@ -847,19 +854,41 @@ public final class Account {
 
     }
 
-    public static DbIterator<AccountIdentifier> searchAccountIdentifiers(String email, int from, int to) {
+    public static DbIterator<AccountIdentifier> searchAccountIdentifiers(String email, long accountColorId, int from, int to) {
         Connection con = null;
         try {
-            String sql = "SELECT * "
-                       + "FROM account_identifier "
-                       + "WHERE email_lower LIKE ? "
-                       + "ORDER BY email_lower "
-                       +  DbUtils.limitsClause(from, to);
-          
+            String sql;
+            if (accountColorId == 0) {
+                sql = "SELECT * "
+                    + "FROM account_identifier "
+                    + "WHERE email_lower LIKE ? "
+                    + "ORDER BY email_lower "
+                    +  DbUtils.limitsClause(from, to);
+            }
+            else {
+                sql = "SELECT * "
+                    + "FROM ( "
+                    + "  SELECT account_id, email, email_lower, height, ( "
+                    + "    SELECT account_color_id FROM account "
+                    + "    WHERE latest = TRUE "
+                    + "    AND id = ai.account_id "
+                    + "  ) AS account_color_id "
+                    + "  FROM account_identifier AS ai "
+                    + "  WHERE email_lower LIKE ? "
+                    + "  ORDER BY email_lower "
+                    + ") q "
+                    + "WHERE account_color_id = ? "
+                    + DbUtils.limitsClause(from, to);
+            }
+
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql.toString());
-            pstmt.setString(1, "%" + email.toLowerCase() + "%");
-            DbUtils.setLimits(2, pstmt, from, to);
+            int i=1;
+            pstmt.setString(i++, "%" + email.toLowerCase() + "%");
+            if (accountColorId!=0) {
+                pstmt.setLong(i++, accountColorId);
+            }
+            DbUtils.setLimits(i, pstmt, from, to);
             
             return accountIdentifierTable.getManyBy(con, pstmt, false);
             
@@ -930,7 +959,24 @@ public final class Account {
     public static void addAccountIdentifier(Transaction transaction, MofoAttachment.SetAccountIdentifierAttachment attachment) {
         accountIdentifierTable.insert(new AccountIdentifier(transaction, attachment));
     }
-    
+
+    public static DbIterator<Account> getAccountColorAccounts(long accountColorId, int from, int to) {
+        Connection con = null;
+        try {
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(
+                  "SELECT * FROM account "
+                + "WHERE account_color = ? AND latest = TRUE "
+                +  DbUtils.limitsClause(from, to)
+            );
+            pstmt.setLong(1, accountColorId);
+            return accountTable.getManyBy(con, pstmt, false);
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
     static void init() {}
 
 
@@ -943,12 +989,14 @@ public final class Account {
     private long unconfirmedBalanceNQT;
     private long forgedBalanceNQT;
     private long activeLesseeId;
+    private long accountColorId;
 
-    private Account(long id) {
+    private Account(long id, long accountColorId) {
         if (id != Crypto.rsDecode(Crypto.rsEncode(id))) {
             Logger.logMessage("CRITICAL ERROR: Reed-Solomon encoding fails for " + id);
         }
         this.id = id;
+        this.accountColorId = accountColorId;
         this.dbKey = accountDbKeyFactory.newKey(this.id);
         this.creationHeight = Nxt.getBlockchain().getHeight();
     }
@@ -962,13 +1010,14 @@ public final class Account {
         this.unconfirmedBalanceNQT = rs.getLong("unconfirmed_balance");
         this.forgedBalanceNQT = rs.getLong("forged_balance");
         this.activeLesseeId = rs.getLong("active_lessee_id");
+        this.accountColorId = rs.getLong("account_color_id");
     }
 
     private void save(Connection con) throws SQLException {
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO account (id, creation_height, "
                 + "key_height, balance, unconfirmed_balance, forged_balance, "
-                + "active_lessee_id, height, latest) "
-                + "KEY (id, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
+                + "active_lessee_id, account_color_id, height, latest) "
+                + "KEY (id, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
             int i = 0;
             pstmt.setLong(++i, this.id);
             pstmt.setInt(++i, this.creationHeight);
@@ -977,6 +1026,7 @@ public final class Account {
             pstmt.setLong(++i, this.unconfirmedBalanceNQT);
             pstmt.setLong(++i, this.forgedBalanceNQT);
             DbUtils.setLongZeroToNull(pstmt, ++i, this.activeLesseeId);
+            DbUtils.setLongZeroToNull(pstmt, ++i, this.accountColorId);
             pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
             pstmt.executeUpdate();
         }
@@ -984,6 +1034,24 @@ public final class Account {
 
     public long getId() {
         return id;
+    }
+
+    public long getAccountColorId() {
+        return accountColorId;
+    }
+
+    public void setAccountColorId(long accountColorId) {
+        if (this.id == Genesis.CREATOR_ID) {
+            throw new RuntimeException("Cannot assign account color: to Genesis account");
+        }
+        if (this.balanceNQT != 0) {
+            throw new RuntimeException("Cannot assign account color: balance is not 0");
+        }
+        if (this.accountColorId != 0) {
+            throw new RuntimeException("Cannot assign account color: account color already set");
+        }
+        this.accountColorId = accountColorId;
+        accountTable.insert(this);
     }
 
     public AccountInfo getAccountInfo() {
