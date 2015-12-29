@@ -48,7 +48,7 @@ public final class GetAccountAssets extends APIServlet.APIRequestHandler {
             try (DbIterator<Account.AccountAsset> accountAssets = account.getAssets(height, 0, -1)) {
                 JSONArray assetJSON = new JSONArray();
                 while (accountAssets.hasNext()) {
-                    assetJSON.add(JSONData.accountAsset(accountAssets.next(), false, true));
+                    assetJSON.add(JSONData.accountAsset(accountAssets.next(), true, true));
                 }
                 response.put("accountAssets", assetJSON);
                 return response;
