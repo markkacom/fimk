@@ -338,4 +338,106 @@ public class MofoAttachment {
             return period;
         }
     }
+
+    public final static class AccountColorCreateAttachment extends AbstractAttachment {
+
+        private final String name;
+        private final String description;
+
+        AccountColorCreateAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+            this.name = Convert.readString(buffer, buffer.get(), Constants.MAX_ACCOUNT_COLOR_NAME_LENGTH).trim().intern();
+            this.description = Convert.readString(buffer, buffer.getShort(), Constants.MAX_ACCOUNT_COLOR_DESCRIPTION_LENGTH).trim().intern();
+        }
+
+        AccountColorCreateAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+            this.name = (Convert.nullToEmpty((String) attachmentData.get("name"))).trim().intern();
+            this.description = (Convert.nullToEmpty((String) attachmentData.get("description"))).trim().intern();
+        }
+
+        public AccountColorCreateAttachment(String name, String description) {
+            this.name = name.trim();
+            this.description = description.trim();
+        }
+
+        @Override
+        int getMySize() {
+            return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length;
+        }
+
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            byte[] name = Convert.toBytes(this.name);
+            byte[] description = Convert.toBytes(this.description);
+            buffer.put((byte)name.length);
+            buffer.put(name);
+            buffer.putShort((short)description.length);
+            buffer.put(description);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            attachment.put("name", name);
+            attachment.put("description", description);
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return MofoTransactions.AccountColorCreateTransaction.ACCOUNT_COLOR_CREATE;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    public final static class AccountColorAssignAttachment extends AbstractAttachment {
+
+        private final long accountColorId;
+
+        AccountColorAssignAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            super(buffer, transactionVersion);
+            this.accountColorId = buffer.getLong();
+        }
+
+        AccountColorAssignAttachment(JSONObject attachmentData) {
+            super(attachmentData);
+            this.accountColorId = Convert.parseUnsignedLong((String) attachmentData.get("accountColorId"));
+        }
+
+        public AccountColorAssignAttachment(long accountColorId) {
+            this.accountColorId = accountColorId;
+        }
+
+        @Override
+        int getMySize() {
+            return 8;
+        }
+
+        @Override
+        void putMyBytes(ByteBuffer buffer) {
+            buffer.putLong(accountColorId);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        void putMyJSON(JSONObject attachment) {
+            attachment.put("accountColorId", Long.toUnsignedString(accountColorId));
+        }
+
+        @Override
+        public TransactionType getTransactionType() {
+            return MofoTransactions.AccountColorAssignTransaction.ACCOUNT_COLOR_ASSIGN;
+        }
+
+        public long getAccountColorId() {
+            return accountColorId;
+        }
+    }
 }
