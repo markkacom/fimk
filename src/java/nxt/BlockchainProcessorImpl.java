@@ -28,6 +28,7 @@ import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
+
 import org.h2.fulltext.FullTextLucene;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -1059,6 +1060,13 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
         }
         if (block.getPayloadLength() > Constants.MAX_PAYLOAD_LENGTH || block.getPayloadLength() < 0) {
             throw new BlockNotAcceptedException("Invalid block payload length " + block.getPayloadLength(), block);
+        }
+
+        if (AccountColor.getAccountColorEnabled()) {
+            Account account = Account.getAccount(block.getGeneratorId());
+            if (account == null || account.getAccountColorId() != 0) {
+                throw new BlockNotAcceptedException("Block forged by colored account", block);
+            }
         }
     }
 
