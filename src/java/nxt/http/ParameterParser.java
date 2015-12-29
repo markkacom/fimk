@@ -174,7 +174,7 @@ final class ParameterParser {
     }
 
     static NamespacedAlias getNamespacedAlias(HttpServletRequest req) throws ParameterException {
-        Long aliasId;
+        long aliasId = 0;
         try {
             aliasId = Convert.parseUnsignedLong(Convert.emptyToNull(req.getParameter("alias")));
         } catch (RuntimeException e) {
@@ -182,10 +182,11 @@ final class ParameterParser {
         }        
         String aliasName = Convert.emptyToNull(req.getParameter("aliasName"));
         NamespacedAlias alias;
-        if (aliasId != null) {
+        if (aliasId != 0) {
             alias = NamespacedAlias.getAlias(aliasId);
         } else if (aliasName != null) {
-            alias = NamespacedAlias.getAlias(getAccount(req).getId(), aliasName.toLowerCase());
+            long accountId = ParameterParser.getAccountId(req, "account", true);
+            alias = NamespacedAlias.getAlias(accountId, aliasName.toLowerCase());
         } else {
             throw new ParameterException(MISSING_ALIAS_OR_ALIAS_NAME);
         }
