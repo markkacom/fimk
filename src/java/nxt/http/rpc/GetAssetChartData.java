@@ -17,12 +17,14 @@ public class GetAssetChartData extends RPCCall {
         super(identifier);
     }
     
+    static final byte TEN_MINUTES = 0;
     static final byte HOUR = 1;
     static final byte DAY  = 2;
     static final byte WEEK = 3;    
   
     private int windowToSeconds(byte window) {
         switch (window) {
+        case TEN_MINUTES: return 600;
         case HOUR: return 3600;
         case DAY: return 86400;
         case WEEK: return 604800;
@@ -35,7 +37,7 @@ public class GetAssetChartData extends RPCCall {
     public JSONStreamAware call(JSONObject arguments) throws ParameterException {
       
         Asset asset = ParameterParser.getAsset(arguments);
-        byte window = (byte) ParameterParser.getInt(arguments, "window", HOUR, WEEK, true);
+        byte window = (byte) ParameterParser.getInt(arguments, "window", TEN_MINUTES, WEEK, true);
 
         JSONObject response = new JSONObject();
         JSONObject json = new JSONObject();
