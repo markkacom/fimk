@@ -57,8 +57,7 @@ public class Search extends RPCCall {
                         json.put("decimals", asset.getDecimals());
                         json.put("description", asset.getDescription());
                         json.put("asset", Long.toUnsignedString(asset.getId()));
-                        json.put("accountRS", Convert.rsAccount(asset.getAccountId()));
-                      
+                        JSONData.putAccount(json, "account", asset.getAccountId());
                         results.add(json);
                     }
                 }
@@ -72,8 +71,7 @@ public class Search extends RPCCall {
                     json.put("decimals", asset.getDecimals());
                     json.put("description", asset.getDescription());
                     json.put("asset", Long.toUnsignedString(asset.getId()));
-                    json.put("accountRS", Convert.rsAccount(asset.getAccountId()));
-                  
+                    JSONData.putAccount(json, "account", asset.getAccountId());
                     results.add(json);
                 }
             }
@@ -86,16 +84,8 @@ public class Search extends RPCCall {
                 if (account_id != 0) {
                     Account account = Account.getAccount(account_id);
                     if (account != null) {
-                        JSONObject json = new JSONObject();
-                        AccountInfo info = account.getAccountInfo();
-                        if (info != null) {
-                            json.put("name", info.getName());
-                            json.put("description", info.getDescription());
-                        }
-                        json.put("balanceNQT", account.getBalanceNQT());
-                        json.put("effectiveNXT", account.getEffectiveBalanceNXT());
-                        json.put("accountRS", Convert.rsAccount(account.getId()));
-                      
+                        JSONObject json = JSONData.accountBalance(account);
+                        JSONData.putAccount(json, "account", account.getId());
                         results.add(json);                      
                     }
                 }
@@ -107,12 +97,8 @@ public class Search extends RPCCall {
                     if (info != null) {
                         Account account = Account.getAccount(info.getAccountId());
                         if (account != null) {
-                            JSONObject json = new JSONObject();
-                            json.put("name", info.getName());
-                            json.put("description", info.getDescription());
-                            json.put("balanceNQT", account.getBalanceNQT());
-                            json.put("effectiveNXT", account.getEffectiveBalanceNXT());
-                            json.put("accountRS", Convert.rsAccount(account.getId()));
+                            JSONObject json = JSONData.accountBalance(account);
+                            JSONData.putAccount(json, "account", account.getId());
                             results.add(json);
                         }
                     }
