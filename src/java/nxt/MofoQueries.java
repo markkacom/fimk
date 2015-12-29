@@ -100,11 +100,7 @@ public final class MofoQueries {
         }
         
         public long getTotalFeeNQT() {
-            long total = 0;
-            if ("FIMK".equals(Nxt.APPLICATION)) {
-              total = totalFeeNQT + (blockCount * (200 * Constants.ONE_NXT));
-            }          
-            return total;
+            return totalFeeNQT;
         }
         
         public long getAccountId() {
@@ -201,8 +197,12 @@ public final class MofoQueries {
                     }
                     
                     /* Must implement a catch here in case we are on NXT and not on FIMK */
-                    //stat.add(total_fee + RewardsImpl.calculatePOSRewardNQT(height));
-                    stat.add(total_fee);
+                    if ("FIMK".equals(Nxt.APPLICATION)) {
+                        stat.add(total_fee + RewardsImpl.calculatePOSRewardNQT(height));
+                    }
+                    else {
+                        stat.add(total_fee);  
+                    }
                 }
             }
             
@@ -1064,7 +1064,7 @@ public final class MofoQueries {
              + "SUM(quantity) vol, "
              + "GROUP_CONCAT(price ORDER BY timestamp, ',') as price_concat "
              + "FROM trade "
-             + "WHERE asset_id = ? GROUP BY r ORDER BY r;");
+             + "WHERE asset_id = ? GROUP BY r ORDER BY r LIMIT 10000");
         
         try (Connection con = Db.db.getConnection();              
             PreparedStatement pstmt = con.prepareStatement(b.toString());)
