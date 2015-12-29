@@ -4,7 +4,9 @@ import static nxt.http.JSONResponses.UNKNOWN_ORDER;
 import nxt.Asset;
 import nxt.Order;
 import nxt.http.ParameterException;
+import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -30,8 +32,9 @@ public class GetAskOrder extends RPCCall {
           response.put("name", asset.getName());
           response.put("decimals", asset.getDecimals());
           response.put("asset", Long.toUnsignedString(asset.getId()));
+          JSONData.putAccount(response, "issuer", asset.getAccountId());
       }
-      
+
       response.put("quantityQNT", String.valueOf(order.getQuantityQNT()));
       response.put("priceNQT", String.valueOf(order.getPriceNQT()));
       response.put("height", order.getHeight());
