@@ -150,6 +150,15 @@ public final class Generator implements Comparable<Generator> {
             return null;
           }
         }
+
+        if (AccountColor.getAccountColorEnabled()) {
+            Account account = Account.getAccount(generator.getAccountId());
+            if (account.getAccountColorId() != 0) {
+                Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) +
+                    " is not allowed to forge. Only non colored accounts can forge.");
+                return null;
+            }
+        }
         
         Generator old = generators.putIfAbsent(secretPhrase, generator);
         if (old != null) {
