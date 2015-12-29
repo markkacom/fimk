@@ -1,15 +1,17 @@
 package nxt.http.rpc;
 
+import java.util.List;
+
 import nxt.Account;
 import nxt.Asset;
 import nxt.AssetTransfer;
 import nxt.MofoAsset;
-import nxt.MofoQueries;
 import nxt.MofoAsset.AssetFee;
 import nxt.Trade;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
+import nxt.virtualexchange.VirtualTrade;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -47,7 +49,11 @@ public class GetAsset extends RPCCall {
             // quantityQNTTotal
             // quantityQNTToday
             // numberOfTradesToday
-            MofoQueries.getAssetMetrics(response, asset.getId());
+            //MofoQueries.getAssetMetrics(response, asset.getId());
+            List<VirtualTrade> iterator = VirtualTrade.getTrades(asset.getId(), 0, 0);
+            if (!iterator.isEmpty()) {
+                response.put("lastPriceNQT", String.valueOf(iterator.get(0).getPriceNQT()));
+            }
         }
         
         if (Asset.privateEnabled()) {
