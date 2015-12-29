@@ -268,6 +268,10 @@ public abstract class Order {
             return askOrderTable.getAll(from, to);
         }
 
+        public static int getAskOrdersCountByAccount(long accountId) {
+            return askOrderTable.getCount(new DbClause.LongClause("account_id", accountId));
+        }
+
         public static DbIterator<Ask> getAskOrdersByAccount(long accountId, int from, int to) {
             return askOrderTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
         }
@@ -426,6 +430,10 @@ public abstract class Order {
 
         public static DbIterator<Bid> getBidOrdersByAccount(long accountId, int from, int to) {
             return bidOrderTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
+        }
+
+        public static int getBidOrdersCountByAccount(long accountId) {
+            return bidOrderTable.getCount(new DbClause.LongClause("account_id", accountId));
         }
 
         public static DbIterator<Bid> getBidOrdersByAsset(long assetId, int from, int to) {
