@@ -372,7 +372,8 @@ public final class Nxt {
                 MofoAsset.init();
                 ExchangeObserver.init();
                 MofoVerificationAuthority.init();
-                GossipProcessorImpl.getInstance();                
+                GossipProcessorImpl.getInstance();
+                AccountColor.init();
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
