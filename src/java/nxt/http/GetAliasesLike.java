@@ -20,6 +20,7 @@ import nxt.Alias;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -31,13 +32,14 @@ public final class GetAliasesLike extends APIServlet.APIRequestHandler {
     static final GetAliasesLike instance = new GetAliasesLike();
 
     private GetAliasesLike() {
-        super(new APITag[] {APITag.ALIASES, APITag.SEARCH}, "aliasPrefix", "firstIndex", "lastIndex");
+        super(new APITag[] {APITag.ALIASES, APITag.SEARCH}, "account", "aliasPrefix", "firstIndex", "lastIndex");
     }
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
+        long accountId = ParameterParser.getUnsignedLong(req, "account", false);
         String prefix = Convert.emptyToNull(req.getParameter("aliasPrefix"));
         if (prefix == null) {
             return JSONResponses.missing("aliasPrefix");
@@ -49,7 +51,9 @@ public final class GetAliasesLike extends APIServlet.APIRequestHandler {
         JSONObject response = new JSONObject();
         JSONArray aliasJSON = new JSONArray();
         response.put("aliases", aliasJSON);
-        try (DbIterator<Alias> aliases = Alias.getAliasesLike(prefix, firstIndex, lastIndex)) {
+        try (DbIterator<Alias> aliases = accountId == 0 ? 
+              Alias.getAliasesLike(prefix, firstIndex, lastIndex) :
+              Alias.getAliasesLike(prefix, accountId, firstIndex, lastIndex)) {
             while (aliases.hasNext()) {
                 aliasJSON.add(JSONData.alias(aliases.next()));
             }
