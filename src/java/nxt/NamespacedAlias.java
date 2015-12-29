@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
@@ -50,7 +51,19 @@ public final class NamespacedAlias {
     public static DbIterator<NamespacedAlias> getAliasesByOwner(long accountId, int from, int to) {
         return aliasTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
     }
-    
+
+    public static DbIterator<NamespacedAlias> searchAliases(String query, long accountId, int from, int to) {
+        DbClause dbClause = new DbClause(" account_id = ? AND alias_name_lower LIKE ? ") {
+            @Override
+            public int set(PreparedStatement pstmt, int index) throws SQLException {
+                pstmt.setLong(index++, accountId);
+                pstmt.setString(index++, '%' + query.replace("%", "\\%").replace("_", "\\_") + '%');
+                return index;
+            }
+        };
+        return aliasTable.getManyBy(dbClause, from, to);
+    }
+
     public static NamespacedAlias getAlias(final long sender_id, final String aliasName) {
         DbClause dbClause = new DbClause(" account_id = ? AND alias_name_lower = ? ") {
             @Override
