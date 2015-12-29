@@ -2,8 +2,10 @@ package nxt.http.rpc;
 
 import nxt.Account;
 import nxt.Account.AccountInfo;
+import nxt.DigitalGoodsStore;
 import nxt.Generator;
 import nxt.Nxt;
+import nxt.Order;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
@@ -26,6 +28,9 @@ public class GetAccount extends RPCCall {
       
         Account account = ParameterParser.getAccount(arguments);
         boolean includeForging = "true".equalsIgnoreCase((String) arguments.get("includeForging"));
+        boolean includeAssetCount = "true".equalsIgnoreCase((String) arguments.get("includeAssetCount"));
+        boolean includePurchasedProductsCount = "true".equalsIgnoreCase((String) arguments.get("includePurchasedProductsCount"));
+        boolean includeSoldProductsCount = "true".equalsIgnoreCase((String) arguments.get("includeSoldProductsCount"));
         
         JSONObject response = JSONData.accountBalance(account);
         JSONData.putAccount(response, "account", account.getId());
@@ -56,6 +61,20 @@ public class GetAccount extends RPCCall {
                     response.put("deadline", generator.getDeadline());
                     response.put("hitTime", generator.getHitTime());
                 }
+            }
+
+            if (includeAssetCount) {
+                response.put("assetCount", Account.getAccountAssetCount(account.getId()));
+                response.put("askOrderCount", Order.Ask.getAskOrdersCountByAccount(account.getId()));
+                response.put("bidOrderCount", Order.Bid.getBidOrdersCountByAccount(account.getId()));
+            }
+
+            if (includePurchasedProductsCount) {
+                response.put("purchasedProductsCount", DigitalGoodsStore.Purchase.getBuyerPurchaseCount(account.getId(), false, false));
+            }
+
+            if (includeSoldProductsCount) {
+                response.put("soldProductsCount", DigitalGoodsStore.Purchase.getSellerPurchaseCount(account.getId(), false, false));
             }
         }
         return response;      
