@@ -20,6 +20,7 @@ import nxt.crypto.Crypto;
 import nxt.db.DbKey;
 import nxt.util.Convert;
 import nxt.util.Logger;
+
 import org.json.simple.JSONObject;
 
 import java.math.BigInteger;
@@ -1004,6 +1005,9 @@ final class TransactionImpl implements Transaction {
 
         /* Throws NxtException.NotValidException if senderPublicKey is on locked list */
         Locked.test(Nxt.getBlockchain().getHeight(), senderPublicKey);
+
+        /* Limit colored accounts from sending or receiving "normal" FIMK */
+        AccountColor.validate(this);
     }
 
     // returns false iff double spending
@@ -1017,7 +1021,21 @@ final class TransactionImpl implements Transaction {
         senderAccount.apply(getSenderPublicKey());
         Account recipientAccount = Account.getAccount(recipientId);
         if (recipientAccount == null && recipientId != 0) {
-            recipientAccount = Account.addOrGetAccount(recipientId);
+
+            /* Payments to new accounts inherit sender account color */
+            /* Asset transfers to new accounts inherit sender account color */
+            /* Arbitrary message to new accounts inherit sender account color */
+
+            if ((getType().getType() == TransactionType.TYPE_PAYMENT && getType().getSubtype() == TransactionType.SUBTYPE_PAYMENT_ORDINARY_PAYMENT) ||
+                (getType().getType() == TransactionType.TYPE_COLORED_COINS && getType().getSubtype() == TransactionType.SUBTYPE_COLORED_COINS_ASSET_TRANSFER) ||
+                (getType().getType() == TransactionType.TYPE_MESSAGING && getType().getSubtype() == TransactionType.SUBTYPE_MESSAGING_ARBITRARY_MESSAGE))
+            {
+                recipientAccount = Account.addOrGetAccount(recipientId, senderAccount.getAccountColorId());
+            }
+            else
+            {
+                recipientAccount = Account.addOrGetAccount(recipientId);
+            }
         }
         if (referencedTransactionFullHash != null
                 && timestamp > Constants.REFERENCED_TRANSACTION_FULL_HASH_BLOCK_TIMESTAMP) {
