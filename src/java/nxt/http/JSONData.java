@@ -18,6 +18,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Account.AccountInfo;
+import nxt.AccountColor;
 import nxt.Alias;
 import nxt.Asset;
 import nxt.Attachment.MonetarySystemAttachment;
@@ -815,7 +816,14 @@ final class JSONData {
             AccountInfo info = account.getAccountInfo();
             if (info != null) {
                 json.put(name + "Name", info.getName());  
-            }  
+            }
+            if (account.getAccountColorId() != 0) {
+                AccountColor accountColor = AccountColor.getAccountColor(account.getAccountColorId());
+                if (accountColor != null) {
+                    json.put(name + "ColorId", Long.toUnsignedString(accountColor.getId()));
+                    json.put(name + "ColorName", accountColor.getName());
+                }
+            }
         }    
         json.put(name, Long.toUnsignedString(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));
@@ -841,8 +849,22 @@ final class JSONData {
         if (Asset.privateEnabled()) {
             json.put("type", asset.getType());
         }
+        putAccount(json, "issuer", asset.getAccountId());
     }
 
     private JSONData() {} // never
+
+    public static JSONObject accountColor(AccountColor accountColor, boolean includeAccountInfo, boolean includeDescription) {
+        JSONObject json = new JSONObject();
+        json.put("accountColorId", Long.toUnsignedString(accountColor.getId()));
+        json.put("accountColorName", accountColor.getName());
+        if (includeDescription) {
+            json.put("description", accountColor.getDescription());
+        }
+        if (includeAccountInfo) {
+            putAccount(json, "account", accountColor.getAccountId());
+        }
+        return json;
+    }
 
 }
