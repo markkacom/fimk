@@ -45,7 +45,7 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
         if (!Account.getAccountIDsEnabled()) {
             return JSONResponses.FEATURE_NOT_AVAILABLE;
         }
-      
+
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Account senderAccount = ParameterParser.getSenderAccount(req);
         String identifier = Convert.emptyToNull(req.getParameter("identifier"));
@@ -64,14 +64,21 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             JSONObject response = new JSONObject();
             response.put("errorCode", 4);
             response.put("errorDescription", "Invalid identifier");
-            return JSON.prepare(response);          
+            return JSON.prepare(response);
         }
 
         if (Account.getAccountIdByIdentifier(wrapper.getNormalizedId()) != 0) {
             JSONObject response = new JSONObject();
             response.put("errorCode", 4);
             response.put("errorDescription", "Duplicate identifier");
-            return JSON.prepare(response);          
+            return JSON.prepare(response);
+        }
+
+        if (Account.hasAccountIdentifier(recipientId)) {
+            JSONObject response = new JSONObject();
+            response.put("errorCode", 4);
+            response.put("errorDescription", "Recipient already has identifier");
+            return JSON.prepare(response);
         }
 
         if (wrapper.getIsDefaultServer() && recipientId == senderAccount.getId()) {
@@ -91,12 +98,12 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             if (publicKey == null) {
                 publicKey = Convert.parseHexString(Convert.emptyToNull(req.getParameter("recipientPublicKey")));
             }
-            
+
             /* assigning non default identifiers always require signatory to be a verification authority */
-    
+
             boolean signatorIsVerificationAuthority;
             byte[] message = Convert.toBytes(identifier);
-            
+
             if (signatory == 0) {
                 signatorIsVerificationAuthority = false;
             }
@@ -114,21 +121,21 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
                     publicKey = signatoryAccount.getPublicKey();
                 }
             }
-    
+
             if (!wrapper.getIsDefaultServer() && !signatorIsVerificationAuthority) {
                 JSONObject response = new JSONObject();
                 response.put("errorCode", 4);
                 response.put("errorDescription", "Operation requires verified authorizer signature");
                 return JSON.prepare(response);
             }
-    
+
             if (publicKey == null) {
                 JSONObject response = new JSONObject();
                 response.put("errorCode", 4);
                 response.put("errorDescription", "Operation requires publicKey of signatory");
-                return JSON.prepare(response);              
+                return JSON.prepare(response);
             }
-            
+
             if (!Crypto.verify(signature, message, publicKey, false)) {
                 JSONObject response = new JSONObject();
                 response.put("errorCode", 4);

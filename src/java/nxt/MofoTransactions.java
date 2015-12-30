@@ -495,6 +495,10 @@ public class MofoTransactions {
                     throw new NxtException.NotValidException("Duplicate identifier");
                 }
 
+                if (Account.hasAccountIdentifier(transaction.getRecipientId())) {
+                    throw new NxtException.NotValidException("Recipient already has identifier");
+                }
+
                 if (wrapper.getIsDefaultServer() && transaction.getRecipientId() == transaction.getSenderId()) {
 
                     /* no validation required, account is assigning default id to itself */

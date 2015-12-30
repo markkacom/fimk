@@ -336,7 +336,7 @@ public final class Account {
         private final long accountId;
         private final DbKey dbKey;
         private final String email;
-        
+
         private AccountIdentifier(Transaction transaction, MofoAttachment.SetAccountIdentifierAttachment attachment) {
             this.accountId = transaction.getRecipientId();
             this.email = attachment.getIdentifier();
@@ -572,7 +572,7 @@ public final class Account {
         }
 
     };
-    
+
     private static final DbKey.StringKeyFactory<AccountIdentifier> accountIdentifierDbKeyFactory = new DbKey.StringKeyFactory<AccountIdentifier>("email") {
 
         @Override
@@ -587,20 +587,20 @@ public final class Account {
         protected AccountIdentifier load(Connection con, ResultSet rs) throws SQLException {
             return new AccountIdentifier(rs);
         }
-  
+
         @Override
         protected void save(Connection con, AccountIdentifier accountIdentifier) throws SQLException {
             accountIdentifier.save(con);
         }
-        
+
         @Override
         protected String defaultSort() {
             return " ORDER BY height DESC, email_lower ";
         }
-        
+
         public void rollback(int height) {
             super.rollback(height);
-        };        
+        };
     };
 
     private static final Listeners<Account,Event> listeners = new Listeners<>();
@@ -889,33 +889,39 @@ public final class Account {
                 pstmt.setLong(i++, accountColorId);
             }
             DbUtils.setLimits(i, pstmt, from, to);
-            
+
             return accountIdentifierTable.getManyBy(con, pstmt, false);
-            
+
         } catch (SQLException e) {
             DbUtils.close(con);
             throw new RuntimeException(e.toString(), e);
         }
     }
 
+    /* Change of plans, accounts can only have one identifier
+     * TODO: remove iteration logic */
+    public static boolean hasAccountIdentifier(long accountId) {
+        return accountIdentifierTable.getCount(new DbClause.LongClause("account_id", accountId)) != 0;
+    }
+
     public static DbIterator<AccountIdentifier> getAccountIdentifiers(long accountId, int from, int to) {
         return accountIdentifierTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
     }
-    
+
     public static long getAccountIdByIdentifier(String identifier) {
         if (identifier == null) {
             return 0;
         }
-        try ( 
+        try (
             Connection con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT account_id "
                 + "FROM account_identifier "
                 + "WHERE email_lower = ?");
         ) {
             pstmt.setString(1, identifier.toLowerCase());
-          
+
             try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {              
+                while (rs.next()) {
                     return rs.getLong("account_id");
                 }
             }
@@ -925,7 +931,7 @@ public final class Account {
             throw new RuntimeException(e.toString(), e);
         }
     }
-    
+
     public static Account getAccountByIdentifier(String identifier) {
         if (identifier == null) {
             return null;
@@ -938,24 +944,24 @@ public final class Account {
                        + "    ON a.id = b.account_id "
                        + "WHERE b.email_lower = ? AND latest = TRUE "
                        + "LIMIT 1";
-          
+
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql.toString());
             pstmt.setString(1, identifier.toLowerCase());
-            
+
             try (DbIterator<Account> iterator = accountTable.getManyBy(con, pstmt, false)) {
                 if (iterator.hasNext()) {
                     return iterator.next();
                 }
             }
             return null;
-            
+
         } catch (SQLException e) {
             DbUtils.close(con);
             throw new RuntimeException(e.toString(), e);
         }
     }
-    
+
     public static void addAccountIdentifier(Transaction transaction, MofoAttachment.SetAccountIdentifierAttachment attachment) {
         accountIdentifierTable.insert(new AccountIdentifier(transaction, attachment));
     }
