@@ -28,9 +28,9 @@ import java.sql.SQLException;
 import org.json.simple.JSONObject;
 
 public final class Asset {
-  
+
     public final static byte TYPE_REGULAR_ASSET = (byte) 0;
-    public final static byte TYPE_PRIVATE_ASSET = (byte) 1;    
+    public final static byte TYPE_PRIVATE_ASSET = (byte) 1;
 
     private static final DbKey.LongKeyFactory<Asset> assetDbKeyFactory = new DbKey.LongKeyFactory<Asset>("id") {
 
@@ -81,7 +81,7 @@ public final class Asset {
     static void addAsset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
         assetTable.insert(new Asset(transaction, attachment));
     }
-    
+
     public static void putAsset(JSONObject json, long id) {
         Asset asset = getAsset(id);
         if (asset != null) {
@@ -171,7 +171,7 @@ public final class Asset {
     public byte getType() {
       return type;
     }
-    
+
     public DbIterator<Account.AccountAsset> getAccounts(int from, int to) {
         return Account.getAssetAccounts(this.assetId, from, to);
     }
@@ -189,9 +189,6 @@ public final class Asset {
     }
 
     public static boolean privateEnabled() {
-        if(Nxt.getBlockchain().getLastBlock().getHeight() >= Constants.PRIVATE_ASSETS_BLOCK) {
-            return true;
-        }
-        return false;
+        return HardFork.PRIVATE_ASSETS_BLOCK();
     }
 }
