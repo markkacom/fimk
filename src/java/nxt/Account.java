@@ -382,7 +382,7 @@ public final class Account {
     }
 
     public static boolean getAccountIDsEnabled() {
-        return Nxt.getBlockchain().getHeight() > Constants.ACCOUNT_IDENTIFIER_BLOCK;
+        return HardFork.ACCOUNT_IDENTIFIER_BLOCK();
     }
 
     private static final DbKey.LongKeyFactory<Account> accountDbKeyFactory = new DbKey.LongKeyFactory<Account>("id") {
