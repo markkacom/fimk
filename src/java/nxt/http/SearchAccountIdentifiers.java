@@ -1,12 +1,8 @@
 /******************************************************************************
- * Copyright © 2013-2015 The Nxt Core Developers.                             *
- *                                                                            *
- * See the AUTHORS.txt, DEVELOPER-AGREEMENT.txt and LICENSE.txt files at      *
- * the top-level directory of this distribution for the individual copyright  *
- * holder information and the developer policies on copyright and licensing.  *
+ * Copyright © 2014-2016 Krypto Fin ry and FIMK Developers.                   *
  *                                                                            *
  * Unless otherwise agreed in a custom licensing agreement, no part of the    *
- * Nxt software, including this file, may be copied, modified, propagated,    *
+ * FIMK software, including this file, may be copied, modified, propagated,   *
  * or distributed except according to the terms contained in the LICENSE.txt  *
  * file.                                                                      *
  *                                                                            *
@@ -17,6 +13,8 @@
 package nxt.http;
 
 import nxt.Account;
+import nxt.Account.AccountInfo;
+import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
 
@@ -31,7 +29,7 @@ public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler
     static final SearchAccountIdentifiers instance = new SearchAccountIdentifiers();
 
     private SearchAccountIdentifiers() {
-        super(new APITag[] {APITag.ACCOUNTS, APITag.SEARCH}, "query", "firstIndex", "lastIndex");
+        super(new APITag[] {APITag.ACCOUNTS, APITag.SEARCH}, "query", "accountColorId", "firstIndex", "lastIndex");
     }
 
     @SuppressWarnings("unchecked")
@@ -40,14 +38,18 @@ public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler
         String query = Convert.nullToEmpty(req.getParameter("query"));
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
+        long accountColorId = ParameterParser.getUnsignedLong(req, "accountColorId", false);
 
         JSONObject response = new JSONObject();
         JSONArray accountsJSONArray = new JSONArray();
-        try (DbIterator<Account.AccountIdentifier> identifiers = Account.searchAccountIdentifiers(query, firstIndex, lastIndex)) {
+        try (DbIterator<Account.AccountIdentifier> identifiers = Account.searchAccountIdentifiers(query, accountColorId, firstIndex, lastIndex)) {
             for (Account.AccountIdentifier identifier : identifiers) {
                 JSONObject accountJSON = new JSONObject();
-                accountJSON.put("accountRS", Convert.rsAccount(identifier.getAccountId()));
-                accountJSON.put("identifier", identifier.getEmail());
+                String rsFormatted = Crypto.rsEncode(identifier.getAccountId());
+                accountJSON.put("accountRS", "FIM-"+rsFormatted);
+                if (!rsFormatted.equals(identifier.getEmail())) {
+                  accountJSON.put("identifier", identifier.getEmail());
+                }
                 accountsJSONArray.add(accountJSON);
             }
         }
