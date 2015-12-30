@@ -26,26 +26,26 @@ import java.util.TimeZone;
 import nxt.util.Convert;
 
 public final class Constants {
-  
+
     public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
     public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
 
     public static final long ONE_NXT = 100000000;
-    
+
     public static final long MIN_FEE_NQT = ONE_NXT / 10;
-    
+
     public static final int MAX_NUMBER_OF_TRANSACTIONS = 512;
     public static final int MAX_PAYLOAD_LENGTH = MAX_NUMBER_OF_TRANSACTIONS * 176;
     public static final int SECONDS_BETWEEN_BLOCKS = 30;
-    
+
     /* XXX - POS reward amounts and halving */
     public static final long FORGER_FEE_STAGE_CHANGE_AT_BLOCK = 889920;
     public static final long[] FORGER_FEE_AMOUNT_NQT_STAGES = { 200 * ONE_NXT, 100 * ONE_NXT, 50 * ONE_NXT, 25 * ONE_NXT };
-    
+
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
-    
+
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
     public static final int MAX_ROLLBACK = Math.max(Nxt.getIntProperty("nxt.maxRollback"), 720);
     public static final int GUARANTEED_BALANCE_CONFIRMATIONS = isTestnet ? Nxt.getIntProperty("nxt.testnetGuaranteedBalanceConfirmations", 1440) : 1440;
@@ -110,7 +110,7 @@ public final class Constants {
     public static final int MAX_HUB_ANNOUNCEMENT_URIS = 100;
     public static final int MAX_HUB_ANNOUNCEMENT_URI_LENGTH = 1000;
     public static final long MIN_HUB_EFFECTIVE_BALANCE = 100000;
-    
+
     public static final int SECOND_BIRTH_BLOCK = 1;
     public static final int THIRD_BIRTH_BLOCK = 203000;
     public static final int THIRD_BIRTH_BLOCK_TEST = 2;
@@ -161,28 +161,25 @@ public final class Constants {
     public static final int MONETARY_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int PHASING_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int LAST_KNOWN_BLOCK = isTestnet ? 0 : 384000;
-    public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
-    public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
-    public static final int COLORED_ACCOUNTS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
     public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
-   
+
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0;  /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
-    
+
     public static final int MAX_ACCOUNT_IDENTIFIER_LENGTH = 100;
-    
+
     public static final int MAX_ACCOUNT_COLOR_NAME_LENGTH = 10;
     public static final int MAX_ACCOUNT_COLOR_DESCRIPTION_LENGTH = 1000;
 
     public static final long MASTER_VERIFICATION_AUTHORITY_ACCOUNT = Genesis.GENESIS_RECIPIENTS[0];
     public static final int MAX_VERIFICATION_AUTHORITY_PERIOD = 100000;
     public static final int MIN_VERIFICATION_AUTHORITY_PERIOD = 0;
-    
-    public static final int[] MIN_VERSION = new int[] {0, 4, 0};                
-    
-    public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;    
-    
+
+    public static final int[] MIN_VERSION = new int[] {0, 4, 0};
+
+    public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;
+
     public static final int FORGER_FEE_BLOCK = SECOND_BIRTH_BLOCK + 1;
 
     public static final long EPOCH_BEGINNING;
@@ -202,16 +199,16 @@ public final class Constants {
     public static final String ALLOWED_CURRENCY_CODE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String NAMESPACED_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz!#$%&()*+-./:;<=>?@[]_{|}";
     public static final String ALLOWED_ACCOUNT_ID_SERVER = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.";
-    public static final String ALLOWED_ACCOUNT_ID_NAME = ALLOWED_ACCOUNT_ID_SERVER + "!#$%&*+/=?^_{|}~";     
+    public static final String ALLOWED_ACCOUNT_ID_NAME = ALLOWED_ACCOUNT_ID_SERVER + "!#$%&*+/=?^_{|}~";
 
     public static final int EC_RULE_TERMINATOR = 600; /* cfb: This constant defines a straight edge when "longest chain"
                                                         rule is outweighed by "economic majority" rule; the terminator
                                                         is set as number of seconds before the current time. */
 
     public static final int EC_BLOCK_DISTANCE_LIMIT = 60;
-    
+
     /* XXX - List of Account ID's that are allowed to forge (or null to allow all) */
-    public static final List<Long> allowedToForge; 
+    public static final List<Long> allowedToForge;
     static {
         List<String> allowed = Nxt.getStringListProperty("nxt.allowedToForge");
         if (allowed.size() == 0) {
@@ -227,7 +224,7 @@ public final class Constants {
             }
         }
     }
-    
+
     public static final int MAX_GOSSIP_CACHE_LENGTH = 2000;
     public static final int MAX_GOSSIP_MESSAGE_LENGTH = 1000;
     public static final int MAX_GOSSIP_TIMEDRIFFT = 15;
