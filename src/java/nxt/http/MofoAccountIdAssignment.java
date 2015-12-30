@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright © 2014-2016 Krypto Fin ry and FIMK Developers.                   *
+ *                                                                            *
+ * See the AUTHORS.txt, DEVELOPER-AGREEMENT.txt and LICENSE.txt files at      *
+ * the top-level directory of this distribution for the individual copyright  *
+ * holder information and the developer policies on copyright and licensing.  *
+ *                                                                            *
+ * Unless otherwise agreed in a custom licensing agreement, no part of the    *
+ * Nxt software, including this file, may be copied, modified, propagated,    *
+ * or distributed except according to the terms contained in the LICENSE.txt  *
+ * file.                                                                      *
+ *                                                                            *
+ * Removal or modification of this copyright notice is prohibited.            *
+ *                                                                            *
+ ******************************************************************************/
+
 package nxt.http;
 
 
@@ -34,8 +50,8 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             return JSONResponses.FEATURE_NOT_AVAILABLE;
         }
       
-        long recipient = ParameterParser.getAccountId(req, "recipient", true);
-        Account account = ParameterParser.getSenderAccount(req);
+        long recipientId = ParameterParser.getAccountId(req, "recipient", true);
+        Account senderAccount = ParameterParser.getSenderAccount(req);
         String identifier = Convert.emptyToNull(req.getParameter("identifier"));
         long signatory;
         try {
@@ -45,13 +61,6 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
         }
         byte[] signature = Convert.parseHexString(Convert.emptyToNull(req.getParameter("signature")));
 
-        if (Account.getAccountByIdentifier(identifier) != null) {
-            JSONObject response = new JSONObject();
-            response.put("errorCode", 4);
-            response.put("errorDescription", "Duplicate account identifier");
-            return JSON.prepare(response);            
-        }
-        
         MofoIdentifier wrapper;
         try {
             wrapper = new MofoIdentifier(identifier);
@@ -62,15 +71,14 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             return JSON.prepare(response);          
         }
 
-        long identifierId = Account.getAccountIdByIdentifier(wrapper.getNormalizedId());
-        if (identifierId != 0) {
+        if (Account.getAccountIdByIdentifier(wrapper.getNormalizedId()) != 0) {
             JSONObject response = new JSONObject();
             response.put("errorCode", 4);
             response.put("errorDescription", "Duplicate identifier");
             return JSON.prepare(response);          
         }
 
-        if (wrapper.getIsDefaultServer() && recipient == account.getId()) {
+        if (wrapper.getIsDefaultServer() && recipientId == senderAccount.getId()) {
 
             /* no validation required, account is assigning default id to itself */
 
@@ -80,15 +88,12 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             /* validation might be required - try and get the public key first */
 
             byte[] publicKey = null;
-            Account recipientAccount = Account.getAccount(recipient);
+            Account recipientAccount = Account.getAccount(recipientId);
             if (recipientAccount != null) {
                 publicKey = recipientAccount.getPublicKey();
             }
             if (publicKey == null) {
-                String recipientPublicKey = Convert.emptyToNull(req.getParameter("recipientPublicKey"));
-                if (recipientPublicKey != null) {
-                    publicKey = Convert.toBytes(recipientPublicKey);
-                }
+                publicKey = Convert.parseHexString(Convert.emptyToNull(req.getParameter("recipientPublicKey")));
             }
             
             /* assigning non default identifiers always require signatory to be a verification authority */
@@ -100,8 +105,18 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
                 signatorIsVerificationAuthority = false;
             }
             else {
-                signatorIsVerificationAuthority = MofoVerificationAuthority.getIsVerificationAuthority(signatory);
-                publicKey = Account.getAccount(signatory).getPublicKey();
+                /* don't touch the db if not necessary */
+                if (!wrapper.getIsDefaultServer()) {
+                    signatorIsVerificationAuthority = MofoVerificationAuthority.getIsVerificationAuthority(signatory);
+                }
+                else {
+                    /* Does not matter, just assign it something */
+                    signatorIsVerificationAuthority = false;
+                }
+                Account signatoryAccount = Account.getAccount(signatory);
+                if (signatoryAccount != null) {
+                    publicKey = signatoryAccount.getPublicKey();
+                }
             }
     
             if (!wrapper.getIsDefaultServer() && !signatorIsVerificationAuthority) {
@@ -127,7 +142,7 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
         }
 
         Attachment attachment = new MofoAttachment.SetAccountIdentifierAttachment(identifier, signatory, signature);
-        return createTransaction(req, account, recipient, 0, attachment);
+        return createTransaction(req, senderAccount, recipientId, 0, attachment);
     }
 
 }
