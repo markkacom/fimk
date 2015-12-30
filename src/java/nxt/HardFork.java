@@ -16,14 +16,14 @@ public class HardFork {
     }
 
     public static boolean PRIVATE_ASSETS_BLOCK() {
-        return isEnabled("PRIVATE_ASSETS_BLOCK");
+        return isEnabled("PRIVATEASSETSBLOCK");
     }
 
     public static boolean ACCOUNT_IDENTIFIER_BLOCK() {
-        return isEnabled("ACCOUNT_IDENTIFIER_BLOCK");
+        return isEnabled("ACCOUNTIDENTIFIERBLOCK");
     }
 
     public static boolean COLORED_ACCOUNTS_BLOCK() {
-        return isEnabled("COLORED_ACCOUNTS_BLOCK");
+        return isEnabled("COLOREDACCOUNTSBLOCK");
     }
 }
