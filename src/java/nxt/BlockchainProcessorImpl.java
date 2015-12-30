@@ -62,10 +62,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 final class BlockchainProcessorImpl implements BlockchainProcessor {
-  
+
     /* Rollback 57M theft */
     static final Long ASSET_FREEZE_57M_THEFT_BLOCK = Convert.parseUnsignedLong("13325683304515417100");
-    static final int ASSET_FREEZE_57M_THEFT_HEIGHT = 282570;  
+    static final int ASSET_FREEZE_57M_THEFT_HEIGHT = 282570;
 
     private static final byte[] CHECKSUM_THIRD_BIRTH_BLOCK = Constants.isTestnet ? null : null;
     private static final byte[] CHECKSUM_FOURTH_BIRTH_BLOCK = Constants.isTestnet ? null : null;
@@ -709,11 +709,11 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     }
 
     private final Listener<Block> checksumListener = block -> {
-        if (CHECKSUM_THIRD_BIRTH_BLOCK != null && block.getHeight() == Constants.THIRD_BIRTH_BLOCK 
+        if (CHECKSUM_THIRD_BIRTH_BLOCK != null && block.getHeight() == Constants.THIRD_BIRTH_BLOCK
                 && ! verifyChecksum(CHECKSUM_THIRD_BIRTH_BLOCK, 0, Constants.THIRD_BIRTH_BLOCK)) {
             popOffTo(0);
         }
-        if (CHECKSUM_FOURTH_BIRTH_BLOCK != null && block.getHeight() == Constants.FOURTH_BIRTH_BLOCK 
+        if (CHECKSUM_FOURTH_BIRTH_BLOCK != null && block.getHeight() == Constants.FOURTH_BIRTH_BLOCK
                 && ! verifyChecksum(CHECKSUM_FOURTH_BIRTH_BLOCK, Constants.THIRD_BIRTH_BLOCK, Constants.FOURTH_BIRTH_BLOCK)) {
             popOffTo(Constants.THIRD_BIRTH_BLOCK);
         }
@@ -939,7 +939,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             for (TransactionImpl transaction : transactions) {
                 digest.update(transaction.bytes());
             }
-            
+
             BlockImpl genesisBlock = new BlockImpl(-1, 0, 0, Genesis.TOTAL_GENESIS_AMOUNT_NQT, 0, transactions.size() * 128, digest.digest(),
                     Genesis.CREATOR_PUBLIC_KEY, new byte[64], Genesis.GENESIS_BLOCK_SIGNATURE, null, transactions);
             genesisBlock.setPrevious(null);
@@ -1280,7 +1280,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             .comparingLong(UnconfirmedTransaction::getArrivalTimestamp)
             .thenComparingInt(UnconfirmedTransaction::getHeight)
             .thenComparingLong(UnconfirmedTransaction::getId);
-            
+
     private static final Comparator<UnconfirmedTransaction> transactionIdComparator = Comparator
             .comparingLong(UnconfirmedTransaction::getId);
 
