@@ -50,7 +50,7 @@ public final class AccountColor {
         switch (transaction.getType().getType()) {
             case TransactionType.TYPE_PAYMENT: {
                 switch (transaction.getType().getSubtype()) {
-                    case TransactionType.SUBTYPE_PAYMENT_ORDINARY_PAYMENT: {  
+                    case TransactionType.SUBTYPE_PAYMENT_ORDINARY_PAYMENT: {
 
                         /* All accounts can send payments to new accounts */
                         if (recipientAccount == null) {
@@ -80,7 +80,7 @@ public final class AccountColor {
             case TransactionType.TYPE_COLORED_COINS: {
                 switch (transaction.getType().getSubtype()) {
                     case TransactionType.SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION:
-                    case TransactionType.SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION: 
+                    case TransactionType.SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION:
                     case TransactionType.SUBTYPE_COLORED_COINS_DIVIDEND_PAYMENT:
                     case TransactionType.SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT:
                     case TransactionType.SUBTYPE_COLORED_COINS_ASSET_ISSUANCE: {
@@ -184,14 +184,14 @@ public final class AccountColor {
                     case TransactionType.SUBTYPE_DIGITAL_GOODS_FEEDBACK:
                     case TransactionType.SUBTYPE_DIGITAL_GOODS_REFUND: {
 
-                        /* Not affected by account color */ 
+                        /* Not affected by account color */
                         return;
                     }
                     case TransactionType.SUBTYPE_DIGITAL_GOODS_PURCHASE: {
 
                         /* Goods seller must have same color as sender */
                         Attachment.DigitalGoodsPurchase attachment = (Attachment.DigitalGoodsPurchase) transaction.getAttachment();
-                        DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(attachment.getGoodsId());  
+                        DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(attachment.getGoodsId());
                         if (goods != null) {
                             Account sellerAccount = Account.getAccount(goods.getSellerId());
                             if (sellerAccount != null) {
@@ -211,14 +211,14 @@ public final class AccountColor {
                     throw new NxtException.NotValidException("Monetary system not supported for colored accounts");
                 }
 
-                return; 
+                return;
             }
             case TransactionType.TYPE_DATA: {
                 switch (transaction.getType().getSubtype()) {
                     case TransactionType.SUBTYPE_DATA_TAGGED_DATA_UPLOAD:
                     case TransactionType.SUBTYPE_DATA_TAGGED_DATA_EXTEND: {
 
-                        /* Not affected by account color */ 
+                        /* Not affected by account color */
                         return;
                     }
                 }
@@ -229,7 +229,7 @@ public final class AccountColor {
                     case MofoTransactions.SUBTYPE_FIMKRYPTO_ACCOUNT_ID_ASSIGNMENT:
                     case MofoTransactions.SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_ADD_ACCOUNT:
                     case MofoTransactions.SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_REMOVE_ACCOUNT:
-                    case MofoTransactions.SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE: 
+                    case MofoTransactions.SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_SET_FEE:
                     case MofoTransactions.SUBTYPE_FIMKRYPTO_SET_VERIFICATION_AUTHORITY: {
 
                         /* Not affected by account color */
@@ -261,7 +261,7 @@ public final class AccountColor {
             }
         }
 
-        throw new NxtException.NotValidException("Unsupported transaction type " + 
+        throw new NxtException.NotValidException("Unsupported transaction type " +
             transaction.getType().getName() + " (type=" +  transaction.getType().getType() + " subtype=" +
                 transaction.getType().getSubtype() + ")");
     }
@@ -308,7 +308,7 @@ public final class AccountColor {
         return accountColorTable.getManyBy(new DbClause.LongClause("account_id", accountId), from, to);
     }
 
-    /* Searches the account colors table using LIKE search on the name column 
+    /* Searches the account colors table using LIKE search on the name column
      * Optionally results are limited to creator account unless accountId is 0 */
     public static DbIterator<AccountColor> searchAccountColorsByName(String name, long accountId, int from, int to) {
         Connection con = null;
@@ -409,6 +409,6 @@ public final class AccountColor {
     }
 
     public static boolean getAccountColorEnabled() {
-        return Nxt.getBlockchain().getHeight() > Constants.COLORED_ACCOUNTS_BLOCK;
+        return HardFork.COLORED_ACCOUNTS_BLOCK();
     }
 }
