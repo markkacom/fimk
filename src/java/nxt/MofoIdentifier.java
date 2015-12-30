@@ -2,7 +2,7 @@ package nxt;
 
 public class MofoIdentifier {
   
-    static final String DEFAULT_SERVER = "fimk.fi";
+    static final String[] DEFAULT_SERVERS = new String[] { "fimk.fi", "lompsa.com" };
   
     private String normalizedId;
     private boolean isDefaultServer;
@@ -40,7 +40,13 @@ public class MofoIdentifier {
             }
         }
         
-        isDefaultServer = DEFAULT_SERVER.equals(server);       
+        for (int i=0; i<DEFAULT_SERVERS.length; i++) {
+            if (DEFAULT_SERVERS[i].equals(server)) {
+                isDefaultServer = true;
+                return;
+            }
+        }
+        isDefaultServer = false;
     }
     
     public boolean getIsDefaultServer() {
