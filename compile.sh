@@ -28,7 +28,7 @@ echo "fim.zip generated successfully"
 # Package it all up
 # ==============================================================================
 
-VERSION=0.5.2
+VERSION=0.6.0
 BASE=fim
 DATE=`date +%Y-%m-%d`
 
