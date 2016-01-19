@@ -13,8 +13,6 @@
 package nxt.http;
 
 import nxt.Account;
-import nxt.Account.AccountInfo;
-import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
 
@@ -44,13 +42,9 @@ public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler
         JSONArray accountsJSONArray = new JSONArray();
         try (DbIterator<Account.AccountIdentifier> identifiers = Account.searchAccountIdentifiers(query, accountColorId, firstIndex, lastIndex)) {
             for (Account.AccountIdentifier identifier : identifiers) {
-                JSONObject accountJSON = new JSONObject();
-                String rsFormatted = Crypto.rsEncode(identifier.getAccountId());
-                accountJSON.put("accountRS", "FIM-"+rsFormatted);
-                if (!rsFormatted.equals(identifier.getEmail())) {
-                  accountJSON.put("identifier", identifier.getEmail());
-                }
-                accountsJSONArray.add(accountJSON);
+                JSONObject json = new JSONObject();
+                JSONData.putAccount(json, "account", identifier.getAccountId());
+                accountsJSONArray.add(json);
             }
         }
         response.put("accounts", accountsJSONArray);
