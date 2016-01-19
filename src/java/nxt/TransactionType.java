@@ -16,6 +16,7 @@
 
 package nxt;
 
+import nxt.Attachment.ColoredCoinsAssetIssuance;
 import nxt.util.Convert;
 import nxt.util.Logger;
 
@@ -67,7 +68,7 @@ public abstract class TransactionType {
     static final byte SUBTYPE_DIGITAL_GOODS_FEEDBACK = 6;
     static final byte SUBTYPE_DIGITAL_GOODS_REFUND = 7;
 
-    static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0; 
+    static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0;
 
     static final byte SUBTYPE_DATA_TAGGED_DATA_UPLOAD = 0;
     static final byte SUBTYPE_DATA_TAGGED_DATA_EXTEND = 1;
@@ -155,7 +156,7 @@ public abstract class TransactionType {
                 }
             case TYPE_MONETARY_SYSTEM:
                 return MonetarySystem.findTransactionType(subtype);
-                
+
             case MofoTransactions.TYPE_FIMKRYPTO:
                 return MofoTransactions.findTransactionType(subtype);
 
@@ -1165,6 +1166,7 @@ public abstract class TransactionType {
         public static final TransactionType ASSET_ISSUANCE = new ColoredCoins() {
 
             private final Fee ASSET_ISSUANCE_FEE = new Fee.ConstantFee(1000 * Constants.ONE_NXT);
+            private final Fee PRIVATE_ASSET_ISSUANCE_FEE = new Fee.ConstantFee(10000 * Constants.ONE_NXT);
 
             @Override
             public final byte getSubtype() {
@@ -1178,6 +1180,15 @@ public abstract class TransactionType {
 
             @Override
             public Fee getBaselineFee(Transaction transaction) {
+                Attachment.ColoredCoinsAssetIssuance attachment = (ColoredCoinsAssetIssuance) transaction.getAttachment();
+                if (attachment.getType() == Asset.TYPE_PRIVATE_ASSET) {
+                    if (Constants.isTestnet) {
+                        if (Nxt.getBlockchain().getHeight() <= 110000) {
+                            return ASSET_ISSUANCE_FEE;
+                        }
+                    }
+                    return PRIVATE_ASSET_ISSUANCE_FEE;
+                }
                 return ASSET_ISSUANCE_FEE;
             }
 
@@ -1217,7 +1228,7 @@ public abstract class TransactionType {
                         || attachment.getDecimals() < 0 || attachment.getDecimals() > 8
                         || attachment.getQuantityQNT() <= 0
                         || attachment.getQuantityQNT() > Constants.MAX_ASSET_QUANTITY_QNT
-                        ) {
+                        || attachment.getType() < 0 || attachment.getType() > 1) {
                     throw new NxtException.NotValidException("Invalid asset issuance: " + attachment.getJSONObject());
                 }
                 String normalizedName = attachment.getName().toLowerCase();
@@ -1331,7 +1342,7 @@ public abstract class TransactionType {
 
         abstract static class ColoredCoinsOrderPlacement extends ColoredCoins {
 
-            @Override 
+            @Override
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 Attachment.ColoredCoinsOrderPlacement attachment = (Attachment.ColoredCoinsOrderPlacement)transaction.getAttachment();
                 if (attachment.getPriceNQT() <= 0 || attachment.getPriceNQT() > Constants.MAX_BALANCE_NQT
@@ -1350,7 +1361,7 @@ public abstract class TransactionType {
             }
 
             abstract void doValidateAttachment(Transaction transaction) throws NxtException.ValidationException;
-            
+
             @Override
             public final boolean canHaveRecipient() {
                 return false;
@@ -1420,7 +1431,7 @@ public abstract class TransactionType {
                         if (issuerAccount != null) {
                             senderAccount.addToAssetBalanceQNT(attachment.getAssetId(), -attachment.getOrderFeeQNT());
                             issuerAccount.addToAssetAndUnconfirmedAssetBalanceQNT(attachment.getAssetId(), attachment.getOrderFeeQNT());
-                            
+
                             Order.Ask.addOrder(transaction, attachment);
                         }
                     }
@@ -1448,10 +1459,10 @@ public abstract class TransactionType {
                     if ( ! MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getSenderId())) {
                         throw new NxtException.NotValidException("Account not allowed to place ask order");
                     }
-                    long orderFeeQNT = MofoAsset.calculateOrderFee(attachment.getAssetId(), attachment.getQuantityQNT()); 
+                    long orderFeeQNT = MofoAsset.calculateOrderFee(attachment.getAssetId(), attachment.getQuantityQNT());
                     if (orderFeeQNT != attachment.getOrderFeeQNT()) {
                         throw new NxtException.NotValidException("Incorrect \"orderFeeQNT\" should be "+String.valueOf(orderFeeQNT));
-                    }                    
+                    }
                 }
             }
         };
@@ -1490,7 +1501,7 @@ public abstract class TransactionType {
                             return true;
                         }
                     }
-                    else {                  
+                    else {
                         senderAccount.addToUnconfirmedBalanceNQT(-Math.multiplyExact(attachment.getQuantityQNT(), attachment.getPriceNQT()));
                         return true;
                     }
@@ -1540,9 +1551,9 @@ public abstract class TransactionType {
                     long orderFeeNQT = MofoAsset.calculateOrderFee(attachment.getAssetId(), totalNQT);
                     if (orderFeeNQT != attachment.getOrderFeeNQT()) {
                         throw new NxtException.NotValidException("Incorrect \"orderFeeNQT\" should be "+String.valueOf(orderFeeNQT));
-                    }                    
+                    }
                 }
-            }            
+            }
         };
 
         abstract static class ColoredCoinsOrderCancellation extends ColoredCoins {
