@@ -1,38 +1,42 @@
-FIM Origins:
+/******************************************************************************
+ * Copyright © 2014-2016 FIMK Developers                                      *
+ ******************************************************************************/
 
-FIM is open source software and based on NXT 
+Welcome to FIMK.
+
+FIMK is open source software and based on NXT 
 (https://bitbucket.org/JeanLucPicard/nxt/overview). 
-FIM is different from NXT in the following ways:
 
-* 30 second block time (instead of 60 seconds)
-* Lower transaction fees (0.1 instead of 1)
-* Block rewards are paid to the block forger
-* Completely new client built from scratch (http://mofowallet.com)
+This is FIMK version 0.6.0 which is based on NXT 1.5.10.
 
-This README is based of the original NXT README.
+FIMK 0.6.0 is a mandatory update, you must update to this version before:
 
-This is FIM version 0.4.0 which is based on NXT 1.4.16.
+                    Jan 18th 2016 - 21.00 GMT
 
-
-Running the FIM software:
+Running the FIMK software:
 
 Dependencies: Java 8 or later needs to be installed first. Only the Oracle JVM
 has been tested and supported.
 
-There is no installation needed. Unpack the fim.zip package and open a
-shell in the resulting fim directory. Execute the run.sh script if using Linux,
+There is no installation needed. Unpack the zip package to a directory of your choice
+and it will be populated with the lompsa.exe client and fim server directory.
+
+RUNNING THE SERVER:
+
+Execute the run.sh script if using Linux,
 or run.bat if using Windows. This will start a java server process, which will
 begin logging its activities to the console. The initialization takes a few
 seconds. When it is ready, you should see the message 
-"FIM server 0.2.0 (based on NXT 1.1.5) started successfully". 
-Open a browser, without stopping the java process, and go to
-http://localhost:7886 , where the FIM UI should now be available. To stop the
-application, type Ctrl-C inside the console window.
+"FIM server 0.6.0 (based on NXT 1.5.10) started successfully". 
+
+THROUGH THE WEB BROWSER:
+
+Run the server first. Open a browser, without stopping the java process, and go to
+http://localhost:7886 , where the FIMK UI should now be available. 
 
 Warning: It is better to use only latin characters and no spaces in the path
-to the Nxt installation directory, as the use of special characters may result
+to the fim installation directory, as the use of special characters may result
 in permissions denied error in the browser, which is a known jetty issue.
-
 
 Customization:
 
@@ -49,21 +53,9 @@ when upgrading the software, you can safely overwrite nxt-default.properties
 with the updated file from the new package, while your customizations remain
 safe in the nxt.properties file.
 
-
-How to contribute?
-
-There are many ways to contribute to Nxt. Here are some examples:
-
- * create pull requests
- * review pull requests
- * review existing code
- * create issues (aka feature ideas, bug reports, documentation etc.)
- * answer issues
-
-
 Technical details:
 
-The FIM software is a client-server application. It consists of a java server
+The FIMK software is a client-server application. It consists of a java server
 process, the one started by the run.sh script, and a javascript user interface
 run in a browser. To run a node, forge, update the blockchain, interact with
 peers, only the java process needs to be running, so you could logout and close
@@ -71,32 +63,20 @@ the browser but keep the java process running. If you want to keep forging, make
 sure you do not click on "stop forging" when logging out. You can also just
 close the browser without logging out.
 
-The java process communicates with peers on port 6864 tcp by default. If you are
+The java process communicates with peers on port 7864 tcp by default. If you are
 behind a router or a firewall and want to have your node accept incoming peer
 connections, you should setup port forwarding. The server will still work though
 even if only outgoing connections are allowed, so opening this port is optional.
 
 The user interface is available on port 7886. This port also accepts http API
-requests which other FIM client applications could use.
+requests which other FIMK client applications could use.
 
 The blockchain is stored on disk using the H2 embedded database, inside the
-fim_test_db directory. When upgrading, you should not delete the old fim_test_db
+fim_db directory. When upgrading, you should not delete the old fim_db
 directory, upgrades always include code that can upgrade old database files to
 the new version whenever needed. But there is no harm if you do delete the
-fim_test_db, except that it will take some extra time to download the blockchain
+fim_db, except that it will take some extra time to download the blockchain
 from scratch.
-
-The default FIM client does not store any wallet-type file on disk. Unlike
-bitcoin, your password is the only thing you need to get access to your account,
-and is the only piece of data you need to backup or remember. This also means
-that anybody can get access to your account with only your password - so make
-sure it is long and random. A weak password will result in your funds being
-stolen immediately.
-
-The java process logs its activities and error messages to the standard output
-which you see in the console window, but also to a file fim.log, which gets
-overwritten at restart. In case of an error, the fim.log file may contain
-helpful information, so include its contents when submitting a bug report.
 
 In addition to the default user interface at http://localhost:7886 , the
 following urls are available:
@@ -107,20 +87,3 @@ directly using the http interface without going through the browser UI.
 
 http://localhost:7886/test?requestType=<specificRequestType> - same as above,
 but only shows the form for the request type specified.
-
-http://localhost:7866/doc - a javadoc documentation for client developers who
-want to use the Java API directly instead of going through the http interface.
-
-http://localhost:7886/admin.html - some more commonly used commands, using the
-http interface.
-
-
-Compiling:
-
-The source is included in the src subdirectory. To compile it on linux, just
-run the enclosed compile.sh script. This will compile all java classes and
-put them under the classes subdirectory, which is already in the classpath
-used by the run.sh startup script. The compiled class files can optionally be
-packaged in a nxt.jar file using the enclosed jar.sh script, and then nxt.jar
-should be included in the classpath instead of the classes subdirectory.
-
