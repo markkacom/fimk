@@ -131,9 +131,21 @@ public class MofoTransactions {
 
         public static final TransactionType PRIVATE_ASSET_ADD_ACCOUNT = new PrivateAssetAddAccountTransaction() {
 
+            private Fee.ConstantFee PRIVATE_ASSET_ADD_ACCOUNT_FEE = new Fee.ConstantFee(Constants.ONE_NXT * 10);
+
             @Override
             public final byte getSubtype() {
                 return SUBTYPE_FIMKRYPTO_PRIVATE_ASSET_ADD_ACCOUNT;
+            }
+
+            @Override
+            public final Fee getBaselineFee(Transaction transaction) {
+                if (Constants.isTestnet) {
+                    if (Nxt.getBlockchain().getHeight() <= 110000) {
+                        return Fee.DEFAULT_FEE;
+                    }
+                }
+                return PRIVATE_ASSET_ADD_ACCOUNT_FEE;
             }
 
             @Override
@@ -662,7 +674,7 @@ public class MofoTransactions {
 
     public static abstract class AccountColorCreateTransaction extends TransactionType {
 
-        private static final Fee ACCOUNT_COLOR_CREATE_FEE = new Fee.ConstantFee(Constants.ONE_NXT * 10);
+        private static final Fee ACCOUNT_COLOR_CREATE_FEE = new Fee.ConstantFee(Constants.ONE_NXT * 10000);
 
         private AccountColorCreateTransaction() {
         }
