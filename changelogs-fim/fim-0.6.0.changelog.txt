@@ -1,0 +1,151 @@
+FIMK 0.6.0 is a mandatory update, you must update to this version before:
+
+                    Jan 18th 2016 - 21.00 GMT
+
+This is a critical update and will cause you to be on a fork if you don't
+update. The hard fork will happen by setting a set of pre-determined aliases
+on the FIMK blockchain.  
+
+FIMK 0.6.0 is based on NXT 1.5.10
+  
+  NXT 1.5.10 is the last NXT release before enabling the following 
+  functionalities:
+    
+  - Monetary System
+  - Voting
+  - Phasing
+  - Prunable Message Data
+    
+  At this stage while this code is ready and available on the FIMK testnet we
+  did not yet decide to enable these functionalities on the main FIMK net.
+  Instead this release enables only new FIMK functionalities.
+    
+FIMK 0.6.0 changes:
+
+This release embeds Lompsa client 0.5.0.
+
+Private Assets 
+  
+  When issueing an asset users can choose to issue a 'private' asset instead
+  of a 'standard' asset. This functionality is implemented through a change 
+  to the internal asset exchange mechanism where we've introduced the 'type'
+  property for each asset. Currently there are the types 'standard' and 
+  'private', in the future more asset types can be added through this 
+  mechanism.
+  
+  A private asset is meant for use in financial institutions, it is an asset
+  class which gives the asset issuer more control over the asset on the
+  decentralized FIMK network.
+  
+  Issueing a private asset costs 10,000 FIM.
+  
+  A private asset issuer can do the following:
+  
+  1. Issue a new asset and mark it private
+  
+     To create a private asset either use the Lompsa client and tick the 
+     'private' checkbox when issueing a new asset.
+     Or use the HTTP API "issueAsset" and provide a "type" parameter which 
+     is set to "1" for private assets. ("0" is the default but can be 
+     omitted for standard assets). 
+  
+  2. Determine (to) who the asset can be traded or transfered.
+     
+     Accounts are either allowed or not allowed to trade and transfer, the
+     asset issuer can add and remove these accounts.
+     Buy or sell orders from accounts that are removed from the list of 
+     accounts allowed to trade or transfer are automatically cancelled.
+  
+     Adding an account to the list of allowed accounts costs 10 FIM,
+     removing an account from the list of allowed accounts costs 0.1 FIM.
+     
+     To add (or remove) allowed accounts either use the Lompsa client (see
+     Lompsa Advanced section).
+     Or use the HTTP API "addPrivateAssetAccount" or 
+     "removePrivateAssetAccount", provide the asset identifier as the 'asset'
+     parameter and set the account to add/remove as the transaction 
+     recipient. 
+  
+  3. Set and collect trade fee
+  
+     Asset issuer can (optionally) set a trade fee for the private asset. 
+     Upon each automated trade which occurs in the decentralized order 
+     matching engine a percentage is taken from the receiving account, this
+     is either FIM (or colored FIM) or the private asset being traded.
+     
+     Changing the trade fee costs 0.1 FIM, default trade fee is set to 0%.
+     
+  4. Set and collect order fee
+  
+     Asset issuer can (optionally) set a order fee for private assets. When
+     selling an asset the order fee is paid as a percentage of the amount of
+     assets offered, when buying an asset the order fee fee is paid as a 
+     percentage of the total amount of FIMK (or colored FIMK) offered.
+     
+     Changing the order fee costs 0.1 FIM, default order fee is set to 0%.
+
+     To change the order or trade fee percentage either use the Lompsa 
+     client (see Lompsa Advanced section).
+     Or use the HTTP API "setPrivateAssetFee" this API call allows to set  
+     both order and trade fee with a single call. The call expects the 
+     "asset" parameter to identify the asset and a percentage value for 
+     either (or both) "orderFeePercentage" and "tradeFeePercentage".
+     
+     See the following table for what values relate to which percentages.
+     
+     -----------------------------------------------------------------------
+     | Parameter (**FeePercentage)              | Actual percentage        | 
+     -----------------------------------------------------------------------
+     | 1                                        | 0.000001%                | 
+     | 10                                       | 0.00001%                 | 
+     | 100,000                                  | 0.1%                     | 
+     | 1,000,000                                | 1%                       | 
+     | 10,000,000                               | 10%                      |
+     ----------------------------------------------------------------------- 
+     
+     When using the Lompsa client UI these values are calculated and 
+     formatted automatically for you.         
+     
+Colored Accounts
+
+  Colored accounts is a new FIMK feature which borrows it's name from the 
+  concept of colored-coins.
+  With colored accounts any user can create their own account color and create
+  one or more initial colored accounts.
+  
+  This is similar in many ways to the Monetary System but with some key 
+  differences:
+  
+  1. You must send FIM to a colored account to turn it into colored FIM (no need
+     for large amounts - works just as well with NQT (0.00000001 FIM)).
+  
+  2. Colored accounts are not limited in functionality as Monetary System units
+     are; colored accounts can be used in the Asset Exchange as well as in the
+     Marketplace and all other current and future FIMK functionalities.
+     
+  3. Colored accounts are supported in the Lompsa client as regular accounts.
+  
+  4. FIM can be transfered to colored FIM and back to FIM again by sending it 
+     to the color creator.
+  
+  Once the color creator has created the account color and the initial colored
+  account is assigned you can create any new number of colored accounts simply 
+  by sending them a payment, asset transfer or message. Only new accounts can 
+  become colored accounts.
+
+  Creating a new account color costs 10,000 FIM.
+  
+  To create a new account color either use the Lompsa client (see advanced 
+  section).
+  Or use the HTTP API "accountColorCreate" which expects a 'name' and 
+  'description' parameter.
+  
+  To assign the initial colored account either use the Lompsa client (see
+  advanced section).
+  Or use the HTTP API "accountColorAssign" which expects an "accountColorId" and
+  the "recipient".
+  
+Email Account Identifiers
+
+  The preparation for this feature is still under way, this release enables the
+  core requirements to move to this new method of identifying accounts.
