@@ -16,6 +16,7 @@
 
 package nxt;
 
+import nxt.Account.AccountIdentifier;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.db.DbClause;
@@ -898,6 +899,31 @@ public final class Account {
         }
     }
 
+    public static AccountIdentifier getEmailAccountIdentifier(long accountId) {
+        Connection con = null;
+        try {
+            String sql = "SELECT * "
+                + "FROM account_identifier "
+                + "WHERE account_id = ? "
+                + "LIMIT 1 OFFSET 1";
+
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql.toString());
+            pstmt.setLong(1, accountId);
+
+            try (DbIterator<AccountIdentifier> iterator = accountIdentifierTable.getManyBy(con, pstmt, true)) {
+                if (iterator.hasNext()) {
+                    return iterator.next();
+                }
+            }
+
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+        return null;
+    }
+
     /* Change of plans, accounts can only have one identifier
      * TODO: remove iteration logic */
     public static boolean hasAccountIdentifier(long accountId) {
@@ -1104,6 +1130,16 @@ public final class Account {
             data = Convert.compress(data);
         }
         return EncryptedData.encrypt(data, Crypto.getPrivateKey(senderSecretPhrase), getPublicKey());
+    }
+
+    static public EncryptedData encryptTo(byte[] recipientPublicKey, byte[] data, String senderSecretPhrase, boolean compress) {
+        if (recipientPublicKey == null) {
+            throw new IllegalArgumentException("Must provide recipient account public key");
+        }
+        if (compress && data.length > 0) {
+            data = Convert.compress(data);
+        }
+        return EncryptedData.encrypt(data, Crypto.getPrivateKey(senderSecretPhrase), recipientPublicKey);
     }
 
     public byte[] decryptFrom(EncryptedData encryptedData, String recipientSecretPhrase, boolean uncompress) {
