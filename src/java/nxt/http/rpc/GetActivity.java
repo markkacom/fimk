@@ -23,22 +23,22 @@ import nxt.http.websocket.RPCCall;
 import nxt.util.Convert;
 
 public class GetActivity extends RPCCall {
-  
+
     public static RPCCall instance = new GetActivity("getActivity");
     static int COUNT = 15;
 
     public GetActivity(String identifier) {
         super(identifier);
     }
-  
+
     @SuppressWarnings("unchecked")
     @Override
     public JSONStreamAware call(JSONObject arguments) throws ParameterException {
-        Account account = null;
-        String accountId = Convert.emptyToNull((String) arguments.get("account"));
-        if (accountId != null) {
-            account = ParameterParser.getAccount(arguments);
-        }        
+        long accountId = 0;
+        String accountIdVal = Convert.emptyToNull((String) arguments.get("account"));
+        if (accountIdVal != null) {
+            accountId = Convert.parseAccountId(accountIdVal);
+        }
         int timestamp = ParameterParser.getTimestamp(arguments);
         if (timestamp == 0) {
             timestamp = Nxt.getEpochTime();
@@ -47,28 +47,28 @@ public class GetActivity extends RPCCall {
         boolean includeBlocks       = "true".equals(arguments.get("includeBlocks"));
         boolean includeTrades       = ! "false".equals(arguments.get("includeTrades"));
         boolean includeTransactions = ! "false".equals(arguments.get("includeTransactions"));
-        
+
         List<TransactionFilter> filters = ParameterParser.getTransactionFilter(arguments);
-        
+
         List<Trade> trades = null;
         List<Block> blocks = null;
         List<Transaction> transactions = null;
-        List<Transaction> unconfirmedTransactions = getUnconfirmedTransactions(account, timestamp, filters, includeTransactions);
+        List<Transaction> unconfirmedTransactions = getUnconfirmedTransactions(accountId, timestamp, filters, includeTransactions);
         Iterator<Transaction> unconfirmedTransactionIterator = null;
         if (includeTransactions && unconfirmedTransactions != null) {
             unconfirmedTransactionIterator = unconfirmedTransactions.iterator();
         }
-        
+
         try (
-            DbIterator<? extends Trade> tradeIterator = getTrades(account, timestamp, includeTrades);
-            DbIterator<? extends Block> blockIterator = getBlocks(account, timestamp, includeBlocks);
-            DbIterator<? extends Transaction> transactionIterator = getTransactions(account, timestamp, filters, includeTransactions);
+            DbIterator<? extends Trade> tradeIterator = getTrades(accountId, timestamp, includeTrades);
+            DbIterator<? extends Block> blockIterator = getBlocks(accountId, timestamp, includeBlocks);
+            DbIterator<? extends Transaction> transactionIterator = getTransactions(accountId, timestamp, filters, includeTransactions);
         ) {
             int i = 0;
             Trade trade = null;
             Block block = null;
             Transaction transaction = null;
-            
+
             while (i++ < COUNT) {
                 if (includeTrades && trade == null && tradeIterator.hasNext()) {
                     trade = tradeIterator.next();
@@ -84,10 +84,10 @@ public class GetActivity extends RPCCall {
                         transaction = transactionIterator.next();
                     }
                 }
-                
+
                 switch (getHighestIndex(
-                          block == null ? 0 : block.getTimestamp(), 
-                          transaction == null ? 0 : transaction.getTimestamp(), 
+                          block == null ? 0 : block.getTimestamp(),
+                          transaction == null ? 0 : transaction.getTimestamp(),
                           trade == null ? 0 : trade.getTimestamp())) {
                 case 0:
                     if (block != null) {
@@ -101,7 +101,7 @@ public class GetActivity extends RPCCall {
                 case 1:
                     if (transaction != null) {
                         if (transactions == null) {
-                            transactions = new ArrayList<Transaction>();                      
+                            transactions = new ArrayList<Transaction>();
                         }
                         transactions.add(transaction);
                         transaction = null;
@@ -119,9 +119,9 @@ public class GetActivity extends RPCCall {
                 }
             }
         }
-        
+
         JSONObject response = new JSONObject();
-  
+
         if (trades != null) {
             JSONArray array = new JSONArray();
             for (Trade trade : trades) {
@@ -129,7 +129,7 @@ public class GetActivity extends RPCCall {
             }
             response.put("trades", array);
         }
-         
+
         if (blocks != null) {
             JSONArray array = new JSONArray();
             for (Block block : blocks) {
@@ -137,7 +137,7 @@ public class GetActivity extends RPCCall {
             }
             response.put("blocks", array);
         }
-        
+
         if (transactions != null) {
             JSONArray array = new JSONArray();
             for (Transaction transaction : transactions) {
@@ -149,55 +149,55 @@ public class GetActivity extends RPCCall {
                 }
             }
             response.put("transactions", array);
-        } 
-        
-        return response;      
+        }
+
+        return response;
     }
 
-    
-    private DbIterator<? extends Trade> getTrades(Account account, int timestamp, boolean includeTrades) {
+
+    private DbIterator<? extends Trade> getTrades(long accountId, int timestamp, boolean includeTrades) {
         if (includeTrades) {
-            if (account != null) {
-                return MofoQueries.getAccountAssetTradesBefore(account, timestamp, COUNT);
+            if (accountId != 0) {
+                return MofoQueries.getAccountAssetTradesBefore(accountId, timestamp, COUNT);
             }
             return MofoQueries.getAssetTradesBefore(timestamp, COUNT);
         }
         return null;
     }
-    
-    private DbIterator<? extends Block> getBlocks(Account account, int timestamp, boolean includeBlocks) {
+
+    private DbIterator<? extends Block> getBlocks(long accountId, int timestamp, boolean includeBlocks) {
         if (includeBlocks) {
-            if (account != null) {
-                return MofoQueries.getBlocks(account, timestamp, COUNT);
+            if (accountId != 0) {
+                return MofoQueries.getBlocks(accountId, timestamp, COUNT);
             }
             return MofoQueries.getBlocks(timestamp, COUNT);
         }
         return null;
     }
-    
-    private DbIterator<? extends Transaction> getTransactions(Account account, int timestamp, List<TransactionFilter> filters, boolean includeTransactions) {
+
+    private DbIterator<? extends Transaction> getTransactions(long accountId, int timestamp, List<TransactionFilter> filters, boolean includeTransactions) {
         if (includeTransactions) {
-            if (account != null) {
-                return MofoQueries.getTransactions(account, timestamp, COUNT, filters);
+            if (accountId != 0) {
+                return MofoQueries.getTransactions(accountId, timestamp, COUNT, filters);
             }
             return MofoQueries.getTransactions(timestamp, COUNT, filters);
         }
         return null;
     }
-    
-    private List<Transaction> getUnconfirmedTransactions(Account account, int timestamp, List<TransactionFilter> filters, boolean includeTransactions) {
+
+    private List<Transaction> getUnconfirmedTransactions(long accountId, int timestamp, List<TransactionFilter> filters, boolean includeTransactions) {
         if (includeTransactions && Nxt.getBlockchain().getLastBlock().getTimestamp() < timestamp) {
-            if (account != null) {
-                return MofoQueries.getUnconfirmedTransactions(account, timestamp, COUNT, filters);
+            if (accountId != 0) {
+                return MofoQueries.getUnconfirmedTransactions(accountId, timestamp, COUNT, filters);
             }
             return MofoQueries.getUnconfirmedTransactions(timestamp, COUNT, filters);
         }
         return null;
     }
-    
+
     private int getHighestIndex(int x, int y, int z) {
         if (x >= y && x >= z) { return 0; }
         if (y >= x && y >= z) { return 1; }
         return 2;
-    }      
+    }
 }
