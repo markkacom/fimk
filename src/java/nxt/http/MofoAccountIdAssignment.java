@@ -81,6 +81,16 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             return JSON.prepare(response);
         }
 
+        if (wrapper.getIsDefaultServer()) {
+            String similarId = wrapper.getSimilarId();
+            if (similarId != null && Account.getAccountIdByIdentifier(similarId) != 0) {
+                JSONObject response = new JSONObject();
+                response.put("errorCode", 4);
+                response.put("errorDescription", "Duplicate identifier");
+                return JSON.prepare(response);
+            }
+        }
+
         if (wrapper.getIsDefaultServer() && recipientId == senderAccount.getId()) {
 
             /* no validation required, account is assigning default id to itself */
