@@ -313,7 +313,7 @@ public final class APIServlet extends HttpServlet {
         map.put("trimDerivedTables", TrimDerivedTables.instance);
 
         registerFIMKAPI(map);
-        
+
         apiRequestHandlers = Collections.unmodifiableMap(map);
     }
 
@@ -326,7 +326,7 @@ public final class APIServlet extends HttpServlet {
         map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
         map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
         map.put("getPrivateAssetAccount", GetPrivateAssetAccount.instance);
-        map.put("setPrivateAssetFee", SetPrivateAssetFee.instance);      
+        map.put("setPrivateAssetFee", SetPrivateAssetFee.instance);
         map.put("getVirtualAskOrders", GetVirtualAskOrders.instance);
         map.put("getVirtualBidOrders", GetVirtualBidOrders.instance);
         map.put("getVirtualTrades", GetVirtualTrades.instance);
@@ -343,15 +343,16 @@ public final class APIServlet extends HttpServlet {
         map.put("accountColorList", AccountColorList.instance);
         map.put("accountColorSearch", AccountColorSearch.instance);
         map.put("accountColorGet", AccountColorGet.instance);
-        
+        map.put("signMessage", SignMessage.instance);
+
         if (Constants.isTestnet) {
             map.put("getWebsocketEvents", GetWebsocketEvents.instance);
             map.put("startCollectingWebsocketEvents", StartCollectingWebsocketEvents.instance);
             map.put("stopCollectingWebsocketEvents", StopCollectingWebsocketEvents.instance);
         }
     }
-    
-    
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         process(req, resp);
