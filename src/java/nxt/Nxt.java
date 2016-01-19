@@ -52,7 +52,7 @@ public final class Nxt {
 
     public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.6.0"; /* FIM Version*/
+    public static final String VERSION = "0.6.1"; /* FIM Version*/
 
     private static volatile Time time = new Time.EpochTime();
 
