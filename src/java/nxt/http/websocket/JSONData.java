@@ -8,6 +8,7 @@ import java.util.Objects;
 import nxt.Account;
 import nxt.Appendix;
 import nxt.Asset;
+import nxt.Account.AccountIdentifier;
 import nxt.Account.AccountInfo;
 import nxt.Attachment.MonetarySystemAttachment;
 import nxt.Attachment.ColoredCoinsAssetTransfer;
@@ -50,7 +51,7 @@ public class JSONData {
         }
         return json;
     }
-  
+
     @SuppressWarnings("unchecked")
     public static void putAccount(JSONObject json, String name, long accountId) {
         Account account = Account.getAccount(accountId);
@@ -66,11 +67,18 @@ public class JSONData {
                     json.put(name + "ColorName", accountColor.getName());
                 }
             }
-        }    
+            AccountIdentifier identifier = Account.getEmailAccountIdentifier(accountId);
+            if (identifier != null) {
+                json.put(name + "Email", identifier.getEmail());
+            }
+            else {
+                json.put(name + "Email", Convert.rsAccount(accountId));
+            }
+        }
         json.put(name, Long.toUnsignedString(accountId));
-        json.put(name + "RS", Convert.rsAccount(accountId));      
+        json.put(name + "RS", Convert.rsAccount(accountId));
     }
-    
+
     @SuppressWarnings("unchecked")
     public static JSONArray transactions(List<? extends Transaction> transactions, boolean unconfirmed) {
         JSONArray result = new JSONArray();
@@ -79,7 +87,7 @@ public class JSONData {
         }
         return result;
     }
-    
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static JSONObject transaction(Transaction transaction, boolean unconfirmed) {
         JSONObject json = new JSONObject();
@@ -90,7 +98,7 @@ public class JSONData {
         json.put("amountNQT", transaction.getAmountNQT());
         json.put("feeNQT", transaction.getFeeNQT());
         json.put("deadline", transaction.getDeadline());
-        
+
         if (unconfirmed) {
           json.put("confirmations", -1);
         }
@@ -146,7 +154,7 @@ public class JSONData {
                         if (order == null) {
                             continue;
                         }
-                        assetId = order.getAssetId();                        
+                        assetId = order.getAssetId();
                     }
                     else {
                         continue;
@@ -157,7 +165,7 @@ public class JSONData {
                 }
             }
             else if (transaction.getType().getType() == 5 && appendage instanceof MonetarySystemAttachment) {
-                final long currencyId = ((MonetarySystemAttachment) appendage).getCurrencyId(); 
+                final long currencyId = ((MonetarySystemAttachment) appendage).getCurrencyId();
                 JSONData.putCurrencyInfo(attachmentJSON, currencyId);
             }
         }
@@ -171,7 +179,7 @@ public class JSONData {
         }
         return json;
     }
-  
+
     @SuppressWarnings("unchecked")
     private static void putCurrencyInfo(JSONObject json, long currencyId) {
         Currency currency = Currency.getCurrency(currencyId);
@@ -184,7 +192,7 @@ public class JSONData {
         json.put("type", currency.getType());
         json.put("decimals", currency.getDecimals());
         json.put("issuanceHeight", currency.getIssuanceHeight());
-        putAccount(json, "issuerAccount", currency.getAccountId());     
+        putAccount(json, "issuerAccount", currency.getAccountId());
     }
 
     @SuppressWarnings("unchecked")
@@ -195,26 +203,26 @@ public class JSONData {
             json.put("decimals", asset.getDecimals());
             if (Asset.privateEnabled()) {
                 json.put("type", asset.getType());
-            }            
+            }
         }
-    }    
-   
+    }
+
     public static int generateTradeHash(Trade trade) {
-        return Objects.hash(Long.valueOf(trade.getAssetId()), 
+        return Objects.hash(Long.valueOf(trade.getAssetId()),
                             Long.valueOf(trade.getAskOrderId()),
                             Long.valueOf(trade.getBidOrderId()),
                             Long.valueOf(trade.getSellerId()),
                             Long.valueOf(trade.getBuyerId()),
                             Long.valueOf(trade.getBlockId()),
                             Long.valueOf(trade.getPriceNQT()),
-                            Long.valueOf(trade.getQuantityQNT()) );      
+                            Long.valueOf(trade.getQuantityQNT()) );
     }
-    
+
     @SuppressWarnings("unchecked")
     public static JSONObject trade(Trade trade, boolean includeAssetInfo) {
         JSONObject json = new JSONObject();
-        
-        json.put("id", generateTradeHash(trade));        
+
+        json.put("id", generateTradeHash(trade));
         json.put("timestamp", trade.getTimestamp());
         json.put("quantityQNT", String.valueOf(trade.getQuantityQNT()));
         json.put("priceNQT", String.valueOf(trade.getPriceNQT()));
@@ -234,7 +242,7 @@ public class JSONData {
         }
         return json;
     }
-  
+
     @SuppressWarnings("unchecked")
     public static JSONArray trades(List<? extends Trade> trades) {
         JSONArray result = new JSONArray();
@@ -243,13 +251,13 @@ public class JSONData {
         }
         return result;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static JSONObject minimalBlock(Block block) {
         JSONObject json = new JSONObject();
         json.put("block", block.getStringId());
         json.put("height", block.getHeight());
-        json.put("generator", Convert.rsAccount(block.getGeneratorId())); 
+        json.put("generator", Convert.rsAccount(block.getGeneratorId()));
         json.put("timestamp", block.getTimestamp());
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
@@ -270,16 +278,16 @@ public class JSONData {
         if (includeAssetInfo) {
             Asset asset = Asset.getAsset(accountAsset.getAssetId());
             json.put("name", asset.getName());
-            json.put("decimals", asset.getDecimals());          
+            json.put("decimals", asset.getDecimals());
             json.put("totalQuantityQNT", asset.getQuantityQNT());
             putAccount(json, "issuer", asset.getAccountId());
             if (Asset.privateEnabled()) {
                 json.put("type", asset.getType());
-            }            
+            }
         }
         return json;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static JSONObject accountCurrency(Account.AccountCurrency accountCurrency, boolean includeCurrencyInfo) {
         JSONObject json = new JSONObject();
@@ -291,7 +299,7 @@ public class JSONData {
         }
         return json;
     }
-  
+
     @SuppressWarnings("unchecked")
     public static JSONObject order(Order order) {
         JSONObject json = new JSONObject();
