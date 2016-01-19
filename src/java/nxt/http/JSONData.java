@@ -17,6 +17,7 @@
 package nxt.http;
 
 import nxt.Account;
+import nxt.Account.AccountIdentifier;
 import nxt.Account.AccountInfo;
 import nxt.AccountColor;
 import nxt.Alias;
@@ -264,12 +265,12 @@ final class JSONData {
         JSONObject json = new JSONObject();
         json.put("block", block.getStringId());
         json.put("height", block.getHeight());
-        json.put("generator", Convert.rsAccount(block.getGeneratorId())); 
+        json.put("generator", Convert.rsAccount(block.getGeneratorId()));
         json.put("timestamp", block.getTimestamp());
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
-        
+
         /* XXX - Include POS reward for block */
         json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
         return json;
@@ -308,7 +309,7 @@ final class JSONData {
             block.getTransactions().forEach(transaction -> transactions.add(transaction.getStringId()));
         }
         json.put("transactions", transactions);
-        
+
         /* XXX - Include POS reward for block */
         json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
         return json;
@@ -686,7 +687,7 @@ final class JSONData {
         JSONObject attachmentJSON = new JSONObject();
         for (Appendix appendage : transaction.getAppendages(true)) {
             attachmentJSON.putAll(appendage.getJSONObject());
-            if (transaction.getType().getType() == 5 && appendage instanceof MonetarySystemAttachment) {              
+            if (transaction.getType().getType() == 5 && appendage instanceof MonetarySystemAttachment) {
                 final long currencyId = ((MonetarySystemAttachment) appendage).getCurrencyId();
                 putCurrencyInfo(attachmentJSON, currencyId);
             }
@@ -815,7 +816,7 @@ final class JSONData {
         if (account != null) {
             AccountInfo info = account.getAccountInfo();
             if (info != null) {
-                json.put(name + "Name", info.getName());  
+                json.put(name + "Name", info.getName());
             }
             if (account.getAccountColorId() != 0) {
                 AccountColor accountColor = AccountColor.getAccountColor(account.getAccountColorId());
@@ -824,7 +825,14 @@ final class JSONData {
                     json.put(name + "ColorName", accountColor.getName());
                 }
             }
-        }    
+            AccountIdentifier identifier = Account.getEmailAccountIdentifier(accountId);
+            if (identifier != null) {
+                json.put(name + "Email", identifier.getEmail());
+            }
+            else {
+                json.put(name + "Email", Convert.rsAccount(accountId));
+            }
+        }
         json.put(name, Long.toUnsignedString(accountId));
         json.put(name + "RS", Convert.rsAccount(accountId));
     }
