@@ -60,7 +60,7 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                 throw new ParameterException(JSON.prepare(response));
             }
         }
-        
+
         long accountTwoId;
         String accountTwoValue = Convert.emptyToNull(req.getParameter("accountTwo"));
         if (accountTwoValue == null) {
@@ -75,8 +75,8 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                 response.put("errorDescription", "Incorrect \"accountTwo\"");
                 throw new ParameterException(JSON.prepare(response));
             }
-        } 
-        
+        }
+
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
 
@@ -86,8 +86,8 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                 while (iterator.hasNext()) {
                     Transaction transaction = iterator.next();
                     if (transaction.getType().getType() == 1 && transaction.getType().getSubtype() == 0) {
-                        if ((transaction.getSenderId() == accountOneId && transaction.getRecipientId() == accountTwoId) || 
-                             transaction.getSenderId() == accountTwoId && transaction.getRecipientId() == accountOneId) 
+                        if ((transaction.getSenderId() == accountOneId && transaction.getRecipientId() == accountTwoId) ||
+                             transaction.getSenderId() == accountTwoId && transaction.getRecipientId() == accountOneId)
                         {
                             transactions.add(transaction);
                         }
@@ -95,7 +95,7 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                 }
             }
         }
-        
+
         try (DbIterator<? extends Transaction> iterator = MofoChat.getChatTransactions(accountOneId, accountTwoId, firstIndex, lastIndex)) {
             while (iterator.hasNext()) {
                 transactions.add(iterator.next());
@@ -104,7 +104,7 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
 
         JSONArray list = new JSONArray();
         for (Transaction transaction : transactions) {
-                
+
             JSONObject json = new JSONObject();
             if (transaction instanceof UnconfirmedTransaction) {
                 json.put("confirmations", -1);
@@ -129,10 +129,10 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                     }
                 }
                 json.put("attachment", attachmentJSON);
-            }                
+            }
             list.add(json);
         }
-        
+
         JSONObject response = new JSONObject();
         response.put("accountOneRS", Convert.rsAccount(accountOneId));
         Account accountOne = Account.getAccount(accountOneId);
@@ -145,7 +145,7 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
                 response.put("accountOnePublicKey", Convert.toHexString(accountOne.getPublicKey()));
             }
         }
-        
+
         response.put("accountTwoRS", Convert.rsAccount(accountTwoId));
         Account accountTwo = Account.getAccount(accountTwoId);
         if (accountTwo != null) {
@@ -153,11 +153,11 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
             if (info != null) {
                 response.put("accountTwoName", info.getName());
             }
-            if (accountOne.getPublicKey() != null) {
+            if (accountTwo.getPublicKey() != null) {
                 response.put("accountTwoPublicKey", Convert.toHexString(accountTwo.getPublicKey()));
             }
         }
-        
+
         response.put("messages", list);
         return response;
     }
