@@ -37,6 +37,7 @@ import nxt.crypto.EncryptedData;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import nxt.util.Search;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -44,6 +45,7 @@ import org.json.simple.parser.ParseException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -179,7 +181,7 @@ final class ParameterParser {
             aliasId = Convert.parseUnsignedLong(Convert.emptyToNull(req.getParameter("alias")));
         } catch (RuntimeException e) {
             throw new ParameterException(INCORRECT_ALIAS);
-        }        
+        }
         String aliasName = Convert.emptyToNull(req.getParameter("aliasName"));
         NamespacedAlias alias;
         if (aliasId != 0) {
@@ -202,8 +204,8 @@ final class ParameterParser {
             throw new ParameterException(incorrect("filter"));
         }
         return filter;
-    }  
-    
+    }
+
     static long getAmountNQT(HttpServletRequest req) throws ParameterException {
         return getLong(req, "amountNQT", 1L, Constants.MAX_BALANCE_NQT, true);
     }
@@ -211,11 +213,11 @@ final class ParameterParser {
     static long getFeeNQT(HttpServletRequest req) throws ParameterException {
         return getLong(req, "feeNQT", 0L, Constants.MAX_BALANCE_NQT, true);
     }
-    
+
     static long getOrderFeeNQT(HttpServletRequest req) throws ParameterException {
         return getLong(req, "orderFeeNQT", 0L, Constants.MAX_BALANCE_NQT, false);
     }
-    
+
     static long getOrderFeeQNT(HttpServletRequest req, long max) throws ParameterException {
         return getLong(req, "orderFeeQNT", 0L, max, false);
     }
@@ -298,15 +300,27 @@ final class ParameterParser {
         if (plainMessage == null) {
             return null;
         }
-        if (recipientAccount == null) {
+        byte[] recipientPublicKey = null;
+        if (recipientAccount != null) {
+            recipientPublicKey = recipientAccount.getPublicKey();
+        }
+        if (recipientPublicKey == null) {
+            String recipientPublicKeyValue = Convert.emptyToNull(req.getParameter("recipientPublicKey"));
+            if (recipientPublicKeyValue != null) {
+                recipientPublicKey = Convert.parseHexString(recipientPublicKeyValue);
+            }
+        }
+        if (recipientPublicKey == null) {
             throw new ParameterException(INCORRECT_RECIPIENT);
         }
+
         String secretPhrase = getSecretPhrase(req);
         boolean isText = !"false".equalsIgnoreCase(req.getParameter("messageToEncryptIsText"));
         boolean compress = !"false".equalsIgnoreCase(req.getParameter("compressMessageToEncrypt"));
         try {
             byte[] plainMessageBytes = isText ? Convert.toBytes(plainMessage) : Convert.parseHexString(plainMessage);
-            return recipientAccount.encryptTo(plainMessageBytes, secretPhrase, compress);
+            return Account.encryptTo(recipientPublicKey, plainMessageBytes, secretPhrase, compress);
+
         } catch (RuntimeException e) {
             throw new ParameterException(INCORRECT_PLAIN_MESSAGE);
         }
@@ -405,8 +419,8 @@ final class ParameterParser {
             throw new ParameterException(JSONResponses.unknownAccount(accountId));
         }
         return account;
-    }    
-    
+    }
+
     static Account getAccount(HttpServletRequest req) throws ParameterException {
         return getAccount(req, "account");
     }
@@ -433,7 +447,7 @@ final class ParameterParser {
         }
         return result;
     }
-    
+
     static List<Long> getAccountIds(HttpServletRequest req) throws ParameterException {
         String[] accountValues = req.getParameterValues("account");
         if (accountValues == null || accountValues.length == 0) {
@@ -452,7 +466,7 @@ final class ParameterParser {
         }
         return result;
     }
-    
+
     static long getAccountId(HttpServletRequest req) throws ParameterException {
         String accountValue = Convert.emptyToNull(req.getParameter("account"));
         if (accountValue == null) {
@@ -678,19 +692,19 @@ final class ParameterParser {
         if (param == null) {
             return null;
         }
-      
+
         List<TransactionFilter> filter = new ArrayList<TransactionFilter>();
         String[] pairs = param.split(",");
         for (String p : pairs) {
-            
+
             String[] pair = p.split(":");
             if (pair.length != 2) {
                 throw new ParameterException(incorrect("filter"));
             }
-            
+
             try {
                 filter.add(new TransactionFilter(
-                    Integer.parseInt(pair[0]), 
+                    Integer.parseInt(pair[0]),
                     Integer.parseInt(pair[1])
                 ));
             }
@@ -698,7 +712,7 @@ final class ParameterParser {
                 throw new ParameterException(incorrect("filter"));
             }
         }
-        
+
         return filter;
     }
 
