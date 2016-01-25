@@ -1,0 +1,5 @@
+This release blacklists all nodes that have not updated to 0.6.0, it seems 
+not all nodes have updated to 0.6.* which will cause a fork of the network.
+
+By running this version you can be sure not to end up on that fork that will
+eventually die when everyone else updates to 0.6.*.
