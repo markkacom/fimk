@@ -16,7 +16,7 @@ import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 
 public class RunJSTests {
-  
+
     public static void main(String[] args) {
         NxtProperties.setup();
         JUnitCore runner = new JUnitCore();
