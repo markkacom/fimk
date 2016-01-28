@@ -21,7 +21,6 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
 import static nxt.http.JSONResponses.INCORRECT_ASSET;
 
 public final class GetPrivateAssetAccount extends CreateTransaction {
@@ -34,9 +33,7 @@ public final class GetPrivateAssetAccount extends CreateTransaction {
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if ( ! Asset.privateEnabled()) {
-            return FEATURE_NOT_AVAILABLE;
-        }
+
         Asset asset = ParameterParser.getAsset(req);
         if ( ! MofoAsset.isPrivateAsset(asset)) {
             return INCORRECT_ASSET;
