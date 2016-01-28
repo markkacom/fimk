@@ -38,9 +38,6 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
     @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!Account.getAccountIDsEnabled()) {
-            return JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
         String identifier = Convert.emptyToNull(req.getParameter("identifier"));
         if (identifier == null) {
@@ -69,7 +66,7 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
                 response.put("description", info.getDescription());
             }
         }
-        
+
         Account.AccountLease accountLease = account.getAccountLease();
         if (accountLease != null && accountLease.getCurrentLesseeId() != 0) {
             JSONData.putAccount(response, "currentLessee", accountLease.getCurrentLesseeId());
