@@ -23,7 +23,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-public final class AccountColorSearch extends CreateTransaction {
+public final class AccountColorSearch extends APIServlet.APIRequestHandler {
 
     static final AccountColorSearch instance = new AccountColorSearch();
 
@@ -34,15 +34,12 @@ public final class AccountColorSearch extends CreateTransaction {
     @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!AccountColor.getAccountColorEnabled()) {
-            return nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
         long accountId = ParameterParser.getAccountId(req, "account", false);
-        boolean includeAccountInfo = req.getParameter("includeAccountInfo") == "true";
-        boolean includeDescription = req.getParameter("includeDescription") == "true";
+        boolean includeAccountInfo = "true".equals(req.getParameter("includeAccountInfo"));
+        boolean includeDescription = "true".equals(req.getParameter("includeDescription"));
         String name = Convert.nullToEmpty(req.getParameter("name"));
 
         JSONObject response = new JSONObject();
