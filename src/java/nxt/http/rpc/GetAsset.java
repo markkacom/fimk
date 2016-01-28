@@ -17,25 +17,25 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 public class GetAsset extends RPCCall {
-    
+
     public static RPCCall instance = new GetAsset("getAsset");
 
     public GetAsset(String identifier) {
         super(identifier);
     }
-  
+
     @SuppressWarnings("unchecked")
     @Override
     public JSONStreamAware call(JSONObject arguments) throws ParameterException {
-      
+
         boolean includeDetails = "true".equals((String) arguments.get("includeDetails"));
         boolean includeVolumes = "true".equals((String) arguments.get("includeVolumes"));
-      
+
         Asset asset = ParameterParser.getAsset(arguments);
         JSONObject response = new JSONObject();
         response.put("decimals", asset.getDecimals());
         response.put("name", asset.getName());
-        
+
         if (includeDetails) {
             response.put("description", asset.getDescription());
             JSONData.putAccount(response, "issuer", asset.getAccountId());
@@ -44,7 +44,7 @@ public class GetAsset extends RPCCall {
             response.put("numberOfTransfers", AssetTransfer.getTransferCount(asset.getId()));
             response.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
         }
-   
+
         if (includeVolumes) {
             // quantityQNTTotal
             // quantityQNTToday
@@ -55,17 +55,15 @@ public class GetAsset extends RPCCall {
                 response.put("lastPriceNQT", String.valueOf(iterator.get(0).getPriceNQT()));
             }
         }
-        
-        if (Asset.privateEnabled()) {
-            response.put("type", asset.getType());
-            if (MofoAsset.isPrivateAsset(asset)) {
-                AssetFee fee = MofoAsset.getFee(asset.getId());
-                response.put("orderFeePercentage", fee.getOrderFeePercentage());
-                response.put("tradeFeePercentage", fee.getTradeFeePercentage());
-            }
-        }        
 
-        return response;      
-    }  
+        response.put("type", asset.getType());
+        if (MofoAsset.isPrivateAsset(asset)) {
+            AssetFee fee = MofoAsset.getFee(asset.getId());
+            response.put("orderFeePercentage", fee.getOrderFeePercentage());
+            response.put("tradeFeePercentage", fee.getTradeFeePercentage());
+        }
+
+        return response;
+    }
 
 }
