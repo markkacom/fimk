@@ -34,15 +34,12 @@ public final class MofoGetAccountIdentifiers extends APIServlet.APIRequestHandle
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!Account.getAccountIDsEnabled()) {
-            return JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
-      
+
         long accountId = ParameterParser.getAccountId(req);
         int firstIndex = ParameterParser.getFirstIndex(req);
-        int lastIndex = ParameterParser.getLastIndex(req);        
-        
-        
+        int lastIndex = ParameterParser.getLastIndex(req);
+
+
         JSONArray result = new JSONArray();
         try (DbIterator<AccountIdentifier> identifiers = Account.getAccountIdentifiers(accountId, firstIndex, lastIndex)) {
             while (identifiers.hasNext()) {
@@ -51,7 +48,7 @@ public final class MofoGetAccountIdentifiers extends APIServlet.APIRequestHandle
         }
         JSONObject response = new JSONObject();
         response.put("identifiers", result);
-        return response;        
+        return response;
     }
 
 }
