@@ -14,7 +14,6 @@ package nxt.http;
 
 
 import nxt.Account;
-import nxt.AccountColor;
 import nxt.Attachment;
 import nxt.Constants;
 import nxt.MofoAttachment;
@@ -38,9 +37,6 @@ public final class AccountColorCreate extends CreateTransaction {
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!AccountColor.getAccountColorEnabled()) {
-            return nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
         String name = Convert.emptyToNull(req.getParameter("name"));
         String description = Convert.nullToEmpty(req.getParameter("description"));
