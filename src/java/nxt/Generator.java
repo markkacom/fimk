@@ -133,22 +133,22 @@ public final class Generator implements Comparable<Generator> {
     }
 
     public static Generator startForging(String secretPhrase) {
-        Generator generator = new Generator(secretPhrase);      
-        
+        Generator generator = new Generator(secretPhrase);
+
         /* XXX - Prevent or allow forging based on nxt.allowedToForge */
         if (Constants.allowedToForge instanceof List) {
-          boolean found = false;
-          for (Long allowed : Constants.allowedToForge) {
-            if (allowed.equals(generator.getAccountId())) {
-              found = true;
-              break;
+            boolean found = false;
+            for (Long allowed : Constants.allowedToForge) {
+                if (allowed.equals(generator.getAccountId())) {
+                    found = true;
+                    break;
+                }
             }
-          }
-          if (found == false) {
-            Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) + 
-                " is not allowed to forge. See nxt.allowedToForge property.");
-            return null;
-          }
+            if (found == false) {
+                Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) +
+                    " is not allowed to forge. See nxt.allowedToForge property.");
+                return null;
+            }
         }
 
         if (AccountColor.getAccountColorEnabled()) {
@@ -159,7 +159,7 @@ public final class Generator implements Comparable<Generator> {
                 return null;
             }
         }
-        
+
         Generator old = generators.putIfAbsent(secretPhrase, generator);
         if (old != null) {
             Logger.logDebugMessage(old + " is already forging");
@@ -196,7 +196,7 @@ public final class Generator implements Comparable<Generator> {
     public static Generator getGenerator(String secretPhrase) {
         return generators.get(secretPhrase);
     }
-    
+
     public static Generator getGenerator(long id) {
         for (Generator generator : getAllGenerators()) {
             if (generator.accountId == id) {
@@ -204,7 +204,7 @@ public final class Generator implements Comparable<Generator> {
             }
         }
         return null;
-    }    
+    }
 
     public static Collection<Generator> getAllGenerators() {
         return allGenerators;
@@ -260,7 +260,7 @@ public final class Generator implements Comparable<Generator> {
         if (allowsFakeForging(publicKey)) {
             return BigInteger.ZERO;
         }
-        /* XXX - Enable forging below TRANSPARENT_FORGING_BLOCK */ 
+        /* XXX - Enable forging below TRANSPARENT_FORGING_BLOCK */
         //if (block.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK) {
         //    throw new IllegalArgumentException("Not supported below Transparent Forging Block");
         //}
