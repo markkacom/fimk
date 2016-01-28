@@ -193,18 +193,18 @@ class NxtDbVersion extends DbVersion {
                     + "account_id BIGINT NOT NULL, alias_name VARCHAR NOT NULL, "
                     + "alias_name_lower VARCHAR AS LOWER (alias_name) NOT NULL, "
                     + "alias_uri VARCHAR NOT NULL, timestamp INT NOT NULL, "
-                    + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");              
+                    + "height INT NOT NULL, latest BOOLEAN NOT NULL DEFAULT TRUE)");
             case 74:
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS alias_id_height_idx ON namespaced_alias (id, height DESC)");
-            case 75:  
+            case 75:
                 apply("CREATE INDEX IF NOT EXISTS alias_account_id_idx ON namespaced_alias (account_id, height DESC)");
             case 76:
                 apply("CREATE INDEX IF NOT EXISTS alias_name_lower_idx ON namespaced_alias (alias_name_lower)");
-            case 77:              
+            case 77:
                 apply("CREATE INDEX IF NOT EXISTS transaction_block_timestamp_idx ON transaction (block_timestamp DESC)");
-            case 78:  
+            case 78:
                 apply("DROP INDEX IF EXISTS transaction_timestamp_idx");
-            case 79:  
+            case 79:
                 apply("CREATE TABLE IF NOT EXISTS alias (db_id IDENTITY, id BIGINT NOT NULL, "
                     + "account_id BIGINT NOT NULL, alias_name VARCHAR NOT NULL, "
                     + "alias_name_lower VARCHAR AS LOWER (alias_name) NOT NULL, "
@@ -676,7 +676,7 @@ class NxtDbVersion extends DbVersion {
                 /* FIMKrypto */
                 apply("CREATE TABLE IF NOT EXISTS account_identifier (db_id IDENTITY, "
                     + "account_id BIGINT NOT NULL, email VARCHAR NOT NULL, "
-                    + "email_lower VARCHAR AS LOWER (email) NOT NULL, height INT NOT NULL)");       
+                    + "email_lower VARCHAR AS LOWER (email) NOT NULL, height INT NOT NULL)");
             case 262:
                 /* FIMKrypto */
                 apply("CREATE UNIQUE INDEX IF NOT EXISTS account_identifier_email_idx ON account_identifier (email_lower)");
@@ -1063,9 +1063,13 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS account_account_color_id_idx ON account (account_color_id)");
             case 431:
                 /* FIMKrypto */
-                BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
                 apply("CREATE INDEX IF NOT EXISTS name_account_color_idx ON account_color (name_lower)");
             case 432:
+                /* FIMKrypto */
+                BlockDb.deleteBlocksFromHeight(Constants.PRIVATE_ASSETS_BLOCK);
+                BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
+                apply(null);
+            case 433:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
