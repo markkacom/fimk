@@ -31,16 +31,13 @@ public final class AccountColorAssign extends CreateTransaction {
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!AccountColor.getAccountColorEnabled()) {
-            return nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         if (Account.getAccount(recipientId) != null) {
             return nxt.http.JSONResponses.incorrect("recipient", "Recipient account already exists");
         }
 
-        long accountColorId = ParameterParser.getUnsignedLong(req, "accountColorId", true); 
+        long accountColorId = ParameterParser.getUnsignedLong(req, "accountColorId", true);
         AccountColor accountColor = AccountColor.getAccountColor(accountColorId);
         if (accountColor == null) {
             return nxt.http.JSONResponses.incorrect("accountColorId", "Account Color does not exist");
