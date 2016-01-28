@@ -16,6 +16,7 @@
 
 package nxt;
 
+import nxt.BlockImpl.BadBlock;
 import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.db.DerivedDbTable;
@@ -1050,6 +1051,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }
         }
         if (!block.verifyGenerationSignature() && !Generator.allowsFakeForging(block.getGeneratorPublicKey())) {
+            // Logger.logInfoMessage("Generation signature verification failed");
+            // Logger.logInfoMessage("badBlocks.put("+block.getHeight()+", new BadBlock(\""+Long.toUnsignedString(block.getId())+"\", \""+Long.toUnsignedString(block.getGeneratorId())+"\"));");
             throw new BlockNotAcceptedException("Generation signature verification failed", block);
         }
         if (!block.verifyBlockSignature()) {
