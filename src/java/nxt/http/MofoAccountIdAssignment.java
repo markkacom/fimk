@@ -15,6 +15,7 @@ package nxt.http;
 
 import nxt.Account;
 import nxt.Attachment;
+import nxt.HardFork;
 import nxt.MofoAttachment;
 import nxt.MofoIdentifier;
 import nxt.MofoVerificationAuthority;
@@ -42,9 +43,6 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
     @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!Account.getAccountIDsEnabled()) {
-            return JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Account senderAccount = ParameterParser.getSenderAccount(req);
@@ -74,20 +72,22 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
             return JSON.prepare(response);
         }
 
-        if (Account.hasAccountIdentifier(recipientId)) {
-            JSONObject response = new JSONObject();
-            response.put("errorCode", 4);
-            response.put("errorDescription", "Recipient already has identifier");
-            return JSON.prepare(response);
-        }
-
-        if (wrapper.getIsDefaultServer()) {
-            String similarId = wrapper.getSimilarId();
-            if (similarId != null && Account.getAccountIdByIdentifier(similarId) != 0) {
+        if ( ! HardFork.ACCOUNT_IDENTIFIER_BLOCK_2()) {
+            if (Account.hasAccountIdentifier(recipientId)) {
                 JSONObject response = new JSONObject();
                 response.put("errorCode", 4);
-                response.put("errorDescription", "Duplicate identifier");
+                response.put("errorDescription", "Recipient already has identifier");
                 return JSON.prepare(response);
+            }
+
+            if (wrapper.getIsDefaultServer()) {
+                String similarId = wrapper.getSimilarId();
+                if (Account.getAccountIdByIdentifier(similarId) != 0) {
+                    JSONObject response = new JSONObject();
+                    response.put("errorCode", 4);
+                    response.put("errorDescription", "Duplicate identifier");
+                    return JSON.prepare(response);
+                }
             }
         }
 
