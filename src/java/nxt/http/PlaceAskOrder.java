@@ -45,7 +45,7 @@ public final class PlaceAskOrder extends CreateTransaction {
         Asset asset = ParameterParser.getAsset(req);
         long priceNQT = ParameterParser.getPriceNQT(req);
         long quantityQNT = ParameterParser.getQuantityQNT(req);
-        long orderFeeQNT = Asset.privateEnabled() ? ParameterParser.getOrderFeeQNT(req, asset.getQuantityQNT()) : 0;
+        long orderFeeQNT = ParameterParser.getOrderFeeQNT(req, asset.getQuantityQNT());
         Account account = ParameterParser.getSenderAccount(req);
 
         long assetBalance = account.getUnconfirmedAssetBalanceQNT(asset.getId());
@@ -53,7 +53,7 @@ public final class PlaceAskOrder extends CreateTransaction {
             return NOT_ENOUGH_ASSETS;
         }
 
-        if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
+        if (MofoAsset.isPrivateAsset(asset)) {
             long minOrderFeeQNT = MofoAsset.calculateOrderFee(asset.getId(), quantityQNT);
             if (minOrderFeeQNT > orderFeeQNT) {
                 JSONObject response = new JSONObject();
