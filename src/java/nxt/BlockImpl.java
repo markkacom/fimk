@@ -56,6 +56,25 @@ final class BlockImpl implements Block {
     private volatile byte[] bytes = null;
 
 
+    static class BadBlock {
+        final int height;
+        final long blockId;
+        final long generatorId;
+        BadBlock(int height, String blockId, String generatorId) {
+            this.height = height;
+            this.blockId = Long.parseUnsignedLong(blockId);
+            this.generatorId = Long.parseUnsignedLong(generatorId);
+        }
+    }
+
+    static final BadBlock[] badBlocks = new BadBlock[] {
+        new BadBlock(96249, "16907697720883873606", "6940473716024842998"),
+        new BadBlock(272975, "7934656345073593945", "6940473716024842998"),
+        new BadBlock(380561, "9137805412098722935", "6620150687243551817"),
+        new BadBlock(391945, "12078054570916897845", "6620150687243551817"),
+        new BadBlock(441804, "10846632891054387244", "6620150687243551817")
+    };
+
     BlockImpl(int version, int timestamp, long previousBlockId, long totalAmountNQT, long totalFeeNQT, int payloadLength, byte[] payloadHash,
               byte[] generatorPublicKey, byte[] generationSignature, byte[] previousBlockHash, List<TransactionImpl> transactions, String secretPhrase) {
         this(version, timestamp, previousBlockId, totalAmountNQT, totalFeeNQT, payloadLength, payloadHash,
@@ -332,21 +351,8 @@ final class BlockImpl implements Block {
         }
         return hasValidSignature;
     }
-    
-    /* XXX - fix for invalid generation signature block 96249 */
-    final byte[] GENERATION_SIG_96248 = Convert.parseHexString("942b93195bcb48045019f38859606c1b4aefe98751dd97833631c7fab2c9edfd");
-    final byte[] GENERATION_SIG_96249 = Convert.parseHexString("5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4"); 
-    
-    /* XXX - fix for invalid generation signature block 272974 */
-    final byte[] GENERATION_SIG_272974 = Convert.parseHexString("147345e8e51e8d026c5e277cda8764e6a50abe763b583f38910572f810f7b7a3");
-    final byte[] GENERATION_SIG_272975 = Convert.parseHexString("1a6ed2bcf9c9f70e169e76c6c260cfab72d95f8218e4fb6e91c106ea5d881b49");
-    
-    /* XXX - fix for invalid generation signature block 380560 */
-    final byte[] GENERATION_SIG_380561 = Convert.parseHexString("d09af2f9aa2f200e80591d9b26bc3820165a19f51bc0041d230f885f12258c36");
-    final byte[] GENERATION_SIG_380562 = Convert.parseHexString("a507753a79279800f543d018d789d75c1a2fd6137fd33c04323dcab9c2edabdf");    
 
     boolean verifyGenerationSignature() throws BlockchainProcessor.BlockOutOfOrderException {
-
         try {
             BlockImpl previousBlock = BlockchainImpl.getInstance().getBlock(getPreviousBlockId());
             if (previousBlock == null) {
@@ -374,45 +380,25 @@ final class BlockImpl implements Block {
                     return false;
                 }
             }
-            
+
             /* XXX - Prevent stolen funds to forge blocks */
             if ( ! Locked.allowedToForge(account.getPublicKey())) {
-
-              Logger.logMessage("Public key not allowed to forge blocks");
-              return true;
-            }
-            
-            /* XXX - fix for invalid generation signature block 96249 */
-            if (previousBlock.height == 96248 && 
-                Arrays.equals(GENERATION_SIG_96248, previousBlock.generationSignature) && 
-                Arrays.equals(GENERATION_SIG_96249, generationSignature)) {
-              
-              Logger.logMessage("Block 96249 generation signature checkpoint passed");
-              return true;
-            }
-            
-            /* XXX - fix for invalid generation signature block 272974 */
-            if (previousBlock.height == 272974 && 
-                Arrays.equals(GENERATION_SIG_272974, previousBlock.generationSignature) && 
-                Arrays.equals(GENERATION_SIG_272975, generationSignature)) {
-              
-              Logger.logMessage("Block 272974 generation signature checkpoint passed");
-              return true;
-            }
-            
-            /* XXX - fix for invalid generation signature block 380560 */
-            if (previousBlock.height == 380561 && 
-                Arrays.equals(GENERATION_SIG_380561, previousBlock.generationSignature) && 
-                Arrays.equals(GENERATION_SIG_380562, generationSignature)) {
-              
-              Logger.logMessage("Block 380561 generation signature checkpoint passed");
-              return true;
+                Logger.logMessage("Public key not allowed to forge blocks");
+                return false;
             }
 
             BigInteger hit = new BigInteger(1, new byte[]{generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
 
-            return Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)
-                    || (this.height < Constants.TRANSPARENT_FORGING_BLOCK_5 /* NXT specific ** && Arrays.binarySearch(badBlocks, this.getId()) >= 0*/);
+            if (Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+                return true;
+            }
+            for (BadBlock badBlock : badBlocks) {
+                if (badBlock.height == getHeight() && badBlock.blockId == getId() && badBlock.generatorId == getGeneratorId()) {
+                    Logger.logInfoMessage("Block " + getHeight() + " generation signature checkpoint passed");
+                    return true;
+                }
+            }
+            return false;
 
         } catch (RuntimeException e) {
 
@@ -426,7 +412,7 @@ final class BlockImpl implements Block {
     void apply() {
         /* XXX - Add the POS reward to the block forger */
         long augmentedFeeNQT = RewardsImpl.augmentFee(this, totalFeeNQT);
-      
+
         Account generatorAccount = Account.addOrGetAccount(getGeneratorId());
         generatorAccount.apply(getGeneratorPublicKey());
         generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(augmentedFeeNQT);
@@ -462,7 +448,7 @@ final class BlockImpl implements Block {
 
         if ((this.getId() != Genesis.GENESIS_BLOCK_ID || previousBlockId != 0) && cumulativeDifficulty.equals(BigInteger.ZERO)) {
             long curBaseTarget = previousBlock.baseTarget;
-            
+
             /* XXX - Replaced hardcoded 60 with Constants.SECONDS_BETWEEN_BLOCKS */
             long newBaseTarget = BigInteger.valueOf(curBaseTarget)
                     .multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
