@@ -839,7 +839,6 @@ public final class MofoQueries {
             throw new RuntimeException("Accounts cannot be empty");
         }
 
-        int SIX_MONTHS_AGO = timestamp - ((31 * 24 * 60 * 60) * 6);
         Connection con = null;
         try {
             con = Db.db.getConnection();
@@ -859,14 +858,14 @@ public final class MofoQueries {
             PreparedStatement pstmt = con.prepareStatement(b.toString());
 
             int i = 0;
-            pstmt.setInt(++i, SIX_MONTHS_AGO);
+            pstmt.setInt(++i, timestamp);
             pstmt.setInt(++i, timestamp);
             for (int j=0; j<accounts.size(); j++) {
                 pstmt.setLong(++i, accounts.get(j));
             }
             pstmt.setInt(++i, limit);
 
-            pstmt.setInt(++i, SIX_MONTHS_AGO);
+            pstmt.setInt(++i, timestamp);
             pstmt.setInt(++i, timestamp);
             for (int j=0; j<accounts.size(); j++) {
                 pstmt.setLong(++i, accounts.get(j));
