@@ -125,7 +125,7 @@ public interface Attachment extends Appendix {
         }
 
     };
-    
+
     final class MessagingAliasAssignment extends AbstractAttachment {
 
         private final String aliasName;
@@ -882,7 +882,12 @@ public interface Attachment extends Appendix {
             this.description = Convert.nullToEmpty((String) attachmentData.get("description"));
             this.quantityQNT = Convert.parseLong(attachmentData.get("quantityQNT"));
             this.decimals = ((Long) attachmentData.get("decimals")).byteValue();
-            this.type = Asset.privateEnabled() ? ((Long) attachmentData.get("type")).byteValue() : 0;
+            if (Asset.privateEnabled() && attachmentData.containsKey("type")) {
+                this.type = ((Long) attachmentData.get("type")).byteValue();
+            }
+            else {
+                this.type = 0;
+            }
         }
 
         public ColoredCoinsAssetIssuance(String name, String description, long quantityQNT, byte decimals, byte type) {
@@ -895,7 +900,11 @@ public interface Attachment extends Appendix {
 
         @Override
         int getMySize() {
-            return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1 + (Asset.privateEnabled() ? 1 : 0);
+            int size = 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1;
+            if (Asset.privateEnabled()) {
+                size += 1;
+            };
+            return size;
         }
 
         @Override
@@ -1079,7 +1088,7 @@ public interface Attachment extends Appendix {
     }
 
     final class ColoredCoinsAskOrderPlacement extends ColoredCoinsOrderPlacement {
-      
+
         private final long orderFeeQNT;
 
         ColoredCoinsAskOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
@@ -1089,7 +1098,7 @@ public interface Attachment extends Appendix {
 
         ColoredCoinsAskOrderPlacement(JSONObject attachmentData) {
             super(attachmentData);
-            this.orderFeeQNT = Asset.privateEnabled() ? Convert.parseLong(attachmentData.get("orderFeeQNT")) : 0;
+            this.orderFeeQNT = Convert.parseLong(attachmentData.get("orderFeeQNT"));
         }
 
         public ColoredCoinsAskOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeQNT) {
@@ -1131,7 +1140,7 @@ public interface Attachment extends Appendix {
     final class ColoredCoinsBidOrderPlacement extends ColoredCoinsOrderPlacement {
 
         private final long orderFeeNQT;
-      
+
         ColoredCoinsBidOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
             this.orderFeeNQT = Asset.privateEnabled() ? buffer.getLong() : 0;
@@ -1139,7 +1148,7 @@ public interface Attachment extends Appendix {
 
         ColoredCoinsBidOrderPlacement(JSONObject attachmentData) {
             super(attachmentData);
-            this.orderFeeNQT = Asset.privateEnabled() ? Convert.parseLong(attachmentData.get("orderFeeNQT")) : 0;
+            this.orderFeeNQT = Convert.parseLong(attachmentData.get("orderFeeNQT"));
         }
 
         public ColoredCoinsBidOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeNQT) {
