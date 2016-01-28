@@ -46,11 +46,11 @@ public final class PlaceBidOrder extends CreateTransaction {
         long priceNQT = ParameterParser.getPriceNQT(req);
         long quantityQNT = ParameterParser.getQuantityQNT(req);
         long feeNQT = ParameterParser.getFeeNQT(req);
-        long orderFeeNQT = Asset.privateEnabled() ? ParameterParser.getOrderFeeNQT(req) : 0;
+        long orderFeeNQT = ParameterParser.getOrderFeeNQT(req);
         Account account = ParameterParser.getSenderAccount(req);
 
         long totalNQT = Math.multiplyExact(priceNQT, quantityQNT);
-        
+
         try {
             if (Math.addExact(feeNQT, totalNQT) > account.getUnconfirmedBalanceNQT()) {
                 return NOT_ENOUGH_FUNDS;
@@ -58,8 +58,8 @@ public final class PlaceBidOrder extends CreateTransaction {
         } catch (ArithmeticException e) {
             return NOT_ENOUGH_FUNDS;
         }
-        
-        if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
+
+        if (MofoAsset.isPrivateAsset(asset)) {
             long minOrderFeeNQT = MofoAsset.calculateOrderFee(asset.getId(), totalNQT);
             if (minOrderFeeNQT > orderFeeNQT) {
                 JSONObject response = new JSONObject();
