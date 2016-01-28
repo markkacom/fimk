@@ -164,6 +164,11 @@ public final class Constants {
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
     public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
 
+    public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
+    public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
+    public static final int COLORED_ACCOUNTS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
+    public static final int ACCOUNT_IDENTIFIER_BLOCK_2 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
+
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0;  /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
 
@@ -175,8 +180,6 @@ public final class Constants {
     public static final long MASTER_VERIFICATION_AUTHORITY_ACCOUNT = Genesis.GENESIS_RECIPIENTS[0];
     public static final int MAX_VERIFICATION_AUTHORITY_PERIOD = 100000;
     public static final int MIN_VERIFICATION_AUTHORITY_PERIOD = 0;
-
-    public static final int[] MIN_VERSION = new int[] {0, 4, 0};
 
     public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;
 
