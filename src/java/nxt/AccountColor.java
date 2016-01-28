@@ -340,18 +340,7 @@ public final class AccountColor {
         accountColorTable.insert(new AccountColor(transaction, attachment));
     }
 
-    /*@SuppressWarnings("unchecked")
-    public static void putAccountColor(JSONObject json, long id) {
-        AccountColor accountColor = getAccountColor(id);
-        if (accountColor != null) {
-            json.put("id", Long.toUnsignedString(id));
-            json.put("name", accountColor.getName());
-            json.put("description", accountColor.getDescription());
-        }
-    }*/
-
     static void init() {}
-
 
     private final long accountColorId;
     private final DbKey dbKey;
