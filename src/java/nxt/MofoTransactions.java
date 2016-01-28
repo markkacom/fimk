@@ -491,7 +491,7 @@ public class MofoTransactions {
             void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.SetAccountIdentifierAttachment attachment = (MofoAttachment.SetAccountIdentifierAttachment) transaction.getAttachment();
 
-                if (!Account.getAccountIDsEnabled()) {
+                if ( ! HardFork.ACCOUNT_IDENTIFIER_BLOCK()) {
                     throw new NxtException.NotValidException("Not yet enabled");
                 }
 
@@ -507,8 +507,10 @@ public class MofoTransactions {
                     throw new NxtException.NotValidException("Duplicate identifier");
                 }
 
-                if (Account.hasAccountIdentifier(transaction.getRecipientId())) {
-                    throw new NxtException.NotValidException("Recipient already has identifier");
+                if ( ! HardFork.ACCOUNT_IDENTIFIER_BLOCK_2()) {
+                    if (Account.hasAccountIdentifier(transaction.getRecipientId())) {
+                        throw new NxtException.NotValidException("Recipient already has identifier");
+                    }
                 }
 
                 if (wrapper.getIsDefaultServer() && transaction.getRecipientId() == transaction.getSenderId()) {
