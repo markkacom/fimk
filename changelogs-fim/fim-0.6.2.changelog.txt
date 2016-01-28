@@ -1,0 +1,101 @@
+Bug fix for fork issue shown in console as 'java.nio.BufferUnderflowException'.
+The bug (fixed in this release) caused an error during blockchain scanning
+or downloading.
+
+To prevent peers from being on or switching to a possible fork caused by 0.6.0.
+On startup we'll one time delete all blocks after PRIVATE_ASSETS_BLOCK and 
+force a rescan.
+
+This version blacklists all nodes on or below 0.6.0.
+
+This release comes with a mechanism that allows the FIMK developers to notify
+users of updates. The update notifications come with a simple instruction
+to upgrade your current version.
+
+We've also added a HardFork module which allows for saver and faster 
+hardforks, fork heights are no longer hard coded in the java source but (much 
+more flexibly) written on the blockchain instead. 
+
+Special care was given to make sure these variable hard fork heights can only 
+be set a single time (since you can change alias values). 
+
+With these two mechanisms we believe we can now go and release updates at a much
+faster pace and much more convenient for FIMK server operators. Without the risk
+of forking the network without users noticing.
+
+IMPORTANT INFORMATION ABOUT VERSION MANAGER ...
+
+    The version manager reads application version data from the blockchain.
+    Peers who chose to do so can have their FIMK software periodically check the
+    blockchain and be notified when their current version is out of date.
+
+    There are three values on the blockchain that are involved in this process.
+
+    LATEST VERSION (LATESTVERSION/9266582752086146948)
+
+        This alias holds the most recent available version and a SHA256 checksum
+        of the downloadable package.
+        The version notifcations use this version and checksum to generate a
+        command you should run to update your current version to LATESTVERSION.
+
+        The expected format for this alias:
+            [0-9]+\.[0-9]+\.[0-9]+(-.+)?\s+[a-z0-9]{64}
+ 
+    MINIMUM VERSION WARN (MINVERSIONWARN/17359617168004080578)
+ 
+        This alias holds the version number and blockheight, only after the
+        blockheight has passed will the version manager act upon this.
+        The version number is the minimal version you should run before we start
+        issuing notifications that your version can be updated.
+ 
+        You can disable this functionality in your nxt.properties config file.
+        Set `nxt.warnNotLatestVersion=false` to disable this functionality.
+ 
+        The expected format for this alias:
+ 
+            [0-9]+\.[0-9]+\.[0-9]+(-.+)?\s+[0-9]+
+ 
+    MINIMUM VERSION BLACKLIST (MINVERSIONBLACKLIST/9364249966090852339)
+ 
+        This alias holds the version number and blockheight, only after the
+        blockheight has passed will the version manager act upon this.
+        The version number is the minimal version you should run before we issue
+        a notification that your version must be updated.
+ 
+        When the version manager detects you run a version up or below this
+        version your server WILL BE SHUTDOWN. To start the server again either
+        update (recommended) or disable this feature in nxt.properties.
+ 
+        Peers who enable this feature will start to blacklist all nodes on the
+        network that are running a version on or below this version.
+ 
+        You can disable this functionality in your nxt.properties config file.
+        Set `nxt.shutdownWhenOutdated=false` to disable this functionality.
+ 
+        The expected format for this alias:
+ 
+            [0-9]+\.[0-9]+\.[0-9]+(-.+)?\s+[0-9]+
+ 
+    As mentioned the default behavior for clients who do not disable this feature
+    is for their servers to SHUTDOWN when we detect the server version is up or
+    below MINVERSIONBLACKLIST.
+ 
+    The rational behind this is to protect users from accidentally landing on a
+    network fork because of a required update they've missed.
+    
+    Running an unsupported version is dangerous and should be avoided for several
+    reasons:
+    
+        1. Forgers running an unsupported version will loose their FIMK forged
+           on that fork. Electricity is wasted running your server and damage is
+           caused to the rest of the network when you send blocks or transactions
+           that are incompatible.
+        2. Exchange operators running an unsupported version run the risk of
+           loosing money when on a fork. The exchange software will accept
+           FIMK deposits and credit BTC or other internal tokens to the depositor
+           if these deposits where made while on a fork the exchange will loose
+           the deposited FIMK.
+        3. Merchants very similar to exchange operators risk the loss of funds
+           when they accept FIMK payments while their server is on a fork.
+        4. Ordinary users who accept payments or asset transfers risk loosing
+           those funds since they are on a fork.
