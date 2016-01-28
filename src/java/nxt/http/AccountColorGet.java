@@ -18,7 +18,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-public final class AccountColorGet extends CreateTransaction {
+public final class AccountColorGet extends APIServlet.APIRequestHandler {
 
     static final AccountColorGet instance = new AccountColorGet();
 
@@ -28,18 +28,15 @@ public final class AccountColorGet extends CreateTransaction {
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!AccountColor.getAccountColorEnabled()) {
-            return nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
-        boolean includeAccountInfo = req.getParameter("includeAccountInfo") == "true";
-        boolean includeDescription = req.getParameter("includeDescription") == "true";
+        boolean includeAccountInfo = "true".equals(req.getParameter("includeAccountInfo"));
+        boolean includeDescription = "true".equals(req.getParameter("includeDescription"));
         long accountColorId = ParameterParser.getUnsignedLong(req, "accountColorId", true);
         AccountColor accountColor = AccountColor.getAccountColor(accountColorId);
         if (accountColor == null) {
-          return nxt.http.JSONResponses.unknown("accountColor"); 
+            return nxt.http.JSONResponses.unknown("accountColor");
         }
-        
+
         return JSONData.accountColor(accountColor, includeAccountInfo, includeDescription);
     }
 }
