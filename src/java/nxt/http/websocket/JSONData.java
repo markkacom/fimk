@@ -201,9 +201,7 @@ public class JSONData {
         if (asset != null) {
             json.put("name", asset.getName());
             json.put("decimals", asset.getDecimals());
-            if (Asset.privateEnabled()) {
-                json.put("type", asset.getType());
-            }
+            json.put("type", asset.getType());
         }
     }
 
@@ -281,9 +279,7 @@ public class JSONData {
             json.put("decimals", asset.getDecimals());
             json.put("totalQuantityQNT", asset.getQuantityQNT());
             putAccount(json, "issuer", asset.getAccountId());
-            if (Asset.privateEnabled()) {
-                json.put("type", asset.getType());
-            }
+            json.put("type", asset.getType());
         }
         return json;
     }
