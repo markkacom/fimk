@@ -15,15 +15,13 @@ package nxt.http;
 import nxt.AccountColor;
 import nxt.NxtException;
 import nxt.db.DbIterator;
-import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-public final class AccountColorList extends CreateTransaction {
+public final class AccountColorList extends APIServlet.APIRequestHandler {
 
     static final AccountColorList instance = new AccountColorList();
 
@@ -34,16 +32,12 @@ public final class AccountColorList extends CreateTransaction {
     @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
-        if (!AccountColor.getAccountColorEnabled()) {
-            return nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
-        }
 
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
         long accountId = ParameterParser.getAccountId(req, "account", false);
-        boolean includeAccountInfo = req.getParameter("includeAccountInfo") == "true";
-        boolean includeDescription = req.getParameter("includeDescription") == "true";
-        String query = Convert.nullToEmpty(req.getParameter("query")).trim();
+        boolean includeAccountInfo = "true".equals(req.getParameter("includeAccountInfo"));
+        boolean includeDescription = "true".equals(req.getParameter("includeDescription"));
 
         JSONObject response = new JSONObject();
         JSONArray colors = new JSONArray();
