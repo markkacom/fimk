@@ -8,7 +8,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-import nxt.Account;
 import nxt.Block;
 import nxt.MofoQueries;
 import nxt.Nxt;
