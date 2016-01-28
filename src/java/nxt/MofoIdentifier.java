@@ -64,6 +64,6 @@ public class MofoIdentifier {
             int index = DEFAULT_SERVERS[0].equals(server) ? 1 : 0;
             return name + '@' + DEFAULT_SERVERS[index];
         }
-        return null;
+        return "";
     }
 }
