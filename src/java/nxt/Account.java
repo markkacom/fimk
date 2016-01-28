@@ -16,7 +16,6 @@
 
 package nxt;
 
-import nxt.Account.AccountIdentifier;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.db.DbClause;
@@ -380,10 +379,6 @@ public final class Account {
         public String toString() {
             return "AccountIdentifier account_id: " + Long.toUnsignedString(accountId) + " email: " + email;
         }
-    }
-
-    public static boolean getAccountIDsEnabled() {
-        return HardFork.ACCOUNT_IDENTIFIER_BLOCK();
     }
 
     private static final DbKey.LongKeyFactory<Account> accountDbKeyFactory = new DbKey.LongKeyFactory<Account>("id") {
