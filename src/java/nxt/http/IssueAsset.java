@@ -17,7 +17,6 @@
 package nxt.http;
 
 import nxt.Account;
-import nxt.Asset;
 import nxt.Attachment;
 import nxt.Constants;
 import nxt.NxtException;
@@ -48,7 +47,7 @@ public final class IssueAsset extends CreateTransaction {
         String name = req.getParameter("name");
         String description = req.getParameter("description");
         String decimalsValue = Convert.emptyToNull(req.getParameter("decimals"));
-        String typeValue = Asset.privateEnabled() ? Convert.emptyToNull(req.getParameter("type")) : null;
+        String typeValue = Convert.emptyToNull(req.getParameter("type"));
 
         if (name == null) {
             return MISSING_NAME;
