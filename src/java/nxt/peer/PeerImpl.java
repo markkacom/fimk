@@ -17,6 +17,8 @@
 package nxt.peer;
 
 import nxt.Account;
+import nxt.AppVersion;
+import nxt.AppVersionManager;
 import nxt.BlockchainProcessor;
 import nxt.Constants;
 import nxt.Nxt;
@@ -27,6 +29,7 @@ import nxt.util.CountingInputStream;
 import nxt.util.CountingOutputWriter;
 import nxt.util.JSON;
 import nxt.util.Logger;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
@@ -68,7 +71,7 @@ final class PeerImpl implements Peer {
     private volatile String platform;
     private volatile String application;
     private volatile String version;
-    private volatile boolean isOldVersion; 
+    private volatile boolean isOldVersion;
     private volatile long adjustedWeight;
     private volatile long blacklistingTime;
     private volatile String blacklistingCause;
@@ -159,29 +162,13 @@ final class PeerImpl implements Peer {
         }
         this.version = version;
         isOldVersion = false;
-        if (application != null && ! Nxt.APPLICATION.equals(application)) {
-          isOldVersion = true;
-        }         
-        else if (Nxt.APPLICATION.equals(application)) {
-            String[] versions;
-            if (version == null || (versions = version.split("\\.")).length < Constants.MIN_VERSION.length) {
+        if (Nxt.APPLICATION.equals(application)) {
+            AppVersion appVersion = new AppVersion(version);
+            if (!appVersion.getIsValid()) {
                 isOldVersion = true;
-            } else {
-                for (int i = 0; i < Constants.MIN_VERSION.length; i++) {
-                    try {
-                        int v = Integer.parseInt(versions[i]);
-                        if (v > Constants.MIN_VERSION[i]) {
-                            isOldVersion = false;
-                            break;
-                        } else if (v < Constants.MIN_VERSION[i]) {
-                            isOldVersion = true;
-                            break;
-                        }
-                    } catch (NumberFormatException e) {
-                        isOldVersion = true;
-                        break;
-                    }
-                }
+            }
+            if (AppVersionManager.getInstance().MIN_VERSION.compareTo(appVersion) >= 0) {
+                isOldVersion = true;
             }
             if (isOldVersion) {
                 Logger.logDebugMessage(String.format("Blacklisting %s version %s", host, version));
@@ -268,7 +255,7 @@ final class PeerImpl implements Peer {
     public boolean getGossipEnabled() {
         return gossipEnabled;
     }
-    
+
     void setGossipEnabled(boolean gossipEnabled) {
         this.gossipEnabled = gossipEnabled;
     }
@@ -291,11 +278,11 @@ final class PeerImpl implements Peer {
     public boolean isBlacklisted() {
         if (isWhitelisted()) {
             return false;
-        }    
+        }
         return blacklistingTime > 0 || isOldVersion || Peers.knownBlacklistedPeers.contains(host)
                 || (announcedAddress != null && Peers.knownBlacklistedPeers.contains(announcedAddress));
     }
-    
+
     @Override
     public boolean isWhitelisted() {
       return Peers.knownWhitelistedPeers.contains(host);
