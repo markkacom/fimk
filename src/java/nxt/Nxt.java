@@ -52,7 +52,8 @@ public final class Nxt {
 
     public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.6.1"; /* FIM Version*/
+    public static final String VERSION = "0.6.2"; /* FIM Version*/
+    public static final String MIN_VERSION = "0.6.0"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
 
@@ -374,6 +375,7 @@ public final class Nxt {
                 MofoVerificationAuthority.init();
                 GossipProcessorImpl.getInstance();
                 AccountColor.init();
+                AppVersionManager.getInstance();
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
@@ -385,7 +387,7 @@ public final class Nxt {
                 Logger.logMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
                 Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") started successfully.");
                 Logger.logMessage("Copyright © 2013-2015 The Nxt Core Developers.");
-                Logger.logMessage("Copyright © 2014-2015 Krypto Fin ry and the FIMKrypto Developers.");
+                Logger.logMessage("Copyright © 2014-2016 Krypto Fin ry and the FIMKrypto Developers.");
                 Logger.logMessage("Distributed under GPLv2, with ABSOLUTELY NO WARRANTY.");
                 if (API.getBrowserUri() != null) {
                     Logger.logMessage("Client UI is at " + API.getBrowserUri());
