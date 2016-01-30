@@ -1093,7 +1093,7 @@ public interface Attachment extends Appendix {
 
         ColoredCoinsAskOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
-            this.orderFeeQNT = Asset.privateEnabled() ? buffer.getLong() : 0;
+            this.orderFeeQNT = Asset.privateEnabled() && buffer.hasRemaining() ? buffer.getLong() : 0;
         }
 
         ColoredCoinsAskOrderPlacement(JSONObject attachmentData) {
@@ -1143,7 +1143,7 @@ public interface Attachment extends Appendix {
 
         ColoredCoinsBidOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
-            this.orderFeeNQT = Asset.privateEnabled() ? buffer.getLong() : 0;
+            this.orderFeeNQT = Asset.privateEnabled() && buffer.hasRemaining() ? buffer.getLong() : 0;
         }
 
         ColoredCoinsBidOrderPlacement(JSONObject attachmentData) {
