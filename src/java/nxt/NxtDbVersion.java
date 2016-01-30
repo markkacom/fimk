@@ -1066,7 +1066,9 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE INDEX IF NOT EXISTS name_account_color_idx ON account_color (name_lower)");
             case 432:
                 /* FIMKrypto */
-                BlockDb.deleteBlocksFromHeight(Constants.PRIVATE_ASSETS_BLOCK);
+                if (!Constants.isTestnet) {
+                    BlockDb.deleteBlocksFromHeight(Constants.PRIVATE_ASSETS_BLOCK);
+                }
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
                 apply(null);
             case 433:
