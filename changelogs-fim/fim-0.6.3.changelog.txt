@@ -1,0 +1,2 @@
+Bug fix. Accounts that contain ask or bid orders from before the most recent
+fork did not return correct results from getActivity API.  
