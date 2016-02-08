@@ -873,7 +873,7 @@ public interface Attachment extends Appendix {
             this.description = Convert.readString(buffer, buffer.getShort(), Constants.MAX_ASSET_DESCRIPTION_LENGTH);
             this.quantityQNT = buffer.getLong();
             this.decimals = buffer.get();
-            this.type = Asset.privateEnabled() ? buffer.get() : 0;
+            this.type = Asset.privateEnabled() && buffer.hasRemaining() ? buffer.get() : 0;
         }
 
         ColoredCoinsAssetIssuance(JSONObject attachmentData) {
