@@ -25,23 +25,28 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
     static final GetNamespacedAliases instance = new GetNamespacedAliases();
 
     private GetNamespacedAliases() {
-        super(new APITag[] {APITag.ALIASES}, "account", "filter", "firstIndex", "lastIndex");
+        super(new APITag[] {APITag.ALIASES}, "account", "filter", "firstIndex", "lastIndex", "sortBy", "sortAsc");
     }
 
     @SuppressWarnings("unchecked")
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
-      
+
         final long accountId = ParameterParser.getAccount(req).getId();
         final String filter = ParameterParser.getFilter(req);
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = Math.max(ParameterParser.getLastIndex(req), 0);
 
+        /* Default sort is by name, other option is by height. Use @sortBy=height */
+        boolean sortByHeight = "height".equals(req.getParameter("sortBy"));
+        int sortBy = sortByHeight ? NamespacedAlias.SORT_BY_HEIGHT : NamespacedAlias.SORT_BY_NAME;
+        boolean sortAsc = "true".equals(req.getParameter("sortAsc"));
+
         JSONArray aliases = new JSONArray();
         try (
             DbIterator<NamespacedAlias> iterator = (filter == null) ?
-                  NamespacedAlias.getAliasesByOwner(accountId, firstIndex, lastIndex) :
-                  NamespacedAlias.searchAliases(filter, accountId, firstIndex, lastIndex) ) {
+                  NamespacedAlias.getAliasesByOwner(accountId, firstIndex, lastIndex, sortBy, sortAsc) :
+                  NamespacedAlias.searchAliases(filter, accountId, firstIndex, lastIndex, sortBy, sortAsc) ) {
             while (iterator.hasNext()) {
                 aliases.add(JSONData.namespacedAlias(iterator.next()));
             }
@@ -49,7 +54,7 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
 
         JSONObject response = new JSONObject();
         response.put("aliases", aliases);
-        return response;        
+        return response;
     }
 
 }
