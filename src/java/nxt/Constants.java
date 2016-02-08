@@ -167,7 +167,7 @@ public final class Constants {
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int COLORED_ACCOUNTS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
-    public static final int ACCOUNT_IDENTIFIER_BLOCK_2 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;
+    public static final int ACCOUNT_IDENTIFIER_BLOCK_2 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 957300;
 
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0;  /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
