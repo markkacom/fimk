@@ -16,10 +16,12 @@ public class HardFork {
      * to change a fork height after it was set.
      */
 
-    static long ACCOUNT_IDENTIFIER_BLOCK_2_ID = Long.parseUnsignedLong("10133298006531225081");
+    // static long ACCOUNT_IDENTIFIER_BLOCK_2_ID = Long.parseUnsignedLong("10133298006531225081"); // 957300
+    static long NAMESPACED_ALIAS_FIX_ID = Long.parseUnsignedLong("16302510207109928211");
 
     static ForkHeight[] forks = {
-        new ForkHeight(ACCOUNT_IDENTIFIER_BLOCK_2_ID)
+        // new ForkHeight(ACCOUNT_IDENTIFIER_BLOCK_2_ID),
+        new ForkHeight(NAMESPACED_ALIAS_FIX_ID)
     };
 
     static void init() {
@@ -37,9 +39,9 @@ public class HardFork {
         Nxt.getBlockchainProcessor().addListener(new Listener<Block>() {
             @Override
             public void notify(Block block) {
-              for (ForkHeight fork : forks) {
-                  fork.reset();
-              }
+                for (ForkHeight fork : forks) {
+                    fork.reset();
+                }
             }
         }, BlockchainProcessor.Event.RESCAN_BEGIN);
     }
@@ -89,10 +91,14 @@ public class HardFork {
     }
 
     public static boolean ACCOUNT_IDENTIFIER_BLOCK_2() {
-        return Nxt.getBlockchain().getHeight() > getForkHeight(ACCOUNT_IDENTIFIER_BLOCK_2_ID);
+        return Nxt.getBlockchain().getHeight() > Constants.ACCOUNT_IDENTIFIER_BLOCK_2;
     }
 
     public static boolean COLORED_ACCOUNTS_BLOCK() {
         return Nxt.getBlockchain().getHeight() > Constants.COLORED_ACCOUNTS_BLOCK;
+    }
+
+    public static boolean NAMESPACED_ALIAS_FIX() {
+        return Nxt.getBlockchain().getHeight() > getForkHeight(NAMESPACED_ALIAS_FIX_ID);
     }
 }
