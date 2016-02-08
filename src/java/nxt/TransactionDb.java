@@ -150,7 +150,7 @@ final class TransactionDb {
 
             TransactionType transactionType = TransactionType.findTransactionType(type, subtype);
             TransactionImpl.BuilderImpl builder = new TransactionImpl.BuilderImpl(version, null,
-                    amountNQT, feeNQT, deadline, transactionType.parseAttachment(buffer, version))
+                    amountNQT, feeNQT, deadline, transactionType.parseAttachment(buffer, version, timestamp))
                     .timestamp(timestamp)
                     .referencedTransactionFullHash(referencedTransactionFullHash)
                     .signature(signature)
@@ -190,7 +190,7 @@ final class TransactionDb {
             if (rs.getBoolean("has_prunable_encrypted_message")) {
                 builder.appendix(new Appendix.PrunableEncryptedMessage(buffer, version));
             }
-           
+
             return builder.build();
 
         } catch (SQLException e) {

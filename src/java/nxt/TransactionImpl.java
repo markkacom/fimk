@@ -663,7 +663,7 @@ final class TransactionImpl implements Transaction {
             }
             TransactionType transactionType = TransactionType.findTransactionType(type, subtype);
             TransactionImpl.BuilderImpl builder = new BuilderImpl(version, senderPublicKey, amountNQT, feeNQT,
-                    deadline, transactionType.parseAttachment(buffer, version))
+                    deadline, transactionType.parseAttachment(buffer, version, timestamp))
                     .timestamp(timestamp)
                     .referencedTransactionFullHash(referencedTransactionFullHash)
                     .signature(signature)
@@ -816,7 +816,7 @@ final class TransactionImpl implements Transaction {
             }
             TransactionImpl.BuilderImpl builder = new BuilderImpl(version, senderPublicKey,
                     amountNQT, feeNQT, deadline,
-                    transactionType.parseAttachment(attachmentData))
+                    transactionType.parseAttachment(attachmentData, timestamp))
                     .timestamp(timestamp)
                     .referencedTransactionFullHash(referencedTransactionFullHash)
                     .signature(signature)
@@ -947,7 +947,7 @@ final class TransactionImpl implements Transaction {
         }
         return true;
     }
-    
+
     @Override
     public void validate() throws NxtException.ValidationException {
         if (timestamp == 0 ? (deadline != 0 || feeNQT != 0) : (deadline < 1 || feeNQT <= 0)

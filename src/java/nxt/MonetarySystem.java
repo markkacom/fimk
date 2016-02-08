@@ -120,12 +120,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyIssuance(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyIssuance parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyIssuance parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyIssuance(attachmentData);
         }
 
@@ -204,12 +204,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemReserveIncrease parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemReserveIncrease parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemReserveIncrease(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemReserveIncrease parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemReserveIncrease parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemReserveIncrease(attachmentData);
         }
 
@@ -274,12 +274,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemReserveClaim parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemReserveClaim parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemReserveClaim(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemReserveClaim parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemReserveClaim parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemReserveClaim(attachmentData);
         }
 
@@ -337,12 +337,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyTransfer parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyTransfer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyTransfer(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyTransfer parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyTransfer parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyTransfer(attachmentData);
         }
 
@@ -408,12 +408,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemPublishExchangeOffer parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemPublishExchangeOffer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemPublishExchangeOffer(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemPublishExchangeOffer parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemPublishExchangeOffer parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemPublishExchangeOffer(attachmentData);
         }
 
@@ -514,12 +514,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemExchangeBuy parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemExchangeBuy parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemExchangeBuy(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemExchangeBuy parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemExchangeBuy parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemExchangeBuy(attachmentData);
         }
 
@@ -561,12 +561,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemExchangeSell parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemExchangeSell parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemExchangeSell(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemExchangeSell parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemExchangeSell parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemExchangeSell(attachmentData);
         }
 
@@ -610,12 +610,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyMinting parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyMinting parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyMinting(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyMinting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyMinting parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyMinting(attachmentData);
         }
 
@@ -690,12 +690,12 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyDeletion parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyDeletion parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyDeletion(buffer, transactionVersion);
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyDeletion parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+        Attachment.MonetarySystemCurrencyDeletion parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyDeletion(attachmentData);
         }
 

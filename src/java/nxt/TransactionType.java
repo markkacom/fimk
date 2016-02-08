@@ -181,9 +181,9 @@ public abstract class TransactionType {
 
     public abstract byte getSubtype();
 
-    abstract Attachment.AbstractAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException;
+    abstract Attachment.AbstractAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException;
 
-    abstract Attachment.AbstractAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException;
+    abstract Attachment.AbstractAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException;
 
     abstract void validateAttachment(Transaction transaction) throws NxtException.ValidationException;
 
@@ -337,12 +337,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.EmptyAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.EmptyAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return Attachment.ORDINARY_PAYMENT;
             }
 
             @Override
-            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return Attachment.ORDINARY_PAYMENT;
             }
 
@@ -389,12 +389,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.EmptyAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.EmptyAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return Attachment.ARBITRARY_MESSAGE;
             }
 
             @Override
-            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return Attachment.ARBITRARY_MESSAGE;
             }
 
@@ -443,12 +443,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingAliasAssignment parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingAliasAssignment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasAssignment(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingAliasAssignment parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingAliasAssignment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasAssignment(attachmentData);
             }
 
@@ -509,12 +509,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingAliasSell parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingAliasSell parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasSell(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingAliasSell parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingAliasSell parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasSell(attachmentData);
             }
 
@@ -596,12 +596,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingAliasBuy parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingAliasBuy parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasBuy(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingAliasBuy parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingAliasBuy parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasBuy(attachmentData);
             }
 
@@ -673,12 +673,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingAliasDelete parseAttachment(final ByteBuffer buffer, final byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingAliasDelete parseAttachment(final ByteBuffer buffer, final byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasDelete(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingAliasDelete parseAttachment(final JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingAliasDelete parseAttachment(final JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAliasDelete(attachmentData);
             }
 
@@ -750,12 +750,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingPollCreation parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingPollCreation parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingPollCreation(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingPollCreation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingPollCreation parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingPollCreation(attachmentData);
             }
 
@@ -845,12 +845,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingVoteCasting parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingVoteCasting parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingVoteCasting(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingVoteCasting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingVoteCasting parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingVoteCasting(attachmentData);
             }
 
@@ -947,12 +947,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingPhasingVoteCasting parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingPhasingVoteCasting parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingPhasingVoteCasting(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingPhasingVoteCasting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingPhasingVoteCasting parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingPhasingVoteCasting(attachmentData);
             }
 
@@ -1057,12 +1057,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingHubAnnouncement parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingHubAnnouncement parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingHubAnnouncement(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingHubAnnouncement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingHubAnnouncement parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingHubAnnouncement(attachmentData);
             }
 
@@ -1116,12 +1116,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.MessagingAccountInfo parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.MessagingAccountInfo parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAccountInfo(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.MessagingAccountInfo parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.MessagingAccountInfo parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.MessagingAccountInfo(attachmentData);
             }
 
@@ -1193,12 +1193,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsAssetIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAssetIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAssetIssuance(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsAssetIssuance parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAssetIssuance parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAssetIssuance(attachmentData);
             }
 
@@ -1264,12 +1264,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsAssetTransfer parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAssetTransfer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAssetTransfer(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsAssetTransfer parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAssetTransfer parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAssetTransfer(attachmentData);
             }
 
@@ -1387,12 +1387,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsAskOrderPlacement parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAskOrderPlacement parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAskOrderPlacement(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsAskOrderPlacement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAskOrderPlacement parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAskOrderPlacement(attachmentData);
             }
 
@@ -1480,12 +1480,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsBidOrderPlacement parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsBidOrderPlacement parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsBidOrderPlacement(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsBidOrderPlacement parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsBidOrderPlacement parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsBidOrderPlacement(attachmentData);
             }
 
@@ -1592,12 +1592,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsAskOrderCancellation parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAskOrderCancellation parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAskOrderCancellation(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsAskOrderCancellation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsAskOrderCancellation parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsAskOrderCancellation(attachmentData);
             }
 
@@ -1639,12 +1639,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsBidOrderCancellation parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsBidOrderCancellation parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsBidOrderCancellation(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsBidOrderCancellation parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.ColoredCoinsBidOrderCancellation parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.ColoredCoinsBidOrderCancellation(attachmentData);
             }
 
@@ -1686,12 +1686,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.ColoredCoinsDividendPayment parseAttachment(ByteBuffer buffer, byte transactionVersion) {
+            Attachment.ColoredCoinsDividendPayment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) {
                 return new Attachment.ColoredCoinsDividendPayment(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.ColoredCoinsDividendPayment parseAttachment(JSONObject attachmentData) {
+            Attachment.ColoredCoinsDividendPayment parseAttachment(JSONObject attachmentData, int timestamp) {
                 return new Attachment.ColoredCoinsDividendPayment(attachmentData);
             }
 
@@ -1802,12 +1802,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsListing parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsListing parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsListing(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsListing parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsListing parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsListing(attachmentData);
             }
 
@@ -1855,12 +1855,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsDelisting parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsDelisting parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsDelisting(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsDelisting parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsDelisting parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsDelisting(attachmentData);
             }
 
@@ -1914,12 +1914,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsPriceChange parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsPriceChange parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsPriceChange(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsPriceChange parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsPriceChange parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsPriceChange(attachmentData);
             }
 
@@ -1975,12 +1975,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsQuantityChange parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsQuantityChange parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsQuantityChange(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsQuantityChange parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsQuantityChange parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsQuantityChange(attachmentData);
             }
 
@@ -2037,12 +2037,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsPurchase parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsPurchase parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsPurchase(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsPurchase parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsPurchase parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsPurchase(attachmentData);
             }
 
@@ -2127,12 +2127,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsDelivery parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsDelivery parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsDelivery(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsDelivery parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsDelivery parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsDelivery(attachmentData);
             }
 
@@ -2195,12 +2195,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsFeedback parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsFeedback parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsFeedback(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsFeedback parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsFeedback parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsFeedback(attachmentData);
             }
 
@@ -2258,12 +2258,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.DigitalGoodsRefund parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsRefund parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsRefund(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.DigitalGoodsRefund parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.DigitalGoodsRefund parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.DigitalGoodsRefund(attachmentData);
             }
 
@@ -2360,12 +2360,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.AccountControlEffectiveBalanceLeasing(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.AccountControlEffectiveBalanceLeasing(attachmentData);
             }
 
@@ -2466,12 +2466,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.TaggedDataUpload parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.TaggedDataUpload parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.TaggedDataUpload(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.TaggedDataUpload parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.TaggedDataUpload parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.TaggedDataUpload(attachmentData);
             }
 
@@ -2530,12 +2530,12 @@ public abstract class TransactionType {
             }
 
             @Override
-            Attachment.TaggedDataExtend parseAttachment(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+            Attachment.TaggedDataExtend parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.TaggedDataExtend(buffer, transactionVersion);
             }
 
             @Override
-            Attachment.TaggedDataExtend parseAttachment(JSONObject attachmentData) throws NxtException.NotValidException {
+            Attachment.TaggedDataExtend parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new Attachment.TaggedDataExtend(attachmentData);
             }
 
