@@ -87,6 +87,10 @@ import nxt.util.ThreadPool;
 
 public class AppVersionManager {
 
+    private static final boolean SHUTDOWN_WHEN_OUTDATED = Nxt.getBooleanProperty("nxt.shutdownWhenOutdated");
+    private static final boolean WARN_NOT_LATEST_VERSION = Nxt.getBooleanProperty("nxt.warnNotLatestVersion");
+    private static final int NEW_VERSION_CHECK_INTERVAL = Nxt.getIntProperty("nxt.newVersionCheckInterval", 600);
+
     private static long LATEST_VERSION_ID = Constants.isTestnet ? 0 : Long.parseUnsignedLong("9266582752086146948");
     private static long BLACKLIST_VERSION_ID = Constants.isTestnet ? 0 : Long.parseUnsignedLong("9364249966090852339");
     private static long WARN_VERSION_ID = Constants.isTestnet ? 0 : Long.parseUnsignedLong("17359617168004080578");
@@ -180,10 +184,10 @@ public class AppVersionManager {
     }
 
     private AppVersionManager() {
-        if (Nxt.getBooleanProperty("nxt.shutdownWhenOutdated") ||
-            Nxt.getBooleanProperty("nxt.warnNotLatestVersion")) {
+        if (SHUTDOWN_WHEN_OUTDATED ||
+            WARN_NOT_LATEST_VERSION) {
             ThreadPool.scheduleThread("GetAppVersionUpdates", getAppVersionUpdates,
-                                      Nxt.getIntProperty("nxt.newVersionCheckInterval", 600)); // once every 10 minutes
+                                      NEW_VERSION_CHECK_INTERVAL); // once every 10 minutes
         }
     }
 
@@ -250,7 +254,7 @@ public class AppVersionManager {
                     }
                 }
 
-                if (Nxt.getBooleanProperty("nxt.shutdownWhenOutdated")) {
+                if (SHUTDOWN_WHEN_OUTDATED) {
                     if (Nxt.getBlockchain().getHeight() >= blacklistVersion.getHeight() &&
                         blacklistVersion.version.compareTo(VERSION) >= 0) {
                         shutdownServer(latestVersion);
@@ -258,7 +262,7 @@ public class AppVersionManager {
                     }
                 }
 
-                if (Nxt.getBooleanProperty("nxt.warnNotLatestVersion")) {
+                if (WARN_NOT_LATEST_VERSION) {
                     if (Nxt.getBlockchain().getHeight() >= warnVersion.getHeight()  &&
                         warnVersion.version.compareTo(VERSION) >= 0) {
                         printVersionWarning(latestVersion);
