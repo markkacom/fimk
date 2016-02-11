@@ -1194,12 +1194,12 @@ public abstract class TransactionType {
 
             @Override
             Attachment.ColoredCoinsAssetIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
-                return new Attachment.ColoredCoinsAssetIssuance(buffer, transactionVersion);
+                return new Attachment.ColoredCoinsAssetIssuance(buffer, transactionVersion, timestamp);
             }
 
             @Override
             Attachment.ColoredCoinsAssetIssuance parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
-                return new Attachment.ColoredCoinsAssetIssuance(attachmentData);
+                return new Attachment.ColoredCoinsAssetIssuance(attachmentData, timestamp);
             }
 
             @Override
@@ -1388,12 +1388,12 @@ public abstract class TransactionType {
 
             @Override
             Attachment.ColoredCoinsAskOrderPlacement parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
-                return new Attachment.ColoredCoinsAskOrderPlacement(buffer, transactionVersion);
+                return new Attachment.ColoredCoinsAskOrderPlacement(buffer, transactionVersion, timestamp);
             }
 
             @Override
             Attachment.ColoredCoinsAskOrderPlacement parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
-                return new Attachment.ColoredCoinsAskOrderPlacement(attachmentData);
+                return new Attachment.ColoredCoinsAskOrderPlacement(attachmentData, timestamp);
             }
 
             @Override
@@ -1481,12 +1481,12 @@ public abstract class TransactionType {
 
             @Override
             Attachment.ColoredCoinsBidOrderPlacement parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
-                return new Attachment.ColoredCoinsBidOrderPlacement(buffer, transactionVersion);
+                return new Attachment.ColoredCoinsBidOrderPlacement(buffer, transactionVersion, timestamp);
             }
 
             @Override
             Attachment.ColoredCoinsBidOrderPlacement parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
-                return new Attachment.ColoredCoinsBidOrderPlacement(attachmentData);
+                return new Attachment.ColoredCoinsBidOrderPlacement(attachmentData, timestamp);
             }
 
             @Override
