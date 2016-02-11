@@ -22,6 +22,7 @@ import nxt.env.RuntimeMode;
 import nxt.gossip.GossipProcessor;
 import nxt.gossip.GossipProcessorImpl;
 import nxt.http.API;
+import nxt.http.websocket.BlockchainEvents;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
 import nxt.user.Users;
@@ -52,8 +53,8 @@ public final class Nxt {
 
     public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.6.3"; /* FIM Version*/
-    public static final String MIN_VERSION = "0.6.0"; /* Blacklist everything up or below this version */
+    public static final String VERSION = "0.6.4"; /* FIM Version*/
+    public static final String MIN_VERSION = "0.6.1"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
 
@@ -367,6 +368,7 @@ public final class Nxt {
                 Generator.init();
                 API.init();
                 WebsocketServer.init();
+                BlockchainEvents.getInstance();
                 Users.init();
                 DebugTrace.init();
                 MofoMessaging.init();
