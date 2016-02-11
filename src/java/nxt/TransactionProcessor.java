@@ -30,7 +30,16 @@ public interface TransactionProcessor extends Observable<List<? extends Transact
         ADDED_UNCONFIRMED_TRANSACTIONS,
         ADDED_CONFIRMED_TRANSACTIONS,
         RELEASE_PHASED_TRANSACTION,
-        REJECT_PHASED_TRANSACTION
+        REJECT_PHASED_TRANSACTION,
+
+        /* Notifies listeners about transactions that have previously been in a
+         * block but had their block popped which makes them unconfirmed now. */
+        REMOVED_TRANSACTIONS,
+
+        /* Notifies listeners about transactions that where either first downloaded
+         * from other peers or transactions that have been broadcasted from this
+         * node. */
+        ADDED_TRANSACTIONS
     }
 
     DbIterator<? extends Transaction> getAllUnconfirmedTransactions();
