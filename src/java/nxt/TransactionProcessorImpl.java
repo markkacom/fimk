@@ -338,6 +338,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
             List<Transaction> acceptedTransactions = Collections.singletonList(transaction);
             Peers.sendToSomePeers(acceptedTransactions);
             transactionListeners.notify(acceptedTransactions, Event.ADDED_UNCONFIRMED_TRANSACTIONS);
+            transactionListeners.notify(acceptedTransactions, Event.ADDED_TRANSACTIONS);
             if (enableTransactionRebroadcasting) {
                 broadcastedTransactions.add((TransactionImpl) transaction);
             }
@@ -462,6 +463,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
                 transaction.unsetBlock();
                 waitingTransactions.add(new UnconfirmedTransaction(transaction, Math.min(currentTime, Convert.fromEpochTime(transaction.getTimestamp()))));
             }
+            transactionListeners.notify(new ArrayList<Transaction>(Collections.unmodifiableCollection(transactions)), Event.REMOVED_TRANSACTIONS);
         }
     }
 
@@ -539,6 +541,7 @@ final class TransactionProcessorImpl implements TransactionProcessor {
         }
         if (addedUnconfirmedTransactions.size() > 0) {
             transactionListeners.notify(addedUnconfirmedTransactions, Event.ADDED_UNCONFIRMED_TRANSACTIONS);
+            transactionListeners.notify(addedUnconfirmedTransactions, Event.ADDED_TRANSACTIONS);
         }
         broadcastedTransactions.removeAll(receivedTransactions);
         if (!exceptions.isEmpty()) {
