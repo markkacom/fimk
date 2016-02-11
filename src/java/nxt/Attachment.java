@@ -861,36 +861,35 @@ public interface Attachment extends Appendix {
 
     final class ColoredCoinsAssetIssuance extends AbstractAttachment {
 
+        private final int timestamp;
         private final String name;
         private final String description;
         private final long quantityQNT;
         private final byte decimals;
         private final byte type;
 
-        ColoredCoinsAssetIssuance(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        ColoredCoinsAssetIssuance(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
+            this.timestamp = timestamp;
             this.name = Convert.readString(buffer, buffer.get(), Constants.MAX_ASSET_NAME_LENGTH);
             this.description = Convert.readString(buffer, buffer.getShort(), Constants.MAX_ASSET_DESCRIPTION_LENGTH);
             this.quantityQNT = buffer.getLong();
             this.decimals = buffer.get();
-            this.type = Asset.privateEnabled() && buffer.hasRemaining() ? buffer.get() : 0;
+            this.type = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? buffer.get() : 0;
         }
 
-        ColoredCoinsAssetIssuance(JSONObject attachmentData) {
+        ColoredCoinsAssetIssuance(JSONObject attachmentData, int timestamp) {
             super(attachmentData);
+            this.timestamp = timestamp;
             this.name = (String) attachmentData.get("name");
             this.description = Convert.nullToEmpty((String) attachmentData.get("description"));
             this.quantityQNT = Convert.parseLong(attachmentData.get("quantityQNT"));
             this.decimals = ((Long) attachmentData.get("decimals")).byteValue();
-            if (Asset.privateEnabled() && attachmentData.containsKey("type")) {
-                this.type = ((Long) attachmentData.get("type")).byteValue();
-            }
-            else {
-                this.type = 0;
-            }
+            this.type = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? ((Long) attachmentData.get("type")).byteValue() : 0;
         }
 
         public ColoredCoinsAssetIssuance(String name, String description, long quantityQNT, byte decimals, byte type) {
+            this.timestamp = Integer.MAX_VALUE;
             this.name = name;
             this.description = Convert.nullToEmpty(description);
             this.quantityQNT = quantityQNT;
@@ -901,7 +900,7 @@ public interface Attachment extends Appendix {
         @Override
         int getMySize() {
             int size = 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1;
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 size += 1;
             };
             return size;
@@ -917,7 +916,7 @@ public interface Attachment extends Appendix {
             buffer.put(description);
             buffer.putLong(quantityQNT);
             buffer.put(decimals);
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 buffer.put(type);
             }
         }
@@ -928,7 +927,7 @@ public interface Attachment extends Appendix {
             attachment.put("description", description);
             attachment.put("quantityQNT", quantityQNT);
             attachment.put("decimals", decimals);
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 attachment.put("type", type);
             }
         }
@@ -1090,19 +1089,23 @@ public interface Attachment extends Appendix {
     final class ColoredCoinsAskOrderPlacement extends ColoredCoinsOrderPlacement {
 
         private final long orderFeeQNT;
+        private final int timestamp;
 
-        ColoredCoinsAskOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
+        ColoredCoinsAskOrderPlacement(ByteBuffer buffer, byte transactionVersion, int timestamp) {
             super(buffer, transactionVersion);
-            this.orderFeeQNT = Asset.privateEnabled() && buffer.hasRemaining() ? buffer.getLong() : 0;
+            this.timestamp = timestamp;
+            this.orderFeeQNT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? buffer.getLong() : 0;
         }
 
-        ColoredCoinsAskOrderPlacement(JSONObject attachmentData) {
+        ColoredCoinsAskOrderPlacement(JSONObject attachmentData, int timestamp) {
             super(attachmentData);
-            this.orderFeeQNT = Convert.parseLong(attachmentData.get("orderFeeQNT"));
+            this.timestamp = timestamp;
+            this.orderFeeQNT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? Convert.parseLong(attachmentData.get("orderFeeQNT")) : 0;
         }
 
         public ColoredCoinsAskOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeQNT) {
             super(assetId, quantityQNT, priceNQT);
+            this.timestamp = Integer.MAX_VALUE;
             this.orderFeeQNT = orderFeeQNT;
         }
 
@@ -1113,13 +1116,13 @@ public interface Attachment extends Appendix {
 
         @Override
         int getMySize() {
-            return super.getMySize() + (Asset.privateEnabled() ? 8 : 0);
+            return super.getMySize() + (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? 8 : 0);
         }
 
         @Override
         void putMyBytes(ByteBuffer buffer) {
             super.putMyBytes(buffer);
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 buffer.putLong(orderFeeQNT);
             }
         }
@@ -1127,7 +1130,7 @@ public interface Attachment extends Appendix {
         @Override
         void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 attachment.put("orderFeeQNT", orderFeeQNT);
             }
         }
@@ -1139,20 +1142,24 @@ public interface Attachment extends Appendix {
 
     final class ColoredCoinsBidOrderPlacement extends ColoredCoinsOrderPlacement {
 
+        private final int timestamp;
         private final long orderFeeNQT;
 
-        ColoredCoinsBidOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
+        ColoredCoinsBidOrderPlacement(ByteBuffer buffer, byte transactionVersion, int timestamp) {
             super(buffer, transactionVersion);
-            this.orderFeeNQT = Asset.privateEnabled() && buffer.hasRemaining() ? buffer.getLong() : 0;
+            this.timestamp = timestamp;
+            this.orderFeeNQT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? buffer.getLong() : 0;
         }
 
-        ColoredCoinsBidOrderPlacement(JSONObject attachmentData) {
+        ColoredCoinsBidOrderPlacement(JSONObject attachmentData, int timestamp) {
             super(attachmentData);
-            this.orderFeeNQT = Convert.parseLong(attachmentData.get("orderFeeNQT"));
+            this.timestamp = timestamp;
+            this.orderFeeNQT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? Convert.parseLong(attachmentData.get("orderFeeNQT")) : 0;
         }
 
         public ColoredCoinsBidOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeNQT) {
             super(assetId, quantityQNT, priceNQT);
+            this.timestamp = Integer.MAX_VALUE;
             this.orderFeeNQT = orderFeeNQT;
         }
 
@@ -1163,13 +1170,13 @@ public interface Attachment extends Appendix {
 
         @Override
         int getMySize() {
-            return super.getMySize() + (Asset.privateEnabled() ? 8 : 0);
+            return super.getMySize() + (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? 8 : 0);
         }
 
         @Override
         void putMyBytes(ByteBuffer buffer) {
             super.putMyBytes(buffer);
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 buffer.putLong(orderFeeNQT);
             }
         }
@@ -1177,7 +1184,7 @@ public interface Attachment extends Appendix {
         @Override
         void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
-            if (Asset.privateEnabled()) {
+            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 attachment.put("orderFeeNQT", orderFeeNQT);
             }
         }
