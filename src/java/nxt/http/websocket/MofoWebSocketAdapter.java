@@ -16,44 +16,44 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
 
     /**
      * MofoWallet websocket dialect:
-     * 
+     *
      * All operations expect an array as argument where the first element is the
      * operation. Arguments to the operation are determined per operation and
      * are explained below:
-     * 
+     *
      * op: call
-     * 
-     * The call operation calls a remote procedure and has a mechanism to 
+     *
+     * The call operation calls a remote procedure and has a mechanism to
      * asynchronously send a response to the caller.
-     * 
-     * ['call', call-id, method, arguments] 
-     *  
+     *
+     * ['call', call-id, method, arguments]
+     *
      * op: subscribe
-     * 
+     *
      * This subscribes the socket to a certain topic, meaning the socket will
-     * be notified about said topic events. The topic argument is an array of 
+     * be notified about said topic events. The topic argument is an array of
      * topics.
-     * 
+     *
      * ['subscribe', [topic,topic]]
-     * 
+     *
      * op: unsubscribe
-     * 
-     * Reverse of subscribe, this unsubscribes the socket from receiving 
+     *
+     * Reverse of subscribe, this unsubscribes the socket from receiving
      * notifications about said topic.
-     * 
+     *
      * ['unsubscribe', topic]
-     *   
+     *
      */
 
     @Override
     public void onWebSocketConnect(Session sess) {
         super.onWebSocketConnect(sess);
-        
+
         InetSocketAddress address = sess.getRemoteAddress();
         if (address != null) {
             Logger.logDebugMessage("Socket Connected: " + address.getHostString());
         }
-        
+
         if (API.allowedBotHosts != null && ! API.allowedBotHosts.contains(sess.getRemoteAddress().getHostName())) {
             try {
                 Logger.logDebugMessage("Disconnecting because of not-allowed bot host");
@@ -63,35 +63,35 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
                 Logger.logDebugMessage("Could not disconnect socket", e);
             }
             return;
-        }       
+        }
     }
 
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
         //Logger.logDebugMessage("Received TEXT message: " + message);
-        
+
         Object json = JSONValue.parse(message);
-        
+
         if (json instanceof String && "ping".equals(json)) {
           sendAsync("pong");
           return;
         }
-        
+
         if (!(json instanceof JSONArray)) {
             Logger.logDebugMessage("WebSocket - expected an array - "+message);
             return;
         }
-        
+
         JSONArray argv = (JSONArray) json;
         if (argv.size() < 1 || !(argv.get(0) instanceof String)) {
             Logger.logDebugMessage("WebSocket - invalid operation - "+message);
             return;
         }
-        
-        String op = (String) argv.get(0); 
+
+        String op = (String) argv.get(0);
         if ("call".equals(op)) {
-          
+
             if (argv.size() < 2 || !(argv.get(1) instanceof String)) {
                 Logger.logDebugMessage("WebSocket - invalid call id - "+message);
                 return;
@@ -103,8 +103,8 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
             if (argv.size() < 4 || !(argv.get(3) instanceof JSONObject)) {
                 Logger.logDebugMessage("WebSocket - invalid method - "+message);
                 return;
-            }            
-            
+            }
+
             final String call_id        = (String) argv.get(1);
             final String method         = (String) argv.get(2);
             final JSONObject arguments  = (JSONObject) argv.get(3);
@@ -117,10 +117,20 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
             }
             else {
                 if (argv.get(1) instanceof String) {
-                    MofoSocketServer.subscribe(this, (String) argv.get(1));
+                    String topic = (String) argv.get(1);
+
+                    /* the new way - transaction topics start with [101, */
+                    if (topic.startsWith("[101,")) {
+                        BlockchainEvents.getInstance().subscribe(this, topic);
+                    }
+                    /* the old way */
+                    else {
+                        MofoSocketServer.subscribe(this, topic);
+                    }
                 }
                 else if (argv.get(1) instanceof JSONArray) {
-                    for (Object topic : (JSONArray) argv.get(1)) {
+                    JSONArray array = (JSONArray) argv.get(1);
+                    for (Object topic : array) {
                         if (!(topic instanceof String)) {
                             Logger.logDebugMessage("WebSocket - invalid topic - "+message);
                             break;
@@ -139,7 +149,16 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
             }
             else {
                 if (argv.get(1) instanceof String) {
-                    MofoSocketServer.unsubscribe(this, (String) argv.get(1));
+                    String topic = (String) argv.get(1);
+
+                    /* the new way - transaction topics start with [101, */
+                    if (topic.startsWith("[101,")) {
+                        BlockchainEvents.getInstance().unsubscribe(this, topic);
+                    }
+                    /* the old way */
+                    else {
+                        MofoSocketServer.unsubscribe(this, topic);
+                    }
                 }
                 else if (argv.get(1) instanceof JSONArray) {
                     for (Object topic : (JSONArray) argv.get(1)) {
@@ -153,27 +172,28 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
                 else {
                     Logger.logDebugMessage("WebSocket - invalid topic - "+message);
                 }
-            }          
+            }
         }
         else {
             Logger.logDebugMessage("WebSocket - operation not supported '"+op+"' - "+message);
         }
-    }    
-    
+    }
+
     @Override
     public void onWebSocketClose(int statusCode, String reason) {
         super.onWebSocketClose(statusCode,reason);
         Logger.logDebugMessage("Socket Closed: [" + statusCode + "] " + reason);
         MofoSocketServer.socketClosed(this);
+        BlockchainEvents.getInstance().socketClosed(this);
     }
-    
+
     @Override
     public void onWebSocketError(Throwable cause) {
         super.onWebSocketError(cause);
         cause.printStackTrace(System.err);
         Logger.logErrorMessage(cause.toString());
     }
-    
+
     public void sendAsync(String str) {
         if (getSession() != null && getSession().isOpen()) {
             //Logger.logDebugMessage("Send TEXT message: " + str);
