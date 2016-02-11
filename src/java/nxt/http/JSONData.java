@@ -63,7 +63,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-final class JSONData {
+public final class JSONData {
 
     static JSONObject alias(Alias alias) {
         JSONObject json = new JSONObject();
@@ -659,7 +659,7 @@ final class JSONData {
         return json;
     }
 
-    static JSONObject unconfirmedTransaction(Transaction transaction) {
+    public static JSONObject unconfirmedTransaction(Transaction transaction) {
         JSONObject json = new JSONObject();
         json.put("type", transaction.getType().getType());
         json.put("subtype", transaction.getType().getSubtype());
