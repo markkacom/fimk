@@ -318,6 +318,8 @@ public final class APIServlet extends HttpServlet {
     }
 
     static void registerFIMKAPI(Map<String,APIRequestHandler> map) {
+        map.put("getAccountTransactionCount", GetAccountTransactionCount.instance);
+        map.put("getTransactionCount", GetTransactionCount.instance);
         map.put("getBlocksIdsFromHeight", GetBlocksIdsFromHeight.instance);
         map.put("getNamespacedAlias", GetNamespacedAlias.instance);
         map.put("setNamespacedAlias", SetNamespacedAlias.instance);
