@@ -283,6 +283,29 @@ final class BlockchainImpl implements Blockchain {
     }
 
     @Override
+    public int getTransactionCount(Account account) {
+        Connection con = null;
+        try {
+            String sql = "SELECT COUNT(DISTINCT id) FROM transaction WHERE recipient_id = ? OR sender_id = ?";
+            con = Db.db.getConnection();
+            PreparedStatement pstmt;
+            int i = 0;
+            pstmt = con.prepareStatement(sql);
+            pstmt.setLong(++i, account.getId());
+            pstmt.setLong(++i, account.getId());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
+    @Override
     public DbIterator<TransactionImpl> getAllTransactions() {
         Connection con = null;
         try {
@@ -414,4 +437,109 @@ final class BlockchainImpl implements Blockchain {
         return new DbIterator<>(con, pstmt, TransactionDb::loadTransaction);
     }
 
+    @Override
+    public DbIterator<TransactionImpl> getTransactions(int numberOfConfirmations, byte type, byte subtype,
+                                                       int blockTimestamp, boolean withMessage, boolean phasedOnly, boolean nonPhasedOnly,
+                                                       int from, int to) {
+        if (phasedOnly && nonPhasedOnly) {
+            throw new IllegalArgumentException("At least one of phasedOnly or nonPhasedOnly must be false");
+        }
+        int height = numberOfConfirmations > 0 ? getHeight() - numberOfConfirmations : Integer.MAX_VALUE;
+        if (height < 0) {
+            throw new IllegalArgumentException("Number of confirmations required " + numberOfConfirmations
+                    + " exceeds current blockchain height " + getHeight());
+        }
+        Connection con = null;
+        try {
+            StringBuilder buf = new StringBuilder();
+            buf.append("SELECT * FROM transaction ");
+            boolean needsAnd = false;
+            if (blockTimestamp > 0) {
+                buf.append("WHERE block_timestamp >= ? ");
+                needsAnd = true;
+            }
+            if (type >= 0) {
+                if (needsAnd) {
+                    buf.append("AND ");
+                }
+                else {
+                    buf.append("WHERE ");
+                }
+                buf.append("type = ? ");
+                if (subtype >= 0) {
+                    buf.append("AND subtype = ? ");
+                }
+                needsAnd = true;
+            }
+            if (height < Integer.MAX_VALUE) {
+                if (needsAnd) {
+                    buf.append("AND ");
+                }
+                else {
+                    buf.append("WHERE ");
+                }
+                buf.append("height <= ? ");
+                needsAnd = true;
+            }
+            if (withMessage) {
+                if (needsAnd) {
+                    buf.append("AND ");
+                }
+                else {
+                    buf.append("WHERE ");
+                }
+                buf.append("(has_message = TRUE OR has_encrypted_message = TRUE ");
+                buf.append("OR ((has_prunable_message = TRUE OR has_prunable_encrypted_message = TRUE) AND timestamp > ?)) ");
+                needsAnd = true;
+            }
+            if (phasedOnly) {
+                if (needsAnd) {
+                    buf.append("AND ");
+                }
+                else {
+                    buf.append("WHERE ");
+                }
+                buf.append("phased = TRUE ");
+                needsAnd = true;
+            }
+            else if (nonPhasedOnly) {
+                if (needsAnd) {
+                    buf.append("AND ");
+                }
+                else {
+                    buf.append("WHERE ");
+                }
+                buf.append("phased = FALSE ");
+            }
+
+            buf.append("ORDER BY timestamp DESC");
+            buf.append(DbUtils.limitsClause(from, to));
+            con = Db.db.getConnection();
+            PreparedStatement pstmt;
+            int i = 0;
+            pstmt = con.prepareStatement(buf.toString());
+            if (blockTimestamp > 0) {
+                pstmt.setInt(++i, blockTimestamp);
+            }
+            if (type >= 0) {
+                pstmt.setByte(++i, type);
+                if (subtype >= 0) {
+                    pstmt.setByte(++i, subtype);
+                }
+            }
+            if (height < Integer.MAX_VALUE) {
+                pstmt.setInt(++i, height);
+            }
+            int prunableExpiration = Constants.INCLUDE_EXPIRED_PRUNABLE ? 0 : Nxt.getEpochTime() - Constants.MAX_PRUNABLE_LIFETIME;
+            if (withMessage) {
+                pstmt.setInt(++i, prunableExpiration);
+            }
+
+            DbUtils.setLimits(++i, pstmt, from, to);
+            return getTransactions(con, pstmt);
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
 }
