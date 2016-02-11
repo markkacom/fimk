@@ -165,6 +165,7 @@ public final class Constants {
     public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
 
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
+    public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int COLORED_ACCOUNTS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int ACCOUNT_IDENTIFIER_BLOCK_2 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 957300;
