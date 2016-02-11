@@ -21,6 +21,8 @@ import nxt.Nxt;
 import nxt.NxtException;
 import nxt.Transaction;
 import nxt.db.DbIterator;
+import nxt.util.Convert;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -39,7 +41,13 @@ public final class GetBlockchainTransactions extends APIServlet.APIRequestHandle
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
-        Account account = ParameterParser.getAccount(req);
+        Account account;
+        if (Convert.emptyToNull(req.getParameter("account")) != null) {
+            account = ParameterParser.getAccount(req);
+        }
+        else {
+            account = null;
+        }
         int timestamp = ParameterParser.getTimestamp(req);
         int numberOfConfirmations = ParameterParser.getNumberOfConfirmations(req);
         boolean withMessage = "true".equalsIgnoreCase(req.getParameter("withMessage"));
@@ -62,12 +70,20 @@ public final class GetBlockchainTransactions extends APIServlet.APIRequestHandle
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);
 
+        if (account == null) {
+            lastIndex = Math.min(firstIndex + 20, lastIndex);
+        }
+
         JSONArray transactions = new JSONArray();
-        try (DbIterator<? extends Transaction> iterator = Nxt.getBlockchain().getTransactions(account, numberOfConfirmations, type, subtype, timestamp,
-                withMessage, phasedOnly, nonPhasedOnly, firstIndex, lastIndex)) {
+        try (DbIterator<? extends Transaction> iterator = account != null ?
+                Nxt.getBlockchain().getTransactions(account, numberOfConfirmations, type, subtype, timestamp,  withMessage, phasedOnly, nonPhasedOnly, firstIndex, lastIndex) :
+                Nxt.getBlockchain().getTransactions(numberOfConfirmations, type, subtype, timestamp,  withMessage, phasedOnly, nonPhasedOnly, firstIndex, lastIndex)) {
             while (iterator.hasNext()) {
                 Transaction transaction = iterator.next();
-                transactions.add(JSONData.transaction(transaction));
+                JSONObject json = JSONData.transaction(transaction);
+                //json.remove("signature");
+                //json.remove("signatureHash");
+                transactions.add(json);
             }
         }
 
