@@ -58,21 +58,21 @@ final class BlockImpl implements Block {
 
     static class BadBlock {
         final int height;
-        final long blockId;
+        final byte[] generationSignature;
         final long generatorId;
-        BadBlock(int height, String blockId, String generatorId) {
+        BadBlock(int height, String generationSignature, String generatorId) {
             this.height = height;
-            this.blockId = Long.parseUnsignedLong(blockId);
+            this.generationSignature = Convert.parseHexString(generationSignature);
             this.generatorId = Long.parseUnsignedLong(generatorId);
         }
     }
 
     static final BadBlock[] badBlocks = new BadBlock[] {
-        new BadBlock(96249, "16907697720883873606", "6940473716024842998"),
-        new BadBlock(272975, "7934656345073593945", "6940473716024842998"),
-        new BadBlock(380561, "9137805412098722935", "6620150687243551817"),
-        new BadBlock(391945, "12078054570916897845", "6620150687243551817"),
-        new BadBlock(441804, "10846632891054387244", "6620150687243551817")
+        new BadBlock(96249, "5f5c132acef36a1d329b69c45d1d26b3c3941e7679a6254ce825685100e04dd4", "6940473716024842998"),
+        new BadBlock(272975, "1a6ed2bcf9c9f70e169e76c6c260cfab72d95f8218e4fb6e91c106ea5d881b49", "6940473716024842998"),
+        new BadBlock(380561, "d09af2f9aa2f200e80591d9b26bc3820165a19f51bc0041d230f885f12258c36", "6620150687243551817"),
+        new BadBlock(391945, "c1738121a8d5fb319119fa6776330130ed04ae02c539b0826cc283eea745ddaf", "6620150687243551817"),
+        new BadBlock(441804, "0a051ba78433365bad7183bea18c08a54cdcaf41bdf83a6dbd00f6db95373545", "6620150687243551817")
     };
 
     BlockImpl(int version, int timestamp, long previousBlockId, long totalAmountNQT, long totalFeeNQT, int payloadLength, byte[] payloadHash,
@@ -393,8 +393,10 @@ final class BlockImpl implements Block {
                 return true;
             }
             for (BadBlock badBlock : badBlocks) {
-                if (badBlock.height == getHeight() && badBlock.blockId == getId() && badBlock.generatorId == getGeneratorId()) {
-                    Logger.logInfoMessage("Block " + getHeight() + " generation signature checkpoint passed");
+                if (badBlock.height == (previousBlock.height+1) &&
+                        badBlock.generatorId == getGeneratorId() &&
+                            Arrays.equals(generationSignature, badBlock.generationSignature)) {
+                    Logger.logInfoMessage("Block " + previousBlock.height+1 + " generation signature checkpoint passed");
                     return true;
                 }
             }
