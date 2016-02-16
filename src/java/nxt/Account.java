@@ -43,7 +43,7 @@ public final class Account {
 
     public enum Event {
         BALANCE, UNCONFIRMED_BALANCE, ASSET_BALANCE, UNCONFIRMED_ASSET_BALANCE, CURRENCY_BALANCE, UNCONFIRMED_CURRENCY_BALANCE,
-        LEASE_SCHEDULED, LEASE_STARTED, LEASE_ENDED
+        LEASE_SCHEDULED, LEASE_STARTED, LEASE_ENDED, PUBLIC_KEY
     }
 
     public static final class AccountAsset {
@@ -1399,6 +1399,7 @@ public final class Account {
             this.keyHeight = Nxt.getBlockchain().getHeight();
             accountTable.insert(this);
             publicKeyTable.insert(this.publicKey);
+            listeners.notify(this, Event.PUBLIC_KEY);
         }
     }
 
