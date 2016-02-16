@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-final class TransactionImpl implements Transaction {
+public final class TransactionImpl implements Transaction {
 
     static final class BuilderImpl implements Builder {
 
@@ -369,7 +369,7 @@ final class TransactionImpl implements Transaction {
         return Convert.toHexString(referencedTransactionFullHash);
     }
 
-    byte[] referencedTransactionFullHash() {
+    public byte[] referencedTransactionFullHash() {
         return referencedTransactionFullHash;
     }
 
