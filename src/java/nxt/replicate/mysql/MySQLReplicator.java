@@ -29,6 +29,7 @@ public class MySQLReplicator implements IReplicator {
 
     @Override
     public boolean rescanBegin(int height) {
+        Logger.logInfoMessage("MySQLReplicator rescanBegin at height " + height);
         try (Connection con = db.getConnection();
              PreparedStatement pstmtDelete = con.prepareStatement("DELETE FROM block WHERE height >= ?")) {
               pstmtDelete.setInt(1, height);
