@@ -17,12 +17,17 @@
 package nxt;
 
 import nxt.db.DbVersion;
+import nxt.replicate.Replicate;
 
 class NxtDbVersion extends DbVersion {
 
     protected void update(int nextUpdate) {
         switch (nextUpdate) {
             case 1:
+
+                /* When we start with an empty database always clear the replication database if there is one */
+                Replicate.db.dropTables();
+
                 apply("CREATE TABLE IF NOT EXISTS block (db_id IDENTITY, id BIGINT NOT NULL, version INT NOT NULL, "
                         + "timestamp INT NOT NULL, previous_block_id BIGINT, "
                         + "FOREIGN KEY (previous_block_id) REFERENCES block (id) ON DELETE CASCADE, total_amount BIGINT NOT NULL, "
