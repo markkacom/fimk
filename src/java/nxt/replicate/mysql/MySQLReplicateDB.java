@@ -86,6 +86,11 @@ SET FOREIGN_KEY_CHECKS = 1;
     }
 
     @Override
+    public void dropTables() {
+        replicator.rescanBegin(0);
+    }
+
+    @Override
     public IReplicator getReplicator() {
         return replicator;
     }

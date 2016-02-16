@@ -92,6 +92,8 @@ public abstract class ReplicateDB {
 
     public abstract IReplicator getReplicator();
 
+    public abstract void dropTables();
+
     public void init(ReplicateDBVersion dbVersion) {
         Logger.logDebugMessage("Replicated database jdbc url set to %s username %s", jdbcUrl, username);
 
