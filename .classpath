@@ -28,6 +28,8 @@
 	<classpathentry kind="lib" path="testlib/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="testlib/mockito-all-1.9.5.jar"/>
 	<classpathentry kind="lib" path="/nxt-plus/testlib/junit-4.11.jar"/>
+	<classpathentry kind="lib" path="lib/HikariCP-2.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.38-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
