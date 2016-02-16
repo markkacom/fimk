@@ -25,6 +25,7 @@ import nxt.http.API;
 import nxt.http.websocket.BlockchainEvents;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
+import nxt.replicate.Replicate;
 import nxt.user.Users;
 import nxt.util.Convert;
 import nxt.util.Logger;
@@ -337,6 +338,7 @@ public final class Nxt {
                 Logger.init();
                 logSystemProperties();
                 runtimeMode.init();
+                Replicate.init();
                 setServerStatus("FIM Server - Loading database", null);
                 Db.init();
                 setServerStatus("FIM Server - Loading resources", null);
@@ -355,13 +357,13 @@ public final class Nxt {
                 AssetTransfer.init();
                 Vote.init();
                 PhasingVote.init();
-                Currency.init();
+                /*Currency.init();
                 CurrencyBuyOffer.init();
                 CurrencySellOffer.init();
                 CurrencyFounder.init();
                 CurrencyMint.init();
                 CurrencyTransfer.init();
-                Exchange.init();
+                Exchange.init();*/
                 PrunableMessage.init();
                 TaggedData.init();
                 Peers.init();
