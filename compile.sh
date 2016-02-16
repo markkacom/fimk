@@ -28,7 +28,7 @@ echo "fim.zip generated successfully"
 # Package it all up
 # ==============================================================================
 
-VERSION=0.6.3
+VERSION=0.6.4
 BASE=fim
 DATE=`date +%Y-%m-%d`
 
@@ -76,7 +76,7 @@ sed -i "s/${orig}/${VERSION}/g" $ANNOUNCEMENT
 orig=#DATE#
 sed -i "s/${orig}/${DATE}/g" $ANNOUNCEMENT
 
-gpg --clearsign --batch --default-key 00467BE7 $ANNOUNCEMENT
+gpg --clearsign --batch --default-key AC34E2D5 $ANNOUNCEMENT
 mv $ANNOUNCEMENT.asc $ANNOUNCEMENT
 
 echo "========================================================================="
