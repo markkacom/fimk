@@ -29,15 +29,29 @@ public final class GetAccountTransactionCount extends APIServlet.APIRequestHandl
     static final GetAccountTransactionCount instance = new GetAccountTransactionCount();
 
     private GetAccountTransactionCount() {
-        super(new APITag[] {APITag.ACCOUNTS, APITag.TRANSACTIONS}, "account");
+        super(new APITag[] {APITag.ACCOUNTS, APITag.TRANSACTIONS}, "account", "type", "subtype");
     }
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
+
+        byte type;
+        byte subtype;
+        try {
+            type = Byte.parseByte(req.getParameter("type"));
+        } catch (NumberFormatException e) {
+            type = -1;
+        }
+        try {
+            subtype = Byte.parseByte(req.getParameter("subtype"));
+        } catch (NumberFormatException e) {
+            subtype = -1;
+        }
+
         JSONObject response = new JSONObject();
-        response.put("numberOfTransactions", Nxt.getBlockchain().getTransactionCount(account));
+        response.put("numberOfTransactions", Nxt.getBlockchain().getTransactionCount(account,type,subtype));
 
         return response;
     }
