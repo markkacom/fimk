@@ -55,7 +55,7 @@ public class MofoTransactions {
             };
 
             @Override
-            MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.NamespacedAliasAssignmentAttachment(buffer, transactionVersion);
             }
 
@@ -154,7 +154,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AddPrivateAssetAccountAttachment(buffer, transactionVersion);
             }
 
@@ -245,7 +245,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.RemovePrivateAssetAccountAttachment(buffer, transactionVersion);
             }
 
@@ -360,7 +360,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.PrivateAssetSetFeeAttachment(buffer, transactionVersion);
             }
 
@@ -461,7 +461,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.SetAccountIdentifierAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.SetAccountIdentifierAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.SetAccountIdentifierAttachment(buffer, transactionVersion);
             }
 
@@ -620,7 +620,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.VerificationAuthorityAssignmentAttachment(buffer, transactionVersion);
             }
 
@@ -718,7 +718,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.AccountColorCreateAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.AccountColorCreateAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountColorCreateAttachment(buffer, transactionVersion);
             }
 
@@ -807,7 +807,7 @@ public class MofoTransactions {
             }
 
             @Override
-            MofoAttachment.AccountColorAssignAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            public MofoAttachment.AccountColorAssignAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountColorAssignAttachment(buffer, transactionVersion);
             }
 
