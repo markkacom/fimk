@@ -357,13 +357,13 @@ public final class Nxt {
                 AssetTransfer.init();
                 Vote.init();
                 PhasingVote.init();
-                /*Currency.init();
-                CurrencyBuyOffer.init();
-                CurrencySellOffer.init();
-                CurrencyFounder.init();
-                CurrencyMint.init();
-                CurrencyTransfer.init();
-                Exchange.init();*/
+                Currency.init(); // remove
+                CurrencyBuyOffer.init(); // remove
+                CurrencySellOffer.init(); // remove
+                CurrencyFounder.init(); // remove
+                CurrencyMint.init(); // remove
+                CurrencyTransfer.init(); // remove
+                Exchange.init(); // remove
                 PrunableMessage.init();
                 TaggedData.init();
                 Peers.init();
