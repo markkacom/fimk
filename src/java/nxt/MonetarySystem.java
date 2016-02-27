@@ -120,7 +120,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemCurrencyIssuance parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyIssuance(buffer, transactionVersion);
         }
 
@@ -204,7 +204,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemReserveIncrease parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemReserveIncrease parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemReserveIncrease(buffer, transactionVersion);
         }
 
@@ -274,7 +274,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemReserveClaim parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemReserveClaim parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemReserveClaim(buffer, transactionVersion);
         }
 
@@ -337,7 +337,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyTransfer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemCurrencyTransfer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyTransfer(buffer, transactionVersion);
         }
 
@@ -408,7 +408,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemPublishExchangeOffer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemPublishExchangeOffer parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemPublishExchangeOffer(buffer, transactionVersion);
         }
 
@@ -514,7 +514,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemExchangeBuy parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemExchangeBuy parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemExchangeBuy(buffer, transactionVersion);
         }
 
@@ -561,7 +561,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemExchangeSell parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemExchangeSell parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemExchangeSell(buffer, transactionVersion);
         }
 
@@ -610,7 +610,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyMinting parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemCurrencyMinting parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyMinting(buffer, transactionVersion);
         }
 
@@ -690,7 +690,7 @@ public abstract class MonetarySystem extends TransactionType {
         }
 
         @Override
-        Attachment.MonetarySystemCurrencyDeletion parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+        public Attachment.MonetarySystemCurrencyDeletion parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
             return new Attachment.MonetarySystemCurrencyDeletion(buffer, transactionVersion);
         }
 
