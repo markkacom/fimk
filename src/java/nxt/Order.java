@@ -29,11 +29,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Order {
-  
+
     public static enum Event {
         CREATE, UPDATE, REMOVE
-    }    
-    
+    }
+
     private static void matchOrders(long assetId) {
 
         Order.Ask askOrder;
@@ -47,36 +47,36 @@ public abstract class Order {
             }
 
             Trade trade = Trade.addTrade(assetId, askOrder, bidOrder);
-            
+
             if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(askOrder.getAssetId())) {
                 /**
-                 * When a trade fee is imposed that fee (percentage) will be deducted from 
+                 * When a trade fee is imposed that fee (percentage) will be deducted from
                  * the amount of NQT which the asker receives and from the QNT of assets
                  * that the bidder receives.
-                 * 
+                 *
                  * The NQT from the asker and the QNT from the bidder are transferred to the
                  * asset issuer account.
                  */
 
                 askOrder.updateQuantityQNT(Math.subtractExact(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
-                
+
                 Account askAccount = Account.getAccount(askOrder.getAccountId());
-                long amountNQT = Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT());                
+                long amountNQT = Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT());
                 long feeNQT = MofoAsset.calculateTradeFee(assetId, amountNQT);
-                
+
                 askAccount.addToBalanceAndUnconfirmedBalanceNQT(Math.subtractExact(amountNQT, feeNQT));
                 askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
-    
+
                 bidOrder.updateQuantityQNT(Math.subtractExact(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
-                
+
                 Account bidAccount = Account.getAccount(bidOrder.getAccountId());
                 long quantityQNT = trade.getQuantityQNT();
                 long feeQNT = MofoAsset.calculateTradeFee(assetId, quantityQNT);
-                
+
                 bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, Math.subtractExact(quantityQNT, feeQNT));
                 bidAccount.addToBalanceNQT(-Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT()));
                 bidAccount.addToUnconfirmedBalanceNQT(Math.multiplyExact(trade.getQuantityQNT(), (bidOrder.getPriceNQT() - trade.getPriceNQT())));
-                
+
                 Account issuerAccount = Account.getAccount(Asset.getAsset(assetId).getAccountId());
                 issuerAccount.addToBalanceAndUnconfirmedBalanceNQT(feeNQT);
                 issuerAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, feeQNT);
@@ -86,7 +86,7 @@ public abstract class Order {
                 Account askAccount = Account.getAccount(askOrder.getAccountId());
                 askAccount.addToBalanceAndUnconfirmedBalanceNQT(Math.multiplyExact(trade.getQuantityQNT(), trade.getPriceNQT()));
                 askAccount.addToAssetBalanceQNT(assetId, -trade.getQuantityQNT());
-    
+
                 bidOrder.updateQuantityQNT(Math.subtractExact(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
                 Account bidAccount = Account.getAccount(bidOrder.getAccountId());
                 bidAccount.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, trade.getQuantityQNT());
@@ -214,16 +214,16 @@ public abstract class Order {
     */
 
     public static final class Ask extends Order {
-      
+
         private static final Listeners<Order,Event> listeners = new Listeners<>();
-        
+
         public static boolean addListener(Listener<Order> listener, Event eventType) {
             return listeners.addListener(listener, eventType);
         }
-      
+
         public static boolean removeListener(Listener<Order> listener, Event eventType) {
             return listeners.removeListener(listener, eventType);
-        }      
+        }
 
         private static final DbKey.LongKeyFactory<Ask> askOrderDbKeyFactory = new DbKey.LongKeyFactory<Ask>("id") {
 
@@ -255,7 +255,7 @@ public abstract class Order {
         public static VersionedEntityDbTable<Ask> getTable() {
             return askOrderTable;
         }
-        
+
         public static int getCount() {
             return askOrderTable.getCount();
         }
@@ -278,6 +278,14 @@ public abstract class Order {
 
         public static DbIterator<Ask> getAskOrdersByAsset(long assetId, int from, int to) {
             return askOrderTable.getManyBy(new DbClause.LongClause("asset_id", assetId), from, to);
+        }
+
+        public static int getAskOrderCountByAsset(long assetId, long accountId) {
+            DbClause clause = new DbClause.LongClause("asset_id", assetId);
+            if (accountId != 0) {
+                clause = clause.and(new DbClause.LongClause("account_id", accountId));
+            }
+            return askOrderTable.getCount(clause);
         }
 
         public static DbIterator<Ask> getAskOrdersByAccountAsset(final long accountId, final long assetId, int from, int to) {
@@ -373,16 +381,16 @@ public abstract class Order {
     }
 
     public static final class Bid extends Order {
-      
+
         private static final Listeners<Order,Event> listeners = new Listeners<>();
-        
+
         public static boolean addListener(Listener<Order> listener, Event eventType) {
             return listeners.addListener(listener, eventType);
         }
-      
+
         public static boolean removeListener(Listener<Order> listener, Event eventType) {
             return listeners.removeListener(listener, eventType);
-        }      
+        }
 
         private static final DbKey.LongKeyFactory<Bid> bidOrderDbKeyFactory = new DbKey.LongKeyFactory<Bid>("id") {
 
@@ -411,7 +419,7 @@ public abstract class Order {
             }
 
         };
-        
+
         public static VersionedEntityDbTable<Bid> getTable() {
             return bidOrderTable;
         }
@@ -438,6 +446,14 @@ public abstract class Order {
 
         public static DbIterator<Bid> getBidOrdersByAsset(long assetId, int from, int to) {
             return bidOrderTable.getManyBy(new DbClause.LongClause("asset_id", assetId), from, to);
+        }
+
+        public static int getBidOrderCountByAsset(long assetId, long accountId) {
+            DbClause clause = new DbClause.LongClause("asset_id", assetId);
+            if (accountId != 0) {
+                clause = clause.and(new DbClause.LongClause("account_id", accountId));
+            }
+            return bidOrderTable.getCount(clause);
         }
 
         public static DbIterator<Bid> getBidOrdersByAccountAsset(final long accountId, final long assetId, int from, int to) {
@@ -498,7 +514,7 @@ public abstract class Order {
             super(rs);
             this.dbKey = bidOrderDbKeyFactory.newKey(super.id);
         }
-        
+
         private void save(Connection con, String table) throws SQLException {
             super.save(con, table);
         }

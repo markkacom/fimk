@@ -17,6 +17,7 @@
 package nxt;
 
 import nxt.db.DbClause;
+import nxt.db.DbClause.LongClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.DbUtils;
@@ -136,6 +137,30 @@ public final class Trade {
         return tradeTable.getCount(new DbClause.LongClause("asset_id", assetId));
     }
 
+    public static int getTradeCount(long assetId, long accountId) {
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(
+                     "SELECT COUNT(*) FROM ( "
+                   + "SELECT * FROM trade WHERE seller_id = ? AND asset_id = ?"
+                   + "UNION ALL SELECT * FROM trade WHERE buyer_id = ? AND seller_id <> ? AND asset_id = ?"
+                   + ")"))
+        {
+            int i = 0;
+            pstmt.setLong(++i, accountId);
+            pstmt.setLong(++i, assetId);
+            pstmt.setLong(++i, accountId);
+            pstmt.setLong(++i, accountId);
+            pstmt.setLong(++i, assetId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
     static Trade addTrade(long assetId, Order.Ask askOrder, Order.Bid bidOrder) {
         Trade trade = new Trade(assetId, askOrder, bidOrder);
         tradeTable.insert(trade);
@@ -229,7 +254,7 @@ public final class Trade {
             pstmt.executeUpdate();
         }
     }
-    
+
     public static EntityDbTable<Trade> getTable() { return tradeTable; }
 
     public long getBlockId() { return blockId; }
@@ -257,9 +282,9 @@ public final class Trade {
     public long getQuantityQNT() { return quantityQNT; }
 
     public long getPriceNQT() { return priceNQT; }
-    
+
     public long getAssetId() { return assetId; }
-    
+
     public int getTimestamp() { return timestamp; }
 
     public int getHeight() {

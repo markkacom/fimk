@@ -332,6 +332,9 @@ public final class APIServlet extends HttpServlet {
         map.put("getVirtualAskOrders", GetVirtualAskOrders.instance);
         map.put("getVirtualBidOrders", GetVirtualBidOrders.instance);
         map.put("getVirtualTrades", GetVirtualTrades.instance);
+        map.put("getVirtualAskCount", GetVirtualAskOrderCount.instance);
+        map.put("getVirtualBidCount", GetVirtualBidOrderCount.instance);
+        map.put("getVirtualTradeCount", GetVirtualTradeCount.instance);
         map.put("setAccountIdentifier", MofoAccountIdAssignment.instance);
         map.put("getAccountIdentifiers", MofoGetAccountIdentifiers.instance);
         map.put("searchAccountIdentifiers", SearchAccountIdentifiers.instance);

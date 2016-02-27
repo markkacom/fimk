@@ -14,7 +14,7 @@ import nxt.virtualexchange.VirtualOrder.VirtualAsk;
 import nxt.virtualexchange.VirtualOrder.VirtualBid;
 
 public class VirtualTrade {
-  
+
     private int height;
     private long assetId;
     private int timestamp;
@@ -29,12 +29,12 @@ public class VirtualTrade {
     private long priceNQT;
     private static final List<VirtualTrade> virtualTrades = new ArrayList<VirtualTrade>();
 
-    public VirtualTrade(long assetId, int timestamp, int height, VirtualAsk askOrder, VirtualBid bidOrder) {       
+    public VirtualTrade(long assetId, int timestamp, int height, VirtualAsk askOrder, VirtualBid bidOrder) {
         this.height = height;
         this.assetId = assetId;
         this.timestamp = timestamp;
         this.askOrderId = askOrder.getId();
-        this.bidOrderId = bidOrder.getId();        
+        this.bidOrderId = bidOrder.getId();
         this.askOrderHeight = askOrder.getHeight();
         this.bidOrderHeight = bidOrder.getHeight();
         this.sellerId = askOrder.getAccountId();
@@ -52,22 +52,22 @@ public class VirtualTrade {
                 this.isBuy = askOrderId < bidOrderId;
             }
         }
-        this.priceNQT = isBuy ? askOrder.getPriceNQT() : bidOrder.getPriceNQT();        
+        this.priceNQT = isBuy ? askOrder.getPriceNQT() : bidOrder.getPriceNQT();
     }
-    
-    public VirtualTrade(Trade trade) {       
+
+    public VirtualTrade(Trade trade) {
         this.height = trade.getHeight();
         this.assetId = trade.getAssetId();
         this.timestamp = trade.getTimestamp();
         this.askOrderId = trade.getAskOrderId();
-        this.bidOrderId = trade.getBidOrderId();        
+        this.bidOrderId = trade.getBidOrderId();
         this.askOrderHeight = trade.getAskOrderHeight();
         this.bidOrderHeight = trade.getBidOrderHeight();
         this.sellerId = trade.getSellerId();
         this.buyerId = trade.getBuyerId();
         this.quantityQNT = trade.getQuantityQNT();
         this.isBuy = trade.isBuy();
-        this.priceNQT = trade.getPriceNQT();        
+        this.priceNQT = trade.getPriceNQT();
     }
 
     public static void notifyTradeAdded(VirtualTrade trade) {
@@ -76,14 +76,14 @@ public class VirtualTrade {
             String topic = "TRADE_ADDED*"+asset;
             MofoSocketServer.notifyJSON(topic, trade.toJSONObject());
         }
-    }    
+    }
 
     @SuppressWarnings("unchecked")
     public static void notifyTradeRemoved(VirtualTrade trade) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
             String asset = Long.toUnsignedString(trade.getAssetId());
             String topic = "TRADE_REMOVED*"+asset;
-            
+
             JSONObject json = new JSONObject();
             json.put("asset", Long.toUnsignedString(trade.getAssetId()));
             json.put("askOrder", Long.toUnsignedString(trade.getAskOrderId()));
@@ -91,13 +91,13 @@ public class VirtualTrade {
             MofoSocketServer.notifyJSON(topic, json);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void notifyTradeUpdated(Trade trade) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
             String asset = Long.toUnsignedString(trade.getAssetId());
             String topic = "TRADE_UPDATED*"+asset;
-            
+
             JSONObject json = new JSONObject();
             json.put("asset", Long.toUnsignedString(trade.getAssetId()));
             json.put("askOrder", Long.toUnsignedString(trade.getAskOrderId()));
@@ -107,15 +107,15 @@ public class VirtualTrade {
             MofoSocketServer.notifyJSON(topic, json);
         }
     }
-    
+
     public static List<VirtualTrade> getVirtualTrades() {
         return virtualTrades;
     }
-    
+
     public static VirtualTrade find(Trade trade) {
         return find(trade.getAskOrderId(), trade.getBidOrderId());
     }
-    
+
     static VirtualTrade find(long askOrderId, long bidOrderId) {
         for (VirtualTrade trade : virtualTrades) {
             if (trade.getAskOrderId() == askOrderId && trade.getBidOrderId() == bidOrderId) {
@@ -124,19 +124,19 @@ public class VirtualTrade {
         }
         return null;
     }
-    
+
     public static VirtualTrade addTrade(long assetId, int timestamp, int height,  VirtualAsk askOrder, VirtualBid bidOrder) {
         VirtualTrade trade = new VirtualTrade(assetId, timestamp, height,  askOrder, bidOrder);
         virtualTrades.add(trade);
         notifyTradeAdded(trade);
         return trade;
     }
-    
+
     public static void removeTrade(VirtualTrade trade) {
         virtualTrades.remove(trade);
         notifyTradeRemoved(trade);
     }
-    
+
     @SuppressWarnings("unchecked")
     public JSONObject toJSONObject() {
         JSONObject json = new JSONObject();
@@ -153,62 +153,62 @@ public class VirtualTrade {
         json.put("confirmations", Nxt.getBlockchain().getHeight() - height);
         JSONData.putAssetInfo(json, getAssetId());
         return json;
-    }    
-    
+    }
+
     public int getHeight() {
         return height;
     }
-    
+
     public long getAssetId() {
         return assetId;
     }
-    
+
     public int getTimestamp() {
         return timestamp;
     }
-    
+
     public long getAskOrderId() {
         return askOrderId;
     }
-    
+
     public long getBidOrderId() {
         return bidOrderId;
     }
-    
+
     public int getAskOrderHeight() {
         return askOrderHeight;
     }
-    
+
     public int getBidOrderHeight() {
         return bidOrderHeight;
     }
-    
+
     public long getSellerId() {
         return sellerId;
     }
-    
+
     public long getBuyerId() {
         return buyerId;
     }
-    
+
     public long getQuantityQNT() {
         return quantityQNT;
     }
-    
+
     public boolean isBuy() {
         return isBuy;
     }
-    
+
     public long getPriceNQT() {
         return priceNQT;
     }
-    
+
     public static List<VirtualTrade> getTrades(long assetId, int firstIndex, int lastIndex) {
         if (firstIndex < 0 || lastIndex < firstIndex) {
             throw new IndexOutOfBoundsException();
         }
         lastIndex = Math.min(firstIndex+100, lastIndex);
-        
+
         /* filter trades on asset */
         List<VirtualTrade> trades = new ArrayList<VirtualTrade>();
         for (int i=firstIndex; i<virtualTrades.size(); i++) {
@@ -217,7 +217,7 @@ public class VirtualTrade {
                 trades.add(trade);
             }
         }
-        
+
         if (trades.isEmpty()) {
             List<VirtualTrade> result = new ArrayList<VirtualTrade>();
             try (DbIterator<Trade> realTrades = Trade.getAssetTrades(assetId, firstIndex, lastIndex);) {
@@ -227,7 +227,7 @@ public class VirtualTrade {
             }
             return result;
         }
-        return getMergedTrades(assetId, trades, firstIndex, lastIndex);      
+        return getMergedTrades(assetId, trades, firstIndex, lastIndex);
     }
 
     private static List<VirtualTrade> getMergedTrades(long assetId, List<VirtualTrade> trades, int firstIndex, int lastIndex) {
@@ -249,5 +249,18 @@ public class VirtualTrade {
             }
         }
         return result;
+    }
+
+    public static int getTradeCount(long assetId, long accountId) {
+        int count = 0;
+        for (VirtualTrade trade : virtualTrades) {
+            if (trade.getAssetId() == assetId) {
+                if (accountId != 0 && (trade.getBuyerId() != accountId && trade.getSellerId() != accountId)) {
+                    continue;
+                }
+                count++;
+            }
+        }
+        return count + (accountId == 0 ? Trade.getTradeCount(assetId) : Trade.getTradeCount(assetId, accountId));
     }
 }
