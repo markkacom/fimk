@@ -75,7 +75,7 @@ public interface Appendix {
             this.version = 1;
         }
 
-        abstract String getAppendixName();
+        public abstract String getAppendixName();
 
         @Override
         public final int getSize() {
@@ -181,7 +181,7 @@ public interface Appendix {
         private final byte[] message;
         private final boolean isText;
 
-        Message(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        public Message(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
             int messageLength = buffer.getInt();
             this.isText = messageLength < 0; // ugly hack
@@ -223,7 +223,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
@@ -291,7 +291,7 @@ public interface Appendix {
         private final boolean isText;
         private volatile PrunableMessage prunableMessage;
 
-        PrunablePlainMessage(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        public PrunablePlainMessage(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
             this.hash = new byte[32];
             buffer.get(this.hash);
@@ -333,7 +333,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
@@ -553,7 +553,7 @@ public interface Appendix {
         private final boolean isCompressed;
         private volatile PrunableMessage prunableMessage;
 
-        PrunableEncryptedMessage(ByteBuffer buffer, byte transactionVersion) {
+        public PrunableEncryptedMessage(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
             this.hash = new byte[32];
             buffer.get(this.hash);
@@ -629,7 +629,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
@@ -666,7 +666,7 @@ public interface Appendix {
         @Override
         void validateAtFinish(Transaction transaction) {
         }
-        
+
         @Override
         void apply(Transaction transaction, Account senderAccount, Account recipientAccount) {
             PrunableMessage.add(transaction, this);
@@ -731,7 +731,7 @@ public interface Appendix {
             return new EncryptedMessage(attachmentData);
         }
 
-        EncryptedMessage(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        public EncryptedMessage(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
         }
 
@@ -744,7 +744,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
@@ -776,7 +776,7 @@ public interface Appendix {
             return new EncryptToSelfMessage(attachmentData);
         }
 
-        EncryptToSelfMessage(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
+        public EncryptToSelfMessage(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
         }
 
@@ -789,7 +789,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
@@ -815,7 +815,7 @@ public interface Appendix {
 
         private final byte[] publicKey;
 
-        PublicKeyAnnouncement(ByteBuffer buffer, byte transactionVersion) {
+        public PublicKeyAnnouncement(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
             this.publicKey = new byte[32];
             buffer.get(this.publicKey);
@@ -831,7 +831,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
@@ -907,7 +907,7 @@ public interface Appendix {
         private final byte algorithm;
         private final VoteWeighting voteWeighting;
 
-        Phasing(ByteBuffer buffer, byte transactionVersion) {
+        public Phasing(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
             finishHeight = buffer.getInt();
             byte votingModel = buffer.get();
@@ -989,7 +989,7 @@ public interface Appendix {
         }
 
         @Override
-        String getAppendixName() {
+        public String getAppendixName() {
             return appendixName;
         }
 
