@@ -51,7 +51,7 @@ public interface Attachment extends Appendix {
         protected AbstractAttachment() {}
 
         @Override
-        final String getAppendixName() {
+        public final String getAppendixName() {
             return getTransactionType().getName();
         }
 
@@ -2700,7 +2700,6 @@ public interface Attachment extends Appendix {
         }
 
         abstract long getTaggedDataId(Transaction transaction);
-
     }
 
     final class TaggedDataUpload extends TaggedDataAttachment {
