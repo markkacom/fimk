@@ -49,12 +49,12 @@ public class MySQLReplicator implements IReplicator {
                 short index = 0;
                 for (Transaction transaction : transactions) {
                     try (PreparedStatement pstmt = con.prepareStatement(
-                            "INSERT INTO unconfirmed_transaction ("
+                            "REPLACE INTO unconfirmed_transaction ("
                           + "id, deadline, recipient_id, sender_id, amount, fee, type, subtype, "
                           + "timestamp, attachment_bytes, transaction_version, has_message, "
                           + "has_encrypted_message, has_encrypttoself_message, "
                           + "expiration, height, transaction_index) "
-                          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ")) {
                         int i = 0;
                         pstmt.setLong(++i, transaction.getId());
                         pstmt.setShort(++i, transaction.getDeadline());
@@ -78,8 +78,8 @@ public class MySQLReplicator implements IReplicator {
                                 appendage.putBytes(buffer);
                             }
                             pstmt.setBytes(++i, buffer.array());
-                            pstmt.setByte(++i, transaction.getVersion());
                         }
+                        pstmt.setByte(++i, transaction.getVersion());
                         pstmt.setBoolean(++i, transaction.getMessage() != null);
                         pstmt.setBoolean(++i, transaction.getEncryptedMessage() != null);
                         pstmt.setBoolean(++i, transaction.getEncryptToSelfMessage() != null);
@@ -126,7 +126,7 @@ public class MySQLReplicator implements IReplicator {
                 short index = 0;
                 for (Transaction transaction : transactions) {
                     try (PreparedStatement pstmt = con.prepareStatement(
-                            "INSERT INTO transaction (id, deadline, recipient_id, amount, "
+                            "REPLACE INTO transaction (id, deadline, recipient_id, amount, "
                           + "fee, height, block_id, signature, timestamp, type, subtype, sender_id, "
                           + "block_timestamp, referenced_transaction_full_hash, attachment_bytes, "
                           + "transaction_version, has_message, has_encrypted_message, has_encrypttoself_message, transaction_index) "
@@ -188,7 +188,7 @@ public class MySQLReplicator implements IReplicator {
                pstmtSelect.setLong(1, block.getId());
                try (ResultSet rs = pstmtSelect.executeQuery()) {
                    while (rs.next()) {
-                       pstmtDelete.setLong(1, rs.getLong("db_id"));
+                       pstmtDelete.setLong(1, rs.getLong("id"));
                        pstmtDelete.executeUpdate();
                    }
                    return true;
@@ -210,8 +210,8 @@ public class MySQLReplicator implements IReplicator {
         try {
             try (Connection con = db.getConnection()) {
                 try (PreparedStatement pstmt = con.prepareStatement(
-                        "INSERT INTO block (id, timestamp, "
-                      + "total_amount, total_fee, height, generator_id) "
+                        "REPLACE INTO block (id, timestamp, "
+                      + "   total_amount, total_fee, height, generator_id) "
                       + "VALUES (?, ?, ?, ?, ?, ?)")) {
                    int i = 0;
                    pstmt.setLong(++i, block.getId());
