@@ -50,7 +50,7 @@ public class GetAsset extends RPCCall {
             // quantityQNTToday
             // numberOfTradesToday
             //MofoQueries.getAssetMetrics(response, asset.getId());
-            List<VirtualTrade> iterator = VirtualTrade.getTrades(asset.getId(), 0, 0);
+            List<VirtualTrade> iterator = VirtualTrade.getTrades(asset.getId(), 0, 0, 0);
             if (!iterator.isEmpty()) {
                 response.put("lastPriceNQT", String.valueOf(iterator.get(0).getPriceNQT()));
             }

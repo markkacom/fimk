@@ -203,7 +203,7 @@ public class VirtualTrade {
         return priceNQT;
     }
 
-    public static List<VirtualTrade> getTrades(long assetId, int firstIndex, int lastIndex) {
+    public static List<VirtualTrade> getTrades(long assetId, long accountId, int firstIndex, int lastIndex) {
         if (firstIndex < 0 || lastIndex < firstIndex) {
             throw new IndexOutOfBoundsException();
         }
@@ -214,23 +214,28 @@ public class VirtualTrade {
         for (int i=firstIndex; i<virtualTrades.size(); i++) {
             VirtualTrade trade = virtualTrades.get(i);
             if (trade.getAssetId() == assetId) {
+                if (accountId != 0 && (trade.getBuyerId() != accountId && trade.getSellerId() != accountId)) {
+                    continue;
+                }
                 trades.add(trade);
             }
         }
 
         if (trades.isEmpty()) {
             List<VirtualTrade> result = new ArrayList<VirtualTrade>();
-            try (DbIterator<Trade> realTrades = Trade.getAssetTrades(assetId, firstIndex, lastIndex);) {
+            try (DbIterator<Trade> realTrades = accountId == 0 ?
+                    Trade.getAssetTrades(assetId, firstIndex, lastIndex) :
+                    Trade.getAccountAssetTrades(accountId, assetId, firstIndex, lastIndex);) {
                 while (realTrades.hasNext()) {
                     result.add(new VirtualTrade(realTrades.next()));
                 }
             }
             return result;
         }
-        return getMergedTrades(assetId, trades, firstIndex, lastIndex);
+        return getMergedTrades(assetId, accountId, trades, firstIndex, lastIndex);
     }
 
-    private static List<VirtualTrade> getMergedTrades(long assetId, List<VirtualTrade> trades, int firstIndex, int lastIndex) {
+    private static List<VirtualTrade> getMergedTrades(long assetId, long accountId, List<VirtualTrade> trades, int firstIndex, int lastIndex) {
         List<VirtualTrade> result = new ArrayList<VirtualTrade>();
         if (firstIndex < trades.size()) {
             for (int i=firstIndex; i<trades.size(); i++) {
@@ -243,7 +248,9 @@ public class VirtualTrade {
             firstIndex -= trades.size();
             lastIndex -= trades.size();
         }
-        try (DbIterator<Trade> iterator = Trade.getAssetTrades(assetId, firstIndex, lastIndex)) {
+        try (DbIterator<Trade> iterator = accountId == 0 ?
+                Trade.getAssetTrades(assetId, firstIndex, lastIndex) :
+                Trade.getAccountAssetTrades(accountId, assetId, firstIndex, lastIndex)) {
             while (iterator.hasNext()) {
                 result.add(new VirtualTrade(iterator.next()));
             }
