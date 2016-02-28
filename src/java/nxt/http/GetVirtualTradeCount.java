@@ -1,12 +1,9 @@
 package nxt.http;
 
-import java.util.List;
-
 import nxt.NxtException;
 import nxt.util.Convert;
 import nxt.virtualexchange.VirtualTrade;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
