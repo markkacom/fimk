@@ -60,15 +60,33 @@ public final class NamespacedAlias {
     }
 
     public static DbIterator<NamespacedAlias> searchAliases(String query, long accountId, int from, int to, int sortColumn, boolean sortAsc) {
-        DbClause dbClause = new DbClause(" account_id = ? AND alias_name_lower LIKE ? ") {
+        String sql = accountId == 0 ? " alias_name_lower LIKE ? " : " account_id = ? AND alias_name_lower LIKE ? ";
+        DbClause dbClause = new DbClause(sql) {
             @Override
             public int set(PreparedStatement pstmt, int index) throws SQLException {
-                pstmt.setLong(index++, accountId);
+                if (accountId != 0) {
+                    pstmt.setLong(index++, accountId);
+                }
                 pstmt.setString(index++, '%' + query.replace("%", "\\%").replace("_", "\\_") + '%');
                 return index;
             }
         };
         return aliasTable.getManyBy(dbClause, from, to, getOrderBy(sortColumn, sortAsc));
+    }
+
+    public static int searchAliasesCount(String query, long accountId) {
+        String sql = accountId == 0 ? " alias_name_lower LIKE ? " : " account_id = ? AND alias_name_lower LIKE ? ";
+        DbClause dbClause = new DbClause(sql) {
+            @Override
+            public int set(PreparedStatement pstmt, int index) throws SQLException {
+                if (accountId != 0) {
+                    pstmt.setLong(index++, accountId);
+                }
+                pstmt.setString(index++, '%' + query.replace("%", "\\%").replace("_", "\\_") + '%');
+                return index;
+            }
+        };
+        return aliasTable.getCount(dbClause);
     }
 
     public static NamespacedAlias getAlias(final long sender_id, final String aliasName) {

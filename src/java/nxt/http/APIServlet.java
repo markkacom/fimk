@@ -324,6 +324,7 @@ public final class APIServlet extends HttpServlet {
         map.put("getNamespacedAlias", GetNamespacedAlias.instance);
         map.put("setNamespacedAlias", SetNamespacedAlias.instance);
         map.put("getNamespacedAliases", GetNamespacedAliases.instance);
+        map.put("getNamespacedAliasesCount", GetNamespacedAliasesCount.instance);
         //map.put("mofoCombine", MofoCombine.instance);
         map.put("addPrivateAssetAccount", AddPrivateAssetAccount.instance);
         map.put("removePrivateAssetAccount", RemovePrivateAssetAccount.instance);
