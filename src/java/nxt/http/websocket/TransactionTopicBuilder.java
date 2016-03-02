@@ -11,13 +11,13 @@ import nxt.TransactionType;
 import nxt.util.Convert;
 
 /**
- * TopicBuilder generates topic for use in subscribing to websocket events.
+ * TransactionTopicBuilder generates topic for use in subscribing to websocket events.
  * The topic string is a JSON array serialized to string.
  * The serialized array has the following structure.
  *
  * [
- *    # Topic type identifier. This first slot always contains the string "transaction".
- *    "transaction",
+ *    # Topic type identifier. This first slot always contains the number 101
+ *    101,
  *
  *    # The second slot contains an array of arrays, each sub array has the
  *    # transaction type as its first element and the subtype as the second element.
@@ -154,27 +154,4 @@ public class TransactionTopicBuilder {
         }
         return true;
     }
-
-//    public boolean matchesOther(TransactionTopicBuilder other) {
-//        return listEquals(types, other.types) && account == other.account &&
-//                recipient == other.recipient && sender == other.sender;
-//    }
-//
-//    private boolean listEquals(List<TransactionTopicType> listA, List<TransactionTopicType> listB) {
-//        if (listA != null) {
-//            if (listB == null || listA.size() != listB.size()) {
-//                return false;
-//            }
-//            for (int i=0; i<listA.size(); i++) {
-//                TransactionTopicType typeA = listA.get(i);
-//                TransactionTopicType typeB = listB.get(i);
-//                if ((typeA.type != typeB.type) || (typeA.subtype != typeB.subtype)) {
-//                    return false;
-//                }
-//            }
-//            return true;
-//        }
-//        return listB == null;
-//    }
-
 }
