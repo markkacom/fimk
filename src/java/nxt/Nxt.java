@@ -22,7 +22,7 @@ import nxt.env.RuntimeMode;
 import nxt.gossip.GossipProcessor;
 import nxt.gossip.GossipProcessorImpl;
 import nxt.http.API;
-import nxt.http.websocket.BlockchainEvents;
+import nxt.http.websocket.Events;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
 import nxt.replicate.Replicate;
@@ -370,7 +370,7 @@ public final class Nxt {
                 Generator.init();
                 API.init();
                 WebsocketServer.init();
-                BlockchainEvents.getInstance();
+                Events.getInstance();
                 Users.init();
                 DebugTrace.init();
                 MofoMessaging.init();
