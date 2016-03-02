@@ -18,9 +18,25 @@ import nxt.Transaction;
 import nxt.db.DbIterator;
 import nxt.http.websocket.MofoSocketServer;
 import nxt.util.Convert;
+import nxt.util.Listener;
+import nxt.util.Listeners;
 
 
 public abstract class VirtualOrder {
+
+    public static enum Event {
+        CREATE, UPDATE, REMOVE
+    }
+
+    protected static final Listeners<VirtualOrder,Event> listeners = new Listeners<>();
+
+    public static boolean addListener(Listener<VirtualOrder> listener, Event eventType) {
+        return listeners.addListener(listener, eventType);
+    }
+
+    public static boolean removeListener(Listener<VirtualOrder> listener, Event eventType) {
+        return listeners.removeListener(listener, eventType);
+    }
 
     private static final Map<Long, VirtualAsk> virtualAskMap = new HashMap<Long, VirtualAsk>();
     private static final Map<Long, VirtualBid> virtualBidMap = new HashMap<Long, VirtualBid>();
@@ -113,7 +129,7 @@ public abstract class VirtualOrder {
         }
     }
 
-    protected abstract String getType();
+    public abstract String getType();
     protected abstract void save();
 
     public static Map<Long, VirtualAsk> getVirtualAsks() {
@@ -214,9 +230,11 @@ public abstract class VirtualOrder {
         setQuantityQNT(quantityQNT);
         save();
         if (quantityQNT > 0) {
+            listeners.notify(this, Event.UPDATE);
             notifyOrderUpdate(this);
         }
         else if (quantityQNT == 0) {
+            listeners.notify(this, Event.REMOVE);
             notifyOrderRemoved(this);
         }
         else {
@@ -226,6 +244,7 @@ public abstract class VirtualOrder {
     }
 
     public static class VirtualAsk extends VirtualOrder implements Comparable<VirtualAsk> {
+
         static final String TYPE = "ask";
 
         public VirtualAsk(Order order) {
@@ -237,7 +256,7 @@ public abstract class VirtualOrder {
         }
 
         @Override
-        protected String getType() {
+        public String getType() {
             return TYPE;
         }
 
@@ -307,6 +326,7 @@ public abstract class VirtualOrder {
             VirtualAsk order = new VirtualAsk(transaction, attachment);
             order.setTransactionIndex(transactionIndex);
             order.save();
+            listeners.notify(order, Event.CREATE);
             notifyOrderAdded(order);
             matchOrders(attachment.getAssetId(), transaction.getTimestamp());
             return order;
@@ -322,6 +342,7 @@ public abstract class VirtualOrder {
             }
             if (order.getQuantityQNT() > 0) {
                 order.setQuantityQNT(0);
+                listeners.notify(order, Event.REMOVE);
                 notifyOrderRemoved(order);
             }
             order.save();
@@ -427,6 +448,7 @@ public abstract class VirtualOrder {
     }
 
     public static class VirtualBid extends VirtualOrder implements Comparable<VirtualBid> {
+
         static final String TYPE = "bid";
 
         public VirtualBid(Order order) {
@@ -438,7 +460,7 @@ public abstract class VirtualOrder {
         }
 
         @Override
-        protected String getType() {
+        public String getType() {
             return TYPE;
         }
 
@@ -508,6 +530,7 @@ public abstract class VirtualOrder {
             VirtualBid order = new VirtualBid(transaction, attachment);
             order.setTransactionIndex(transactionIndex);
             order.save();
+            listeners.notify(order, Event.CREATE);
             notifyOrderAdded(order);
             matchOrders(attachment.getAssetId(), transaction.getTimestamp());
             return order;
@@ -523,6 +546,7 @@ public abstract class VirtualOrder {
             }
             if (order.getQuantityQNT() > 0) {
                 order.setQuantityQNT(0);
+                listeners.notify(order, Event.REMOVE);
                 notifyOrderRemoved(order);
             }
             order.save();
