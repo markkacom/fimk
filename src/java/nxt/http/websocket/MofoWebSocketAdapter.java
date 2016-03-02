@@ -121,7 +121,11 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
 
                     /* the new way - transaction topics start with [101, */
                     if (topic.startsWith("[101,")) {
-                        BlockchainEvents.getInstance().subscribe(this, topic);
+                        Events.getInstance().subscribeTransaction(this, topic);
+                    }
+                    /* the new way - exchange topics start with [102, */
+                    else if (topic.startsWith("[102,")) {
+                        Events.getInstance().subscribeTransaction(this, topic);
                     }
                     /* the old way */
                     else {
@@ -153,7 +157,11 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
 
                     /* the new way - transaction topics start with [101, */
                     if (topic.startsWith("[101,")) {
-                        BlockchainEvents.getInstance().unsubscribe(this, topic);
+                        Events.getInstance().unsubscribeTransaction(this, topic);
+                    }
+                    /* the new way - transaction topics start with [102, */
+                    if (topic.startsWith("[102,")) {
+                        Events.getInstance().unsubscribeTransaction(this, topic);
                     }
                     /* the old way */
                     else {
@@ -184,7 +192,7 @@ public class MofoWebSocketAdapter extends WebSocketAdapter {
         super.onWebSocketClose(statusCode,reason);
         Logger.logDebugMessage("Socket Closed: [" + statusCode + "] " + reason);
         MofoSocketServer.socketClosed(this);
-        BlockchainEvents.getInstance().socketClosed(this);
+        Events.getInstance().socketClosed(this);
     }
 
     @Override
