@@ -10,10 +10,26 @@ import nxt.Trade;
 import nxt.db.DbIterator;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.MofoSocketServer;
+import nxt.util.Listener;
+import nxt.util.Listeners;
 import nxt.virtualexchange.VirtualOrder.VirtualAsk;
 import nxt.virtualexchange.VirtualOrder.VirtualBid;
 
 public class VirtualTrade {
+
+    public static enum Event {
+        CREATE, UPDATE, REMOVE
+    }
+
+    protected static final Listeners<VirtualTrade,Event> listeners = new Listeners<>();
+
+    public static boolean addListener(Listener<VirtualTrade> listener, Event eventType) {
+        return listeners.addListener(listener, eventType);
+    }
+
+    public static boolean removeListener(Listener<VirtualTrade> listener, Event eventType) {
+        return listeners.removeListener(listener, eventType);
+    }
 
     private int height;
     private long assetId;
@@ -128,12 +144,14 @@ public class VirtualTrade {
     public static VirtualTrade addTrade(long assetId, int timestamp, int height,  VirtualAsk askOrder, VirtualBid bidOrder) {
         VirtualTrade trade = new VirtualTrade(assetId, timestamp, height,  askOrder, bidOrder);
         virtualTrades.add(trade);
+        listeners.notify(trade, Event.CREATE);
         notifyTradeAdded(trade);
         return trade;
     }
 
     public static void removeTrade(VirtualTrade trade) {
         virtualTrades.remove(trade);
+        listeners.notify(trade, Event.REMOVE);
         notifyTradeRemoved(trade);
     }
 
