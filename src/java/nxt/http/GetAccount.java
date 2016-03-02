@@ -17,6 +17,7 @@
 package nxt.http;
 
 import nxt.Account;
+import nxt.Asset;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
@@ -31,7 +32,7 @@ public final class GetAccount extends APIServlet.APIRequestHandler {
     static final GetAccount instance = new GetAccount();
 
     private GetAccount() {
-        super(new APITag[] {APITag.ACCOUNTS}, "account", "includeLessors", "includeAssets", "includeCurrencies", "includeEffectiveBalance");
+        super(new APITag[] {APITag.ACCOUNTS}, "account", "includeLessors", "includeAssets", "includeAssetDetails", "includeCurrencies", "includeEffectiveBalance");
     }
 
     @Override
@@ -40,6 +41,7 @@ public final class GetAccount extends APIServlet.APIRequestHandler {
         Account account = ParameterParser.getAccount(req);
         boolean includeLessors = !"false".equalsIgnoreCase(req.getParameter("includeLessors"));
         boolean includeAssets = !"false".equalsIgnoreCase(req.getParameter("includeAssets"));
+        boolean includeAssetDetails = "true".equalsIgnoreCase(req.getParameter("includeAssetDetails"));
         boolean includeCurrencies = !"false".equalsIgnoreCase(req.getParameter("includeCurrencies"));
         boolean includeEffectiveBalance = !"false".equalsIgnoreCase(req.getParameter("includeEffectiveBalance"));
 
@@ -92,6 +94,13 @@ public final class GetAccount extends APIServlet.APIRequestHandler {
                 while (accountAssets.hasNext()) {
                     Account.AccountAsset accountAsset = accountAssets.next();
                     JSONObject assetBalance = new JSONObject();
+                    if (includeAssetDetails) {
+                        Asset asset = Asset.getAsset(accountAsset.getAssetId());
+                        if (asset != null) {
+                            assetBalance.put("decimals", asset.getDecimals());
+                            assetBalance.put("name", asset.getName());
+                        }
+                    }
                     assetBalance.put("asset", Long.toUnsignedString(accountAsset.getAssetId()));
                     assetBalance.put("balanceQNT", String.valueOf(accountAsset.getQuantityQNT()));
                     assetBalances.add(assetBalance);
