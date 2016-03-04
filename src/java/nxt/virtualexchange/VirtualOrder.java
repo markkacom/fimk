@@ -305,6 +305,7 @@ public abstract class VirtualOrder {
                 VirtualAsk virtualAsk = getVirtualAsk(iterator.next());
                 if (virtualAsk.getQuantityQNT() > 0) {
                     bestOrder = virtualAsk;
+                    break;
                 }
             }
 
@@ -406,24 +407,24 @@ public abstract class VirtualOrder {
 
                 while ((virtualAsk != null || ask != null) && result.size() < lastIndex) {
                     if (virtualAsk == null) {
-                        result.add(ask);
+                        addToResultSet(ask, result);
                         asks.next();
                         ask = asks.peek() != null ? getVirtualAsk(asks.peek()) : null;
                     }
                     else if (ask == null) {
-                        result.add(virtualAsk);
+                        addToResultSet(virtualAsk, result);
                         virtualAsks.next();
                         virtualAsk = virtualAsks.peek();
                     }
                     else {
                         int compared = ask.compareTo(virtualAsk);
                         if (compared < 0) {
-                            result.add(virtualAsk);
+                            addToResultSet(virtualAsk, result);
                             virtualAsks.next();
                             virtualAsk = virtualAsks.peek();
                         }
                         else {
-                            result.add(ask);
+                            addToResultSet(ask, result);
                             asks.next();
                             ask = asks.peek() != null ? getVirtualAsk(asks.peek()) : null;
                         }
@@ -431,6 +432,18 @@ public abstract class VirtualOrder {
                 }
             }
             return result.subList(firstIndex, Math.min(result.size(), lastIndex));
+        }
+
+        private static void addToResultSet(VirtualAsk ask, List<VirtualAsk> result) {
+            if (ask.getQuantityQNT() == 0) {
+                return;
+            }
+            if (!result.isEmpty()) {
+                if (ask.getId() == result.get(result.size() - 1).getId()) {
+                    return;
+                }
+            }
+            result.add(ask);
         }
 
         public static int getAskCount(long assetId, long accountId) {
@@ -509,6 +522,7 @@ public abstract class VirtualOrder {
                 VirtualBid virtualBid = getVirtualBid(iterator.next());
                 if (virtualBid.getQuantityQNT() > 0) {
                     bestOrder = virtualBid;
+                    break;
                 }
             }
 
@@ -610,24 +624,24 @@ public abstract class VirtualOrder {
 
                 while ((virtualBid != null || bid != null) && result.size() < lastIndex) {
                     if (virtualBid == null) {
-                        result.add(bid);
+                        addToResultSet(bid, result);
                         bids.next();
                         bid = bids.peek() != null ? getVirtualBid(bids.peek()) : null;
                     }
                     else if (bid == null) {
-                        result.add(virtualBid);
+                        addToResultSet(virtualBid, result);
                         virtualBids.next();
                         virtualBid = virtualBids.peek();
                     }
                     else {
                         int compared = bid.compareTo(virtualBid);
                         if (compared < 0) {
-                            result.add(virtualBid);
+                            addToResultSet(virtualBid, result);
                             virtualBids.next();
                             virtualBid = virtualBids.peek();
                         }
                         else {
-                            result.add(bid);
+                            addToResultSet(bid, result);
                             bids.next();
                             bid = bids.peek() != null ? getVirtualBid(bids.peek()) : null;
                         }
@@ -635,6 +649,18 @@ public abstract class VirtualOrder {
                 }
             }
             return result.subList(firstIndex, Math.min(result.size(), lastIndex));
+        }
+
+        private static void addToResultSet(VirtualBid bid, List<VirtualBid> result) {
+            if (bid.getQuantityQNT() == 0) {
+                return;
+            }
+            if (!result.isEmpty()) {
+                if (bid.getId() == result.get(result.size() - 1).getId()) {
+                    return;
+                }
+            }
+            result.add(bid);
         }
 
         public static int getBidCount(long assetId, long accountId) {
