@@ -1,4 +1,5 @@
 /.idea/
+/out/
 /nxt_db*
 /nxt_test_db*
 /nxt.iml
