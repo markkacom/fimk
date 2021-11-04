@@ -408,6 +408,9 @@ public final class Nxt {
             if (initialized) {
                 throw new RuntimeException("Nxt.init has already been called");
             }
+
+            TransactionTypeExtension.init();
+
             initialized = true;
         }
 

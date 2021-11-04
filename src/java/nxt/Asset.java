@@ -105,6 +105,7 @@ public final class Asset {
     private final long quantityQNT;
     private final byte decimals;
     private final byte type;
+    private final int expiry;
 
     private Asset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
         this.assetId = transaction.getId();
@@ -115,6 +116,7 @@ public final class Asset {
         this.quantityQNT = attachment.getQuantityQNT();
         this.decimals = attachment.getDecimals();
         this.type = privateEnabled() ? attachment.getType() : 0;
+        this.expiry = Integer.MAX_VALUE;  // MAX_VALUE means "no expiry"
     }
 
     private Asset(ResultSet rs) throws SQLException {
@@ -126,11 +128,13 @@ public final class Asset {
         this.quantityQNT = rs.getLong("quantity");
         this.decimals = rs.getByte("decimals");
         this.type = privateEnabled() ? rs.getByte("type") : 0;
+        int v = rs.getInt("expiry");
+        this.expiry = v == 0 ? Integer.MAX_VALUE : v;
     }
 
     private void save(Connection con) throws SQLException {
         try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO asset (id, account_id, name, "
-                + "description, quantity, decimals, type, height) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                + "description, quantity, decimals, type, height, expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             int i = 0;
             pstmt.setLong(++i, this.assetId);
             pstmt.setLong(++i, this.accountId);
@@ -140,6 +144,16 @@ public final class Asset {
             pstmt.setByte(++i, this.decimals);
             pstmt.setByte(++i, this.getType());
             pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
+            pstmt.setInt(++i, this.expiry);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void updateExpiry(int expiry) throws SQLException {
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement("UPDATE asset SET expiry = ? WHERE id = ?")) {
+            pstmt.setInt(1, expiry);
+            pstmt.setLong(2, this.assetId);
             pstmt.executeUpdate();
         }
     }

@@ -223,6 +223,18 @@ public abstract class TransactionType {
             recipientAccount.addToBalanceAndUnconfirmedBalanceNQT(amount);
         }
         applyAttachment(transaction, senderAccount, recipientAccount);
+
+        Attachment a = null;
+        applyExtension(transaction, senderAccount, recipientAccount, a);
+    }
+
+    private void applyExtension(TransactionImpl transaction, Account senderAccount, Account recipientAccount, Attachment a) {
+        try {
+            TransactionTypeExtension ext = TransactionTypeExtension.get(transaction.getType());
+            if (ext != null) ext.apply(transaction, senderAccount, recipientAccount, a);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     abstract void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount);
