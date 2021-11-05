@@ -149,12 +149,12 @@ public final class Asset {
         }
     }
 
-    public void updateExpiry(int expiry) throws SQLException {
+    public int updateExpiry(int expiry) throws SQLException {
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("UPDATE asset SET expiry = ? WHERE id = ?")) {
             pstmt.setInt(1, expiry);
             pstmt.setLong(2, this.assetId);
-            pstmt.executeUpdate();
+            return pstmt.executeUpdate();
         }
     }
 

@@ -231,7 +231,12 @@ public abstract class TransactionType {
     private void applyExtension(TransactionImpl transaction, Account senderAccount, Account recipientAccount, Attachment a) {
         try {
             TransactionTypeExtension ext = TransactionTypeExtension.get(transaction.getType());
-            if (ext != null) ext.apply(transaction, senderAccount, recipientAccount, a);
+            if (ext != null) {
+                String result = ext.apply(transaction, senderAccount, recipientAccount, a);
+                if (result != null) {
+                    Logger.logWarningMessage(String.format("Transaction extension \"%s\" is not applied. %s", ext.getName(), result));
+                }
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
