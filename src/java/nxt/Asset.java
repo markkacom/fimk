@@ -105,7 +105,7 @@ public final class Asset {
     private final long quantityQNT;
     private final byte decimals;
     private final byte type;
-    private final int expiry;
+    private int expiry;
 
     private Asset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
         this.assetId = transaction.getId();
@@ -154,7 +154,9 @@ public final class Asset {
              PreparedStatement pstmt = con.prepareStatement("UPDATE asset SET expiry = ? WHERE id = ?")) {
             pstmt.setInt(1, expiry);
             pstmt.setLong(2, this.assetId);
-            return pstmt.executeUpdate();
+            int result = pstmt.executeUpdate();
+            this.expiry = expiry;
+            return result;
         }
     }
 
@@ -184,6 +186,10 @@ public final class Asset {
 
     public byte getType() {
       return type;
+    }
+
+    public int getExpiry() {
+        return expiry;
     }
 
     public DbIterator<Account.AccountAsset> getAccounts(int from, int to) {

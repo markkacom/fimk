@@ -147,6 +147,7 @@ public final class JSONData {
             json.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
         }
         json.put("type", asset.getType());
+        json.put("expiry", asset.getExpiry());
         return json;
     }
 

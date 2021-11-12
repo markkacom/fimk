@@ -280,6 +280,7 @@ public class JSONData {
             json.put("totalQuantityQNT", asset.getQuantityQNT());
             putAccount(json, "issuer", asset.getAccountId());
             json.put("type", asset.getType());
+            json.put("expiry", asset.getExpiry());
         }
         return json;
     }

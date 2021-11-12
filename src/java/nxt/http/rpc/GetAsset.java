@@ -63,6 +63,8 @@ public class GetAsset extends RPCCall {
             response.put("tradeFeePercentage", fee.getTradeFeePercentage());
         }
 
+        response.put("expiry", asset.getExpiry());
+
         return response;
     }
 
