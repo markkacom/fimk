@@ -34,6 +34,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public final class DigitalGoodsStore {
@@ -248,7 +250,7 @@ public final class DigitalGoodsStore {
         }
 
         public static int getCountInStock() {
-            return goodsTable.getCount(inStockClause);
+            return goodsTable.getCount(inStockClause.and(twoYearsLimitClause()));
         }
 
         public static Goods getGoods(long goodsId) {
@@ -256,29 +258,54 @@ public final class DigitalGoodsStore {
         }
 
         public static DbIterator<Goods> getAllGoods(int from, int to) {
-            return goodsTable.getAll(from, to);
+            return goodsTable.getManyBy(twoYearsLimitClause(), from, to);
+            //return goodsTable.getAll(from, to);
         }
 
         public static DbIterator<Goods> getGoodsInStock(int from, int to) {
-            return goodsTable.getManyBy(inStockClause, from, to);
+            return goodsTable.getManyBy(inStockClause.and(twoYearsLimitClause()), from, to);
+        }
+
+        /**
+         * Restricts Marketplace items max 2 years age
+         */
+        private static DbClause twoYearsLimitClause() {
+            Date now = new Date();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(now);
+            cal.add(Calendar.YEAR, -2);
+            int twoYearsAgoEpochTime = Convert.toEpochTime(cal.getTimeInMillis());
+            int nowEpochTime = Nxt.getEpochTime();
+            return new DbClause.FixedClause(String.format(" (goods.expiry IS NULL OR goods.expiry > %d) AND goods.timestamp > %d ", nowEpochTime, twoYearsAgoEpochTime));
         }
 
         public static DbIterator<Goods> getSellerGoods(final long sellerId, final boolean inStockOnly, int from, int to) {
-            return goodsTable.getManyBy(new SellerDbClause(sellerId, inStockOnly), from, to, " ORDER BY name ASC, timestamp DESC, id ASC ");
+            return goodsTable.getManyBy(
+                    new SellerDbClause(sellerId, inStockOnly).and(twoYearsLimitClause()),
+                    from, to, " ORDER BY name ASC, timestamp DESC, id ASC "
+            );
         }
 
         public static int getSellerGoodsCount(long sellerId, boolean inStockOnly) {
-            return goodsTable.getCount(new SellerDbClause(sellerId, inStockOnly));
+            return goodsTable.getCount(new SellerDbClause(sellerId, inStockOnly).and(twoYearsLimitClause()));
         }
 
         public static DbIterator<Goods> searchGoods(String query, boolean inStockOnly, int from, int to) {
-            return goodsTable.search(query, inStockOnly ? inStockClause : DbClause.EMPTY_CLAUSE, from, to,
-                    " ORDER BY ft.score DESC, goods.timestamp DESC ");
+            return goodsTable.search(
+                    query,
+                    inStockOnly ? inStockClause.and(twoYearsLimitClause()) : DbClause.EMPTY_CLAUSE,
+                    from, to,
+                    " ORDER BY ft.score DESC, goods.timestamp DESC "
+            );
         }
 
         public static DbIterator<Goods> searchSellerGoods(String query, long sellerId, boolean inStockOnly, int from, int to) {
-            return goodsTable.search(query, new SellerDbClause(sellerId, inStockOnly), from, to,
-                    " ORDER BY ft.score DESC, goods.name ASC, goods.timestamp DESC ");
+            return goodsTable.search(
+                    query,
+                    new SellerDbClause(sellerId, inStockOnly).and(twoYearsLimitClause()),
+                    from, to,
+                    " ORDER BY ft.score DESC, goods.name ASC, goods.timestamp DESC "
+            );
         }
 
         private static void init() {}
@@ -295,6 +322,7 @@ public final class DigitalGoodsStore {
         private int quantity;
         private long priceNQT;
         private boolean delisted;
+        private int expiry;
 
         private Goods(Transaction transaction, Attachment.DigitalGoodsListing attachment) {
             this.id = transaction.getId();
@@ -308,6 +336,7 @@ public final class DigitalGoodsStore {
             this.priceNQT = attachment.getPriceNQT();
             this.delisted = false;
             this.timestamp = Nxt.getBlockchain().getLastBlockTimestamp();
+            this.expiry = Integer.MAX_VALUE;  // MAX_VALUE means "no expiry"
         }
 
         private Goods(ResultSet rs) throws SQLException {
@@ -323,12 +352,14 @@ public final class DigitalGoodsStore {
             this.priceNQT = rs.getLong("price");
             this.delisted = rs.getBoolean("delisted");
             this.timestamp = rs.getInt("timestamp");
+            int v = rs.getInt("expiry");
+            this.expiry = v == 0 ? Integer.MAX_VALUE : v;
         }
 
         private void save(Connection con) throws SQLException {
             try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO goods (id, seller_id, name, "
-                    + "description, tags, parsed_tags, timestamp, quantity, price, delisted, height, latest) KEY (id, height) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
+                    + "description, tags, parsed_tags, timestamp, quantity, price, delisted, height, expiry, latest) KEY (id, height) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
                 int i = 0;
                 pstmt.setLong(++i, this.id);
                 pstmt.setLong(++i, this.sellerId);
@@ -341,7 +372,19 @@ public final class DigitalGoodsStore {
                 pstmt.setLong(++i, this.priceNQT);
                 pstmt.setBoolean(++i, this.delisted);
                 pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
+                pstmt.setInt(++i, this.expiry);
                 pstmt.executeUpdate();
+            }
+        }
+
+        public int updateExpiry(int expiry) throws SQLException {
+            try (Connection con = Db.db.getConnection();
+                 PreparedStatement pstmt = con.prepareStatement("UPDATE goods SET expiry = ? WHERE id = ?")) {
+                pstmt.setInt(1, expiry);
+                pstmt.setLong(2, this.getId());
+                int result = pstmt.executeUpdate();
+                this.expiry = expiry;
+                return result;
             }
         }
 
@@ -408,6 +451,10 @@ public final class DigitalGoodsStore {
                 Tag.delist(this);
             }
             goodsTable.insert(this);
+        }
+
+        public int getExpiry() {
+            return expiry;
         }
 
         public String[] getParsedTags() {

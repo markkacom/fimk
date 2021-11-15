@@ -1074,6 +1074,7 @@ class NxtDbVersion extends DbVersion {
             case 433:
                 /* FIMKrypto */
                 apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS expiry INT");
+                apply("ALTER TABLE goods ADD COLUMN IF NOT EXISTS expiry INT");
             case 434:
                 return;
             default:

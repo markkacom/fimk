@@ -67,16 +67,21 @@ class ExpiryExtension extends TransactionTypeExtension {
             return "Attachment type is not suitable";
         }
         if (!getMark().equals(a.getAliasName())) return "Wrong mark";
-        // payload format "assetId|expiryTimestamp", e.g. "834538499053643|465906798"
+        // payload format "assetId|expiryTimestamp|goodsId|expiryTimestamp",
+        // e.g. "834538499053643|465906798|934725444373|465906798"  "||934725444373|465906798"
         String payload = a.getAliasURI();
         if (payload.isEmpty() || payload.indexOf('|') == -1) return "Wrong payload";
         String[] ss = payload.split("\\|");
-        if (ss.length != 2) return "Wrong payload";
+        if (ss.length < 2 || ss.length > 4) return "Wrong payload";
 
         long assetId;
+        long goodsId = 0;
         int expiryTimestamp;
         try {
-            assetId = Long.parseUnsignedLong(ss[0]);
+            assetId = ss[0].trim().isEmpty() ? 0 : Long.parseUnsignedLong(ss[0]);
+            if (ss.length > 2) {
+                goodsId = ss[2].trim().isEmpty() ? 0 : Long.parseUnsignedLong(ss[2]);
+            }
             expiryTimestamp = Integer.parseInt(ss[1]);
         } catch (NumberFormatException e) {
             String resultMessage = "Transaction payload is wrong";
@@ -84,12 +89,26 @@ class ExpiryExtension extends TransactionTypeExtension {
             return resultMessage;
         }
 
-        Asset asset = Asset.getAsset(assetId);
-        if (asset == null) return "Asset is not found";
-        if (asset.getAccountId() != sender.getId()) return "Sender is not issuer of the asset";
+        Asset asset = null;
+        DigitalGoodsStore.Goods goods = null;
+        if (assetId != 0) {
+            asset = Asset.getAsset(assetId);
+            if (asset == null) return "Asset is not found";
+            if (asset.getAccountId() != sender.getId()) return "Sender is not issuer of the asset";
+        }
+        if (goodsId != 0) {
+            goods = DigitalGoodsStore.Goods.getGoods(goodsId);
+            if (goods == null) return "Goods is not found";
+            if (goods.getSellerId() != sender.getId()) return "Sender is not seller of the goods";
+        }
         if (expiryTimestamp < transaction.getTimestamp()) return "Timestamp should be greater than transaction time (should be in future)";
         try {
-            asset.updateExpiry(expiryTimestamp);
+            if (asset != null) {
+                asset.updateExpiry(expiryTimestamp);
+            }
+            if (goods != null) {
+                goods.updateExpiry(expiryTimestamp);
+            }
             return null;  //successful outcome
         } catch (SQLException e) {
             Logger.logErrorMessage("Extension expiry updating error", e);

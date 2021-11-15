@@ -349,6 +349,7 @@ public class JSONData {
         json.put("parsedTags", tagsJSON);
         json.put("delisted", goods.isDelisted());
         json.put("timestamp", goods.getTimestamp());
+        json.put("expiry", goods.getExpiry());
         if (includeCounts) {
             json.put("numberOfPurchases", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), false, true));
             json.put("numberOfPublicFeedbacks", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), true, true));
