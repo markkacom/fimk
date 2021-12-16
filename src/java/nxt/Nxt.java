@@ -53,7 +53,7 @@ public final class Nxt {
 
     public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.6.4"; /* FIM Version*/
+    public static final String VERSION = "0.7.0"; /* FIM Version*/
     public static final String MIN_VERSION = "0.6.1"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
@@ -69,7 +69,7 @@ public final class Nxt {
     static {
         redirectSystemStreams("out");
         redirectSystemStreams("err");
-        System.out.println("Initializing FIM server version " + Nxt.VERSION + " (based on NXT " + NXT_VERSION + ")");
+        System.out.println("Initializing FIM server version " + Nxt.VERSION);
         printCommandLineArguments();
         runtimeMode = RuntimeEnvironment.getRuntimeMode();
         dirProvider = RuntimeEnvironment.getDirProvider();
@@ -322,7 +322,7 @@ public final class Nxt {
         ThreadPool.shutdown();
         Peers.shutdown();
         Db.shutdown();
-        Logger.logShutdownMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") stopped.");
+        Logger.logShutdownMessage("FIM server " + VERSION + " stopped.");
         Logger.shutdown();
         runtimeMode.shutdown();
     }
@@ -387,9 +387,10 @@ public final class Nxt {
 
                 long currentTime = System.currentTimeMillis();
                 Logger.logMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
-                Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") started successfully.");
-                Logger.logMessage("Copyright © 2013-2015 The Nxt Core Developers.");
-                Logger.logMessage("Copyright © 2014-2016 Krypto Fin ry and the FIMKrypto Developers.");
+                Logger.logMessage("FIM server " + VERSION + " started successfully.");
+                Logger.logMessage("Copyright (c) 2013-2015 The Nxt Core Developers.");
+                Logger.logMessage("Copyright (c) 2014-2016 Krypto Fin ry and the FIMKrypto Developers.");
+                Logger.logMessage("Copyright (c) 2017-2021 The FIMK Developers.");
                 Logger.logMessage("Distributed under GPLv2, with ABSOLUTELY NO WARRANTY.");
                 if (API.getBrowserUri() != null) {
                     Logger.logMessage("Client UI is at " + API.getBrowserUri());
