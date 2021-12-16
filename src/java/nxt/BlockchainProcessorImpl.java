@@ -231,7 +231,12 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     Logger.logDebugMessage("Got " + confirmations + " confirmations");
 
                     if (blockchain.getLastBlock().getId() != lastBlockId) {
-                        Logger.logDebugMessage("Downloaded " + (blockchain.getHeight() - commonBlock.getHeight()) + " blocks");
+                        Logger.logMessage(String.format(
+                                "Downloaded %d blocks from %s, height %d",
+                                blockchain.getHeight() - commonBlock.getHeight(),
+                                peer.getHost(),
+                                blockchain.getLastBlock().getHeight()
+                        ));
                     } else {
                         Logger.logDebugMessage("Did not accept peer's blocks, back to our own fork");
                     }
@@ -731,15 +736,24 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }
         }, Event.BLOCK_SCANNED);
 
-        blockListeners.addListener(block -> {
-            if (trimDerivedTables && block.getHeight() % trimFrequency == 0) {
-                trimDerivedTables();
-            }
-            if (block.getHeight() % 5000 == 0) {
-                Logger.logMessage("received block " + block.getHeight());
-                Db.db.analyzeTables();
-            }
-        }, Event.BLOCK_PUSHED);
+        //delayed call to add listener to the end of the listeners to be last invoked on event
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        blockListeners.addListener(block -> {
+                            if (trimDerivedTables && block.getHeight() % trimFrequency == 0) {
+                                trimDerivedTables();
+                            }
+                            if (block.getHeight() % 5000 == 0) {
+                                Logger.logMessage("received block " + block.getHeight());
+                                Db.db.analyzeTables();
+                            }
+                        }, Event.BLOCK_PUSHED);
+                    }
+                },
+                2000
+        );
 
         blockListeners.addListener(checksumListener, Event.BLOCK_PUSHED);
 
