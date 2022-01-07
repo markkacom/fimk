@@ -224,15 +224,15 @@ public abstract class TransactionType {
         }
         applyAttachment(transaction, senderAccount, recipientAccount);
 
-        Attachment a = null;
-        applyExtension(transaction, senderAccount, recipientAccount, a);
+        applyExtension(transaction, senderAccount, recipientAccount);
     }
 
-    private void applyExtension(TransactionImpl transaction, Account senderAccount, Account recipientAccount, Attachment a) {
+    private void applyExtension(TransactionImpl transaction, Account senderAccount, Account recipientAccount) {
+        if (Nxt.getBlockchain().getHeight() < Constants.TRANSACTION_EXTENSION_HEIGHT) return;
         try {
             TransactionTypeExtension ext = TransactionTypeExtension.get(transaction.getType());
             if (ext != null) {
-                String result = ext.apply(transaction, senderAccount, recipientAccount, a);
+                String result = ext.apply(transaction, senderAccount, recipientAccount);
                 if (result != null) {
                     Logger.logWarningMessage(String.format("Transaction extension \"%s\" is not applied. %s", ext.getName(), result));
                 }
