@@ -186,6 +186,9 @@ public final class Constants {
 
     public static final int FORGER_FEE_BLOCK = SECOND_BIRTH_BLOCK + 1;
 
+    /** Height from which the transaction extension features are implemented */
+    public static final int TRANSACTION_EXTENSION_HEIGHT = isTestnet ? 0 : 4_800_000;
+
     public static final long EPOCH_BEGINNING;
     static {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));

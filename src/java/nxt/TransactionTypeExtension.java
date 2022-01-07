@@ -39,7 +39,7 @@ public abstract class TransactionTypeExtension {
     }
 
 
-    abstract String apply(TransactionImpl transaction, Account sender, Account recipient, Attachment a);
+    abstract String apply(TransactionImpl transaction, Account sender, Account recipient);
 
 }
 
@@ -58,7 +58,7 @@ class ExpiryExtension extends TransactionTypeExtension {
         return "Expiry for Assets and Marketplaces";
     }
 
-    String apply(TransactionImpl transaction, Account sender, Account recipient, Attachment attachment) {
+    String apply(TransactionImpl transaction, Account sender, Account recipient) {
         MofoAttachment.NamespacedAliasAssignmentAttachment a;
         Attachment.AbstractAttachment att = transaction.getAttachment();
         if (att instanceof MofoAttachment.NamespacedAliasAssignmentAttachment) {

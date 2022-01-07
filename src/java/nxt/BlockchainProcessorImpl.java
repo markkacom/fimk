@@ -1002,6 +1002,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
                 Db.db.commitTransaction();
             } catch (Exception e) {
+                Logger.logErrorMessage("error on block pushing", e);
                 Db.db.rollbackTransaction();
                 blockchain.setLastBlock(previousLastBlock);
                 throw e;
