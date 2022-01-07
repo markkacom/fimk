@@ -29,7 +29,7 @@ import java.util.List;
 
 public final class Search {
 
-    private static final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+    private static final Analyzer analyzer = new StandardAnalyzer();
 
     public static String[] parseTags(String tags, int minTagLength, int maxTagLength, int maxTagCount) {
         if (tags.trim().length() == 0) {
@@ -37,6 +37,7 @@ public final class Search {
         }
         List<String> list = new ArrayList<>();
         try (TokenStream stream = analyzer.tokenStream(null, new StringReader(tags))) {
+            stream.reset();
             CharTermAttribute attribute = stream.addAttribute(CharTermAttribute.class);
             String tag;
             while (stream.incrementToken() && list.size() < maxTagCount && (tag = attribute.toString()).length() <= maxTagLength && tag.length() >= minTagLength) {
