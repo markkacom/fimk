@@ -60,6 +60,10 @@ public final class Asset {
 
     public static DbIterator<Asset> getAllAssets(int from, int to) {
         return assetTable.getAll(from, to);
+
+//        int nowEpochTime = Nxt.getEpochTime();
+//        DbClause.FixedClause dbClause = new DbClause.FixedClause(String.format(" expiry IS NULL OR expiry > %d ", nowEpochTime));
+//        return assetTable.getManyBy(dbClause, from, to);
     }
 
     public static int getCount() {
@@ -153,7 +157,7 @@ public final class Asset {
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("UPDATE asset SET expiry = ? WHERE id = ?")) {
             pstmt.setInt(1, expiry);
-            pstmt.setLong(2, this.assetId);
+            pstmt.setLong(2, this.getId());
             int result = pstmt.executeUpdate();
             this.expiry = expiry;
             return result;

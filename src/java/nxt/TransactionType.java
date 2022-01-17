@@ -224,6 +224,7 @@ public abstract class TransactionType {
         }
         applyAttachment(transaction, senderAccount, recipientAccount);
 
+        //todo rollback of extension on rollback transaction
         applyExtension(transaction, senderAccount, recipientAccount);
     }
 
