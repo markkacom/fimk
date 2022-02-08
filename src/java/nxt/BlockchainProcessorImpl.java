@@ -16,20 +16,13 @@
 
 package nxt;
 
-import nxt.BlockImpl.BadBlock;
 import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.db.DerivedDbTable;
 import nxt.db.FilteringIterator;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
-import nxt.util.Convert;
-import nxt.util.JSON;
-import nxt.util.Listener;
-import nxt.util.Listeners;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
-
+import nxt.util.*;
 import org.h2.fulltext.FullTextLucene;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -38,29 +31,13 @@ import org.json.simple.JSONValue;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.*;
 
 final class BlockchainProcessorImpl implements BlockchainProcessor {
 
@@ -438,7 +415,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 BlockImpl block = peerBlock.getBlock();
                 if (blockchain.getLastBlock().getId() == block.getPreviousBlockId()) {
                     try {
-                        pushBlock(block);
+                        pushBlock(block, peerBlock.getPeer());
                     } catch (BlockNotAcceptedException e) {
                         peerBlock.getPeer().blacklist(e);
                     }
@@ -967,6 +944,10 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     }
 
     private void pushBlock(final BlockImpl block) throws BlockNotAcceptedException {
+        pushBlock(block, null);
+    }
+
+    private void pushBlock(final BlockImpl block, Peer peer) throws BlockNotAcceptedException {
 
         int curTime = Nxt.getEpochTime();
 
@@ -1001,6 +982,26 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 accept(block, validPhasedTransactions, invalidPhasedTransactions);
 
                 Db.db.commitTransaction();
+
+                //report about pushed block
+                if ((Nxt.getEpochTime() - block.getTimestamp()) < 3*24*60*60) {
+                    LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Convert.fromEpochTime(block.getTimestamp())), ZoneId.systemDefault());
+                    String feederAddresss = peer == null ?
+                            (getLastBlockchainFeeder() == null ? "*" : getLastBlockchainFeeder().getAnnouncedAddress()) :
+                            peer.getAnnouncedAddress() == null ? peer.getHost() : peer.getAnnouncedAddress();
+                    int interval = block.getTimestamp() - previousLastBlock.getTimestamp();
+                    int txCount = block.getTransactions().size();
+                    String logMessage = String.format("Pushed block %s height %d time %s from %s generator %s interval %s %d",
+                            Long.toUnsignedString(block.getId()), block.getHeight(),
+                            dt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                            feederAddresss,
+                            Long.toUnsignedString(block.getGeneratorId()),
+                            txCount > 0 ? "transactions " + txCount : "",
+                            interval
+                    );
+                    Logger.logDebugMessage(logMessage);
+                }
+
             } catch (Exception e) {
                 Logger.logErrorMessage("error on block pushing", e);
                 Db.db.rollbackTransaction();
