@@ -109,7 +109,33 @@ public final class Nxt {
         }
     }
 
-    private static final Properties properties = new Properties(defaultProperties);
+    private static final Properties properties = new Properties(defaultProperties) {
+        @Override
+        public String getProperty(String key) {
+            String v = super.getProperty(key);
+            if (v == null) {
+                //backward compatibility
+                if (key.startsWith("fimk.")) {
+                    key = "nxt." + key.substring(5);
+                    return super.getProperty(key);
+                }
+            }
+            return v;
+        }
+
+        @Override
+        public String getProperty(String key, String defaultValue) {
+            String v = super.getProperty(key, defaultValue);
+            if (v == null) {
+                //backward compatibility
+                if (key.startsWith("fimk.")) {
+                    key = "nxt." + key.substring(5);
+                    return super.getProperty(key, defaultValue);
+                }
+            }
+            return v;
+        }
+    };
 
     static {
         loadProperties(properties, NXT_PROPERTIES, false);
