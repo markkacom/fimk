@@ -75,7 +75,7 @@ public final class Logger {
             System.setProperty("java.util.logging.manager",
                     (oldManager != null ? oldManager : "java.util.logging.LogManager"));
         }
-        if (! Boolean.getBoolean("nxt.doNotConfigureLogging")) {
+        if (! Boolean.getBoolean("fimk.doNotConfigureLogging")) {
             try {
                 Properties loggingProperties = new Properties();
                 Nxt.loadProperties(loggingProperties, "logging-default.properties", true);
@@ -95,8 +95,8 @@ public final class Logger {
             }
         }
         log = org.slf4j.LoggerFactory.getLogger(nxt.Nxt.class);
-        enableStackTraces = Nxt.getBooleanProperty("nxt.enableStackTraces");
-        enableLogTraceback = Nxt.getBooleanProperty("nxt.enableLogTraceback");
+        enableStackTraces = Nxt.getBooleanProperty("fimk.enableStackTraces");
+        enableLogTraceback = Nxt.getBooleanProperty("fimk.enableLogTraceback");
         logInfoMessage("logging enabled");
     }
 

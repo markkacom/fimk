@@ -58,8 +58,8 @@ public final class Nxt {
 
     private static volatile Time time = new Time.EpochTime();
 
-    public static final String NXT_DEFAULT_PROPERTIES = "nxt-default.properties";
-    public static final String NXT_PROPERTIES = "nxt.properties";
+    public static final String NXT_DEFAULT_PROPERTIES = "fimk-default.properties";
+    public static final String NXT_PROPERTIES = "fimk.properties";
     public static final String CONFIG_DIR = "conf";
 
     private static final RuntimeMode runtimeMode;
@@ -74,8 +74,8 @@ public final class Nxt {
         runtimeMode = RuntimeEnvironment.getRuntimeMode();
         dirProvider = RuntimeEnvironment.getDirProvider();
         loadProperties(defaultProperties, NXT_DEFAULT_PROPERTIES, true);
-        if (!VERSION.equals(Nxt.defaultProperties.getProperty("nxt.version"))) {
-            throw new RuntimeException("Using an nxt-default.properties file from a version other than " + VERSION + " is not supported!!!");
+        if (!VERSION.equals(Nxt.defaultProperties.getProperty("fimk.version"))) {
+            throw new RuntimeException("Using an fimk-default.properties file from a version other than " + VERSION + " is not supported!!!");
         }
     }
 
@@ -129,8 +129,8 @@ public final class Nxt {
                 }
             } else {
                 try (InputStream is = ClassLoader.getSystemResourceAsStream(propertiesFile)) {
-                    // When running nxt.exe from a Windows installation we always have nxt.properties in the classpath but this is not the nxt properties file
-                    // Therefore we first load it from the classpath and then look for the real nxt.properties in the user folder.
+                    // When running nxt.exe from a Windows installation we always have fimk.properties in the classpath but this is not the nxt properties file
+                    // Therefore we first load it from the classpath and then look for the real fimk.properties in the user folder.
                     if (is != null) {
                         System.out.printf("Loading %s from classpath\n", propertiesFile);
                         properties.load(is);
@@ -188,7 +188,7 @@ public final class Nxt {
     private static int displayProperties = 0;
     private static boolean getDisplayProperties() {
       if (displayProperties == 0) {
-        String value = properties.getProperty("nxt.debug");
+        String value = properties.getProperty("fimk.debug");
         displayProperties = Boolean.TRUE.toString().equals(value) ? 1 : 2;
       }
       return displayProperties == 1;
@@ -378,7 +378,7 @@ public final class Nxt {
                 GossipProcessorImpl.getInstance();
                 AccountColor.init();
                 AppVersionManager.getInstance();
-                int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
+                int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("fimk.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
                     setTime(new Time.FasterTime(Math.max(getEpochTime(), Nxt.getBlockchain().getLastBlock().getTimestamp()), timeMultiplier));

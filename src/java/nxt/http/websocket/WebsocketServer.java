@@ -25,10 +25,10 @@ public final class WebsocketServer {
     public static final int TESTNET_API_PORT = 6986;
 
     private static Server server;
-    private final static boolean enableWebsockets = Nxt.getBooleanProperty("nxt.enableWebsockets");
-    private final static int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("nxt.websocketServerPort");
-    private final static String host = Nxt.getStringProperty("nxt.websocketServerHost");
-    private static final boolean enableSSL = Nxt.getBooleanProperty("nxt.apiSSL");
+    private final static boolean enableWebsockets = Nxt.getBooleanProperty("fimk.enableWebsockets");
+    private final static int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("fimk.websocketServerPort");
+    private final static String host = Nxt.getStringProperty("fimk.websocketServerHost");
+    private static final boolean enableSSL = Nxt.getBooleanProperty("fimk.apiSSL");
     
     public static void init() {}
     
@@ -77,8 +77,8 @@ public final class WebsocketServer {
         http_config.setOutputBufferSize(32768);
   
         SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStorePath(Nxt.getStringProperty("nxt.keyStorePath"));
-        sslContextFactory.setKeyStorePassword(Nxt.getStringProperty("nxt.keyStorePassword"));
+        sslContextFactory.setKeyStorePath(Nxt.getStringProperty("fimk.keyStorePath"));
+        sslContextFactory.setKeyStorePassword(Nxt.getStringProperty("fimk.keyStorePassword"));
         sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA",
             "SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
             "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");

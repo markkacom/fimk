@@ -27,8 +27,8 @@ import nxt.util.Convert;
 
 public final class Constants {
 
-    public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
-    public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
+    public static final boolean isTestnet = Nxt.getBooleanProperty("fimk.isTestnet");
+    public static final boolean isOffline = Nxt.getBooleanProperty("fimk.isOffline");
 
     public static final long ONE_NXT = 100000000;
 
@@ -47,13 +47,13 @@ public final class Constants {
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
 
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
-    public static final int MAX_ROLLBACK = Math.max(Nxt.getIntProperty("nxt.maxRollback"), 720);
-    public static final int GUARANTEED_BALANCE_CONFIRMATIONS = isTestnet ? Nxt.getIntProperty("nxt.testnetGuaranteedBalanceConfirmations", 1440) : 1440;
-    public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("nxt.testnetLeasingDelay", 1440) : 1440;
+    public static final int MAX_ROLLBACK = Math.max(Nxt.getIntProperty("fimk.maxRollback"), 720);
+    public static final int GUARANTEED_BALANCE_CONFIRMATIONS = isTestnet ? Nxt.getIntProperty("fimk.testnetGuaranteedBalanceConfirmations", 1440) : 1440;
+    public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("fimk.testnetLeasingDelay", 1440) : 1440;
 
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
-    public static final int FORGING_DELAY = Nxt.getIntProperty("nxt.forgingDelay");
-    public static final int FORGING_SPEEDUP = Nxt.getIntProperty("nxt.forgingSpeedup");
+    public static final int FORGING_DELAY = Nxt.getIntProperty("fimk.forgingDelay");
+    public static final int FORGING_SPEEDUP = Nxt.getIntProperty("fimk.forgingSpeedup");
 
     public static final byte MAX_PHASING_VOTE_TRANSACTIONS = 10;
     public static final byte MAX_PHASING_WHITELIST_SIZE = 10;
@@ -74,11 +74,11 @@ public final class Constants {
     public static final int MAX_PRUNABLE_LIFETIME;
     public static final boolean ENABLE_PRUNING;
     static {
-        int maxPrunableLifetime = Nxt.getIntProperty("nxt.maxPrunableLifetime");
+        int maxPrunableLifetime = Nxt.getIntProperty("fimk.maxPrunableLifetime");
         ENABLE_PRUNING = maxPrunableLifetime >= 0;
         MAX_PRUNABLE_LIFETIME = ENABLE_PRUNING ? Math.max(maxPrunableLifetime, MIN_PRUNABLE_LIFETIME) : Integer.MAX_VALUE;
     }
-    public static final boolean INCLUDE_EXPIRED_PRUNABLE = Nxt.getBooleanProperty("nxt.includeExpiredPrunable");
+    public static final boolean INCLUDE_EXPIRED_PRUNABLE = Nxt.getBooleanProperty("fimk.includeExpiredPrunable");
 
     public static final int MAX_ACCOUNT_NAME_LENGTH = 100;
     public static final int MAX_ACCOUNT_DESCRIPTION_LENGTH = 1000;
@@ -217,7 +217,7 @@ public final class Constants {
     /* XXX - List of Account ID's that are allowed to forge (or null to allow all) */
     public static final List<Long> allowedToForge;
     static {
-        List<String> allowed = Nxt.getStringListProperty("nxt.allowedToForge");
+        List<String> allowed = Nxt.getStringListProperty("fimk.allowedToForge");
         if (allowed.size() == 0) {
             allowedToForge = Collections.emptyList();
         }

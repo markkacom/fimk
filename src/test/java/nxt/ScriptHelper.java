@@ -37,20 +37,20 @@ public class ScriptHelper {
     public static void init() {
         Properties properties = new Properties();
         properties = new Properties();
-        properties.setProperty("nxt.shareMyAddress", "false");
-        properties.setProperty("nxt.savePeers", "false");
-        properties.setProperty("nxt.disableGenerateBlocksThread", "true");
-        properties.setProperty("nxt.testUnconfirmedTransactions", "true");
-        properties.setProperty("nxt.debugTraceAccounts", "");
-        properties.setProperty("nxt.debugLogUnconfirmed", "false");
-        properties.setProperty("nxt.debugTraceQuote", "\"");
-        properties.setProperty("nxt.numberOfForkConfirmations", "0");
-        properties.setProperty("nxt.isTestnet", "true");
-        properties.setProperty("nxt.testDbUrl", "jdbc:h2:fim_unit_tests_db/fim;DB_CLOSE_ON_EXIT=FALSE;MVCC=TRUE");
-        properties.setProperty("nxt.isOffline", "true");      
-        properties.setProperty("nxt.enableFakeForging", "true");
-        properties.setProperty("nxt.timeMultiplier", "1");
-        properties.setProperty("nxt.fakeForgingAccount", "FIM-9MAB-AXFN-XXL7-6BHU3");        
+        properties.setProperty("fimk.shareMyAddress", "false");
+        properties.setProperty("fimk.savePeers", "false");
+        properties.setProperty("fimk.disableGenerateBlocksThread", "true");
+        properties.setProperty("fimk.testUnconfirmedTransactions", "true");
+        properties.setProperty("fimk.debugTraceAccounts", "");
+        properties.setProperty("fimk.debugLogUnconfirmed", "false");
+        properties.setProperty("fimk.debugTraceQuote", "\"");
+        properties.setProperty("fimk.numberOfForkConfirmations", "0");
+        properties.setProperty("fimk.isTestnet", "true");
+        properties.setProperty("fimk.testDbUrl", "jdbc:h2:fim_unit_tests_db/fim;DB_CLOSE_ON_EXIT=FALSE;MVCC=TRUE");
+        properties.setProperty("fimk.isOffline", "true");      
+        properties.setProperty("fimk.enableFakeForging", "true");
+        properties.setProperty("fimk.timeMultiplier", "1");
+        properties.setProperty("fimk.fakeForgingAccount", "FIM-9MAB-AXFN-XXL7-6BHU3");
   
         Nxt.init(properties);
         blockchain = BlockchainImpl.getInstance();

@@ -41,8 +41,8 @@ import java.util.List;
  * <ul>
  * <li>timeout - Number of seconds to wait for an event.  The EventWait
  * will complete normally if no event is received within the timeout interval.
- * nxt.apiEventTimeout will be used if no timeout value is specified or
- * if the requested timeout is greater than nxt.apiEventTimeout.</li>
+ * fimk.apiEventTimeout will be used if no timeout value is specified or
+ * if the requested timeout is greater than fimk.apiEventTimeout.</li>
  * </ul>
  *
  * <p>Response parameters:</p>

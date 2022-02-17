@@ -36,13 +36,13 @@ import java.util.Set;
 
 public final class DebugTrace {
 
-    static final String QUOTE = Nxt.getStringProperty("nxt.debugTraceQuote", "\"");
-    static final String SEPARATOR = Nxt.getStringProperty("nxt.debugTraceSeparator", "\t");
-    static final boolean LOG_UNCONFIRMED = Nxt.getBooleanProperty("nxt.debugLogUnconfirmed");
+    static final String QUOTE = Nxt.getStringProperty("fimk.debugTraceQuote", "\"");
+    static final String SEPARATOR = Nxt.getStringProperty("fimk.debugTraceSeparator", "\t");
+    static final boolean LOG_UNCONFIRMED = Nxt.getBooleanProperty("fimk.debugLogUnconfirmed");
 
     static void init() {
-        List<String> accountIdStrings = Nxt.getStringListProperty("nxt.debugTraceAccounts");
-        String logName = Nxt.getStringProperty("nxt.debugTraceLog");
+        List<String> accountIdStrings = Nxt.getStringListProperty("fimk.debugTraceAccounts");
+        String logName = Nxt.getStringProperty("fimk.debugTraceLog");
         if (accountIdStrings.isEmpty() || logName == null) {
             return;
         }

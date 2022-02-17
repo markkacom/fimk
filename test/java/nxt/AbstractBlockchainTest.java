@@ -33,21 +33,21 @@ public abstract class AbstractBlockchainTest {
 
     protected static Properties newTestProperties() {
         Properties testProperties = new Properties();
-        testProperties.setProperty("nxt.shareMyAddress", "false");
-        testProperties.setProperty("nxt.savePeers", "false");
-        //testProperties.setProperty("nxt.enableAPIServer", "false");
-        //testProperties.setProperty("nxt.enableUIServer", "false");
-        testProperties.setProperty("nxt.disableGenerateBlocksThread", "true");
-        //testProperties.setProperty("nxt.disableProcessTransactionsThread", "true");
-        //testProperties.setProperty("nxt.disableRemoveUnconfirmedTransactionsThread", "true");
-        //testProperties.setProperty("nxt.disableRebroadcastTransactionsThread", "true");
-        //testProperties.setProperty("nxt.disablePeerUnBlacklistingThread", "true");
-        //testProperties.setProperty("nxt.getMorePeers", "false");
-        testProperties.setProperty("nxt.testUnconfirmedTransactions", "true");
-        testProperties.setProperty("nxt.debugTraceAccounts", "");
-        testProperties.setProperty("nxt.debugLogUnconfirmed", "false");
-        testProperties.setProperty("nxt.debugTraceQuote", "\"");
-        testProperties.setProperty("nxt.numberOfForkConfirmations", "0");
+        testProperties.setProperty("fimk.shareMyAddress", "false");
+        testProperties.setProperty("fimk.savePeers", "false");
+        //testProperties.setProperty("fimk.enableAPIServer", "false");
+        //testProperties.setProperty("fimk.enableUIServer", "false");
+        testProperties.setProperty("fimk.disableGenerateBlocksThread", "true");
+        //testProperties.setProperty("fimk.disableProcessTransactionsThread", "true");
+        //testProperties.setProperty("fimk.disableRemoveUnconfirmedTransactionsThread", "true");
+        //testProperties.setProperty("fimk.disableRebroadcastTransactionsThread", "true");
+        //testProperties.setProperty("fimk.disablePeerUnBlacklistingThread", "true");
+        //testProperties.setProperty("fimk.getMorePeers", "false");
+        testProperties.setProperty("fimk.testUnconfirmedTransactions", "true");
+        testProperties.setProperty("fimk.debugTraceAccounts", "");
+        testProperties.setProperty("fimk.debugLogUnconfirmed", "false");
+        testProperties.setProperty("fimk.debugTraceQuote", "\"");
+        testProperties.setProperty("fimk.numberOfForkConfirmations", "0");
         return testProperties;
     }
 

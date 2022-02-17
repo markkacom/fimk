@@ -62,15 +62,15 @@ public final class API {
 
     public static final Set<String> allowedBotHosts;
     private static final List<NetworkAddress> allowedBotNets;
-    static final String adminPassword = Nxt.getStringProperty("nxt.adminPassword", "", true);
+    static final String adminPassword = Nxt.getStringProperty("fimk.adminPassword", "", true);
     static final boolean disableAdminPassword;
-    static final int maxRecords = Nxt.getIntProperty("nxt.maxAPIRecords");
+    static final int maxRecords = Nxt.getIntProperty("fimk.maxAPIRecords");
 
     private static final Server apiServer;
     private static URI browserUri;
 
     static {
-        List<String> allowedBotHostsList = Nxt.getStringListProperty("nxt.allowedBotHosts");
+        List<String> allowedBotHostsList = Nxt.getStringListProperty("fimk.allowedBotHosts");
         if (! allowedBotHostsList.contains("*")) {
             Set<String> hosts = new HashSet<>();
             List<NetworkAddress> nets = new ArrayList<>();
@@ -93,16 +93,16 @@ public final class API {
             allowedBotNets = null;
         }
 
-        boolean enableAPIServer = Nxt.getBooleanProperty("nxt.enableAPIServer");
+        boolean enableAPIServer = Nxt.getBooleanProperty("fimk.enableAPIServer");
         if (enableAPIServer) {
-            final int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("nxt.apiServerPort");
-            final int sslPort = Constants.isTestnet ? TESTNET_API_SSLPORT : Nxt.getIntProperty("nxt.apiServerSSLPort");
-            final String host = Nxt.getStringProperty("nxt.apiServerHost");
-            disableAdminPassword = Nxt.getBooleanProperty("nxt.disableAdminPassword") || ("127.0.0.1".equals(host) && adminPassword.isEmpty());
+            final int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("fimk.apiServerPort");
+            final int sslPort = Constants.isTestnet ? TESTNET_API_SSLPORT : Nxt.getIntProperty("fimk.apiServerSSLPort");
+            final String host = Nxt.getStringProperty("fimk.apiServerHost");
+            disableAdminPassword = Nxt.getBooleanProperty("fimk.disableAdminPassword") || ("127.0.0.1".equals(host) && adminPassword.isEmpty());
 
             apiServer = new Server();
             ServerConnector connector;
-            boolean enableSSL = Nxt.getBooleanProperty("nxt.apiSSL");
+            boolean enableSSL = Nxt.getBooleanProperty("fimk.apiSSL");
             //
             // Create the HTTP connector
             //
@@ -110,7 +110,7 @@ public final class API {
                 connector = new ServerConnector(apiServer);
                 connector.setPort(port);
                 connector.setHost(host);
-                connector.setIdleTimeout(Nxt.getIntProperty("nxt.apiServerIdleTimeout"));
+                connector.setIdleTimeout(Nxt.getIntProperty("fimk.apiServerIdleTimeout"));
                 connector.setReuseAddress(true);
                 apiServer.addConnector(connector);
                 Logger.logMessage("API server using HTTP port " + port);
@@ -124,8 +124,8 @@ public final class API {
                 https_config.setSecurePort(sslPort);
                 https_config.addCustomizer(new SecureRequestCustomizer());
                 SslContextFactory sslContextFactory = new SslContextFactory();
-                sslContextFactory.setKeyStorePath(Nxt.getStringProperty("nxt.keyStorePath"));
-                sslContextFactory.setKeyStorePassword(Nxt.getStringProperty("nxt.keyStorePassword", null, true));
+                sslContextFactory.setKeyStorePath(Nxt.getStringProperty("fimk.keyStorePath"));
+                sslContextFactory.setKeyStorePassword(Nxt.getStringProperty("fimk.keyStorePassword", null, true));
                 sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA",
                         "SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
                         "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
@@ -134,7 +134,7 @@ public final class API {
                         new HttpConnectionFactory(https_config));
                 connector.setPort(sslPort);
                 connector.setHost(host);
-                connector.setIdleTimeout(Nxt.getIntProperty("nxt.apiServerIdleTimeout"));
+                connector.setIdleTimeout(Nxt.getIntProperty("fimk.apiServerIdleTimeout"));
                 connector.setReuseAddress(true);
                 apiServer.addConnector(connector);
                 Logger.logMessage("API server using HTTPS port " + sslPort);
@@ -148,7 +148,7 @@ public final class API {
             HandlerList apiHandlers = new HandlerList();
 
             ServletContextHandler apiHandler = new ServletContextHandler();
-            String apiResourceBase = Nxt.getStringProperty("nxt.apiResourceBase");
+            String apiResourceBase = Nxt.getStringProperty("fimk.apiResourceBase");
             if (apiResourceBase != null) {
                 ServletHolder defaultServletHolder = new ServletHolder(new DefaultServlet());
                 defaultServletHolder.setInitParameter("dirAllowed", "false");
@@ -158,10 +158,10 @@ public final class API {
                 defaultServletHolder.setInitParameter("gzip", "true");
                 defaultServletHolder.setInitParameter("etags", "true");
                 apiHandler.addServlet(defaultServletHolder, "/*");
-                apiHandler.setWelcomeFiles(new String[]{Nxt.getStringProperty("nxt.apiWelcomeFile")});
+                apiHandler.setWelcomeFiles(new String[]{Nxt.getStringProperty("fimk.apiWelcomeFile")});
             }
 
-            String javadocResourceBase = Nxt.getStringProperty("nxt.javadocResourceBase");
+            String javadocResourceBase = Nxt.getStringProperty("fimk.javadocResourceBase");
             if (javadocResourceBase != null) {
                 ContextHandler contextHandler = new ContextHandler("/doc");
                 ResourceHandler docFileHandler = new ResourceHandler();
@@ -174,7 +174,7 @@ public final class API {
 
             ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, "/nxt");
             servletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(null, Constants.MAX_TAGGED_DATA_DATA_LENGTH, -1L, 0));
-            if (Nxt.getBooleanProperty("nxt.enableAPIServerGZIPFilter")) {
+            if (Nxt.getBooleanProperty("fimk.enableAPIServerGZIPFilter")) {
                 FilterHolder gzipFilterHolder = apiHandler.addFilter(GzipFilter.class, "/nxt", null);
                 gzipFilterHolder.setInitParameter("methods", "GET,POST");
                 gzipFilterHolder.setAsyncSupported(true);
@@ -184,7 +184,7 @@ public final class API {
 
             apiHandler.addServlet(DbShellServlet.class, "/dbshell");
 
-            if (Nxt.getBooleanProperty("nxt.apiServerCORS")) {
+            if (Nxt.getBooleanProperty("fimk.apiServerCORS")) {
                 FilterHolder filterHolder = apiHandler.addFilter(CrossOriginFilter.class, "/*", null);
                 filterHolder.setInitParameter("allowedHeaders", "*");
                 filterHolder.setAsyncSupported(true);

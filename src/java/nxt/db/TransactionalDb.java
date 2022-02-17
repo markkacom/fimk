@@ -35,9 +35,9 @@ public class TransactionalDb extends BasicDb {
     private static final long txInterval;
     static {
         long temp;
-        stmtThreshold = (temp=Nxt.getIntProperty("nxt.statementLogThreshold")) != 0 ? temp : 1000;
-        txThreshold = (temp=Nxt.getIntProperty("nxt.transactionLogThreshold")) != 0 ? temp : 5000;
-        txInterval = (temp=Nxt.getIntProperty("nxt.transactionLogInterval")) != 0 ? temp*60*1000 : 15*60*1000;
+        stmtThreshold = (temp=Nxt.getIntProperty("fimk.statementLogThreshold")) != 0 ? temp : 1000;
+        txThreshold = (temp=Nxt.getIntProperty("fimk.transactionLogThreshold")) != 0 ? temp : 5000;
+        txInterval = (temp=Nxt.getIntProperty("fimk.transactionLogInterval")) != 0 ? temp*60*1000 : 15*60*1000;
     }
 
     private final ThreadLocal<DbConnection> localConnection = new ThreadLocal<>();

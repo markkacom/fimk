@@ -45,7 +45,7 @@ public abstract class DbVersion {
                 if (! rs.isLast()) {
                     throw new RuntimeException("Invalid version table");
                 }
-                int overrideDbVersion = Nxt.getIntProperty("nxt.debugOverrideDbVersion");
+                int overrideDbVersion = Nxt.getIntProperty("fimk.debugOverrideDbVersion");
                 if (overrideDbVersion != 0) {
                     Logger.logMessage("Overriding db version "+nextUpdate+" with "+overrideDbVersion);
                     nextUpdate = overrideDbVersion;

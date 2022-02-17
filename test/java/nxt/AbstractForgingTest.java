@@ -28,8 +28,8 @@ public abstract class AbstractForgingTest extends AbstractBlockchainTest {
 
     protected static Properties newTestProperties() {
         Properties properties = AbstractBlockchainTest.newTestProperties();
-        properties.setProperty("nxt.isTestnet", "true");
-        properties.setProperty("nxt.isOffline", "true");
+        properties.setProperty("fimk.isTestnet", "true");
+        properties.setProperty("fimk.isOffline", "true");
         return properties;
     }
 

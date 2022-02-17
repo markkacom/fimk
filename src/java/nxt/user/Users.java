@@ -83,21 +83,21 @@ public final class Users {
 
     static {
 
-        List<String> allowedUserHostsList = Nxt.getStringListProperty("nxt.allowedUserHosts");
+        List<String> allowedUserHostsList = Nxt.getStringListProperty("fimk.allowedUserHosts");
         if (! allowedUserHostsList.contains("*")) {
             allowedUserHosts = Collections.unmodifiableSet(new HashSet<>(allowedUserHostsList));
         } else {
             allowedUserHosts = null;
         }
 
-        boolean enableUIServer = Nxt.getBooleanProperty("nxt.enableUIServer");
+        boolean enableUIServer = Nxt.getBooleanProperty("fimk.enableUIServer");
         if (enableUIServer) {
-            final int port = Constants.isTestnet ? TESTNET_UI_PORT : Nxt.getIntProperty("nxt.uiServerPort");
-            final String host = Nxt.getStringProperty("nxt.uiServerHost");
+            final int port = Constants.isTestnet ? TESTNET_UI_PORT : Nxt.getIntProperty("fimk.uiServerPort");
+            final String host = Nxt.getStringProperty("fimk.uiServerHost");
             userServer = new Server();
             ServerConnector connector;
 
-            boolean enableSSL = Nxt.getBooleanProperty("nxt.uiSSL");
+            boolean enableSSL = Nxt.getBooleanProperty("fimk.uiSSL");
             if (enableSSL) {
                 Logger.logMessage("Using SSL (https) for the user interface server");
                 HttpConfiguration https_config = new HttpConfiguration();
@@ -105,8 +105,8 @@ public final class Users {
                 https_config.setSecurePort(port);
                 https_config.addCustomizer(new SecureRequestCustomizer());
                 SslContextFactory sslContextFactory = new SslContextFactory();
-                sslContextFactory.setKeyStorePath(Nxt.getStringProperty("nxt.keyStorePath"));
-                sslContextFactory.setKeyStorePassword(Nxt.getStringProperty("nxt.keyStorePassword", null, true));
+                sslContextFactory.setKeyStorePath(Nxt.getStringProperty("fimk.keyStorePath"));
+                sslContextFactory.setKeyStorePassword(Nxt.getStringProperty("fimk.keyStorePassword", null, true));
                 sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA", "SSL_DHE_RSA_WITH_DES_CBC_SHA",
                         "SSL_DHE_DSS_WITH_DES_CBC_SHA", "SSL_RSA_EXPORT_WITH_RC4_40_MD5", "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
                         "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA", "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
@@ -119,7 +119,7 @@ public final class Users {
 
             connector.setPort(port);
             connector.setHost(host);
-            connector.setIdleTimeout(Nxt.getIntProperty("nxt.uiServerIdleTimeout"));
+            connector.setIdleTimeout(Nxt.getIntProperty("fimk.uiServerIdleTimeout"));
             connector.setReuseAddress(true);
             userServer.addConnector(connector);
 
@@ -129,11 +129,11 @@ public final class Users {
             ResourceHandler userFileHandler = new ResourceHandler();
             userFileHandler.setDirectoriesListed(false);
             userFileHandler.setWelcomeFiles(new String[]{"index.html"});
-            userFileHandler.setResourceBase(Nxt.getStringProperty("nxt.uiResourceBase"));
+            userFileHandler.setResourceBase(Nxt.getStringProperty("fimk.uiResourceBase"));
 
             userHandlers.addHandler(userFileHandler);
 
-            String javadocResourceBase = Nxt.getStringProperty("nxt.javadocResourceBase");
+            String javadocResourceBase = Nxt.getStringProperty("fimk.javadocResourceBase");
             if (javadocResourceBase != null) {
                 ContextHandler contextHandler = new ContextHandler("/doc");
                 ResourceHandler docFileHandler = new ResourceHandler();
@@ -148,7 +148,7 @@ public final class Users {
             ServletHolder userHolder = userHandler.addServletWithMapping(UserServlet.class, "/nxt");
             userHolder.setAsyncSupported(true);
 
-            if (Nxt.getBooleanProperty("nxt.uiServerCORS")) {
+            if (Nxt.getBooleanProperty("fimk.uiServerCORS")) {
                 FilterHolder filterHolder = userHandler.addFilterWithMapping(CrossOriginFilter.class, "/*", FilterMapping.DEFAULT);
                 filterHolder.setInitParameter("allowedHeaders", "*");
                 filterHolder.setAsyncSupported(true);

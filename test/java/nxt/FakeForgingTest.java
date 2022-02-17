@@ -28,11 +28,11 @@ public class FakeForgingTest extends AbstractForgingTest {
     @Before
     public void init() {
         Properties properties = AbstractForgingTest.newTestProperties();
-        properties.setProperty("nxt.disableGenerateBlocksThread", "false");
-        properties.setProperty("nxt.enableFakeForging", "true");
-        properties.setProperty("nxt.timeMultiplier", "1");
+        properties.setProperty("fimk.disableGenerateBlocksThread", "false");
+        properties.setProperty("fimk.enableFakeForging", "true");
+        properties.setProperty("fimk.timeMultiplier", "1");
         AbstractForgingTest.init(properties);
-        Assert.assertTrue("nxt.fakeForgingAccount must be defined in nxt.properties", Nxt.getStringProperty("nxt.fakeForgingAccount") != null);
+        Assert.assertTrue("fimk.fakeForgingAccount must be defined in fimk.properties", Nxt.getStringProperty("fimk.fakeForgingAccount") != null);
     }
 
     @Test

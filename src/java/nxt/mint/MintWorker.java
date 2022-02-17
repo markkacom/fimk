@@ -104,16 +104,16 @@ public class MintWorker {
     }
 
     private void mint() {
-        String currencyCode = Convert.emptyToNull(Nxt.getStringProperty("nxt.mint.currencyCode"));
+        String currencyCode = Convert.emptyToNull(Nxt.getStringProperty("fimk.mint.currencyCode"));
         if (currencyCode == null) {
-            throw new IllegalArgumentException("nxt.mint.currencyCode not specified");
+            throw new IllegalArgumentException("fimk.mint.currencyCode not specified");
         }
-        String secretPhrase = Convert.emptyToNull(Nxt.getStringProperty("nxt.mint.secretPhrase", null, true));
+        String secretPhrase = Convert.emptyToNull(Nxt.getStringProperty("fimk.mint.secretPhrase", null, true));
         if (secretPhrase == null) {
-            throw new IllegalArgumentException("nxt.mint.secretPhrase not specified");
+            throw new IllegalArgumentException("fimk.mint.secretPhrase not specified");
         }
-        boolean isSubmitted = Nxt.getBooleanProperty("nxt.mint.isSubmitted");
-        boolean isStopOnError = Nxt.getBooleanProperty("nxt.mint.stopOnError");
+        boolean isSubmitted = Nxt.getBooleanProperty("fimk.mint.isSubmitted");
+        boolean isStopOnError = Nxt.getBooleanProperty("fimk.mint.stopOnError");
         byte[] publicKeyHash = Crypto.sha256().digest(Crypto.getPublicKey(secretPhrase));
         long accountId = Convert.fullHashToId(publicKeyHash);
         String rsAccount = Convert.rsAccount(accountId);
@@ -127,7 +127,7 @@ public class MintWorker {
         }
         byte algorithm = (byte)(long) currency.get("algorithm");
         byte decimal = (byte)(long) currency.get("decimals");
-        String unitsStr = Nxt.getStringProperty("nxt.mint.unitsPerMint");
+        String unitsStr = Nxt.getStringProperty("fimk.mint.unitsPerMint");
         double wholeUnits = 1;
         if (unitsStr != null && unitsStr.length() > 0) {
             wholeUnits = Double.parseDouble(unitsStr);
@@ -137,11 +137,11 @@ public class MintWorker {
         long counter = (long) mintingTarget.get("counter");
         byte[] target = Convert.parseHexString((String) mintingTarget.get("targetBytes"));
         BigInteger difficulty = new BigInteger((String)mintingTarget.get("difficulty"));
-        long initialNonce = Nxt.getIntProperty("nxt.mint.initialNonce");
+        long initialNonce = Nxt.getIntProperty("fimk.mint.initialNonce");
         if (initialNonce == 0) {
             initialNonce = new Random().nextLong();
         }
-        int threadPoolSize = Nxt.getIntProperty("nxt.mint.threadPoolSize");
+        int threadPoolSize = Nxt.getIntProperty("fimk.mint.threadPoolSize");
         if (threadPoolSize == 0) {
             threadPoolSize = Runtime.getRuntime().availableProcessors();
             Logger.logDebugMessage("Thread pool size " + threadPoolSize);
@@ -191,7 +191,7 @@ public class MintWorker {
             response = currencyMint(secretPhrase, currencyId, solution, units, counter);
         } else {
             response = new JSONObject();
-            response.put("message", "nxt.mint.isSubmitted=false therefore currency mint transaction is not submitted");
+            response.put("message", "fimk.mint.isSubmitted=false therefore currency mint transaction is not submitted");
         }
         return response;
     }
@@ -258,7 +258,7 @@ public class MintWorker {
     private JSONObject getJsonResponse(Map<String, String> params) {
         JSONObject response;
         HttpURLConnection connection = null;
-        String host = Convert.emptyToNull(Nxt.getStringProperty("nxt.mint.serverAddress"));
+        String host = Convert.emptyToNull(Nxt.getStringProperty("fimk.mint.serverAddress"));
         if (host == null) {
             try {
                 host = InetAddress.getLocalHost().getHostAddress();
@@ -267,13 +267,13 @@ public class MintWorker {
             }
         }
         String protocol = "http";
-        boolean useHttps = Nxt.getBooleanProperty("nxt.mint.useHttps");
+        boolean useHttps = Nxt.getBooleanProperty("fimk.mint.useHttps");
         if (useHttps) {
             protocol = "https";
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
             HttpsURLConnection.setDefaultHostnameVerifier(hostNameVerifier);
         }
-        int port = Constants.isTestnet ? API.TESTNET_API_PORT : Nxt.getIntProperty("nxt.apiServerPort");
+        int port = Constants.isTestnet ? API.TESTNET_API_PORT : Nxt.getIntProperty("fimk.apiServerPort");
         String urlParams = getUrlParams(params);
         URL url;
         try {

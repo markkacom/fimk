@@ -71,7 +71,7 @@ import java.util.zip.GZIPOutputStream;
 public class PeerWebSocket {
 
     /** Message compression enabled */
-    private static final boolean isGzipEnabled = Nxt.getBooleanProperty("nxt.enablePeerServerGZIPFilter");
+    private static final boolean isGzipEnabled = Nxt.getBooleanProperty("fimk.enablePeerServerGZIPFilter");
 
     /** Maximum message size */
     static final int MAX_MESSAGE_SIZE = 192*1024*1024;

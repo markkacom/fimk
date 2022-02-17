@@ -57,9 +57,9 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     private final BlockchainImpl blockchain = BlockchainImpl.getInstance();
 
     private final List<DerivedDbTable> derivedTables = new CopyOnWriteArrayList<>();
-    private final boolean trimDerivedTables = Nxt.getBooleanProperty("nxt.trimDerivedTables");
+    private final boolean trimDerivedTables = Nxt.getBooleanProperty("fimk.trimDerivedTables");
     private final int defaultNumberOfForkConfirmations = Nxt.getIntProperty(Constants.isTestnet
-            ? "nxt.testnetNumberOfForkConfirmations" : "nxt.numberOfForkConfirmations");
+            ? "fimk.testnetNumberOfForkConfirmations" : "fimk.numberOfForkConfirmations");
 
     private volatile int lastTrimHeight;
 
@@ -703,7 +703,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     };
 
     private BlockchainProcessorImpl() {
-        final int trimFrequency = Nxt.getIntProperty("nxt.trimFrequency");
+        final int trimFrequency = Nxt.getIntProperty("fimk.trimFrequency");
         blockListeners.addListener(block -> {
             if (block.getHeight() % 5000 == 0) {
                 Logger.logMessage("processed block " + block.getHeight());
@@ -740,8 +740,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             alreadyInitialized = true;
             if (addGenesisBlock()) {
                 scan(0, false);
-            } else if (Nxt.getBooleanProperty("nxt.forceScan")) {
-                scan(0, Nxt.getBooleanProperty("nxt.forceValidate"));
+            } else if (Nxt.getBooleanProperty("fimk.forceScan")) {
+                scan(0, Nxt.getBooleanProperty("fimk.forceValidate"));
             } else {
                 boolean rescan;
                 boolean validate;

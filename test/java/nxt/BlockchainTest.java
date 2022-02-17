@@ -62,14 +62,14 @@ public abstract class BlockchainTest extends AbstractBlockchainTest {
     public static void initNxt() {
         if (!isNxtInitted) {
             Properties properties = ManualForgingTest.newTestProperties();
-            properties.setProperty("nxt.isTestnet", "true");
-            properties.setProperty("nxt.isOffline", "true");
-            properties.setProperty("nxt.enableFakeForging", "true");
-            properties.setProperty("nxt.fakeForgingAccount", forgerAccountId);
-            properties.setProperty("nxt.timeMultiplier", "1");
-            properties.setProperty("nxt.testnetGuaranteedBalanceConfirmations", "1");
-            properties.setProperty("nxt.testnetLeasingDelay", "1");
-            properties.setProperty("nxt.disableProcessTransactionsThread", "true");
+            properties.setProperty("fimk.isTestnet", "true");
+            properties.setProperty("fimk.isOffline", "true");
+            properties.setProperty("fimk.enableFakeForging", "true");
+            properties.setProperty("fimk.fakeForgingAccount", forgerAccountId);
+            properties.setProperty("fimk.timeMultiplier", "1");
+            properties.setProperty("fimk.testnetGuaranteedBalanceConfirmations", "1");
+            properties.setProperty("fimk.testnetLeasingDelay", "1");
+            properties.setProperty("fimk.disableProcessTransactionsThread", "true");
             AbstractForgingTest.init(properties);
             isNxtInitted = true;
         }

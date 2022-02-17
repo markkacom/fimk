@@ -44,8 +44,8 @@ public final class Generator implements Comparable<Generator> {
     private static final byte[] fakeForgingPublicKey;
     static {
         byte[] publicKey = null;
-        if (Nxt.getBooleanProperty("nxt.enableFakeForging")) {
-            Account fakeForgingAccount = Account.getAccount(Convert.parseAccountId(Nxt.getStringProperty("nxt.fakeForgingAccount")));
+        if (Nxt.getBooleanProperty("fimk.enableFakeForging")) {
+            Account fakeForgingAccount = Account.getAccount(Convert.parseAccountId(Nxt.getStringProperty("fimk.fakeForgingAccount")));
             if (fakeForgingAccount != null) {
                 publicKey = fakeForgingAccount.getPublicKey();
             }
@@ -135,7 +135,7 @@ public final class Generator implements Comparable<Generator> {
     public static Generator startForging(String secretPhrase) {
         Generator generator = new Generator(secretPhrase);
 
-        /* XXX - Prevent or allow forging based on nxt.allowedToForge */
+        /* XXX - Prevent or allow forging based on fimk.allowedToForge */
         if (Constants.allowedToForge instanceof List) {
             boolean found = false;
             for (Long allowed : Constants.allowedToForge) {
@@ -146,7 +146,7 @@ public final class Generator implements Comparable<Generator> {
             }
             if (found == false) {
                 Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) +
-                    " is not allowed to forge. See nxt.allowedToForge property.");
+                    " is not allowed to forge. See fimk.allowedToForge property.");
                 return null;
             }
         }
