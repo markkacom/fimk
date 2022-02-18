@@ -21,7 +21,7 @@ copy LICENSE.txt dist /y
 copy README.txt dist /y
 copy run.bat dist /y
 copy run.sh dist /y
-copy conf\nxt-default.properties dist\conf /y
+copy conf\fimk-default.properties dist\conf /y
 copy conf\embedded-template.properties dist\conf /y
 copy conf\logging-default.properties dist\conf /y
 
