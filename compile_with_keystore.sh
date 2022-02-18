@@ -19,12 +19,12 @@ echo "fim.jar generated successfully"
 mkdir dist
 cp html/ lib/ fim.jar keystore LICENSE.txt README.txt run.bat run.sh dist -R
 mkdir dist/conf
-cp conf/nxt-default.properties conf/logging-default.properties dist/conf -R
+cp conf/fimk-default.properties conf/logging-default.properties dist/conf -R
 mkdir dist/logs
 # create not empty logs dir to force electron builder to copy the dir
 touch dist/logs/fim.log
 /bin/rm -f fim.zip
-zip -qr -9 fim.zip conf/nxt-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar keystore LICENSE.txt README.txt run.bat run.sh
+zip -qr -9 fim.zip conf/fimk-default.properties conf/logging-default.properties html/ lib/ logs/ fim.jar keystore LICENSE.txt README.txt run.bat run.sh
 
 echo "fim.zip generated successfully"
 

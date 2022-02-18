@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright © 2014-2016 FIMK Developers                                      *
+ * Copyright ï¿½ 2014-2016 FIMK Developers                                      *
  ******************************************************************************/
 
 Welcome to FIMK.
@@ -43,15 +43,15 @@ Customization:
 There are many configuration parameters that could be changed, but the defaults
 are set so that normally you can run the program immediately after unpacking,
 without any additional configuration. To see what options are there, open the
-conf/nxt-default.properties file. All possible settings are listed, with
+conf/fimk-default.properties file. All possible settings are listed, with
 detailed explanation. If you decide to change any setting, do not edit
-nxt-default.properties directly, but create a new conf/nxt.properties file
+fimk-default.properties directly, but create a new conf/fimk.properties file
 and only add to it the properties that need to be different from the default
-values. You do not need to delete the defaults from nxt-default.properties, the
-settings in nxt.properties override those in nxt-default.properties. This way,
-when upgrading the software, you can safely overwrite nxt-default.properties
+values. You do not need to delete the defaults from fimk-default.properties, the
+settings in fimk.properties override those in fimk-default.properties. This way,
+when upgrading the software, you can safely overwrite fimk-default.properties
 with the updated file from the new package, while your customizations remain
-safe in the nxt.properties file.
+safe in the fimk.properties file.
 
 Technical details:
 
