@@ -39,7 +39,6 @@ public final class GetBlockchainStatus extends APIServlet.APIRequestHandler {
         response.put("application", Nxt.APPLICATION);
         response.put("version", Nxt.VERSION);
         response.put("time", Nxt.getEpochTime());
-        response.put("nxtversion", Nxt.NXT_VERSION);
         Block lastBlock = Nxt.getBlockchain().getLastBlock();
         response.put("lastBlock", lastBlock.getStringId());
         response.put("cumulativeDifficulty", lastBlock.getCumulativeDifficulty().toString());
