@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import static nxt.http.JSONResponses.INCORRECT_ADMIN_PASSWORD;
 import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
@@ -172,13 +173,18 @@ public final class API {
                 apiHandlers.addHandler(contextHandler);
             }
 
-            ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, "/nxt");
-            servletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(null, Constants.MAX_TAGGED_DATA_DATA_LENGTH, -1L, 0));
-            if (Nxt.getBooleanProperty("fimk.enableAPIServerGZIPFilter")) {
-                FilterHolder gzipFilterHolder = apiHandler.addFilter(GzipFilter.class, "/nxt", null);
-                gzipFilterHolder.setInitParameter("methods", "GET,POST");
-                gzipFilterHolder.setAsyncSupported(true);
-            }
+            Function<String, Void> registerServlet = pathSpec -> {
+                ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, pathSpec);
+                servletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(null, Constants.MAX_TAGGED_DATA_DATA_LENGTH, -1L, 0));
+                if (Nxt.getBooleanProperty("fimk.enableAPIServerGZIPFilter")) {
+                    FilterHolder gzipFilterHolder = apiHandler.addFilter(GzipFilter.class, pathSpec, null);
+                    gzipFilterHolder.setInitParameter("methods", "GET,POST");
+                    gzipFilterHolder.setAsyncSupported(true);
+                }
+                return null;
+            };
+            registerServlet.apply("/nxt");  //backward compatibility
+            registerServlet.apply("/fimk");
 
             apiHandler.addServlet(APITestServlet.class, "/test");
 
