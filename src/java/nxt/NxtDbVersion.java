@@ -1076,6 +1076,10 @@ class NxtDbVersion extends DbVersion {
                 apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS expiry INT;" +
                         "ALTER TABLE goods ADD COLUMN IF NOT EXISTS expiry INT");
             case 434:
+                /* FIMKrypto */
+                apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS block_timestamp INT;");
+                BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
+            case 435:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");

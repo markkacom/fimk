@@ -16,46 +16,15 @@
 
 package nxt.http;
 
-import nxt.Account;
+import nxt.*;
 import nxt.Account.AccountIdentifier;
 import nxt.Account.AccountInfo;
-import nxt.AccountColor;
-import nxt.Alias;
-import nxt.Asset;
 import nxt.Attachment.MonetarySystemAttachment;
-import nxt.NamespacedAlias;
-import nxt.Appendix;
-import nxt.AssetTransfer;
-import nxt.Attachment;
-import nxt.Block;
-import nxt.Constants;
-import nxt.Currency;
-import nxt.CurrencyExchangeOffer;
-import nxt.CurrencyFounder;
-import nxt.CurrencyTransfer;
-import nxt.CurrencyType;
-import nxt.DigitalGoodsStore;
-import nxt.Exchange;
-import nxt.Generator;
-import nxt.Nxt;
-import nxt.Order;
-import nxt.PhasingPoll;
-import nxt.PhasingVote;
-import nxt.Poll;
-import nxt.PrunableMessage;
-import nxt.RewardsImpl;
-import nxt.TaggedData;
-import nxt.Token;
-import nxt.Trade;
-import nxt.Transaction;
-import nxt.Vote;
-import nxt.VoteWeighting;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -148,6 +117,8 @@ public final class JSONData {
         }
         json.put("type", asset.getType());
         json.put("expiry", asset.getExpiry());
+        json.put("height", asset.getHeight());
+        json.put("blockTimestamp", asset.getBlockTimestamp());
         return json;
     }
 
