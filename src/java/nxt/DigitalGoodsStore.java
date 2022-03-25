@@ -250,7 +250,7 @@ public final class DigitalGoodsStore {
         }
 
         public static int getCountInStock() {
-            return goodsTable.getCount(inStockClause.and(twoYearsLimitClause()));
+            return goodsTable.getCount(inStockClause.and(goodsTermLimitClause()));
         }
 
         public static Goods getGoods(long goodsId) {
@@ -258,42 +258,42 @@ public final class DigitalGoodsStore {
         }
 
         public static DbIterator<Goods> getAllGoods(int from, int to) {
-            return goodsTable.getManyBy(twoYearsLimitClause(), from, to);
+            return goodsTable.getManyBy(goodsTermLimitClause(), from, to);
             //return goodsTable.getAll(from, to);
         }
 
         public static DbIterator<Goods> getGoodsInStock(int from, int to) {
-            return goodsTable.getManyBy(inStockClause.and(twoYearsLimitClause()), from, to);
+            return goodsTable.getManyBy(inStockClause.and(goodsTermLimitClause()), from, to);
         }
 
         /**
          * Restricts Marketplace items max 2 years age
          */
-        private static DbClause twoYearsLimitClause() {
-            Date now = new Date();
+        private static DbClause goodsTermLimitClause() {
             Calendar cal = Calendar.getInstance();
-            cal.setTime(now);
-            cal.add(Calendar.YEAR, -2);
-            int twoYearsAgoEpochTime = Convert.toEpochTime(cal.getTimeInMillis());
-            int nowEpochTime = Nxt.getEpochTime();
-            return new DbClause.FixedClause(String.format(" (goods.expiry IS NULL OR goods.expiry > %d) AND goods.timestamp > %d ", nowEpochTime, twoYearsAgoEpochTime));
+            Date nowDate = new Date();
+            cal.setTime(nowDate);
+            cal.add(Calendar.MONTH, -6);
+            int maxGoodsTerm = Convert.toEpochTime(cal.getTimeInMillis());
+            int now = Nxt.getEpochTime();
+            return new DbClause.FixedClause(String.format(" (goods.expiry IS NULL OR goods.expiry > %d) AND goods.timestamp > %d ", now, maxGoodsTerm));
         }
 
         public static DbIterator<Goods> getSellerGoods(final long sellerId, final boolean inStockOnly, int from, int to) {
             return goodsTable.getManyBy(
-                    new SellerDbClause(sellerId, inStockOnly).and(twoYearsLimitClause()),
+                    new SellerDbClause(sellerId, inStockOnly).and(goodsTermLimitClause()),
                     from, to, " ORDER BY name ASC, timestamp DESC, id ASC "
             );
         }
 
         public static int getSellerGoodsCount(long sellerId, boolean inStockOnly) {
-            return goodsTable.getCount(new SellerDbClause(sellerId, inStockOnly).and(twoYearsLimitClause()));
+            return goodsTable.getCount(new SellerDbClause(sellerId, inStockOnly).and(goodsTermLimitClause()));
         }
 
         public static DbIterator<Goods> searchGoods(String query, boolean inStockOnly, int from, int to) {
             return goodsTable.search(
                     query,
-                    inStockOnly ? inStockClause.and(twoYearsLimitClause()) : DbClause.EMPTY_CLAUSE,
+                    inStockOnly ? inStockClause.and(goodsTermLimitClause()) : DbClause.EMPTY_CLAUSE,
                     from, to,
                     " ORDER BY ft.score DESC, goods.timestamp DESC "
             );
@@ -302,7 +302,7 @@ public final class DigitalGoodsStore {
         public static DbIterator<Goods> searchSellerGoods(String query, long sellerId, boolean inStockOnly, int from, int to) {
             return goodsTable.search(
                     query,
-                    new SellerDbClause(sellerId, inStockOnly).and(twoYearsLimitClause()),
+                    new SellerDbClause(sellerId, inStockOnly).and(goodsTermLimitClause()),
                     from, to,
                     " ORDER BY ft.score DESC, goods.name ASC, goods.timestamp DESC "
             );
