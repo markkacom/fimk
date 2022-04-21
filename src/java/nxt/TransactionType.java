@@ -239,7 +239,7 @@ public abstract class TransactionType {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e);
+            Logger.logErrorMessage("Transaction extension applying error", e);
         }
     }
 

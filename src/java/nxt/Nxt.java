@@ -404,6 +404,9 @@ public final class Nxt {
                 GossipProcessorImpl.getInstance();
                 AccountColor.init();
                 AppVersionManager.getInstance();
+
+                TransactionTypeExtension.init();
+
                 int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("fimk.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
@@ -431,12 +434,11 @@ public final class Nxt {
             }
         }
 
+        //note it is invoked after scan()
         private static void init() {
             if (initialized) {
                 throw new RuntimeException("Nxt.init has already been called");
             }
-
-            TransactionTypeExtension.init();
 
             initialized = true;
         }

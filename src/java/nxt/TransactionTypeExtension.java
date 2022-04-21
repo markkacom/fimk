@@ -8,7 +8,7 @@ import java.util.Map;
 
 public abstract class TransactionTypeExtension {
 
-    static Map<TransactionType, TransactionTypeExtension> transactionTypeExtensionMap = new HashMap<>(2);
+    static Map<Integer, TransactionTypeExtension> transactionTypeExtensionMap = new HashMap<>(2);
     static Map<String, TransactionTypeExtension> markExtensionMap = new HashMap<>(2);
 
     public static void init() {
@@ -24,7 +24,7 @@ public abstract class TransactionTypeExtension {
             throw new RuntimeException(String.format("Duplicate extension's mark %s", extension.getMark()));
         }
         markExtensionMap.put(extension.getMark(), extension);
-        transactionTypeExtensionMap.put(transactionType, extension);
+        transactionTypeExtensionMap.put(twoBytesToInt(transactionType.getType(), transactionType.getSubtype()), extension);
     }
 
     /**
@@ -35,9 +35,12 @@ public abstract class TransactionTypeExtension {
     protected abstract String getName();
 
     public static TransactionTypeExtension get(TransactionType transactionType) {
-        return transactionTypeExtensionMap.get(transactionType);
+        return transactionTypeExtensionMap.get(twoBytesToInt(transactionType.getType(), transactionType.getSubtype()));
     }
 
+    private static int twoBytesToInt(byte b1, byte b2) {
+        return ((b1 << 8) | (b2 & 0xFF));
+    }
 
     abstract String apply(TransactionImpl transaction, Account sender, Account recipient);
 
@@ -79,10 +82,11 @@ class ExpiryExtension extends TransactionTypeExtension {
         int expiryTimestamp;
         try {
             assetId = ss[0].trim().isEmpty() ? 0 : Long.parseUnsignedLong(ss[0]);
+            expiryTimestamp = Integer.parseInt(ss[1]);
             if (ss.length > 2) {
                 goodsId = ss[2].trim().isEmpty() ? 0 : Long.parseUnsignedLong(ss[2]);
+                expiryTimestamp = Integer.parseInt(ss[3]);
             }
-            expiryTimestamp = Integer.parseInt(ss[1]);
         } catch (NumberFormatException e) {
             String resultMessage = "Transaction payload is wrong";
             Logger.logErrorMessage(resultMessage, e);
