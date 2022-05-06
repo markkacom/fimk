@@ -19,7 +19,6 @@ package nxt;
 import nxt.Attachment.ColoredCoinsAssetIssuance;
 import nxt.util.Convert;
 import nxt.util.Logger;
-
 import org.json.simple.JSONObject;
 
 import java.nio.ByteBuffer;
@@ -233,7 +232,7 @@ public abstract class TransactionType {
         try {
             TransactionTypeExtension ext = TransactionTypeExtension.get(transaction.getType());
             if (ext != null) {
-                String result = ext.apply(transaction, senderAccount, recipientAccount);
+                String result = ext.process(false, transaction, senderAccount, recipientAccount);
                 if (result != null) {
                     Logger.logWarningMessage(String.format("Transaction extension \"%s\" is not applied. %s", ext.getName(), result));
                 }

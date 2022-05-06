@@ -32,7 +32,7 @@ public abstract class TransactionTypeExtension {
      */
     protected abstract String getMark();
 
-    protected abstract String getName();
+    public abstract String getName();
 
     public static TransactionTypeExtension get(TransactionType transactionType) {
         return transactionTypeExtensionMap.get(twoBytesToInt(transactionType.getType(), transactionType.getSubtype()));
@@ -42,7 +42,11 @@ public abstract class TransactionTypeExtension {
         return ((b1 << 8) | (b2 & 0xFF));
     }
 
-    abstract String apply(TransactionImpl transaction, Account sender, Account recipient);
+    /**
+     * Validate and apply transaction extension.
+     * @return error message or null if no error
+     */
+    public abstract String process(boolean validateOnly, Transaction transaction, Account sender, Account recipient);
 
 }
 
@@ -57,13 +61,16 @@ class ExpiryExtension extends TransactionTypeExtension {
     }
 
     @Override
-    protected String getName() {
+    public String getName() {
         return "Expiry for Assets and Marketplaces";
     }
 
-    String apply(TransactionImpl transaction, Account sender, Account recipient) {
+    public String process(boolean validateOnly, Transaction transaction, Account sender, Account recipient) {
         MofoAttachment.NamespacedAliasAssignmentAttachment a;
-        Attachment.AbstractAttachment att = transaction.getAttachment();
+        Attachment.AbstractAttachment att = ((TransactionImpl) transaction).getAttachment();
+
+        //validate
+
         if (att instanceof MofoAttachment.NamespacedAliasAssignmentAttachment) {
             a = (MofoAttachment.NamespacedAliasAssignmentAttachment) att;
         } else {
@@ -98,7 +105,7 @@ class ExpiryExtension extends TransactionTypeExtension {
         if (assetId != 0) {
             asset = Asset.getAsset(assetId);
             if (asset == null) return "Asset is not found";
-            if (asset.getAccountId() != sender.getId()) return "Sender is not issuer of the asset";
+            if (asset.getAccountId() != sender.getId()) return "Sender is not the issuer of the asset";
         }
         if (goodsId != 0) {
             goods = DigitalGoodsStore.Goods.getGoods(goodsId);
@@ -106,6 +113,11 @@ class ExpiryExtension extends TransactionTypeExtension {
             if (goods.getSellerId() != sender.getId()) return "Sender is not seller of the goods";
         }
         if (expiryTimestamp < transaction.getTimestamp()) return "Timestamp should be greater than transaction time (should be in future)";
+
+        if (validateOnly) return null;
+
+        //apply
+
         try {
             if (asset != null) {
                 asset.updateExpiry(expiryTimestamp);
