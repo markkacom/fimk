@@ -366,6 +366,11 @@ public final class JSONData {
         if (peer.isBlacklisted()) {
             json.put("blacklistingCause", peer.getBlacklistingCause());
         }
+        long[] v = peer.getLastBlockIdHeight();
+        if (v != null) {
+            json.put("lastBlockId", v[0]);
+            json.put("lastBlockHeight", v[1]);
+        }
         return json;
     }
 

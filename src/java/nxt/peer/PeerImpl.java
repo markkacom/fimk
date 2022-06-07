@@ -79,6 +79,7 @@ final class PeerImpl implements Peer {
     private volatile long downloadedVolume;
     private volatile long uploadedVolume;
     private volatile int lastUpdated;
+    private volatile long[] lastBlock; // [blockId, height]
     private volatile int lastConnectAttempt;
     private volatile int lastInboundRequest;
     private volatile long hallmarkBalance = -1;
@@ -356,6 +357,17 @@ final class PeerImpl implements Peer {
     @Override
     public int getLastUpdated() {
         return lastUpdated;
+    }
+
+    @Override
+    public void setLastBlockIdHeight(long blockId, int height) {
+        if (this.lastBlock == null) this.lastBlock = new long[2];
+        this.lastBlock[0] = blockId;
+        this.lastBlock[1] = height;
+    }
+
+    public long[] getLastBlockIdHeight() {
+        return lastBlock;
     }
 
     void setLastUpdated(int lastUpdated) {

@@ -983,6 +983,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
                 Db.db.commitTransaction();
 
+                if (peer != null) peer.setLastBlockIdHeight(block.getId(), block.getHeight());
+
                 //report about pushed block
                 if ((Nxt.getEpochTime() - block.getTimestamp()) < 3*24*60*60) {
                     LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Convert.fromEpochTime(block.getTimestamp())), ZoneId.systemDefault());

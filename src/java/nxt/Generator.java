@@ -90,15 +90,7 @@ public final class Generator implements Comparable<Generator> {
                             logged = false;
                         }
                         int generationLimit = Nxt.getEpochTime() - delayTime;
-                        if (!logged) {
-                            for (Generator generator : sortedForgers) {
-                                if (generator.getHitTime() - generationLimit > 60) {
-                                    break;
-                                }
-                                Logger.logDebugMessage(generator.toString());
-                                logged = true;
-                            }
-                        }
+                        log(generationLimit);
                         for (Generator generator : sortedForgers) {
                             if (generator.getHitTime() > generationLimit || generator.forge(lastBlock, generationLimit)) {
                                 return;
@@ -114,6 +106,18 @@ public final class Generator implements Comparable<Generator> {
                 System.exit(1);
             }
 
+        }
+
+        private void log(int generationLimit) {
+            if (!logged) {
+                for (Generator generator : sortedForgers) {
+                    if (generator.getHitTime() - generationLimit > 60) {
+                        break;
+                    }
+                    Logger.logDebugMessage(generator.toString());
+                    logged = true;
+                }
+            }
         }
 
     };
@@ -271,8 +275,9 @@ public final class Generator implements Comparable<Generator> {
     }
 
     static long getHitTime(BigInteger effectiveBalance, BigInteger hit, Block block) {
-        return block.getTimestamp()
-                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
+        // blockTimestamp + hit / (block.baseTarget * effectiveBalance)
+        return (long) (block.getTimestamp()
+                        + 0.0001*hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue());
     }
 
 
