@@ -71,9 +71,9 @@ public final class MofoQueries {
         }
 
         public long getTotalRewardsNQT() {
-            if ("FIMK".equals(Nxt.APPLICATION)) {
+            /*if ("FIMK".equals(Nxt.APPLICATION)) {
               this.sumNQT += (this.count * (200 * Constants.ONE_NXT));
-            }
+            }*/
             return this.sumNQT;
         }
 
