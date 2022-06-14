@@ -2101,8 +2101,11 @@ public abstract class TransactionType {
                     throw new NxtException.NotCurrentlyValidException("Goods " + Long.toUnsignedString(attachment.getGoodsId()) +
                             "not yet listed or already delisted");
                 }
-                if (attachment.getQuantity() > goods.getQuantity() || attachment.getPriceNQT() != goods.getPriceNQT()) {
-                    throw new NxtException.NotCurrentlyValidException("Goods price or quantity changed: " + attachment.getJSONObject());
+                if (attachment.getQuantity() > goods.getQuantity()) {
+                    throw new NxtException.NotCurrentlyValidException("Goods quantity exceeds the available balance: " + attachment.getJSONObject());
+                }
+                if (attachment.getPriceNQT() != goods.getPriceNQT()) {
+                    throw new NxtException.NotCurrentlyValidException("Goods price is wrong: " + attachment.getJSONObject());
                 }
                 if (attachment.getDeliveryDeadlineTimestamp() <= Nxt.getBlockchain().getLastBlockTimestamp()) {
                     throw new NxtException.NotCurrentlyValidException("Delivery deadline has already expired: " + attachment.getDeliveryDeadlineTimestamp());
