@@ -32,7 +32,7 @@ public class GeneratorTest extends BlockchainTest {
     public void forge() {
         byte[] publicKey = ALICE.getPublicKey();
         BlockImpl lastBlock = blockchain.getLastBlock();
-        BigInteger[] hits = Generator.getHit(publicKey, lastBlock);
+        BigInteger[] hits = Generator.calculateHits(publicKey, lastBlock);
         Account account = Account.getAccount(publicKey);
         BigInteger effectiveBalance = BigInteger.valueOf(account == null || account.getEffectiveBalanceNXT() <= 0 ? 0 : account.getEffectiveBalanceNXT());
         long hitTime = Generator.calculateHitTime(effectiveBalance, hits, lastBlock)[0];

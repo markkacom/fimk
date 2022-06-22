@@ -85,7 +85,7 @@ public class Hub {
                         Account account = Account.getAccount(hub.getAccountId());
                         if (account != null && account.getEffectiveBalanceNXT(block.getHeight()) >= Constants.MIN_HUB_EFFECTIVE_BALANCE
                                 && account.getKeyHeight() > 0) {
-                            currentHits.add(new Hit(hub, Generator.calculateHitTime(account, block)));
+                            currentHits.add(new Hit(hub, Generator.calculateHitTime(account, block)[0]));
                         }
                     }
                 }

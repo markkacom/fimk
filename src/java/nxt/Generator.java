@@ -236,7 +236,7 @@ public final class Generator implements Comparable<Generator> {
         }
     }
 
-    static boolean verifyHit(BigInteger[] hits, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
+    static boolean verifyHit(BigInteger[] hits, int selectedHitIndex, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
         int elapsedTime = timestamp - previousBlock.getTimestamp();
         if (elapsedTime <= 0) {
             return false;
@@ -244,13 +244,11 @@ public final class Generator implements Comparable<Generator> {
         BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
         BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
         BigInteger target = prevTarget.add(effectiveBaseTarget);
-        for (BigInteger hit : hits) {
-            if (hit.compareTo(target) < 0
-                    && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
-                    || hit.compareTo(prevTarget) >= 0
-                    || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                    || Constants.isOffline)) return true;
-        }
+        if (hits[selectedHitIndex].compareTo(target) < 0
+                && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
+                || hits[selectedHitIndex].compareTo(prevTarget) >= 0
+                || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
+                || Constants.isOffline)) return true;
         return false;
     }
 
@@ -258,7 +256,7 @@ public final class Generator implements Comparable<Generator> {
         return Constants.isTestnet && publicKey != null && Arrays.equals(publicKey, fakeForgingPublicKey);
     }
 
-    static BigInteger[] getHit(byte[] publicKey, Block block) {
+    static BigInteger[] calculateHits(byte[] publicKey, Block block) {
         if (allowsFakeForging(publicKey)) {
             return new BigInteger[]{BigInteger.ZERO};
         }
@@ -299,12 +297,12 @@ public final class Generator implements Comparable<Generator> {
         return result;
     }
 
-    static long calculateHitTime(Account account, Block block) {
+    static long[] calculateHitTime(Account account, Block block) {
         return calculateHitTime(
                 BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())),
-                getHit(account.getPublicKey(), block),
+                calculateHits(account.getPublicKey(), block),
                 block
-        )[0];
+        );
     }
 
     static long[] calculateHitTime(BigInteger effectiveBalance, BigInteger[] hits, Block block) {
@@ -335,7 +333,7 @@ public final class Generator implements Comparable<Generator> {
     private final byte[] publicKey;
     private volatile long hitTime;
     private volatile BigInteger[] hits;
-    private volatile int bestHitIndex;
+    private volatile int selectedHitIndex;
     private volatile BigInteger effectiveBalance;
 
     private Generator(String secretPhrase) {
@@ -367,7 +365,7 @@ public final class Generator implements Comparable<Generator> {
     @Override
     public int compareTo(Generator g) {
         //todo confused effectiveBalance between this and other (g)
-        int i = this.hits[bestHitIndex].multiply(g.effectiveBalance).compareTo(g.hits[g.bestHitIndex].multiply(this.effectiveBalance));
+        int i = this.hits[selectedHitIndex].multiply(g.effectiveBalance).compareTo(g.hits[g.selectedHitIndex].multiply(this.effectiveBalance));
         if (i != 0) {
             return i;
         }
@@ -385,16 +383,16 @@ public final class Generator implements Comparable<Generator> {
         if (effectiveBalance.signum() == 0) {
             return;
         }
-        hits = getHit(publicKey, lastBlock);
+        hits = calculateHits(publicKey, lastBlock);
         long[] hitTimeAndIndex = calculateHitTime(effectiveBalance, hits, lastBlock);
         hitTime = hitTimeAndIndex[0];
-        bestHitIndex = (int) hitTimeAndIndex[1];
+        selectedHitIndex = (int) hitTimeAndIndex[1];
         listeners.notify(this, Event.GENERATION_DEADLINE);
     }
 
     boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
         int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
-        if (!verifyHit(hits, effectiveBalance, lastBlock, timestamp)) {
+        if (!verifyHit(hits, selectedHitIndex, effectiveBalance, lastBlock, timestamp)) {
             Logger.logDebugMessage(this.toString() + " failed to forge at " + timestamp);
             return false;
         }

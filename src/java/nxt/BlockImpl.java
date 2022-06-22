@@ -387,8 +387,9 @@ final class BlockImpl implements Block {
                 return false;
             }
 
-            BigInteger[] hits = Generator.getHit(getGeneratorPublicKey(), previousBlock);
-            if (Generator.verifyHit(hits, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+            BigInteger[] hits = Generator.calculateHits(getGeneratorPublicKey(), previousBlock);
+            long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock);
+            if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
                 return true;
             }
             for (BadBlock badBlock : badBlocks) {
