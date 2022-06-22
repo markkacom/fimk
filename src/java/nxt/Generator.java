@@ -92,9 +92,8 @@ public final class Generator implements Comparable<Generator> {
                         int generationLimit = Nxt.getEpochTime() - delayTime;
                         log(generationLimit);
                         for (Generator generator : sortedForgers) {
-                            if (generator.getHitTime() > generationLimit || generator.forge(lastBlock, generationLimit)) {
-                                return;
-                            }
+                            if (generator.getHitTime() > generationLimit) return;
+                            if (generator.forge(lastBlock, generationLimit)) return;
                         }
                     } // synchronized
                 } catch (Exception e) {
@@ -237,7 +236,7 @@ public final class Generator implements Comparable<Generator> {
         }
     }
 
-    static boolean verifyHit(BigInteger hit, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
+    static boolean verifyHit(BigInteger[] hits, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
         int elapsedTime = timestamp - previousBlock.getTimestamp();
         if (elapsedTime <= 0) {
             return false;
@@ -245,39 +244,89 @@ public final class Generator implements Comparable<Generator> {
         BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
         BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
         BigInteger target = prevTarget.add(effectiveBaseTarget);
-        return hit.compareTo(target) < 0
-                && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
-                || hit.compareTo(prevTarget) >= 0
-                || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                || Constants.isOffline);
-    }
-
-    static long getHitTime(Account account, Block block) {
-        return getHitTime(BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())), getHit(account.getPublicKey(), block), block);
+        for (BigInteger hit : hits) {
+            if (hit.compareTo(target) < 0
+                    && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
+                    || hit.compareTo(prevTarget) >= 0
+                    || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
+                    || Constants.isOffline)) return true;
+        }
+        return false;
     }
 
     static boolean allowsFakeForging(byte[] publicKey) {
         return Constants.isTestnet && publicKey != null && Arrays.equals(publicKey, fakeForgingPublicKey);
     }
 
-    static BigInteger getHit(byte[] publicKey, Block block) {
+    static BigInteger[] getHit(byte[] publicKey, Block block) {
         if (allowsFakeForging(publicKey)) {
-            return BigInteger.ZERO;
+            return new BigInteger[]{BigInteger.ZERO};
         }
         /* XXX - Enable forging below TRANSPARENT_FORGING_BLOCK */
         //if (block.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK) {
         //    throw new IllegalArgumentException("Not supported below Transparent Forging Block");
         //}
+
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
+        BigInteger[] result = new BigInteger[117];
         byte[] generationSignatureHash = digest.digest(publicKey);
-        return new BigInteger(1, new byte[] {generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
+        result[0] = new BigInteger(1, new byte[]{
+                generationSignatureHash[7],
+                generationSignatureHash[6],
+                generationSignatureHash[5],
+                generationSignatureHash[4],
+                generationSignatureHash[3],
+                generationSignatureHash[2],
+                generationSignatureHash[1],
+                generationSignatureHash[0]
+        });
+        byte[] digestSource = generationSignatureHash;
+        for (int i = 1; i < result.length; i++) {
+            byte[] nextHash = digest.digest(digestSource);
+            result[i] = new BigInteger(1, new byte[]{
+                    nextHash[7],
+                    nextHash[6],
+                    nextHash[5],
+                    nextHash[4],
+                    nextHash[3],
+                    nextHash[2],
+                    nextHash[1],
+                    nextHash[0]
+            });
+            digestSource = nextHash;
+        }
+        return result;
     }
 
-    static long getHitTime(BigInteger effectiveBalance, BigInteger hit, Block block) {
+    static long calculateHitTime(Account account, Block block) {
+        return calculateHitTime(
+                BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())),
+                getHit(account.getPublicKey(), block),
+                block
+        )[0];
+    }
+
+    static long[] calculateHitTime(BigInteger effectiveBalance, BigInteger[] hits, Block block) {
         // blockTimestamp + hit / (block.baseTarget * effectiveBalance)
-        return block.getTimestamp()
-                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
+//        return block.getTimestamp()
+//                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
+
+        long v;
+        long bestTime = 1;
+        int bestIndex = -1;
+        long diff = Long.MAX_VALUE;
+        BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
+        for (int i = 0; i < hits.length; i++) {
+            BigInteger hit = hits[i];
+            v = hit.divide(divider).longValue();
+            if (Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - v) < diff) {
+                diff = Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - v);
+                bestTime = v;
+                bestIndex = i;
+            }
+        }
+        return new long[]{block.getTimestamp() + bestTime, bestIndex};
     }
 
 
@@ -285,7 +334,8 @@ public final class Generator implements Comparable<Generator> {
     private final String secretPhrase;
     private final byte[] publicKey;
     private volatile long hitTime;
-    private volatile BigInteger hit;
+    private volatile BigInteger[] hits;
+    private volatile int bestHitIndex;
     private volatile BigInteger effectiveBalance;
 
     private Generator(String secretPhrase) {
@@ -316,7 +366,8 @@ public final class Generator implements Comparable<Generator> {
 
     @Override
     public int compareTo(Generator g) {
-        int i = this.hit.multiply(g.effectiveBalance).compareTo(g.hit.multiply(this.effectiveBalance));
+        //todo confused effectiveBalance between this and other (g)
+        int i = this.hits[bestHitIndex].multiply(g.effectiveBalance).compareTo(g.hits[g.bestHitIndex].multiply(this.effectiveBalance));
         if (i != 0) {
             return i;
         }
@@ -334,14 +385,16 @@ public final class Generator implements Comparable<Generator> {
         if (effectiveBalance.signum() == 0) {
             return;
         }
-        hit = getHit(publicKey, lastBlock);
-        hitTime = getHitTime(effectiveBalance, hit, lastBlock);
+        hits = getHit(publicKey, lastBlock);
+        long[] hitTimeAndIndex = calculateHitTime(effectiveBalance, hits, lastBlock);
+        hitTime = hitTimeAndIndex[0];
+        bestHitIndex = (int) hitTimeAndIndex[1];
         listeners.notify(this, Event.GENERATION_DEADLINE);
     }
 
     boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
         int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
-        if (!verifyHit(hit, effectiveBalance, lastBlock, timestamp)) {
+        if (!verifyHit(hits, effectiveBalance, lastBlock, timestamp)) {
             Logger.logDebugMessage(this.toString() + " failed to forge at " + timestamp);
             return false;
         }

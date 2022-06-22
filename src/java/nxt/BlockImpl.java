@@ -387,9 +387,8 @@ final class BlockImpl implements Block {
                 return false;
             }
 
-            BigInteger hit = new BigInteger(1, new byte[]{generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
-
-            if (Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+            BigInteger[] hits = Generator.getHit(getGeneratorPublicKey(), previousBlock);
+            if (Generator.verifyHit(hits, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
                 return true;
             }
             for (BadBlock badBlock : badBlocks) {
