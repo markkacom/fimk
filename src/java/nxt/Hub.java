@@ -85,7 +85,11 @@ public class Hub {
                         Account account = Account.getAccount(hub.getAccountId());
                         if (account != null && account.getEffectiveBalanceNXT(block.getHeight()) >= Constants.MIN_HUB_EFFECTIVE_BALANCE
                                 && account.getKeyHeight() > 0) {
-                            currentHits.add(new Hit(hub, Generator.calculateHitTime(account, block)[0]));
+
+                            Transaction[] transactions = Nxt.getTransactionProcessor().getAllWaitingTransactions();
+                            Generator.TimePolitic tm = transactions.length > 0 ? Generator.TimePolitic.MINIMAL : Generator.TimePolitic.NEAREST;
+
+                            currentHits.add(new Hit(hub, Generator.calculateHitTime(account, block, tm)[0]));
                         }
                     }
                 }

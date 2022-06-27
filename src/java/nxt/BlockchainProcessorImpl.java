@@ -1307,19 +1307,18 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     private static final Comparator<UnconfirmedTransaction> transactionIdComparator = Comparator
             .comparingLong(UnconfirmedTransaction::getId);
 
-    public void generateBlock(String secretPhrase, int blockTimestamp) throws BlockNotAcceptedException {
-
+    public PreparedBlockTransactions prepareUnconfirmedTransactions(int blockTimestamp, int previousHeight) {
         List<UnconfirmedTransaction> orderedUnconfirmedTransactions = new ArrayList<>();
-        try (FilteringIterator<UnconfirmedTransaction> unconfirmedTransactions = new FilteringIterator<>(TransactionProcessorImpl.getInstance().getAllUnconfirmedTransactions(),
-                transaction -> hasAllReferencedTransactions(transaction.getTransaction(), transaction.getTimestamp(), 0))) {
+        try (FilteringIterator<UnconfirmedTransaction> unconfirmedTransactions = new FilteringIterator<>(
+                TransactionProcessorImpl.getInstance().getAllUnconfirmedTransactions(),
+                transaction -> hasAllReferencedTransactions(transaction.getTransaction(), transaction.getTimestamp(), 0)
+        )) {
             for (UnconfirmedTransaction unconfirmedTransaction : unconfirmedTransactions) {
                 orderedUnconfirmedTransactions.add(unconfirmedTransaction);
             }
         }
 
-        BlockImpl previousBlock = blockchain.getLastBlock();
-
-        SortedSet<UnconfirmedTransaction> sortedTransactions = new TreeSet<>(previousBlock.getHeight() < Constants.MONETARY_SYSTEM_BLOCK
+        SortedSet<UnconfirmedTransaction> sortedTransactions = new TreeSet<>(previousHeight < Constants.MONETARY_SYSTEM_BLOCK
                 ? transactionIdComparator : transactionArrivalComparator);
 
         Map<TransactionType, Map<String, Boolean>> duplicates = new HashMap<>();
@@ -1350,7 +1349,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     continue;
                 }
 
-                if (unconfirmedTransaction.getVersion() != getTransactionVersion(previousBlock.getHeight())) {
+                if (unconfirmedTransaction.getVersion() != getTransactionVersion(previousHeight)) {
                     continue;
                 }
 
@@ -1383,7 +1382,6 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 payloadLength += transactionLength;
                 totalAmountNQT += unconfirmedTransaction.getAmountNQT();
                 totalFeeNQT += unconfirmedTransaction.getFeeNQT();
-
             }
 
             if (sortedTransactions.size() == prevNumberOfNewTransactions) {
@@ -1391,10 +1389,25 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }
         }
 
+        return new PreparedBlockTransactions(sortedTransactions, totalAmountNQT, totalFeeNQT, payloadLength);
+    }
+
+    public void generateBlock(String secretPhrase, int blockTimestamp) throws BlockNotAcceptedException {
+        this.generateBlock(secretPhrase, blockTimestamp, null);
+    }
+
+    public void generateBlock(String secretPhrase, int blockTimestamp, PreparedBlockTransactions preparedTransactions) throws BlockNotAcceptedException {
+
+        BlockImpl previousBlock = blockchain.getLastBlock();
+
+        if (preparedTransactions == null) {
+            preparedTransactions = prepareUnconfirmedTransactions(blockTimestamp, previousBlock.getHeight());
+        }
+
         List<TransactionImpl> blockTransactions = new ArrayList<>();
 
         MessageDigest digest = Crypto.sha256();
-        for (UnconfirmedTransaction unconfirmedTransaction : sortedTransactions) {
+        for (UnconfirmedTransaction unconfirmedTransaction : preparedTransactions.unconfirmedTransactions) {
             blockTransactions.add(unconfirmedTransaction.getTransaction());
             digest.update(unconfirmedTransaction.getTransaction().bytes());
         }
@@ -1407,7 +1420,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
 
         byte[] previousBlockHash = Crypto.sha256().digest(previousBlock.bytes());
 
-        BlockImpl block = new BlockImpl(getBlockVersion(previousBlock.getHeight()), blockTimestamp, previousBlock.getId(), totalAmountNQT, totalFeeNQT, payloadLength,
+        BlockImpl block = new BlockImpl(getBlockVersion(previousBlock.getHeight()), blockTimestamp, previousBlock.getId(),
+                preparedTransactions.totalAmountNQT, preparedTransactions.totalFeeNQT, preparedTransactions.payloadLength,
                 payloadHash, publicKey, generationSignature, previousBlockHash, blockTransactions, secretPhrase);
 
         try {

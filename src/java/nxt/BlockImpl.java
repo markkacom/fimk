@@ -388,10 +388,22 @@ final class BlockImpl implements Block {
             }
 
             BigInteger[] hits = Generator.calculateHits(getGeneratorPublicKey(), previousBlock);
-            long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock);
-            if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
-                return true;
+            if (this.getTransactions().isEmpty()) {
+                long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock, Generator.TimePolitic.NEAREST);
+                if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+                    return true;
+                }
+            } else {
+                long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock, Generator.TimePolitic.MINIMAL);
+                if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+                    return true;
+                }
+                hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock, Generator.TimePolitic.NEAREST);
+                if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+                    return true;
+                }
             }
+
             for (BadBlock badBlock : badBlocks) {
                 if (badBlock.height == (previousBlock.height+1) &&
                         badBlock.generatorId == getGeneratorId() &&

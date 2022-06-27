@@ -17,20 +17,11 @@
 package nxt;
 
 import nxt.crypto.Crypto;
-import nxt.util.Convert;
-import nxt.util.Listener;
-import nxt.util.Listeners;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
+import nxt.util.*;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +30,10 @@ public final class Generator implements Comparable<Generator> {
 
     public enum Event {
         GENERATION_DEADLINE, START_FORGING, STOP_FORGING
+    }
+
+    public enum TimePolitic {
+        NEAREST, MINIMAL
     }
 
     private static final byte[] fakeForgingPublicKey;
@@ -76,11 +71,12 @@ public final class Generator implements Comparable<Generator> {
                         if (lastBlock == null || lastBlock.getHeight() < Constants.LAST_KNOWN_BLOCK) {
                             return;
                         }
+
                         if (lastBlock.getId() != lastBlockId || sortedForgers == null) {
                             lastBlockId = lastBlock.getId();
                             List<Generator> forgers = new ArrayList<>();
                             for (Generator generator : generators.values()) {
-                                generator.setLastBlock(lastBlock);
+                                generator.updateHit(lastBlock, TimePolitic.NEAREST);
                                 if (generator.effectiveBalance.signum() > 0) {
                                     forgers.add(generator);
                                 }
@@ -90,10 +86,32 @@ public final class Generator implements Comparable<Generator> {
                             logged = false;
                         }
                         int generationLimit = Nxt.getEpochTime() - delayTime;
-                        log(generationLimit);
+                        log(generationLimit, lastBlock);
                         for (Generator generator : sortedForgers) {
+                            if (Nxt.getEpochTime() < generator.pauseEnd) return;
+
+                            int blockTimestamp = (generationLimit - generator.hitTime > 3600) ? generationLimit : (int) generator.hitTime + 1;
+                            BlockchainProcessor.PreparedBlockTransactions preparedBlockTransactions =
+                                    BlockchainProcessorImpl.getInstance().prepareUnconfirmedTransactions(blockTimestamp, lastBlock.getHeight());
+                            if (!preparedBlockTransactions.unconfirmedTransactions.isEmpty()) {
+                                generator.updateHit(lastBlock, TimePolitic.MINIMAL);
+                                blockTimestamp = (generationLimit - generator.hitTime > 3600) ? generationLimit : (int) generator.hitTime + 1;
+                                BlockchainProcessor.PreparedBlockTransactions preparedBlockTransactions2 =
+                                        BlockchainProcessorImpl.getInstance().prepareUnconfirmedTransactions(blockTimestamp, lastBlock.getHeight());
+                                if (preparedBlockTransactions2.unconfirmedTransactions.isEmpty()) {
+                                    //revert to standard hit
+                                    generator.updateHit(lastBlock, TimePolitic.NEAREST);
+                                } else {
+                                    preparedBlockTransactions = preparedBlockTransactions2;
+                                }
+                            }
+
                             if (generator.getHitTime() > generationLimit) return;
-                            if (generator.forge(lastBlock, generationLimit)) return;
+                            generator.pauseEnd = Nxt.getEpochTime() + Constants.SECONDS_BETWEEN_BLOCKS;
+                            if (generator.forge(lastBlock, generationLimit, preparedBlockTransactions)) {
+                                generator.pauseEnd = 0; //success forged block, so no pause
+                                return;
+                            }
                         }
                     } // synchronized
                 } catch (Exception e) {
@@ -107,7 +125,7 @@ public final class Generator implements Comparable<Generator> {
 
         }
 
-        private void log(int generationLimit) {
+        private void log(int generationLimit, Block lastBlock) {
             if (!logged) {
                 for (Generator generator : sortedForgers) {
                     if (generator.getHitTime() - generationLimit > 60) {
@@ -115,6 +133,16 @@ public final class Generator implements Comparable<Generator> {
                     }
                     Logger.logDebugMessage(generator.toString());
                     logged = true;
+                }
+                if (logged && Logger.isDebugEnabled()) {
+                    //report target state
+                    double diff = (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET;
+                    int pos = (int) (diff * 50);
+                    String filled = pos <= 0 ? "" : String.format("%1$" + pos + "s", "").replace(' ', '=');
+                    String padded = filled.length() >= 100 ? "" : String.format("%1$" + (100 - filled.length()) + "s", "").replace(' ', '.');
+                    StringBuilder sb = new StringBuilder(filled + padded);
+                    sb.setCharAt(50, '|');
+                    Logger.logDebugMessage("target [" + sb + "]");
                 }
             }
         }
@@ -244,12 +272,11 @@ public final class Generator implements Comparable<Generator> {
         BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
         BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
         BigInteger target = prevTarget.add(effectiveBaseTarget);
-        if (hits[selectedHitIndex].compareTo(target) < 0
+        return hits[selectedHitIndex].compareTo(target) < 0
                 && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
                 || hits[selectedHitIndex].compareTo(prevTarget) >= 0
                 || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                || Constants.isOffline)) return true;
-        return false;
+                || Constants.isOffline);
     }
 
     static boolean allowsFakeForging(byte[] publicKey) {
@@ -297,34 +324,46 @@ public final class Generator implements Comparable<Generator> {
         return result;
     }
 
-    static long[] calculateHitTime(Account account, Block block) {
+    static long[] calculateHitTime(Account account, Block block, TimePolitic timePolitic) {
         return calculateHitTime(
                 BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())),
                 calculateHits(account.getPublicKey(), block),
-                block
+                block,
+                timePolitic
         );
     }
 
-    static long[] calculateHitTime(BigInteger effectiveBalance, BigInteger[] hits, Block block) {
+    static long[] calculateHitTime(BigInteger effectiveBalance, BigInteger[] hits, Block block, TimePolitic timePolitic) {
         // blockTimestamp + hit / (block.baseTarget * effectiveBalance)
 //        return block.getTimestamp()
 //                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
 
-        long v;
-        long bestTime = 1;
-        int bestIndex = -1;
+        long candidateInterval;
+        long interval = Long.MAX_VALUE;
+        int index = -1;
         long diff = Long.MAX_VALUE;
         BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
         for (int i = 0; i < hits.length; i++) {
             BigInteger hit = hits[i];
-            v = hit.divide(divider).longValue();
-            if (Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - v) < diff) {
-                diff = Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - v);
-                bestTime = v;
-                bestIndex = i;
+            candidateInterval = hit.divide(divider).longValue();
+            if (candidateInterval <= 0) continue;
+
+            if (timePolitic == TimePolitic.NEAREST) {
+                if (Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - candidateInterval) < diff) {
+                    diff = Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - candidateInterval);
+                    interval = candidateInterval;
+                    index = i;
+                }
+            }
+
+            if (timePolitic == TimePolitic.MINIMAL) {
+                if (candidateInterval < interval) {
+                    interval = candidateInterval;
+                    index = i;
+                }
             }
         }
-        return new long[]{block.getTimestamp() + bestTime, bestIndex};
+        return new long[]{block.getTimestamp() + interval, index};
     }
 
 
@@ -335,13 +374,14 @@ public final class Generator implements Comparable<Generator> {
     private volatile BigInteger[] hits;
     private volatile int selectedHitIndex;
     private volatile BigInteger effectiveBalance;
+    private volatile int pauseEnd = 0;
 
     private Generator(String secretPhrase) {
         this.secretPhrase = secretPhrase;
         this.publicKey = Crypto.getPublicKey(secretPhrase);
         this.accountId = Account.getId(publicKey);
         if (Nxt.getBlockchain().getHeight() >= Constants.LAST_KNOWN_BLOCK) {
-            setLastBlock(Nxt.getBlockchain().getLastBlock());
+            updateHit(Nxt.getBlockchain().getLastBlock(), TimePolitic.NEAREST);
         }
         sortedForgers = null;
     }
@@ -377,29 +417,32 @@ public final class Generator implements Comparable<Generator> {
         return "Forger started " + Long.toUnsignedString(accountId) + " ETA " + getDeadline() + "s hittime " + hitTime;
     }
 
-    private void setLastBlock(Block lastBlock) {
+    private void updateHit(Block lastBlock, TimePolitic tm) {
         Account account = Account.getAccount(accountId);
         effectiveBalance = BigInteger.valueOf(account == null || account.getEffectiveBalanceNXT() <= 0 ? 0 : account.getEffectiveBalanceNXT());
         if (effectiveBalance.signum() == 0) {
             return;
         }
         hits = calculateHits(publicKey, lastBlock);
-        long[] hitTimeAndIndex = calculateHitTime(effectiveBalance, hits, lastBlock);
+
+        long[] hitTimeAndIndex = calculateHitTime(effectiveBalance, hits, lastBlock, tm);
+        //if (hitTime != hitTimeAndIndex[0]) System.out.println("delta " + (hitTimeAndIndex[0]- hitTime));
         hitTime = hitTimeAndIndex[0];
         selectedHitIndex = (int) hitTimeAndIndex[1];
         listeners.notify(this, Event.GENERATION_DEADLINE);
     }
 
-    boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
+    boolean forge(Block lastBlock, int generationLimit, BlockchainProcessor.PreparedBlockTransactions unconfirmedTransactions)
+            throws BlockchainProcessor.BlockNotAcceptedException {
         int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
         if (!verifyHit(hits, selectedHitIndex, effectiveBalance, lastBlock, timestamp)) {
-            Logger.logDebugMessage(this.toString() + " failed to forge at " + timestamp);
+            Logger.logDebugMessage(this + " failed to forge at " + timestamp);
             return false;
         }
         int start = Nxt.getEpochTime();
         while (true) {
             try {
-                BlockchainProcessorImpl.getInstance().generateBlock(secretPhrase, timestamp);
+                BlockchainProcessorImpl.getInstance().generateBlock(secretPhrase, timestamp, unconfirmedTransactions);
                 setDelay(Constants.FORGING_DELAY);
                 return true;
             } catch (BlockchainProcessor.TransactionNotAcceptedException e) {

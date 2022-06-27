@@ -35,16 +35,16 @@ public class GeneratorTest extends BlockchainTest {
         BigInteger[] hits = Generator.calculateHits(publicKey, lastBlock);
         Account account = Account.getAccount(publicKey);
         BigInteger effectiveBalance = BigInteger.valueOf(account == null || account.getEffectiveBalanceNXT() <= 0 ? 0 : account.getEffectiveBalanceNXT());
-        long hitTime = Generator.calculateHitTime(effectiveBalance, hits, lastBlock)[0];
+        long hitTime = Generator.calculateHitTime(effectiveBalance, hits, lastBlock, Generator.TimePolitic.NEAREST)[0];
         long deadline = hitTime - lastBlock.getTimestamp();
         Generator generator = Generator.startForging(ALICE.getSecretPhrase());
         int i=1;
         try {
             while (i<deadline) {
-                Assert.assertFalse(generator.forge(lastBlock, lastBlock.getTimestamp() + i));
+                Assert.assertFalse(generator.forge(lastBlock, lastBlock.getTimestamp() + i, null));
                 i += 100;
             }
-            Assert.assertEquals(true, generator.forge(lastBlock, (int)hitTime + 1));
+            Assert.assertEquals(true, generator.forge(lastBlock, (int)hitTime + 1, null));
         } catch (BlockchainProcessor.BlockNotAcceptedException e) {
             e.printStackTrace();
         }

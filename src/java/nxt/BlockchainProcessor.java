@@ -22,6 +22,7 @@ import nxt.util.Observable;
 import org.json.simple.JSONObject;
 
 import java.util.List;
+import java.util.SortedSet;
 
 public interface BlockchainProcessor extends Observable<Block,BlockchainProcessor.Event> {
 
@@ -55,6 +56,20 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
     void registerDerivedTable(DerivedDbTable table);
 
     void trimDerivedTables();
+
+    class PreparedBlockTransactions {
+        SortedSet<UnconfirmedTransaction> unconfirmedTransactions;
+        long totalAmountNQT = 0;
+        long totalFeeNQT = 0;
+        int payloadLength = 0;
+
+        public PreparedBlockTransactions(SortedSet<UnconfirmedTransaction> unconfirmedTransactions, long totalAmountNQT, long totalFeeNQT, int payloadLength) {
+            this.unconfirmedTransactions = unconfirmedTransactions;
+            this.totalAmountNQT = totalAmountNQT;
+            this.totalFeeNQT = totalFeeNQT;
+            this.payloadLength = payloadLength;
+        }
+    }
 
     class BlockNotAcceptedException extends NxtException {
 
