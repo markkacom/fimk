@@ -144,6 +144,16 @@ public final class Generator implements Comparable<Generator> {
                     sb.setCharAt(50, '|');
                     Logger.logDebugMessage("target [" + sb + "]");
                 }
+                if (logged && Logger.isDebugEnabled()) {
+                    //report target state
+                    double diff = (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET;
+                    int pos = (int) (diff * 30);
+                    String filled = pos <= 0 ? "" : String.format("%1$" + pos + "s", "").replace(' ', '=');
+                    String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
+                    StringBuilder sb = new StringBuilder(filled + padded);
+                    sb.setCharAt(30, '|');
+                    Logger.logDebugMessage("target [" + sb + "]");
+                }
             }
         }
 
@@ -294,7 +304,7 @@ public final class Generator implements Comparable<Generator> {
 
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
-        BigInteger[] result = new BigInteger[117];
+        BigInteger[] result = new BigInteger[block.getHeight() + 1 < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 117];
         byte[] generationSignatureHash = digest.digest(publicKey);
         result[0] = new BigInteger(1, new byte[]{
                 generationSignatureHash[7],
@@ -346,11 +356,12 @@ public final class Generator implements Comparable<Generator> {
         for (int i = 0; i < hits.length; i++) {
             BigInteger hit = hits[i];
             candidateInterval = hit.divide(divider).longValue();
-            if (candidateInterval <= 0) continue;
 
             if (timePolitic == TimePolitic.NEAREST) {
-                if (Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - candidateInterval) < diff) {
-                    diff = Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - candidateInterval);
+                //in fact the desired interval here is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this lead to 30s between blocks and stabilised base target
+                long d = Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - 1 - candidateInterval);
+                if (d < diff) {
+                    diff = d;
                     interval = candidateInterval;
                     index = i;
                 }

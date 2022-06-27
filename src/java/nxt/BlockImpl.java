@@ -403,6 +403,11 @@ final class BlockImpl implements Block {
                     return true;
                 }
             }
+            if (this.height < Constants.CONTROL_FORGING_TIME_BLOCK) {
+                if (Generator.verifyHit(hits, 0, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+                    return true;
+                }
+            }
 
             for (BadBlock badBlock : badBlocks) {
                 if (badBlock.height == (previousBlock.height+1) &&

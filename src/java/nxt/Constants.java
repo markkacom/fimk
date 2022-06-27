@@ -163,6 +163,7 @@ public final class Constants {
     public static final int LAST_KNOWN_BLOCK = isTestnet ? 0 : 384000;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
     public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
+    public static final int CONTROL_FORGING_TIME_BLOCK = isTestnet ? 1388 : Integer.MAX_VALUE;
 
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;
