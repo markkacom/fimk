@@ -90,7 +90,7 @@ public final class Generator implements Comparable<Generator> {
                             logged = false;
                         }
                         int generationLimit = Nxt.getEpochTime() - delayTime;
-                        log(generationLimit);
+                        log(generationLimit, lastBlock);
                         for (Generator generator : sortedForgers) {
                             if (generator.getHitTime() > generationLimit) return;
                             if (generator.forge(lastBlock, generationLimit)) return;
@@ -107,7 +107,7 @@ public final class Generator implements Comparable<Generator> {
 
         }
 
-        private void log(int generationLimit) {
+        private void log(int generationLimit, Block lastBlock) {
             if (!logged) {
                 for (Generator generator : sortedForgers) {
                     if (generator.getHitTime() - generationLimit > 60) {
@@ -115,6 +115,16 @@ public final class Generator implements Comparable<Generator> {
                     }
                     Logger.logDebugMessage(generator.toString());
                     logged = true;
+                }
+                if (logged && Logger.isDebugEnabled()) {
+                    //report target state
+                    double diff = (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET;
+                    int pos = (int) (diff * 30);
+                    String filled = pos <= 0 ? "" : String.format("%1$" + pos + "s", "").replace(' ', '=');
+                    String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
+                    StringBuilder sb = new StringBuilder(filled + padded);
+                    sb.setCharAt(30, '|');
+                    Logger.logDebugMessage("target [" + sb + "]");
                 }
             }
         }
@@ -244,12 +254,11 @@ public final class Generator implements Comparable<Generator> {
         BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
         BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
         BigInteger target = prevTarget.add(effectiveBaseTarget);
-        if (hits[selectedHitIndex].compareTo(target) < 0
+        return hits[selectedHitIndex].compareTo(target) < 0
                 && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
                 || hits[selectedHitIndex].compareTo(prevTarget) >= 0
                 || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                || Constants.isOffline)) return true;
-        return false;
+                || Constants.isOffline);
     }
 
     static boolean allowsFakeForging(byte[] publicKey) {
@@ -267,7 +276,7 @@ public final class Generator implements Comparable<Generator> {
 
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
-        BigInteger[] result = new BigInteger[117];
+        BigInteger[] result = new BigInteger[block.getHeight() + 1 < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 117];
         byte[] generationSignatureHash = digest.digest(publicKey);
         result[0] = new BigInteger(1, new byte[]{
                 generationSignatureHash[7],
@@ -279,6 +288,21 @@ public final class Generator implements Comparable<Generator> {
                 generationSignatureHash[1],
                 generationSignatureHash[0]
         });
+
+        /*
+        byte[] a1 = new byte[generationSignatureHash.length + 1] ;
+        System.arraycopy(generationSignatureHash, 0, a1, 1, generationSignatureHash.length);
+        byte[] a2 = new byte[generationSignatureHash.length + 1] ;
+        System.arraycopy(generationSignatureHash, 0, a2, 1, generationSignatureHash.length);
+        a2[0] = 1;
+        byte[] a3 = new byte[generationSignatureHash.length + 1] ;
+        System.arraycopy(generationSignatureHash, 0, a3, 1, generationSignatureHash.length);
+        a3[0] = 2;
+        //...
+        // todo 8 byte arrays for parallel digest computation (optimal for cpu 8 cores).
+        //  Warning: result of parallel computation MUST have the same order (sync results): result1 concat result2 concat result3...
+        */
+
         byte[] digestSource = generationSignatureHash;
         for (int i = 1; i < result.length; i++) {
             byte[] nextHash = digest.digest(digestSource);
@@ -310,21 +334,23 @@ public final class Generator implements Comparable<Generator> {
 //        return block.getTimestamp()
 //                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
 
-        long v;
-        long bestTime = 1;
-        int bestIndex = -1;
+        long candidateInterval;
+        long interval = Long.MAX_VALUE;
+        int index = -1;
         long diff = Long.MAX_VALUE;
         BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
         for (int i = 0; i < hits.length; i++) {
             BigInteger hit = hits[i];
-            v = hit.divide(divider).longValue();
-            if (Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - v) < diff) {
-                diff = Math.abs(Constants.SECONDS_BETWEEN_BLOCKS - v);
-                bestTime = v;
-                bestIndex = i;
+            candidateInterval = hit.divide(divider).longValue();
+            //in fact the desired interval here is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this lead to 30s between blocks and stabilised base target
+            long d = Math.abs(Nxt.getBlockchain().desiredBlockInterval() - 1 - candidateInterval);
+            if (d < diff) {
+                diff = d;
+                interval = candidateInterval;
+                index = i;
             }
         }
-        return new long[]{block.getTimestamp() + bestTime, bestIndex};
+        return new long[]{block.getTimestamp() + interval, index};
     }
 
 
@@ -393,7 +419,7 @@ public final class Generator implements Comparable<Generator> {
     boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
         int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
         if (!verifyHit(hits, selectedHitIndex, effectiveBalance, lastBlock, timestamp)) {
-            Logger.logDebugMessage(this.toString() + " failed to forge at " + timestamp);
+            Logger.logDebugMessage(this + " failed to forge at " + timestamp);
             return false;
         }
         int start = Nxt.getEpochTime();

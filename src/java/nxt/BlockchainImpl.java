@@ -438,6 +438,13 @@ final class BlockchainImpl implements Blockchain {
     }
 
     @Override
+    public int desiredBlockInterval() {
+        return getLastBlock().getTransactions().isEmpty()
+                ? Constants.SECONDS_BETWEEN_BLOCKS
+                : Constants.SECONDS_BETWEEN_BLOCKS - Constants.SECONDS_BETWEEN_BLOCKS / 2;
+    }
+
+    @Override
     public DbIterator<TransactionImpl> getTransactions(int numberOfConfirmations, byte type, byte subtype,
                                                        int blockTimestamp, boolean withMessage, boolean phasedOnly, boolean nonPhasedOnly,
                                                        int from, int to) {

@@ -454,23 +454,20 @@ final class BlockImpl implements Block {
             /* XXX - Replaced hardcoded 60 with Constants.SECONDS_BETWEEN_BLOCKS */
             long newBaseTarget = BigInteger.valueOf(curBaseTarget)
                     .multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
-                    .divide(BigInteger.valueOf(Constants.SECONDS_BETWEEN_BLOCKS)).longValue();
+                    .divide(BigInteger.valueOf(Nxt.getBlockchain().desiredBlockInterval())).longValue();
             if (newBaseTarget < 0 || newBaseTarget > Constants.MAX_BASE_TARGET) {
                 newBaseTarget = Constants.MAX_BASE_TARGET;
             }
-            if (newBaseTarget < curBaseTarget / 2) {
-                newBaseTarget = curBaseTarget / 2;
-            }
-            if (newBaseTarget == 0) {
-                newBaseTarget = 1;
-            }
+            newBaseTarget = Math.max(newBaseTarget, curBaseTarget / 2);
+
+            if (newBaseTarget == 0) newBaseTarget = 1;
+
             long twofoldCurBaseTarget = curBaseTarget * 2;
             if (twofoldCurBaseTarget < 0) {
                 twofoldCurBaseTarget = Constants.MAX_BASE_TARGET;
             }
-            if (newBaseTarget > twofoldCurBaseTarget) {
-                newBaseTarget = twofoldCurBaseTarget;
-            }
+            newBaseTarget = Math.min(newBaseTarget, twofoldCurBaseTarget);
+
             baseTarget = newBaseTarget;
             cumulativeDifficulty = previousBlock.cumulativeDifficulty.add(Convert.two64.divide(BigInteger.valueOf(baseTarget)));
         }
