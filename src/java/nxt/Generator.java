@@ -59,7 +59,7 @@ public final class Generator implements Comparable<Generator> {
     private static final Collection<Generator> allGenerators = Collections.unmodifiableCollection(generators.values());
     private static volatile List<Generator> sortedForgers = null;
     private static long lastBlockId;
-    private static int delayTime = Constants.FORGING_DELAY;
+    private static int delayTime = 0;
 
     private static final Runnable generateBlocksThread = new Runnable() {
 
@@ -231,7 +231,7 @@ public final class Generator implements Comparable<Generator> {
         synchronized (Nxt.getBlockchain()) {
             if (lastBlockId == Generator.lastBlockId && sortedForgers != null) {
                 for (Generator generator : sortedForgers) {
-                    if (generator.getHitTime() >= curTime - Constants.FORGING_DELAY) {
+                    if (generator.getHitTime() >= curTime) {
                         return generator.getHitTime();
                     }
                 }
@@ -426,7 +426,6 @@ public final class Generator implements Comparable<Generator> {
         while (true) {
             try {
                 BlockchainProcessorImpl.getInstance().generateBlock(secretPhrase, timestamp);
-                setDelay(Constants.FORGING_DELAY);
                 return true;
             } catch (BlockchainProcessor.TransactionNotAcceptedException e) {
                 // the bad transaction has been expunged, try again

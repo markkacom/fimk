@@ -52,7 +52,6 @@ public final class Constants {
     public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("fimk.testnetLeasingDelay", 1440) : 1440;
 
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
-    public static final int FORGING_DELAY = Nxt.getIntProperty("fimk.forgingDelay");
     public static final int FORGING_SPEEDUP = Nxt.getIntProperty("fimk.forgingSpeedup");
 
     public static final byte MAX_PHASING_VOTE_TRANSACTIONS = 10;
