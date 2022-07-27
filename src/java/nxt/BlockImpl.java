@@ -451,10 +451,14 @@ final class BlockImpl implements Block {
         if ((this.getId() != Genesis.GENESIS_BLOCK_ID || previousBlockId != 0) && cumulativeDifficulty.equals(BigInteger.ZERO)) {
             long curBaseTarget = previousBlock.baseTarget;
 
-            /* XXX - Replaced hardcoded 60 with Constants.SECONDS_BETWEEN_BLOCKS */
-            long newBaseTarget = BigInteger.valueOf(curBaseTarget)
-                    .multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
-                    .divide(BigInteger.valueOf(Nxt.getBlockchain().desiredBlockInterval())).longValue();
+            int desiredBlockInterval = Nxt.getBlockchain().desiredBlockInterval();
+            double coefficient = (double) (this.timestamp - previousBlock.timestamp) / desiredBlockInterval;
+
+            long newBaseTarget = Math.abs(1 - coefficient) < 0.1
+                    ? curBaseTarget
+                    : BigInteger.valueOf(curBaseTarget).multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
+                    .divide(BigInteger.valueOf(desiredBlockInterval)).longValue();
+
             if (newBaseTarget < 0 || newBaseTarget > Constants.MAX_BASE_TARGET) {
                 newBaseTarget = Constants.MAX_BASE_TARGET;
             }
@@ -462,11 +466,11 @@ final class BlockImpl implements Block {
 
             if (newBaseTarget == 0) newBaseTarget = 1;
 
-            long twofoldCurBaseTarget = curBaseTarget * 2;
-            if (twofoldCurBaseTarget < 0) {
-                twofoldCurBaseTarget = Constants.MAX_BASE_TARGET;
+            long maxBaseTarget = curBaseTarget * (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK ? 4 : 2);
+            if (maxBaseTarget < 0) {
+                maxBaseTarget = Constants.MAX_BASE_TARGET;
             }
-            newBaseTarget = Math.min(newBaseTarget, twofoldCurBaseTarget);
+            newBaseTarget = Math.min(newBaseTarget, maxBaseTarget);
 
             baseTarget = newBaseTarget;
             cumulativeDifficulty = previousBlock.cumulativeDifficulty.add(Convert.two64.divide(BigInteger.valueOf(baseTarget)));
