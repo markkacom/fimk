@@ -452,9 +452,10 @@ final class BlockchainImpl implements Blockchain {
 
     @Override
     public int desiredBlockInterval() {
+        if (this.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK) return Constants.SECONDS_BETWEEN_BLOCKS;
         return getLastBlock().getTransactions().isEmpty()
                 ? Constants.SECONDS_BETWEEN_BLOCKS
-                : Constants.SECONDS_BETWEEN_BLOCKS - Constants.SECONDS_BETWEEN_BLOCKS / 2;
+                : Constants.SECONDS_BETWEEN_BLOCKS / 2;
     }
 
     @Override

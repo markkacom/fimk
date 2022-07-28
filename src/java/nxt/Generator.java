@@ -276,7 +276,7 @@ public final class Generator implements Comparable<Generator> {
 
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
-        BigInteger[] result = new BigInteger[block.getHeight() + 1 < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 117];
+        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 117];
         byte[] generationSignatureHash = digest.digest(publicKey);
         result[0] = new BigInteger(1, new byte[]{
                 generationSignatureHash[7],
@@ -331,8 +331,10 @@ public final class Generator implements Comparable<Generator> {
 
     static long[] calculateHitTime(BigInteger effectiveBalance, BigInteger[] hits, Block block) {
         // blockTimestamp + hit / (block.baseTarget * effectiveBalance)
-//        return block.getTimestamp()
-//                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
+
+        /* Desired interval is Constants.SECONDS_BETWEEN_BLOCKS. Select two hits that provide nearest to desired the hit time.
+        If previous interval is less the desired interval the hit time
+        */
 
         long candidateInterval;
         long interval = Constants.SECONDS_BETWEEN_BLOCKS;
