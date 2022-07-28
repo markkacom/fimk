@@ -28,6 +28,8 @@ public interface Blockchain {
 
     Block getLastBlock(int timestamp);
 
+    BlockImpl getPreLastBlock();
+
     int getHeight();
 
     int getLastBlockTimestamp();

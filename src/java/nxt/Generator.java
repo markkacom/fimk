@@ -120,11 +120,11 @@ public final class Generator implements Comparable<Generator> {
                     //report target state
                     double diff = (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET;
                     int pos = (int) (diff * 30);
-                    String filled = pos <= 0 ? "" : String.format("%1$" + pos + "s", "").replace(' ', '=');
+                    String filled = pos <= 0 ? "" : String.format("%1$" + Math.min(pos, 60) + "s", "").replace(' ', '=');
                     String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
                     StringBuilder sb = new StringBuilder(filled + padded);
                     sb.setCharAt(30, '|');
-                    Logger.logDebugMessage("target [" + sb + "]");
+                    Logger.logDebugMessage("target [" + sb.append(pos > 60 ? " x" + String.format("%.2f", diff) : "]"));
                 }
             }
         }
@@ -335,8 +335,10 @@ public final class Generator implements Comparable<Generator> {
 //                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
 
         long candidateInterval;
-        long interval = Long.MAX_VALUE;
+        long interval = Constants.SECONDS_BETWEEN_BLOCKS;
+        long altInterval = interval;  // altInterval and altIndex are the second selected ones
         int index = -1;
+        int altIndex = -1;
         long diff = Long.MAX_VALUE;
         BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
         for (int i = 0; i < hits.length; i++) {
@@ -344,12 +346,27 @@ public final class Generator implements Comparable<Generator> {
             candidateInterval = hit.divide(divider).longValue();
             //in fact the desired interval here is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this lead to 30s between blocks and stabilised base target
             long d = Math.abs(Nxt.getBlockchain().desiredBlockInterval() - 1 - candidateInterval);
-            if (d < diff) {
+            if (d <= diff) {  // "less than or equal to" is used because the altInterval and altIndex should be setted
                 diff = d;
+                altInterval = interval;
+                altIndex = index;
                 interval = candidateInterval;
                 index = i;
             }
         }
+
+        if (block.getHeight() > Constants.CONTROL_FORGING_TUNED_HITTIME_BLOCK && altIndex != -1) {
+            Block preBlock = Nxt.getBlockchain().getBlock(block.getPreviousBlockId());
+            if (preBlock != null) {
+                int preInterval = block.getTimestamp() - preBlock.getTimestamp();
+                if ((preInterval > Constants.SECONDS_BETWEEN_BLOCKS && interval > Constants.SECONDS_BETWEEN_BLOCKS && altInterval < interval)
+                        || (preInterval < Constants.SECONDS_BETWEEN_BLOCKS && interval < Constants.SECONDS_BETWEEN_BLOCKS && altInterval > interval)) {
+                    interval = altInterval;
+                    index = altIndex;
+                }
+            }
+        }
+
         return new long[]{block.getTimestamp() + interval, index};
     }
 

@@ -39,14 +39,27 @@ final class BlockchainImpl implements Blockchain {
     private BlockchainImpl() {}
 
     private final AtomicReference<BlockImpl> lastBlock = new AtomicReference<>();
+    private final AtomicReference<BlockImpl> preLastBlock = new AtomicReference<>();
 
     @Override
     public BlockImpl getLastBlock() {
         return lastBlock.get();
     }
 
+    public BlockImpl getPreLastBlock() {
+        BlockImpl b = preLastBlock.get();
+        if (b == null) {
+            BlockImpl lb = lastBlock.get();
+            if (lb == null) return null;
+            b = BlockDb.findBlock(lb.getPreviousBlockId());
+            preLastBlock.set(b);
+        }
+        return b;
+    }
+
     void setLastBlock(BlockImpl block) {
         lastBlock.set(block);
+        preLastBlock.set(null);
     }
 
     void setLastBlock(BlockImpl previousBlock, BlockImpl block) {
@@ -79,9 +92,9 @@ final class BlockchainImpl implements Blockchain {
     @Override
     public BlockImpl getBlock(long blockId) {
         BlockImpl block = lastBlock.get();
-        if (block.getId() == blockId) {
-            return block;
-        }
+        if (block.getId() == blockId) return block;
+        BlockImpl preLastBlock = getPreLastBlock();
+        if (preLastBlock != null && preLastBlock.getId() == blockId) return preLastBlock;
         return BlockDb.findBlock(blockId);
     }
 
