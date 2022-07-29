@@ -451,7 +451,7 @@ final class BlockImpl implements Block {
         if ((this.getId() != Genesis.GENESIS_BLOCK_ID || previousBlockId != 0) && cumulativeDifficulty.equals(BigInteger.ZERO)) {
             long curBaseTarget = previousBlock.baseTarget;
 
-            int desiredBlockInterval = Nxt.getBlockchain().desiredBlockInterval();
+            int desiredBlockInterval = Nxt.getBlockchain().desiredBlockInterval(previousBlock);
             double coefficient = (double) (this.timestamp - previousBlock.timestamp) / desiredBlockInterval;
 
             long newBaseTarget = (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK && Math.abs(1 - coefficient) < 0.1)

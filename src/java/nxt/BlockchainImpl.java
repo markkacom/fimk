@@ -450,10 +450,13 @@ final class BlockchainImpl implements Blockchain {
         return new DbIterator<>(con, pstmt, TransactionDb::loadTransaction);
     }
 
+    /**
+     * Desired interval between passed block and next block
+     */
     @Override
-    public int desiredBlockInterval() {
-        if (this.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK) return Constants.SECONDS_BETWEEN_BLOCKS;
-        return getLastBlock().getTransactions().isEmpty()
+    public int desiredBlockInterval(Block block) {
+        if (block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK) return Constants.SECONDS_BETWEEN_BLOCKS;
+        return block.getTransactions().isEmpty()
                 ? Constants.SECONDS_BETWEEN_BLOCKS
                 : Constants.SECONDS_BETWEEN_BLOCKS / 2;
     }

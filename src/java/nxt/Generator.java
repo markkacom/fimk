@@ -336,19 +336,22 @@ public final class Generator implements Comparable<Generator> {
         If previous interval is less the desired interval the hit time
         */
 
-        long candidateInterval;
-        long interval = Constants.SECONDS_BETWEEN_BLOCKS;
-        long altInterval = interval;  // altInterval and altIndex are the second selected ones
+        int candidateInterval;
+        int interval = Constants.SECONDS_BETWEEN_BLOCKS;
+        int altInterval = interval;  // altInterval and altIndex are the second selected ones
         int index = -1;
         int altIndex = -1;
-        long diff = Long.MAX_VALUE;
+        int diff = Integer.MAX_VALUE;
         BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
+
+        //in fact the desired interval is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this leads to 30s between blocks and stabilised base target
+        int desiredInterval = Math.abs(Nxt.getBlockchain().desiredBlockInterval(block)) - 1;
+
         for (int i = 0; i < hits.length; i++) {
             BigInteger hit = hits[i];
-            candidateInterval = hit.divide(divider).longValue();
-            //in fact the desired interval here is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this lead to 30s between blocks and stabilised base target
-            long d = Math.abs(Nxt.getBlockchain().desiredBlockInterval() - 1 - candidateInterval);
-            if (d <= diff) {  // "less than or equal to" is used because the altInterval and altIndex should be setted
+            candidateInterval = hit.divide(divider).intValue();
+            int d = Math.abs(desiredInterval - candidateInterval);
+            if (d < diff) {
                 diff = d;
                 altInterval = interval;
                 altIndex = index;
@@ -359,10 +362,11 @@ public final class Generator implements Comparable<Generator> {
 
         if (block.getHeight() > Constants.CONTROL_FORGING_TUNED_HITTIME_BLOCK && altIndex != -1) {
             Block preBlock = Nxt.getBlockchain().getBlock(block.getPreviousBlockId());
+            int preDesiredInterval = Math.abs(Nxt.getBlockchain().desiredBlockInterval(preBlock)) - 1;
             if (preBlock != null) {
                 int preInterval = block.getTimestamp() - preBlock.getTimestamp();
-                if ((preInterval > Constants.SECONDS_BETWEEN_BLOCKS && interval > Constants.SECONDS_BETWEEN_BLOCKS && altInterval < interval)
-                        || (preInterval < Constants.SECONDS_BETWEEN_BLOCKS && interval < Constants.SECONDS_BETWEEN_BLOCKS && altInterval > interval)) {
+                if ((preInterval > preDesiredInterval && interval > desiredInterval && altInterval < interval)
+                        || (preInterval < preDesiredInterval && interval < desiredInterval && altInterval > interval)) {
                     interval = altInterval;
                     index = altIndex;
                 }

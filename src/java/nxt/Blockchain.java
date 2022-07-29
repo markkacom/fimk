@@ -86,6 +86,6 @@ public interface Blockchain {
 
     DbIterator<? extends Transaction> getTransactions(Connection con, PreparedStatement pstmt);
 
-    int desiredBlockInterval();
+    int desiredBlockInterval(Block block);
 
 }
