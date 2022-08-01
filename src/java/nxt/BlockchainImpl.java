@@ -26,11 +26,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 final class BlockchainImpl implements Blockchain {
 
     private static final BlockchainImpl instance = new BlockchainImpl();
+    private static final int CACHE_SIZE = 255;
 
     static BlockchainImpl getInstance() {
         return instance;
@@ -39,33 +42,23 @@ final class BlockchainImpl implements Blockchain {
     private BlockchainImpl() {}
 
     private final AtomicReference<BlockImpl> lastBlock = new AtomicReference<>();
-    private final AtomicReference<BlockImpl> preLastBlock = new AtomicReference<>();
+    private final ConcurrentMap<Long, BlockImpl> blockCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
     @Override
     public BlockImpl getLastBlock() {
         return lastBlock.get();
     }
 
-    public BlockImpl getPreLastBlock() {
-        BlockImpl b = preLastBlock.get();
-        if (b == null) {
-            BlockImpl lb = lastBlock.get();
-            if (lb == null) return null;
-            b = BlockDb.findBlock(lb.getPreviousBlockId());
-            preLastBlock.set(b);
-        }
-        return b;
-    }
-
     void setLastBlock(BlockImpl block) {
         lastBlock.set(block);
-        preLastBlock.set(null);
+        addToCache(block);
     }
 
     void setLastBlock(BlockImpl previousBlock, BlockImpl block) {
         if (! lastBlock.compareAndSet(previousBlock, block)) {
             throw new IllegalStateException("Last block is no longer previous block");
         }
+        addToCache(block);
     }
 
     @Override
@@ -93,9 +86,14 @@ final class BlockchainImpl implements Blockchain {
     public BlockImpl getBlock(long blockId) {
         BlockImpl block = lastBlock.get();
         if (block.getId() == blockId) return block;
-        BlockImpl preLastBlock = getPreLastBlock();
-        if (preLastBlock != null && preLastBlock.getId() == blockId) return preLastBlock;
-        return BlockDb.findBlock(blockId);
+
+        BlockImpl b = blockCache.get(blockId);
+        if (b == null) {
+            b = BlockDb.findBlock(blockId);
+            if (b != null) addToCache(b);
+        }
+        return b;
+//        return BlockDb.findBlock(blockId);
     }
 
     @Override
@@ -566,4 +564,10 @@ final class BlockchainImpl implements Blockchain {
             throw new RuntimeException(e.toString(), e);
         }
     }
+
+    private void addToCache(BlockImpl b) {
+        if (blockCache.size() >= CACHE_SIZE) blockCache.clear();
+        blockCache.put(b.getId(), b);
+    }
+
 }
