@@ -247,18 +247,21 @@ public final class Generator implements Comparable<Generator> {
     }
 
     static boolean verifyHit(BigInteger[] hits, int selectedHitIndex, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
-        int elapsedTime = timestamp - previousBlock.getTimestamp();
-        if (elapsedTime <= 0) {
-            return false;
-        }
-        BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
-        BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
-        BigInteger target = prevTarget.add(effectiveBaseTarget);
-        return hits[selectedHitIndex].compareTo(target) < 0
-                && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
-                || hits[selectedHitIndex].compareTo(prevTarget) >= 0
-                || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                || Constants.isOffline);
+        int interval = timestamp - previousBlock.getTimestamp();
+        if (interval <= 0)  return false;
+
+        // hit time calculation:  hit / (block.baseTarget * effectiveBalance) and then +1
+        // so   hit = (elapsedTime - 1) * (block.baseTarget * effectiveBalance)  but we dont to get hit back due the loss of accuracy during rounding
+
+        int expectedInterval = hits[selectedHitIndex].divide(
+                BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance)).intValue() + 1;
+
+        return expectedInterval <= interval &&
+                (expectedInterval == interval
+                        || previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
+                        || interval > Constants.BLOCK_INTERVAL_THRESHOLD
+                        || Constants.isOffline);
+
     }
 
     static boolean allowsFakeForging(byte[] publicKey) {
@@ -440,7 +443,7 @@ public final class Generator implements Comparable<Generator> {
     }
 
     boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
-        int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
+        int timestamp = (generationLimit - hitTime > Constants.BLOCK_INTERVAL_THRESHOLD) ? generationLimit : (int) hitTime + 1;
         if (!verifyHit(hits, selectedHitIndex, effectiveBalance, lastBlock, timestamp)) {
             Logger.logDebugMessage(this + " failed to forge at " + timestamp);
             return false;
