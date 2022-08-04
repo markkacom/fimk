@@ -988,19 +988,19 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 //report about pushed block
                 if ((Nxt.getEpochTime() - block.getTimestamp()) < 3*24*60*60) {
                     LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(Convert.fromEpochTime(block.getTimestamp())), ZoneId.systemDefault());
-                    String feederAddresss = peer == null ?
-                            (getLastBlockchainFeeder() == null ? "*" : getLastBlockchainFeeder().getAnnouncedAddress()) :
-                            peer.getAnnouncedAddress() == null ? peer.getHost() : peer.getAnnouncedAddress();
+                    String feederAddresss = peer == null
+                            ? "*"
+                            : peer.getAnnouncedAddress() == null ? peer.getHost() : peer.getAnnouncedAddress();
                     int interval = block.getTimestamp() - previousLastBlock.getTimestamp();
                     int txCount = block.getTransactions().size();
-                    String logMessage = String.format("Pushed block %s height %d time %s from %s generator %s interval %s %d",
+                    String logMessage = String.format("Pushed block %s height %d time %s from %s generator %s interval %d %s",
                             Long.toUnsignedString(block.getId()), block.getHeight(),
                             dt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                             feederAddresss,
                             Long.toUnsignedString(block.getGeneratorId()),
-                            txCount > 0 ? "transactions " + txCount : "",
-                            interval
-                    );
+                            interval,
+                            txCount > 0 ? "transactions " + txCount : ""
+                            );
                     Logger.logDebugMessage(logMessage);
                 }
 
@@ -1014,7 +1014,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             }
         } // synchronized
 
-        if (block.getTimestamp() >= curTime - (Constants.MAX_TIMEDRIFT + Constants.FORGING_DELAY)) {
+        if (block.getTimestamp() >= curTime - Constants.MAX_TIMEDRIFT) {
             Peers.sendToSomePeers(block);
         }
 

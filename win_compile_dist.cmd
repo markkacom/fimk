@@ -26,3 +26,5 @@ copy conf\embedded-template.properties dist\conf /y
 copy conf\logging-default.properties dist\conf /y
 
 echo "dist created successfully"
+
+pause
