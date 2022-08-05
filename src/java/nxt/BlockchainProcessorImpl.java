@@ -413,14 +413,16 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 if (peerBlock == null)
                     break;
                 BlockImpl block = peerBlock.getBlock();
-                if (blockchain.getLastBlock().getId() == block.getPreviousBlockId()) {
-                    try {
-                        pushBlock(block, peerBlock.getPeer());
-                    } catch (BlockNotAcceptedException e) {
-                        peerBlock.getPeer().blacklist(e);
+                synchronized (blockchain) {
+                    if (blockchain.getLastBlock().getId() == block.getPreviousBlockId()) {
+                        try {
+                            pushBlock(block, peerBlock.getPeer());
+                        } catch (BlockNotAcceptedException e) {
+                            peerBlock.getPeer().blacklist(e);
+                        }
+                    } else {
+                        forkBlocks.add(block);
                     }
-                } else {
-                    forkBlocks.add(block);
                 }
             }
             //
@@ -837,11 +839,11 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     @Override
     public void processPeerBlock(JSONObject request) throws NxtException {
         BlockImpl block = BlockImpl.parseBlock(request);
-        BlockImpl lastBlock = blockchain.getLastBlock();
-        if (block.getPreviousBlockId() == lastBlock.getId()) {
-            pushBlock(block);
-        } else if (block.getPreviousBlockId() == lastBlock.getPreviousBlockId() && block.getTimestamp() < lastBlock.getTimestamp()) {
-            synchronized (blockchain) {
+        synchronized (blockchain) {
+            BlockImpl lastBlock = blockchain.getLastBlock();
+            if (block.getPreviousBlockId() == lastBlock.getId()) {
+                pushBlock(block);
+            } else if (block.getPreviousBlockId() == lastBlock.getPreviousBlockId() && block.getTimestamp() < lastBlock.getTimestamp()) {
                 if (lastBlock.getId() != blockchain.getLastBlock().getId()) {
                     return; // blockchain changed, ignore the block
                 }
@@ -856,8 +858,8 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                     pushBlock(lastBlock);
                     TransactionProcessorImpl.getInstance().processLater(block.getTransactions());
                 }
-            }
-        } // else ignore the block
+            } // else ignore the block
+        }
     }
 
     @Override
