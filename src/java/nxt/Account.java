@@ -1113,7 +1113,7 @@ public final class Account {
         return creationHeight;
     }
 
-    int getKeyHeight() {
+    public int getKeyHeight() {
         return keyHeight;
     }
 
@@ -1351,7 +1351,7 @@ public final class Account {
         return getUnconfirmedCurrencyUnits(this.id, currencyId);
     }
 
-    void leaseEffectiveBalance(long lesseeId, short period) {
+    public void leaseEffectiveBalance(long lesseeId, short period) {
         Account lessee = Account.getAccount(lesseeId);
         if (lessee != null && lessee.getKeyHeight() > 0) {
             int height = Nxt.getBlockchain().getHeight();

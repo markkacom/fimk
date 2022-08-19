@@ -18,6 +18,7 @@ package nxt;
 
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
+import nxt.txn.AccountControl;
 import nxt.util.Convert;
 
 import org.json.simple.JSONArray;
@@ -1799,12 +1800,12 @@ public interface Attachment extends Appendix {
 
         private final short period;
 
-        AccountControlEffectiveBalanceLeasing(ByteBuffer buffer, byte transactionVersion) {
+        public AccountControlEffectiveBalanceLeasing(ByteBuffer buffer, byte transactionVersion) {
             super(buffer, transactionVersion);
             this.period = buffer.getShort();
         }
 
-        AccountControlEffectiveBalanceLeasing(JSONObject attachmentData) {
+        public AccountControlEffectiveBalanceLeasing(JSONObject attachmentData) {
             super(attachmentData);
             this.period = ((Long) attachmentData.get("period")).shortValue();
         }
@@ -1830,7 +1831,7 @@ public interface Attachment extends Appendix {
 
         @Override
         public TransactionType getTransactionType() {
-            return TransactionType.AccountControl.EFFECTIVE_BALANCE_LEASING;
+            return AccountControl.EFFECTIVE_BALANCE_LEASING;
         }
 
         public short getPeriod() {
