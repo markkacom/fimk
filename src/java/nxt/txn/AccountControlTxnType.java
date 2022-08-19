@@ -5,9 +5,9 @@ import org.json.simple.JSONObject;
 
 import java.nio.ByteBuffer;
 
-public abstract class AccountControl extends TransactionType {
+public abstract class AccountControlTxnType extends TransactionType {
 
-    private AccountControl() {
+    private AccountControlTxnType() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public abstract class AccountControl extends TransactionType {
     protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
     }
 
-    public static final TransactionType EFFECTIVE_BALANCE_LEASING = new nxt.txn.AccountControl() {
+    public static final TransactionType EFFECTIVE_BALANCE_LEASING = new AccountControlTxnType() {
 
         @Override
         public final byte getSubtype() {
@@ -37,24 +37,24 @@ public abstract class AccountControl extends TransactionType {
         }
 
         @Override
-        protected Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
-            return new Attachment.AccountControlEffectiveBalanceLeasing(buffer, transactionVersion);
+        protected EffectiveBalanceLeasingAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            return new EffectiveBalanceLeasingAttachment(buffer, transactionVersion);
         }
 
         @Override
-        protected Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
-            return new Attachment.AccountControlEffectiveBalanceLeasing(attachmentData);
+        protected EffectiveBalanceLeasingAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            return new EffectiveBalanceLeasingAttachment(attachmentData);
         }
 
         @Override
         protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
-            Attachment.AccountControlEffectiveBalanceLeasing attachment = (Attachment.AccountControlEffectiveBalanceLeasing) transaction.getAttachment();
+            EffectiveBalanceLeasingAttachment attachment = (EffectiveBalanceLeasingAttachment) transaction.getAttachment();
             Account.getAccount(transaction.getSenderId()).leaseEffectiveBalance(transaction.getRecipientId(), attachment.getPeriod());
         }
 
         @Override
         protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-            Attachment.AccountControlEffectiveBalanceLeasing attachment = (Attachment.AccountControlEffectiveBalanceLeasing) transaction.getAttachment();
+            EffectiveBalanceLeasingAttachment attachment = (EffectiveBalanceLeasingAttachment) transaction.getAttachment();
             Account recipientAccount = Account.getAccount(transaction.getRecipientId());
             if (transaction.getSenderId() == transaction.getRecipientId()
                     || transaction.getAmountNQT() != 0
@@ -83,7 +83,7 @@ public abstract class AccountControl extends TransactionType {
 
     };
 
-    public static final TransactionType POP_REWARD_CHALLENGE = new nxt.txn.AccountControl() {
+    public static final TransactionType POP_REWARD_CHALLENGE = new AccountControlTxnType() {
 
         @Override
         public final byte getSubtype() {
@@ -96,24 +96,24 @@ public abstract class AccountControl extends TransactionType {
         }
 
         @Override
-        protected Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
-            return new Attachment.AccountControlEffectiveBalanceLeasing(buffer, transactionVersion);
+        protected EffectiveBalanceLeasingAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            return new EffectiveBalanceLeasingAttachment(buffer, transactionVersion);
         }
 
         @Override
-        protected Attachment.AccountControlEffectiveBalanceLeasing parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
-            return new Attachment.AccountControlEffectiveBalanceLeasing(attachmentData);
+        protected EffectiveBalanceLeasingAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            return new EffectiveBalanceLeasingAttachment(attachmentData);
         }
 
         @Override
         protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
-            Attachment.AccountControlEffectiveBalanceLeasing attachment = (Attachment.AccountControlEffectiveBalanceLeasing) transaction.getAttachment();
+            EffectiveBalanceLeasingAttachment attachment = (EffectiveBalanceLeasingAttachment) transaction.getAttachment();
             Account.getAccount(transaction.getSenderId()).leaseEffectiveBalance(transaction.getRecipientId(), attachment.getPeriod());
         }
 
         @Override
         protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-            Attachment.AccountControlEffectiveBalanceLeasing attachment = (Attachment.AccountControlEffectiveBalanceLeasing) transaction.getAttachment();
+            EffectiveBalanceLeasingAttachment attachment = (EffectiveBalanceLeasingAttachment) transaction.getAttachment();
             Account recipientAccount = Account.getAccount(transaction.getRecipientId());
             if (transaction.getSenderId() == transaction.getRecipientId()
                     || transaction.getAmountNQT() != 0

@@ -17,7 +17,7 @@
 package nxt;
 
 import nxt.Attachment.ColoredCoinsAssetIssuance;
-import nxt.txn.AccountControl;
+import nxt.txn.AccountControlTxnType;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONObject;
@@ -152,9 +152,9 @@ public abstract class TransactionType {
             case TYPE_ACCOUNT_CONTROL:
                 switch (subtype) {
                     case SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING:
-                        return AccountControl.EFFECTIVE_BALANCE_LEASING;
+                        return AccountControlTxnType.EFFECTIVE_BALANCE_LEASING;
                     case SUBTYPE_ACCOUNT_CONTROL_POP_REWARD_CHALLENGE:
-                        return AccountControl.POP_REWARD_CHALLENGE;
+                        return AccountControlTxnType.POP_REWARD_CHALLENGE;
                     default:
                         return null;
                 }

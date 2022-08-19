@@ -18,7 +18,6 @@ package nxt;
 
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
-import nxt.txn.AccountControl;
 import nxt.util.Convert;
 
 import org.json.simple.JSONArray;
@@ -89,16 +88,16 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        final int getMySize() {
+        protected final int getMySize() {
             return 0;
         }
 
         @Override
-        final void putMyBytes(ByteBuffer buffer) {
+        protected final void putMyBytes(ByteBuffer buffer) {
         }
 
         @Override
-        final void putMyJSON(JSONObject json) {
+        protected final void putMyJSON(JSONObject json) {
         }
 
         @Override
@@ -150,12 +149,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length + 2 + Convert.toBytes(aliasURI).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] alias = Convert.toBytes(this.aliasName);
             byte[] uri = Convert.toBytes(this.aliasURI);
             buffer.put((byte)alias.length);
@@ -165,7 +164,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
             attachment.put("uri", aliasURI);
         }
@@ -212,12 +211,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] aliasBytes = Convert.toBytes(aliasName);
             buffer.put((byte)aliasBytes.length);
             buffer.put(aliasBytes);
@@ -225,7 +224,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
             attachment.put("priceNQT", priceNQT);
         }
@@ -263,19 +262,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] aliasBytes = Convert.toBytes(aliasName);
             buffer.put((byte) aliasBytes.length);
             buffer.put(aliasBytes);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
         }
 
@@ -308,19 +307,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length;
         }
 
         @Override
-        void putMyBytes(final ByteBuffer buffer) {
+        protected void putMyBytes(final ByteBuffer buffer) {
             byte[] aliasBytes = Convert.toBytes(aliasName);
             buffer.put((byte)aliasBytes.length);
             buffer.put(aliasBytes);
         }
 
         @Override
-        void putMyJSON(final JSONObject attachment) {
+        protected void putMyJSON(final JSONObject attachment) {
             attachment.put("alias", aliasName);
         }
 
@@ -465,7 +464,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             int size = 2 + Convert.toBytes(pollName).length + 2 + Convert.toBytes(pollDescription).length + 1;
             for (String pollOption : pollOptions) {
                 size += 2 + Convert.toBytes(pollOption).length;
@@ -477,7 +476,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.pollName);
             byte[] description = Convert.toBytes(this.pollDescription);
             byte[][] options = new byte[this.pollOptions.length][];
@@ -508,7 +507,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", this.pollName);
             attachment.put("description", this.pollDescription);
             attachment.put("finishHeight", this.finishHeight);
@@ -607,19 +606,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 1 + this.pollVote.length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(this.pollId);
             buffer.put((byte) this.pollVote.length);
             buffer.put(this.pollVote);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("poll", Long.toUnsignedString(this.pollId));
             JSONArray vote = new JSONArray();
             if (this.pollVote != null) {
@@ -685,12 +684,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + 32 * transactionFullHashes.size() + 4 + revealedSecret.length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put((byte) transactionFullHashes.size());
             transactionFullHashes.forEach(buffer::put);
             buffer.putInt(revealedSecret.length);
@@ -698,7 +697,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             JSONArray jsonArray = new JSONArray();
             transactionFullHashes.forEach(hash -> jsonArray.add(Convert.toHexString(hash)));
             attachment.put("transactionFullHashes", jsonArray);
@@ -759,7 +758,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             int size = 8 + 1;
             for (String uri : uris) {
                 size += 2 + Convert.toBytes(uri).length;
@@ -768,7 +767,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(minFeePerByteNQT);
             buffer.put((byte) uris.length);
             for (String uri : uris) {
@@ -779,7 +778,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("minFeePerByteNQT", minFeePerByteNQT);
             JSONArray uris = new JSONArray();
             Collections.addAll(uris, this.uris);
@@ -825,12 +824,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.name);
             byte[] description = Convert.toBytes(this.description);
             buffer.put((byte)name.length);
@@ -840,7 +839,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("description", description);
         }
@@ -899,7 +898,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             int size = 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1;
             if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 size += 1;
@@ -908,7 +907,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.name);
             byte[] description = Convert.toBytes(this.description);
             buffer.put((byte)name.length);
@@ -923,7 +922,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("description", description);
             attachment.put("quantityQNT", quantityQNT);
@@ -986,12 +985,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + (getVersion() == 0 ? (2 + Convert.toBytes(comment).length) : 0);
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(assetId);
             buffer.putLong(quantityQNT);
             if (getVersion() == 0 && comment != null) {
@@ -1002,7 +1001,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             Asset.putAsset(attachment, assetId);
             attachment.put("quantityQNT", quantityQNT);
             if (getVersion() == 0) {
@@ -1056,19 +1055,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(assetId);
             buffer.putLong(quantityQNT);
             buffer.putLong(priceNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             Asset.putAsset(attachment, assetId);
             attachment.put("quantityQNT", quantityQNT);
             attachment.put("priceNQT", priceNQT);
@@ -1116,12 +1115,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return super.getMySize() + (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? 8 : 0);
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             super.putMyBytes(buffer);
             if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 buffer.putLong(orderFeeQNT);
@@ -1129,7 +1128,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 attachment.put("orderFeeQNT", orderFeeQNT);
@@ -1170,12 +1169,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return super.getMySize() + (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? 8 : 0);
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             super.putMyBytes(buffer);
             if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 buffer.putLong(orderFeeNQT);
@@ -1183,7 +1182,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
                 attachment.put("orderFeeNQT", orderFeeNQT);
@@ -1215,17 +1214,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(orderId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("order", Long.toUnsignedString(orderId));
         }
 
@@ -1303,19 +1302,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(assetId);
             buffer.putInt(height);
             buffer.putLong(amountNQTPerQNT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("asset", Long.toUnsignedString(assetId));
             attachment.put("height", height);
             attachment.put("amountNQTPerQNT", amountNQTPerQNT);
@@ -1375,13 +1374,13 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 2 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 2
                         + Convert.toBytes(tags).length + 4 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] nameBytes = Convert.toBytes(name);
             buffer.putShort((short) nameBytes.length);
             buffer.put(nameBytes);
@@ -1396,7 +1395,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("description", description);
             attachment.put("tags", tags);
@@ -1440,17 +1439,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
         }
 
@@ -1486,18 +1485,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
             buffer.putLong(priceNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
             attachment.put("priceNQT", priceNQT);
         }
@@ -1536,18 +1535,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
             buffer.putInt(deltaQuantity);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
             attachment.put("deltaQuantity", deltaQuantity);
         }
@@ -1594,12 +1593,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4 + 8 + 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
             buffer.putInt(quantity);
             buffer.putLong(priceNQT);
@@ -1607,7 +1606,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
             attachment.put("quantity", quantity);
             attachment.put("priceNQT", priceNQT);
@@ -1665,12 +1664,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4 + goods.getSize() + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(purchaseId);
             buffer.putInt(goodsIsText ? goods.getData().length | Integer.MIN_VALUE : goods.getData().length);
             buffer.put(goods.getData());
@@ -1679,7 +1678,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("purchase", Long.toUnsignedString(purchaseId));
             attachment.put("goodsData", Convert.toHexString(goods.getData()));
             attachment.put("goodsNonce", Convert.toHexString(goods.getNonce()));
@@ -1723,17 +1722,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(purchaseId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("purchase", Long.toUnsignedString(purchaseId));
         }
 
@@ -1769,18 +1768,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(purchaseId);
             buffer.putLong(refundNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("purchase", Long.toUnsignedString(purchaseId));
             attachment.put("refundNQT", refundNQT);
         }
@@ -1794,49 +1793,6 @@ public interface Attachment extends Appendix {
 
         public long getRefundNQT() { return refundNQT; }
 
-    }
-
-    final class AccountControlEffectiveBalanceLeasing extends AbstractAttachment {
-
-        private final short period;
-
-        public AccountControlEffectiveBalanceLeasing(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-            this.period = buffer.getShort();
-        }
-
-        public AccountControlEffectiveBalanceLeasing(JSONObject attachmentData) {
-            super(attachmentData);
-            this.period = ((Long) attachmentData.get("period")).shortValue();
-        }
-
-        public AccountControlEffectiveBalanceLeasing(short period) {
-            this.period = period;
-        }
-
-        @Override
-        int getMySize() {
-            return 2;
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            buffer.putShort(period);
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            attachment.put("period", period);
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return AccountControl.EFFECTIVE_BALANCE_LEASING;
-        }
-
-        public short getPeriod() {
-            return period;
-        }
     }
 
     interface MonetarySystemAttachment {
@@ -1918,13 +1874,13 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(name).length + 1 + Convert.toBytes(code).length + 2 +
                     Convert.toBytes(description).length + 1 + 8 + 8 + 8 + 4 + 8 + 1 + 1 + 1 + 1 + 1;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.name);
             byte[] code = Convert.toBytes(this.code);
             byte[] description = Convert.toBytes(this.description);
@@ -1948,7 +1904,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("code", code);
             attachment.put("description", description);
@@ -2050,18 +2006,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(amountPerUnitNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("amountPerUnitNQT", amountPerUnitNQT);
         }
@@ -2105,18 +2061,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(units);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("units", units);
         }
@@ -2160,18 +2116,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(units);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("units", units);
         }
@@ -2239,12 +2195,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8 + 8 + 8 + 8 + 8 + 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(buyRateNQT);
             buffer.putLong(sellRateNQT);
@@ -2256,7 +2212,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("buyRateNQT", buyRateNQT);
             attachment.put("sellRateNQT", sellRateNQT);
@@ -2334,19 +2290,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(rateNQT);
             buffer.putLong(units);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("rateNQT", rateNQT);
             attachment.put("units", units);
@@ -2440,12 +2396,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(nonce);
             buffer.putLong(currencyId);
             buffer.putLong(units);
@@ -2453,7 +2409,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("nonce", nonce);
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("units", units);
@@ -2503,17 +2459,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
         }
 
@@ -2598,7 +2554,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             if (taggedData != null) {
                 attachment.put("name", taggedData.getName());
                 attachment.put("description", taggedData.getDescription());
@@ -2741,17 +2697,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 32;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put(getHash());
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             attachment.put("hash", Convert.toHexString(getHash()));
         }
@@ -2809,17 +2765,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(taggedDataId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             attachment.put("taggedData", Long.toUnsignedString(taggedDataId));
         }

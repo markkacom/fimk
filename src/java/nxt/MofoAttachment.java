@@ -34,12 +34,12 @@ public class MofoAttachment {
         }
     
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length + 2 + Convert.toBytes(aliasURI).length;
         }
     
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] alias = Convert.toBytes(this.aliasName);
             byte[] uri = Convert.toBytes(this.aliasURI);
             buffer.put((byte)alias.length);
@@ -50,7 +50,7 @@ public class MofoAttachment {
     
         @SuppressWarnings("unchecked")
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
             attachment.put("uri", aliasURI);
         }
@@ -89,17 +89,17 @@ public class MofoAttachment {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
     
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(assetId);
         }
     
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             Asset.putAsset(attachment, assetId);
         }
         
@@ -177,12 +177,12 @@ public class MofoAttachment {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4 + 4;
         }
     
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(assetId);
             buffer.putInt(orderFeePercentage);
             buffer.putInt(tradeFeePercentage);
@@ -190,7 +190,7 @@ public class MofoAttachment {
     
         @SuppressWarnings("unchecked")
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             Asset.putAsset(attachment, assetId);
             attachment.put("orderFeePercentage", orderFeePercentage);
             attachment.put("tradeFeePercentage", tradeFeePercentage);
@@ -251,12 +251,12 @@ public class MofoAttachment {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + 8 + Convert.toBytes(identifier).length + 2 + (signature != null ? signature.length : 0);
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] identifier = Convert.toBytes(this.identifier);
             buffer.put((byte)identifier.length);
             buffer.put(identifier);
@@ -269,7 +269,7 @@ public class MofoAttachment {
 
         @SuppressWarnings("unchecked")
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("identifier", identifier);
             attachment.put("signatory", Long.toUnsignedString(signatory));
             if (signature != null) {
@@ -314,18 +314,18 @@ public class MofoAttachment {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putInt(period);
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("period", period);
         }
 
@@ -362,12 +362,12 @@ public class MofoAttachment {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.name);
             byte[] description = Convert.toBytes(this.description);
             buffer.put((byte)name.length);
@@ -378,7 +378,7 @@ public class MofoAttachment {
 
         @SuppressWarnings("unchecked")
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("description", description);
         }
@@ -416,18 +416,18 @@ public class MofoAttachment {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(accountColorId);
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("accountColorId", Long.toUnsignedString(accountColorId));
         }
 
