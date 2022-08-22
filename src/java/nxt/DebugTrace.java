@@ -17,22 +17,13 @@
 package nxt;
 
 import nxt.db.DbIterator;
+import nxt.txn.*;
 import nxt.util.Convert;
 import nxt.util.Logger;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class DebugTrace {
 
@@ -469,12 +460,12 @@ public final class DebugTrace {
 
     private Map<String,String> getValues(long accountId, Transaction transaction, Attachment attachment, boolean isRecipient) {
         Map<String,String> map = getValues(accountId, false);
-        if (attachment instanceof Attachment.ColoredCoinsOrderPlacement) {
+        if (attachment instanceof OrderPlacementAttachment) {
             if (isRecipient) {
                 return Collections.emptyMap();
             }
-            Attachment.ColoredCoinsOrderPlacement orderPlacement = (Attachment.ColoredCoinsOrderPlacement)attachment;
-            boolean isAsk = orderPlacement instanceof Attachment.ColoredCoinsAskOrderPlacement;
+            OrderPlacementAttachment orderPlacement = (OrderPlacementAttachment)attachment;
+            boolean isAsk = orderPlacement instanceof AskOrderPlacementAttachment;
             map.put("asset", Long.toUnsignedString(orderPlacement.getAssetId()));
             map.put("order", transaction.getStringId());
             map.put("order price", String.valueOf(orderPlacement.getPriceNQT()));
@@ -490,16 +481,16 @@ public final class DebugTrace {
             map.put("order cost", orderCost.toString());
             String event = (isAsk ? "ask" : "bid") + " order";
             map.put("event", event);
-        } else if (attachment instanceof Attachment.ColoredCoinsAssetIssuance) {
+        } else if (attachment instanceof AssetIssuanceAttachment) {
             if (isRecipient) {
                 return Collections.emptyMap();
             }
-            Attachment.ColoredCoinsAssetIssuance assetIssuance = (Attachment.ColoredCoinsAssetIssuance)attachment;
+            AssetIssuanceAttachment assetIssuance = (AssetIssuanceAttachment)attachment;
             map.put("asset", transaction.getStringId());
             map.put("asset quantity", String.valueOf(assetIssuance.getQuantityQNT()));
             map.put("event", "asset issuance");
-        } else if (attachment instanceof Attachment.ColoredCoinsAssetTransfer) {
-            Attachment.ColoredCoinsAssetTransfer assetTransfer = (Attachment.ColoredCoinsAssetTransfer)attachment;
+        } else if (attachment instanceof AssetTransferAttachment) {
+            AssetTransferAttachment assetTransfer = (AssetTransferAttachment)attachment;
             map.put("asset", Long.toUnsignedString(assetTransfer.getAssetId()));
             long quantity = assetTransfer.getQuantityQNT();
             if (! isRecipient) {
@@ -507,8 +498,8 @@ public final class DebugTrace {
             }
             map.put("asset quantity", String.valueOf(quantity));
             map.put("event", "asset transfer");
-        } else if (attachment instanceof Attachment.ColoredCoinsOrderCancellation) {
-            Attachment.ColoredCoinsOrderCancellation orderCancellation = (Attachment.ColoredCoinsOrderCancellation)attachment;
+        } else if (attachment instanceof OrderCancellationAttachment) {
+            OrderCancellationAttachment orderCancellation = (OrderCancellationAttachment)attachment;
             map.put("order", Long.toUnsignedString(orderCancellation.getOrderId()));
             map.put("event", "order cancel");
         } else if (attachment instanceof Attachment.DigitalGoodsPurchase) {
@@ -603,8 +594,8 @@ public final class DebugTrace {
             Currency currency = Currency.getCurrency(reserveIncrease.getCurrencyId());
             map.put("currency cost", String.valueOf(-Math.multiplyExact(reserveIncrease.getAmountPerUnitNQT(), currency.getReserveSupply())));
             map.put("event", "currency reserve");
-        } else if (attachment instanceof Attachment.ColoredCoinsDividendPayment) {
-            Attachment.ColoredCoinsDividendPayment dividendPayment = (Attachment.ColoredCoinsDividendPayment)attachment;
+        } else if (attachment instanceof DividendPaymentAttachment) {
+            DividendPaymentAttachment dividendPayment = (DividendPaymentAttachment)attachment;
             long totalDividend = 0;
             String assetId = Long.toUnsignedString(dividendPayment.getAssetId());
             try (DbIterator<Account.AccountAsset> iterator = Account.getAssetAccounts(dividendPayment.getAssetId(), dividendPayment.getHeight(), 0, -1)) {

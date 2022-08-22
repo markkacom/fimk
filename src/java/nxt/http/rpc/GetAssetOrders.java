@@ -1,23 +1,18 @@
 package nxt.http.rpc;
 
-import java.util.List;
-
-import nxt.Asset;
-import nxt.Attachment.ColoredCoinsAskOrderPlacement;
-import nxt.Attachment.ColoredCoinsBidOrderPlacement;
-import nxt.MofoQueries;
-import nxt.Nxt;
-import nxt.Order;
-import nxt.Transaction;
+import nxt.*;
 import nxt.db.DbIterator;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
+import nxt.txn.AskOrderPlacementAttachment;
+import nxt.txn.BidOrderPlacementAttachment;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
+
+import java.util.List;
 
 import static nxt.http.JSONResponses.INCORRECT_ORDER_TYPE;
 
@@ -59,7 +54,7 @@ public class GetAssetOrders extends RPCCall {
             if (firstIndex == 0) {
                 List<Transaction> unconfirmed = MofoQueries.getUnconfirmedTransactions((byte)2, (byte)2);
                 for (Transaction transaction : unconfirmed) {
-                    ColoredCoinsAskOrderPlacement attachment = (ColoredCoinsAskOrderPlacement) transaction.getAttachment();
+                    AskOrderPlacementAttachment attachment = (AskOrderPlacementAttachment) transaction.getAttachment();
                   
                     JSONObject json = new JSONObject();
                     json.put("order", Long.toUnsignedString(transaction.getId()));
@@ -85,7 +80,7 @@ public class GetAssetOrders extends RPCCall {
             if (firstIndex == 0) {
                 List<Transaction> unconfirmed = MofoQueries.getUnconfirmedTransactions((byte)2, (byte)3);
                 for (Transaction transaction : unconfirmed) {
-                    ColoredCoinsBidOrderPlacement attachment = (ColoredCoinsBidOrderPlacement) transaction.getAttachment();
+                    BidOrderPlacementAttachment attachment = (BidOrderPlacementAttachment) transaction.getAttachment();
                     
                     JSONObject json = new JSONObject();
                     json.put("order", Long.toUnsignedString(transaction.getId()));

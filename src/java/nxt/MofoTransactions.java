@@ -1,15 +1,14 @@
 package nxt;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import nxt.Order.Ask;
 import nxt.Order.Bid;
 import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
-
 import org.json.simple.JSONObject;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 public class MofoTransactions {
 
@@ -409,7 +408,7 @@ public class MofoTransactions {
                     attachment.getTradeFeePercentage() > Constants.MAX_PRIVATE_ASSET_FEE_PERCENTAGE) {
                     throw new NxtException.NotValidException("Out of range trade fee percentage");
                 }
-                if (asset.getType() != Asset.TYPE_PRIVATE_ASSET) {
+                if (!MofoAsset.isPrivateAsset(asset)) {
                     throw new NxtException.NotValidException("Asset is not private");
                 }
                 if ( ! Asset.privateEnabled()) {

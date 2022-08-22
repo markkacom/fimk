@@ -20,6 +20,7 @@ import nxt.Account;
 import nxt.Attachment;
 import nxt.NxtException;
 import nxt.Order;
+import nxt.txn.AskOrderCancellationAttachment;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +43,7 @@ public final class CancelAskOrder extends CreateTransaction {
         if (orderData == null || orderData.getAccountId() != account.getId()) {
             return UNKNOWN_ORDER;
         }
-        Attachment attachment = new Attachment.ColoredCoinsAskOrderCancellation(orderId);
+        Attachment attachment = new AskOrderCancellationAttachment(orderId);
         return createTransaction(req, account, attachment);
     }
 

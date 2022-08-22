@@ -1,15 +1,5 @@
 package nxt.virtualexchange;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.json.simple.JSONObject;
-
-import nxt.Attachment;
 import nxt.Nxt;
 import nxt.Order;
 import nxt.Order.Ask;
@@ -17,7 +7,13 @@ import nxt.Order.Bid;
 import nxt.Transaction;
 import nxt.db.DbIterator;
 import nxt.http.websocket.MofoSocketServer;
+import nxt.txn.AskOrderPlacementAttachment;
+import nxt.txn.BidOrderPlacementAttachment;
+import nxt.txn.OrderPlacementAttachment;
 import nxt.util.Convert;
+import org.json.simple.JSONObject;
+
+import java.util.*;
 
 
 public abstract class VirtualOrder {
@@ -74,7 +70,7 @@ public abstract class VirtualOrder {
     private short transactionIndex;
     private long quantityQNT;
     
-    private VirtualOrder(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+    private VirtualOrder(Transaction transaction, OrderPlacementAttachment attachment) {
         this.id = transaction.getId();
         this.accountId = transaction.getSenderId();
         this.assetId = attachment.getAssetId();
@@ -232,7 +228,7 @@ public abstract class VirtualOrder {
             super(order);
         }
 
-        public VirtualAsk(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+        public VirtualAsk(Transaction transaction, OrderPlacementAttachment attachment) {
             super(transaction, attachment);
         }
 
@@ -303,7 +299,7 @@ public abstract class VirtualOrder {
         }
         
         /* called from ADDED_UNCONFIRMED_TRANSACTION for PLACE_ASK, PLACE_BID transactions */
-        static VirtualAsk addOrder(Transaction transaction, Attachment.ColoredCoinsAskOrderPlacement attachment, short transactionIndex) {
+        static VirtualAsk addOrder(Transaction transaction, AskOrderPlacementAttachment attachment, short transactionIndex) {
             VirtualAsk order = new VirtualAsk(transaction, attachment);
             order.setTransactionIndex(transactionIndex);
             order.save();
@@ -420,7 +416,7 @@ public abstract class VirtualOrder {
             super(order);
         }
 
-        public VirtualBid(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+        public VirtualBid(Transaction transaction, OrderPlacementAttachment attachment) {
             super(transaction, attachment);
         }
         
@@ -491,7 +487,7 @@ public abstract class VirtualOrder {
         }
         
         /* called from ADDED_UNCONFIRMED_TRANSACTION for PLACE_ASK, PLACE_BID transactions */
-        static VirtualBid addOrder(Transaction transaction, Attachment.ColoredCoinsBidOrderPlacement attachment, short transactionIndex) {
+        static VirtualBid addOrder(Transaction transaction, BidOrderPlacementAttachment attachment, short transactionIndex) {
             VirtualBid order = new VirtualBid(transaction, attachment);
             order.setTransactionIndex(transactionIndex);
             order.save();

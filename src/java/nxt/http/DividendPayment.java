@@ -20,6 +20,7 @@ import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
 import nxt.NxtException;
+import nxt.txn.DividendPaymentAttachment;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class DividendPayment extends CreateTransaction {
         final long amountNQTPerQNT = ParameterParser.getAmountNQTPerQNT(request);
         final Account account = ParameterParser.getSenderAccount(request);
         final Asset asset = ParameterParser.getAsset(request);
-        final Attachment attachment = new Attachment.ColoredCoinsDividendPayment(asset.getId(), height, amountNQTPerQNT);
+        final Attachment attachment = new DividendPaymentAttachment(asset.getId(), height, amountNQTPerQNT);
         return this.createTransaction(request, account, attachment);
     }
 

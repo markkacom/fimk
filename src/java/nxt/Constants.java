@@ -16,14 +16,9 @@
 
 package nxt;
 
-import java.util.ArrayList;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
-
 import nxt.util.Convert;
+
+import java.util.*;
 
 public final class Constants {
 
@@ -167,6 +162,7 @@ public final class Constants {
     public static final int CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK = isTestnet ? 4925 : Integer.MAX_VALUE;  //todo set this for mainnet
     public static final int CONTROL_FORGING_TUNED_HITTIME_BLOCK = isTestnet ? 6241 : Integer.MAX_VALUE;  //todo set this for mainnet
 
+    public static final int PRIVATE_ASSETS_MINTABLE_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;  //todo set this for mainnet
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
