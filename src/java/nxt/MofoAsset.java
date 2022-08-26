@@ -199,10 +199,6 @@ public final class MofoAsset {
         return Utils.getBit(asset.getType(), Asset.TYPE_PRIVATE_BIT_POS) == 1;
     }
 
-    public static boolean isMintable(Asset asset) {
-        return Utils.getBit(asset.getType(), Asset.TYPE_MINTABLE_BIT_POS) == 1;
-    }
-
     public static boolean getAccountAllowed(long assetId, long accountId) {
         if (Asset.privateEnabled()) {
             Asset asset = Asset.getAsset(assetId);

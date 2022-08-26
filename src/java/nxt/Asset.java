@@ -31,7 +31,6 @@ import java.sql.SQLException;
 public final class Asset {
 
     public final static byte TYPE_PRIVATE_BIT_POS = 0;     // private  BIN 00000001
-    public final static byte TYPE_MINTABLE_BIT_POS = 1;    // private and mintable  BIN 00000011
 
     private static final DbKey.LongKeyFactory<Asset> assetDbKeyFactory = new DbKey.LongKeyFactory<Asset>("id") {
 
@@ -211,6 +210,9 @@ public final class Asset {
         return decimals;
     }
 
+    /**
+     * Used as bit array, see {@link #TYPE_PRIVATE_BIT_POS}
+     */
     public byte getType() {
       return type;
     }
