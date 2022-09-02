@@ -393,10 +393,10 @@ final class BlockImpl implements Block {
                 return true;
             }
             for (BadBlock badBlock : badBlocks) {
-                if (badBlock.height == (previousBlock.height+1) &&
+                if (badBlock.height == (previousBlock.height + 1) &&
                         badBlock.generatorId == getGeneratorId() &&
-                            Arrays.equals(generationSignature, badBlock.generationSignature)) {
-                    Logger.logInfoMessage("Block " + previousBlock.height+1 + " generation signature checkpoint passed");
+                        Arrays.equals(generationSignature, badBlock.generationSignature)) {
+                    Logger.logInfoMessage("Block " + (previousBlock.height + 1) + " generation signature checkpoint passed");
                     return true;
                 }
             }

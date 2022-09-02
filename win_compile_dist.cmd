@@ -1,6 +1,6 @@
 mkdir classes
 
-%JAVA_HOME%/bin/javac -sourcepath "src/java/" -cp "lib/*;conf/;classes/" -d classes/ src/java/nxt/*.java
+%JAVA_HOME%/bin/javac -sourcepath "src/java/" -cp "lib/*;conf/;classes/" -d classes/ src/java/fimk/*.java
 
 del fim.jar
 %JAVA_HOME%/bin/jar cf fim.jar -C classes .
@@ -26,3 +26,5 @@ copy conf\embedded-template.properties dist\conf /y
 copy conf\logging-default.properties dist\conf /y
 
 echo "dist created successfully"
+
+pause
