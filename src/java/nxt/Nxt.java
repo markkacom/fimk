@@ -371,6 +371,7 @@ public final class Nxt {
                 Alias.init();
                 NamespacedAlias.init();
                 Asset.init();
+                AssetRewarding.init();
                 DigitalGoodsStore.init();
                 Hub.init();
                 Order.init();

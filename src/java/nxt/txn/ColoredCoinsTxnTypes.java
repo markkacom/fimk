@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 public abstract class ColoredCoinsTxnTypes extends TransactionType {
 
-    private ColoredCoinsTxnTypes() {
+    ColoredCoinsTxnTypes() {
     }
 
     @Override
@@ -601,5 +601,7 @@ public abstract class ColoredCoinsTxnTypes extends TransactionType {
         }
 
     };
+
+    public static final TransactionType ASSET_REWARDING = new AssetRewardingTxnType();
 
 }

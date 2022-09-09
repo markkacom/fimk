@@ -58,6 +58,7 @@ public abstract class TransactionType {
     protected static final byte SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION = 4;
     protected static final byte SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION = 5;
     protected static final byte SUBTYPE_COLORED_COINS_DIVIDEND_PAYMENT = 6;
+    protected static final byte SUBTYPE_COLORED_COINS_ASSET_REWARDING = 7;  // assign rules to asset for rewarding
 
     static final byte SUBTYPE_DIGITAL_GOODS_LISTING = 0;
     static final byte SUBTYPE_DIGITAL_GOODS_DELISTING = 1;
@@ -125,6 +126,8 @@ public abstract class TransactionType {
                         return ColoredCoinsTxnTypes.BID_ORDER_CANCELLATION;
                     case SUBTYPE_COLORED_COINS_DIVIDEND_PAYMENT:
                         return ColoredCoinsTxnTypes.DIVIDEND_PAYMENT;
+                    case SUBTYPE_COLORED_COINS_ASSET_REWARDING:
+                        return ColoredCoinsTxnTypes.ASSET_REWARDING;
                     default:
                         return null;
                 }

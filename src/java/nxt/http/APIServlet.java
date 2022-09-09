@@ -22,7 +22,6 @@ import nxt.Nxt;
 import nxt.NxtException;
 import nxt.util.JSON;
 import nxt.util.Logger;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -30,21 +29,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-import static nxt.http.JSONResponses.ERROR_NOT_ALLOWED;
-import static nxt.http.JSONResponses.POST_REQUIRED;
+import static nxt.http.JSONResponses.*;
 
 @SuppressWarnings("serial")
 public final class APIServlet extends HttpServlet {
@@ -252,6 +241,7 @@ public final class APIServlet extends HttpServlet {
         map.put("getAllPrunableMessages", GetAllPrunableMessages.instance);
         map.put("verifyPrunableMessage", VerifyPrunableMessage.instance);
         map.put("issueAsset", IssueAsset.instance);
+        map.put("assignAssetRewarding", AssignAssetRewarding.instance);
         map.put("issueCurrency", IssueCurrency.instance);
         map.put("leaseBalance", LeaseBalance.instance);
         map.put("longConvert", LongConvert.instance);
