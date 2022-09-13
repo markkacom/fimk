@@ -18,6 +18,7 @@ package nxt;
 
 import nxt.txn.AccountControlTxnType;
 import nxt.txn.ColoredCoinsTxnTypes;
+import nxt.txn.extension.TransactionTypeExtension;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONObject;

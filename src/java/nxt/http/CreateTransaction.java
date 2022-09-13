@@ -19,6 +19,7 @@ package nxt.http;
 import nxt.*;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
+import nxt.txn.extension.TransactionTypeExtension;
 import nxt.util.Convert;
 import nxt.util.JSON;
 import nxt.util.Logger;

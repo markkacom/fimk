@@ -1083,9 +1083,14 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE TABLE IF NOT EXISTS asset_rewarding (db_id IDENTITY, id BIGINT NOT NULL, " +
                         "asset_id BIGINT NOT NULL, height INT NOT NULL, frequency INT NOT NULL, target TINYINT NOT NULL, " +
                         "lotteryType TINYINT NOT NULL, baseAmount BIGINT NOT NULL, balanceDivider BIGINT NOT NULL, targetInfo BIGINT NOT NULL, " +
-                        "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE, latest BOOLEAN NOT NULL DEFAULT TRUE)");
-                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_rewarding_asset_id_height_idx ON asset_rewarding (asset_id DESC)");
+                        "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)");
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS asset_rewarding_asset_id_idx ON asset_rewarding (asset_id)");
             case 436:
+                apply("CREATE TABLE IF NOT EXISTS reward_candidate (id BIGINT NOT NULL, " +
+                        "height INT NOT NULL, asset_id BIGINT NOT NULL, account_id BIGINT NOT NULL, " +
+                        "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)");
+                apply("CREATE UNIQUE INDEX IF NOT EXISTS reward_candidate_asset_id_account_id_idx ON reward_candidate (asset_id, account_id)");
+            case 437:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");

@@ -25,6 +25,7 @@ import nxt.http.API;
 import nxt.http.websocket.BlockchainEvents;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
+import nxt.txn.extension.TransactionTypeExtension;
 import nxt.user.Users;
 import nxt.util.Convert;
 import nxt.util.Logger;
@@ -372,6 +373,7 @@ public final class Nxt {
                 NamespacedAlias.init();
                 Asset.init();
                 AssetRewarding.init();
+                RewardCandidate.init();
                 DigitalGoodsStore.init();
                 Hub.init();
                 Order.init();

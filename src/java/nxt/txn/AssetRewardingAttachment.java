@@ -41,7 +41,8 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         this.lotteryType = ((Long) attachmentData.get("privateLotteryType")).byteValue();
         this.baseAmount = Convert.parseLong(attachmentData.get("baseAmount"));
         this.balanceDivider = Convert.parseLong(attachmentData.get("baseBalance"));
-        this.targetInfo = Convert.parseLong(attachmentData.get("a"));
+        String fieldName = fieldName();
+        this.targetInfo = fieldName == null ? 0 : Convert.parseUnsignedLong((String) attachmentData.get(fieldName));
     }
 
     public AssetRewardingAttachment(long asset, int frequency, byte target, byte lotteryType, long baseAmount, long balanceDivider, long targetInfo) {
@@ -72,13 +73,14 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
 
     @Override
     protected void putMyJSON(JSONObject attachment) {
-        attachment.put("asset", asset);
+        attachment.put("asset", Long.toUnsignedString(asset));
         attachment.put("frequency", frequency);
         attachment.put("target", target);
         attachment.put("privateLotteryType", lotteryType);
         attachment.put("baseAmount", baseAmount);
         attachment.put("baseBalance", balanceDivider);
-        attachment.put(fieldName(), targetInfo);
+        String fieldName = fieldName();
+        if (fieldName != null) attachment.put(fieldName, Long.toUnsignedString(targetInfo));
     }
 
     @Override
@@ -116,7 +118,6 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
 
     private String fieldName() {
         if (target == 0) return "balanceAssetId";
-        else if (target == 1) return "forger";
         else if (target == 2) return "account";
         return null;
     }
