@@ -1,15 +1,14 @@
 package nxt;
 
-import nxt.db.DbClause;
-import nxt.db.DbIterator;
-import nxt.db.DbKey;
-import nxt.db.EntityDbTable;
+import nxt.db.*;
 import nxt.txn.AssetRewardingAttachment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class AssetRewarding {
 
@@ -71,37 +70,43 @@ public final class AssetRewarding {
 //        }
 //    }
 
-//    public static DbIterator<AssetTransfer> getAccountAssetTransfers(long accountId, long assetId, int from, int to) {
-//        Connection con = null;
-//        try {
-//            con = Db.db.getConnection();
-//            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM asset_transfer WHERE sender_id = ? AND asset_id = ?"
-//                    + " UNION ALL SELECT * FROM asset_transfer WHERE recipient_id = ? AND sender_id <> ? AND asset_id = ? ORDER BY height DESC, db_id DESC"
-//                    + DbUtils.limitsClause(from, to));
-//            int i = 0;
-//            pstmt.setLong(++i, accountId);
-//            pstmt.setLong(++i, assetId);
-//            pstmt.setLong(++i, accountId);
-//            pstmt.setLong(++i, accountId);
-//            pstmt.setLong(++i, assetId);
-//            DbUtils.setLimits(++i, pstmt, from, to);
-//            return assetRewardingTable.getManyBy(con, pstmt, false);
-//        } catch (SQLException e) {
-//            DbUtils.close(con);
-//            throw new RuntimeException(e.toString(), e);
-//        }
-//    }
-
-    public static int getTransferCount(long assetId) {
-        return assetRewardingTable.getCount(new DbClause.LongClause("asset_id", assetId));
-    }
-
 //    public static AssetTransfer addAssetTransfer(Transaction transaction, AssetTransferAttachment attachment) {
 //        AssetTransfer assetTransfer = new AssetTransfer(transaction, attachment);
 //        assetRewardingTable.insert(assetTransfer);
 //        listeners.notify(assetTransfer, AssetTransfer.Event.ASSET_TRANSFER);
 //        return assetTransfer;
 //    }
+
+
+    public static DbIterator<AssetRewarding> getAssetRewardings(int height) {
+        Connection con = null;
+        try {
+            con = Db.db.getConnection();
+            // todo select records where expiry > today and height > r.height
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM asset_rewarding WHERE height < ? ORDER BY height, id");
+            pstmt.setInt(1, height);
+            return assetRewardingTable.getManyBy(con, pstmt, false);
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
+    public static List<AssetRewarding> getApplicableRewardings(int height) {
+        List<AssetRewarding> result = new ArrayList<>();
+        DbIterator<AssetRewarding> rewardings = getAssetRewardings(height);
+        for (AssetRewarding r : rewardings) {
+            if ((height - r.height) % r.frequency == 0) result.add(r);
+        }
+
+        return result;
+    }
+
+    private static int mapToBounded(int bound, long source) {
+        long coef = Long.MAX_VALUE / bound;
+        return (int) (Math.abs(source) / coef);
+    }
+
 
     static void init() {}
 
@@ -115,7 +120,7 @@ public final class AssetRewarding {
     private final byte lotteryType;
     private final long baseAmount;
     private final long balanceDivider;
-    private final long a;
+    private final long targetInfo;
 
     private AssetRewarding(Transaction transaction, AssetRewardingAttachment attachment) {
         this.id = transaction.getId();
@@ -127,7 +132,7 @@ public final class AssetRewarding {
         this.lotteryType = attachment.getLotteryType();
         this.baseAmount = attachment.getBaseAmount();
         this.balanceDivider = attachment.getBalanceDivider();
-        this.a = attachment.getTargetInfo();
+        this.targetInfo = attachment.getTargetInfo();
     }
 
     private AssetRewarding(ResultSet rs) throws SQLException {
@@ -140,13 +145,13 @@ public final class AssetRewarding {
         this.lotteryType = rs.getByte("lotteryType");
         this.baseAmount = rs.getLong("baseAmount");
         this.balanceDivider = rs.getLong("balanceDivider");
-        this.a = rs.getLong("a");
+        this.targetInfo = rs.getLong("targetInfo");
     }
 
     private void save(Connection con) throws SQLException {
         // overwrite previous transaction on same asset
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO asset_rewarding " +
-                "(id, height, asset_id, frequency, target, lotteryType, baseAmount, balanceDivider, a) "
+                "(id, height, asset_id, frequency, target, lotteryType, baseAmount, balanceDivider, targetInfo) "
                 + "KEY (asset_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ")) {
             int i = 0;
             pstmt.setLong(++i, this.id);
@@ -157,7 +162,7 @@ public final class AssetRewarding {
             pstmt.setByte(++i, this.lotteryType);
             pstmt.setLong(++i, this.baseAmount);
             pstmt.setLong(++i, this.balanceDivider);
-            pstmt.setLong(++i, this.a);
+            pstmt.setLong(++i, this.targetInfo);
             pstmt.executeUpdate();
         }
     }
@@ -194,8 +199,23 @@ public final class AssetRewarding {
         return balanceDivider;
     }
 
-    public long getA() {
-        return a;
+    public long getTargetInfo() {
+        return targetInfo;
     }
 
+    @Override
+    public String toString() {
+        return "AssetRewarding{" +
+                "id=" + id +
+                ", dbKey=" + dbKey +
+                ", height=" + height +
+                ", asset=" + asset +
+                ", frequency=" + frequency +
+                ", target=" + target +
+                ", lotteryType=" + lotteryType +
+                ", baseAmount=" + baseAmount +
+                ", balanceDivider=" + balanceDivider +
+                ", targetInfo=" + targetInfo +
+                '}';
+    }
 }

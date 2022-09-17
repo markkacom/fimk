@@ -1,10 +1,15 @@
 package nxt;
 
+import java.util.List;
+
 public class RewardsImpl {
   
     static public long augmentFee(Block block , long totalFeeNQT) {    
         long rewardNQT = calculatePOSRewardNQT(block);
         long totalRewardNQT = Math.addExact(rewardNQT, totalFeeNQT);
+
+        processPOPRewarding(block.getHeight());
+
         return totalRewardNQT;
     }
     
@@ -20,6 +25,13 @@ public class RewardsImpl {
                 }
             }
         }
+        return 0;
+    }
+
+    static public long processPOPRewarding(int height) {
+        if (height < Constants.FORGER_FEE_BLOCK) return 0;
+        List<AssetRewarding> ars = AssetRewarding.getApplicableRewardings(height);
+        ars.forEach(assetRewarding -> System.out.println(assetRewarding));
         return 0;
     }
 }
