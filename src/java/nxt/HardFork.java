@@ -81,8 +81,8 @@ public class HardFork {
         return Integer.MAX_VALUE;
     }
 
-    public static boolean PRIVATE_ASSETS_REWARD_BLOCK() {
-        return Nxt.getBlockchain().getHeight() > Constants.PRIVATE_ASSETS_REWARD_BLOCK;
+    public static boolean PRIVATE_ASSETS_REWARD_BLOCK(int height) {
+        return (height == -1 ? Nxt.getBlockchain().getHeight() : height) > Constants.PRIVATE_ASSETS_REWARD_BLOCK;
     }
 
     public static boolean PRIVATE_ASSETS_BLOCK() {

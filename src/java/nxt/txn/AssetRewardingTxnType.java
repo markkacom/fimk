@@ -14,7 +14,10 @@ import java.nio.ByteBuffer;
  * 3. lottery type (in case REGISTERED_POP_REWARD_RECEIVER):
  * a) random candidate, reward amount proportional candidate balance,
  * b) random weighted (by balance) candidate, constant reward amount;
- * 4. reward amount parameters: a) base reward amount, b) balance divider (to calculate reward amount) (for case 3.a), c) balance's asset id (for case 3.a and 3.b);
+ * 4. reward amount parameters:
+ *    a) base reward amount,
+ *    b) balance divider (to calculate reward amount) (for case 3.a),
+ *    c) balance's asset id (for case 3.a and 3.b);
  * <p>
  * Rule 3 is used if the REGISTERED_POP_REWARD_RECEIVER is specified in the 2. Item 4.c means what asset's balance is used.
  * For example, the rules are assigned to private asset A, but the balance of asset B is used for calculation amount of reward in asset A.
@@ -116,7 +119,7 @@ public class AssetRewardingTxnType extends ColoredCoinsTxnTypes {
 
     @Override
     protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-        if (Nxt.getBlockchain().getHeight() < Constants.PRIVATE_ASSETS_REWARD_BLOCK) {
+        if (! HardFork.PRIVATE_ASSETS_REWARD_BLOCK(-1)) {
             throw new NxtException.NotYetEnabledException("Private asset rewarding not yet enabled at height " + Nxt.getBlockchain().getHeight());
         }
         AssetRewardingAttachment a = (AssetRewardingAttachment) transaction.getAttachment();

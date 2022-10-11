@@ -46,8 +46,11 @@ public final class RewardCandidate {
         return assetRewardingTable.getCount();
     }
 
-    public static DbIterator<RewardCandidate> getRewardCandidates(long asset, int from, int to) {
-        return assetRewardingTable.getManyBy(new DbClause.LongClause("asset_id", asset), from, to);
+    /**
+     * "sorted by id" is important because is used in the consensus.
+     */
+    public static DbIterator<RewardCandidate> getRewardCandidatesSorted(long asset, int from, int to) {
+        return assetRewardingTable.getManyBy(new DbClause.LongClause("asset_id", asset), from, to, "ORDER BY id");
     }
 
 //    public static DbIterator<AssetTransfer> getAccountAssetTransfers(long accountId, int from, int to) {

@@ -10,7 +10,25 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Rules described rewarding for private asset
+ */
 public final class AssetRewarding {
+
+    /**
+     * Reward amount for asset and account
+     */
+    public static class AssetReward {
+         long accountId;
+         long assetId;
+         long amount;
+
+        public AssetReward(long accountId, long assetId, long amount) {
+            this.accountId = accountId;
+            this.assetId = assetId;
+            this.amount = amount;
+        }
+    }
 
     private static final DbKey.LongKeyFactory<AssetRewarding> dbKeyFactory = new DbKey.LongKeyFactory<AssetRewarding>("id") {
 
@@ -102,7 +120,10 @@ public final class AssetRewarding {
         return result;
     }
 
-    private static int mapToBounded(int bound, long source) {
+    /**
+     * Translate passed source value from range [0..Long.MAX_VALUE] to range [0..bound]
+     */
+    public static int mapToBounded(int bound, long source) {
         long coef = Long.MAX_VALUE / bound;
         return (int) (Math.abs(source) / coef);
     }
@@ -149,7 +170,7 @@ public final class AssetRewarding {
     }
 
     private void save(Connection con) throws SQLException {
-        // overwrite previous transaction on same asset
+        // overwrite previous transaction on same asset. Only single one per asset
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO asset_rewarding " +
                 "(id, height, asset_id, frequency, target, lotteryType, baseAmount, balanceDivider, targetInfo) "
                 + "KEY (asset_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ")) {
