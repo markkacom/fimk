@@ -28,6 +28,15 @@ public final class AssetRewarding {
             this.assetId = assetId;
             this.amount = amount;
         }
+
+        @Override
+        public String toString() {
+            return "AssetReward{" +
+                    "accountId=" + Long.toUnsignedString(accountId) +
+                    ", assetId=" + Long.toUnsignedString(assetId) +
+                    ", amount=" + amount +
+                    '}';
+        }
     }
 
     private static final DbKey.LongKeyFactory<AssetRewarding> dbKeyFactory = new DbKey.LongKeyFactory<AssetRewarding>("id") {
@@ -118,14 +127,6 @@ public final class AssetRewarding {
         }
 
         return result;
-    }
-
-    /**
-     * Translate passed source value from range [0..Long.MAX_VALUE] to range [0..bound]
-     */
-    public static int mapToBounded(int bound, long source) {
-        long coef = Long.MAX_VALUE / bound;
-        return (int) (Math.abs(source) / coef);
     }
 
 

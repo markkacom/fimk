@@ -22,8 +22,8 @@ public final class RewardCandidate {
         }
     };
 
-    private static final EntityDbTable<RewardCandidate> assetRewardingTable =
-            new EntityDbTable<RewardCandidate>("asset_rewarding", rewardCandidateDbKeyFactory) {
+    private static final EntityDbTable<RewardCandidate> rewardCandidateTable =
+            new EntityDbTable<RewardCandidate>("reward_candidate", rewardCandidateDbKeyFactory) {
         @Override
         protected RewardCandidate load(Connection con, ResultSet rs) throws SQLException {
             return new RewardCandidate(rs);
@@ -35,22 +35,22 @@ public final class RewardCandidate {
     };
 
     public static void save(Transaction transaction, long assetId) {
-        assetRewardingTable.insert(new RewardCandidate(transaction, assetId));
+        rewardCandidateTable.insert(new RewardCandidate(transaction, assetId));
     }
 
     public static DbIterator<RewardCandidate> getAll(int from, int to) {
-        return assetRewardingTable.getAll(from, to);
+        return rewardCandidateTable.getAll(from, to);
     }
 
     public static int getCount() {
-        return assetRewardingTable.getCount();
+        return rewardCandidateTable.getCount();
     }
 
     /**
      * "sorted by id" is important because is used in the consensus.
      */
     public static DbIterator<RewardCandidate> getRewardCandidatesSorted(long asset, int from, int to) {
-        return assetRewardingTable.getManyBy(new DbClause.LongClause("asset_id", asset), from, to, "ORDER BY id");
+        return rewardCandidateTable.getManyBy(new DbClause.LongClause("asset_id", asset), from, to, "ORDER BY id");
     }
 
 //    public static DbIterator<AssetTransfer> getAccountAssetTransfers(long accountId, int from, int to) {
@@ -106,6 +106,7 @@ FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)
     private final int height;
     private final long asset;
     private final long account;
+    long balance = -1;  // -1 means not filled
 
     private RewardCandidate(Transaction transaction, long assetId) {
         this.id = transaction.getId();

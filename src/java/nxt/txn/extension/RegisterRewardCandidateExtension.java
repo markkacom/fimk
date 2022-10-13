@@ -43,7 +43,7 @@ class RegisterRewardCandidateExtension extends NamespacedAliasBasedExtension {
         if (assetId != 0) {
             asset = Asset.getAsset(assetId);
             if (asset == null) return "Asset is not found";
-            if (asset.getAccountId() != sender.getId()) return "Sender is not the issuer of the asset";
+            //if (asset.getAccountId() != sender.getId()) return "Sender is not the issuer of the asset";
             if (!MofoAsset.isPrivateAsset(asset)) return "Asset is not private";
         }
 
