@@ -239,7 +239,7 @@ public abstract class TransactionType {
     private void applyExtension(TransactionImpl transaction, Account senderAccount, Account recipientAccount) {
         if (Nxt.getBlockchain().getHeight() < Constants.TRANSACTION_EXTENSION_HEIGHT) return;
         try {
-            TransactionTypeExtension ext = TransactionTypeExtension.get(transaction.getType());
+            TransactionTypeExtension ext = TransactionTypeExtension.get(transaction);
             if (ext != null) {
                 String result = ext.process(false, transaction, senderAccount, recipientAccount);
                 if (result != null) {

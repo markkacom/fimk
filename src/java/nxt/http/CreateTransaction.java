@@ -246,7 +246,7 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
         JSONObject response = null;
         if (Nxt.getBlockchain().getHeight() < Constants.TRANSACTION_EXTENSION_HEIGHT) return response;
         try {
-            TransactionTypeExtension ext = TransactionTypeExtension.get(transaction.getType());
+            TransactionTypeExtension ext = TransactionTypeExtension.get(transaction);
             if (ext != null) {
                 String result = ext.process(true, transaction, senderAccount, recipientAccount);
                 if (result != null) {
