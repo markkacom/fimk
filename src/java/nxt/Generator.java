@@ -237,19 +237,25 @@ public final class Generator implements Comparable<Generator> {
         }
     }
 
-    static boolean verifyHit(BigInteger hit, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
+    /**
+     * Verify hit. Return the cause of not valid hit.
+     */
+    static String verifyHit(BigInteger hit, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
         int elapsedTime = timestamp - previousBlock.getTimestamp();
-        if (elapsedTime <= 0) {
-            return false;
-        }
+        if (elapsedTime <= 0) return "Elapsed time is not positive " + elapsedTime;
+
         BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
         BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
         BigInteger target = prevTarget.add(effectiveBaseTarget);
-        return hit.compareTo(target) < 0
-                && (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
-                || hit.compareTo(prevTarget) >= 0
+
+        if (hit.compareTo(target) >= 0) return String.format("Hit %s exceeds the upper threshold %s", hit, target);
+
+        if (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
                 || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                || Constants.isOffline);
+                || Constants.isOffline) return null;
+
+        if (hit.compareTo(prevTarget) < 0) return String.format("Hit %s is less than the lower threshold %s", hit, target);
+        return null;
     }
 
     static long getHitTime(Account account, Block block) {
@@ -341,8 +347,9 @@ public final class Generator implements Comparable<Generator> {
 
     boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
         int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
-        if (!verifyHit(hit, effectiveBalance, lastBlock, timestamp)) {
-            Logger.logDebugMessage(this.toString() + " failed to forge at " + timestamp);
+        String hitVerifyingResult = verifyHit(hit, effectiveBalance, lastBlock, timestamp);
+        if (hitVerifyingResult != null) {
+            Logger.logDebugMessage(this + " failed to forge at " + timestamp + ". Hit is wrong: " + hitVerifyingResult);
             return false;
         }
         int start = Nxt.getEpochTime();

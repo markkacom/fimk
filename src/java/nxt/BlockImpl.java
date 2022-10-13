@@ -389,8 +389,11 @@ final class BlockImpl implements Block {
 
             BigInteger hit = new BigInteger(1, new byte[]{generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
 
-            if (Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+            String hitVerifyingResult = Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp);
+            if (hitVerifyingResult == null) {
                 return true;
+            } else {
+                Logger.logMessage("Hit is wrong: " + hitVerifyingResult);
             }
             for (BadBlock badBlock : badBlocks) {
                 if (badBlock.height == (previousBlock.height + 1) &&
