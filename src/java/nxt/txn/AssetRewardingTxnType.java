@@ -1,6 +1,7 @@
 package nxt.txn;
 
 import nxt.*;
+import nxt.reward.AssetRewarding;
 import org.json.simple.JSONObject;
 
 import java.nio.ByteBuffer;

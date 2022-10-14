@@ -25,6 +25,8 @@ import nxt.http.API;
 import nxt.http.websocket.BlockchainEvents;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
+import nxt.reward.AssetRewarding;
+import nxt.reward.RewardCandidate;
 import nxt.txn.extension.TransactionTypeExtension;
 import nxt.user.Users;
 import nxt.util.Convert;

@@ -1,5 +1,6 @@
-package nxt;
+package nxt.reward;
 
+import nxt.Transaction;
 import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
@@ -99,7 +100,7 @@ height INT NOT NULL, asset_id BIGINT NOT NULL, account_id BIGINT NOT NULL,
 FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)
 * */
 
-    static void init() {}
+    public static void init() {}
 
     private final long id;
     private final DbKey dbKey;

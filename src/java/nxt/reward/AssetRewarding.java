@@ -1,5 +1,7 @@
-package nxt;
+package nxt.reward;
 
+import nxt.Db;
+import nxt.Transaction;
 import nxt.db.*;
 import nxt.txn.AssetRewardingAttachment;
 
@@ -130,7 +132,7 @@ public final class AssetRewarding {
     }
 
 
-    static void init() {}
+    public static void init() {}
 
 
     private final long id;

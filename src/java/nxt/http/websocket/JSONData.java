@@ -5,6 +5,7 @@ import nxt.Account.AccountIdentifier;
 import nxt.Account.AccountInfo;
 import nxt.Attachment.MonetarySystemAttachment;
 import nxt.peer.Peer;
+import nxt.reward.Reward;
 import nxt.txn.*;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -244,7 +245,7 @@ public class JSONData {
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
-        json.put("totalPOSRewardNQT", RewardsImpl.calculatePOSRewardNQT(block));
+        json.put("totalPOSRewardNQT", Reward.get().calculatePOSRewardNQT(block));
         return json;
     }
 

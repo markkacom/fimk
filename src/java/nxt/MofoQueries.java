@@ -1,5 +1,13 @@
 package nxt;
 
+import nxt.Appendix.Message;
+import nxt.db.DbIterator;
+import nxt.db.DbUtils;
+import nxt.http.websocket.JSONData;
+import nxt.reward.Reward;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
@@ -8,19 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import nxt.Appendix.Message;
-import nxt.db.DbIterator;
-import nxt.db.DbUtils;
-import nxt.http.websocket.JSONData;
+import java.util.*;
 
 public final class MofoQueries {
 
@@ -198,7 +194,7 @@ public final class MofoQueries {
 
                     /* Must implement a catch here in case we are on NXT and not on FIMK */
                     if ("FIMK".equals(Nxt.APPLICATION)) {
-                        stat.add(total_fee + RewardsImpl.calculatePOSRewardNQT(height));
+                        stat.add(total_fee + Reward.get().calculatePOSRewardNQT(height));
                     }
                     else {
                         stat.add(total_fee);

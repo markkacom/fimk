@@ -1,5 +1,9 @@
-package nxt;
+package nxt.reward;
 
+import nxt.Account;
+import nxt.Block;
+import nxt.Constants;
+import nxt.HardFork;
 import nxt.db.DbIterator;
 import nxt.txn.AssetRewardingTxnType.LotteryType;
 import nxt.txn.AssetRewardingTxnType.Target;
@@ -7,9 +11,9 @@ import nxt.txn.AssetRewardingTxnType.Target;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RewardsImpl {
+public class RewardImpl extends Reward {
 
-    public static long augmentFee(Block block, long totalFeeNQT) {
+    public long augmentFee(Block block, long totalFeeNQT) {
         long rewardNQT = calculatePOSRewardNQT(block);
         long totalRewardNQT = Math.addExact(rewardNQT, totalFeeNQT);
 
@@ -22,11 +26,11 @@ public class RewardsImpl {
         return totalRewardNQT;
     }
 
-    public static long calculatePOSRewardNQT(Block block) {
+    public long calculatePOSRewardNQT(Block block) {
         return calculatePOSRewardNQT(block.getHeight());
     }
 
-    public static long calculatePOSRewardNQT(int height) {
+    public long calculatePOSRewardNQT(int height) {
         if (height >= Constants.FORGER_FEE_BLOCK) {
             for (int i = 0; i < Constants.FORGER_FEE_AMOUNT_NQT_STAGES.length; i++) {
                 if (height < (Constants.FORGER_FEE_STAGE_CHANGE_AT_BLOCK * (i + 1))) {
@@ -40,7 +44,7 @@ public class RewardsImpl {
     /**
      * @return array of 1) account id, 2) private asset id, 3) amount
      */
-    public static List<AssetRewarding.AssetReward> processPOPRewarding(Block block) {
+    private List<AssetRewarding.AssetReward> processPOPRewarding(Block block) {
         if (!HardFork.PRIVATE_ASSETS_REWARD_BLOCK(block.getHeight())) return null;
         List<AssetRewarding> ars = AssetRewarding.getApplicableRewardings(block.getHeight());
         List<AssetRewarding.AssetReward> result = ars.isEmpty() ? null : new ArrayList<>(ars.size());
@@ -97,7 +101,7 @@ public class RewardsImpl {
         return result;
     }
 
-    private static List<RewardCandidate> rewardCandidates(long assetId) {
+    private List<RewardCandidate> rewardCandidates(long assetId) {
         //todo filter expired candidate
         List<RewardCandidate> candidates = new ArrayList<>();
         DbIterator<RewardCandidate> it = RewardCandidate.getRewardCandidatesSorted(assetId, 0, Integer.MAX_VALUE);
@@ -108,7 +112,7 @@ public class RewardsImpl {
     /**
      * Translate passed source value from range [0..Long.MAX_VALUE] to range [0..bound]
      */
-    private static long mapToBounded(long bound, long source) {
+    private long mapToBounded(long bound, long source) {
         long coef = Long.MAX_VALUE / bound;
         return Math.abs(source) / coef;
     }

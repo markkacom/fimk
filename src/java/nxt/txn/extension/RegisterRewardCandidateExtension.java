@@ -1,6 +1,7 @@
 package nxt.txn.extension;
 
 import nxt.*;
+import nxt.reward.RewardCandidate;
 import nxt.util.Logger;
 
 class RegisterRewardCandidateExtension extends NamespacedAliasBasedExtension {
