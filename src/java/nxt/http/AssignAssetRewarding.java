@@ -36,7 +36,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
                     (byte) ParameterParser.getInt(req, "lotteryType", 0, 1,  false));
         }
         if (target == AssetRewardingTxnType.Target.CONSTANT_ACCOUNT) {
-            targetInfo = ParameterParser.getUnsignedLong(req, "targetAccount", true);
+            targetInfo = ParameterParser.getAccountId(req, "targetAccount", true);
         }
 
         Account account = ParameterParser.getSenderAccount(req);
