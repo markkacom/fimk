@@ -1,6 +1,7 @@
 package fimk;
 
 import nxt.Block;
+import nxt.Generator;
 import nxt.Nxt;
 
 import java.util.*;
@@ -56,8 +57,16 @@ public class Starter {
                         }
                     }
                 }
+                if ("startforging".equals(command)) {
+                    String secret = input.substring("startforging".length()).trim();
+                    Generator.startForging(secret);
+                }
+                if ("stopforging".equals(command)) {
+                    Generator.stopForging();
+                }
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
         }
     }
