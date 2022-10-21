@@ -146,7 +146,7 @@ public final class Nxt {
             String configFile = System.getProperty(propertiesFile);
             if (configFile != null) {
                 System.out.printf("Loading %s from %s\n", propertiesFile, configFile);
-                try (InputStream fis = new FileInputStream(configFile)) {
+                try (InputStream fis = Files.newInputStream(Paths.get(configFile))) {
                     properties.load(fis);
                     return properties;
                 } catch (IOException e) {
