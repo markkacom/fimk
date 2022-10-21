@@ -226,6 +226,11 @@ public final class Nxt {
         return getIntProperty(name, 0);
     }
 
+    public static int getIntPropertyNew(String suffix, int defaultValue, int testnetDefaultValue) {
+        String name = (Constants.isTestnet ? "fimk.testnet." : "fimk.") + suffix;
+        return getIntProperty(name, Constants.isTestnet ? testnetDefaultValue : defaultValue);
+    }
+
     public static int getIntProperty(String name, int defaultValue) {
         try {
             int result = Integer.parseInt(properties.getProperty(name));

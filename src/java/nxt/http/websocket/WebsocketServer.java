@@ -26,7 +26,7 @@ public final class WebsocketServer {
 
     private static Server server;
     private final static boolean enableWebsockets = Nxt.getBooleanProperty("fimk.enableWebsockets");
-    private final static int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("fimk.websocketServerPort");
+    private final static int port = Nxt.getIntPropertyNew("websocketServerPort", 7986, TESTNET_API_PORT);
     private final static String host = Nxt.getStringProperty("fimk.websocketServerHost");
     private static final boolean enableSSL = Nxt.getBooleanProperty("fimk.apiSSL");
     

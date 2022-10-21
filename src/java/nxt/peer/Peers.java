@@ -23,6 +23,7 @@ import nxt.Db;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.gossip.Gossip;
+import nxt.http.API;
 import nxt.util.Convert;
 import nxt.util.Filter;
 import nxt.util.JSON;
@@ -95,11 +96,13 @@ public final class Peers {
     static final int webSocketIdleTimeout;
     static final boolean useProxy = System.getProperty("socksProxyHost") != null || System.getProperty("http.proxyHost") != null;
 
-    private static final int DEFAULT_PEER_PORT = 7884;
-    private static final int TESTNET_PEER_PORT = 6884;
+    private static final int DEFAULT_PEER_PORT = Nxt.getIntPropertyNew("peerServerPort", 7884, 6884);
+    private static final int TESTNET_PEER_PORT = Nxt.getIntPropertyNew("peerServerPort", 7884, 6884);
     private static final String myPlatform;
     private static final String myAddress;
     private static final int myPeerServerPort;
+
+    private static int defaultPeerPort;
     private static final String myHallmark;
     private static final boolean shareMyAddress;
     private static final int maxNumberOfInboundConnections;
@@ -183,13 +186,12 @@ public final class Peers {
                 String host = uri.getHost();
                 int port = uri.getPort();
                 String announcedAddress;
-                if (!Constants.isTestnet) {
-                    if (port >= 0)
-                        announcedAddress = myAddress;
-                    else
-                        announcedAddress = host + (myPeerServerPort != DEFAULT_PEER_PORT ? ":" + myPeerServerPort : "");
-                } else {
+                if (Constants.isTestnet) {
                     announcedAddress = host;
+                } else {
+                    announcedAddress = port >= 0
+                            ? myAddress
+                            : host + (myPeerServerPort != DEFAULT_PEER_PORT ? ":" + myPeerServerPort : "");
                 }
                 if (announcedAddress == null || announcedAddress.length() > MAX_ANNOUNCED_ADDRESS_LENGTH) {
                     throw new RuntimeException("Invalid announced address length: " + announcedAddress);
@@ -682,7 +684,10 @@ public final class Peers {
     }
 
     public static int getDefaultPeerPort() {
-        return Constants.isTestnet ? TESTNET_PEER_PORT : DEFAULT_PEER_PORT;
+        if (defaultPeerPort == 0) {
+            defaultPeerPort = Nxt.getIntPropertyNew("peerServerPort", DEFAULT_PEER_PORT, TESTNET_PEER_PORT);
+        }
+        return defaultPeerPort;
     }
 
     public static Collection<? extends Peer> getAllPeers() {
@@ -770,8 +775,10 @@ public final class Peers {
 
     static PeerImpl findOrCreatePeer(final InetAddress inetAddress, final String announcedAddress, final boolean create) {
 
-        if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress() || inetAddress.isLinkLocalAddress()) {
-            return null;
+        if (!Nxt.getBooleanProperty("fimk.allowLocalhostPeer")) {
+            if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress() || inetAddress.isLinkLocalAddress()) {
+                return null;
+            }
         }
 
         String host = inetAddress.getHostAddress();
@@ -798,7 +805,7 @@ public final class Peers {
             return null;
         }
         peer = new PeerImpl(host, announcedAddress);
-        if (Constants.isTestnet && peer.getPort() != TESTNET_PEER_PORT) {
+        if (!Nxt.getBooleanProperty("fimk.allowLocalhostPeer") && Constants.isTestnet && peer.getPort() != TESTNET_PEER_PORT) {
             Logger.logDebugMessage("Peer " + host + " on testnet is not using port " + TESTNET_PEER_PORT + ", ignoring");
             return null;
         }
