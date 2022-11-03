@@ -5,6 +5,7 @@ import nxt.Block;
 import nxt.Constants;
 import nxt.HardFork;
 import nxt.db.DbIterator;
+import nxt.peer.rewarding.NodesMonitoringThread;
 import nxt.txn.AssetRewardingTxnType.LotteryType;
 import nxt.txn.AssetRewardingTxnType.Target;
 
@@ -16,6 +17,10 @@ public class RewardImpl extends Reward {
     public long augmentFee(Block block, long totalFeeNQT) {
         long rewardNQT = calculatePOSRewardNQT(block);
         long totalRewardNQT = Math.addExact(rewardNQT, totalFeeNQT);
+
+        if (NodesMonitoringThread.roundSuccess) {
+            // send rewards
+        }
 
         List<AssetRewarding.AssetReward> rewards = processPOPRewarding(block);
         System.out.printf("block %d  pop rewards %d \n", block.getHeight(), rewards == null ? 0 : rewards.size());

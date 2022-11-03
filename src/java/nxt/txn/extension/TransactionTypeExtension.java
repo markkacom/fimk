@@ -19,6 +19,10 @@ public abstract class TransactionTypeExtension {
                 MofoTransactions.NamespacedAliasAssignmentTransaction.NAMESPACED_ALIAS_ASSIGNMENT,
                 new RegisterRewardCandidateExtension()
         );
+        register(
+                MofoTransactions.NamespacedAliasAssignmentTransaction.NAMESPACED_ALIAS_ASSIGNMENT,
+                new RegisterNodeTokenExtension()
+        );
     }
 
     public static void register(TransactionType transactionType, TransactionTypeExtension extension) {

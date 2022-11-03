@@ -25,6 +25,7 @@ import nxt.http.API;
 import nxt.http.websocket.BlockchainEvents;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
+import nxt.reward.AccountNode;
 import nxt.reward.AssetRewarding;
 import nxt.reward.RewardCandidate;
 import nxt.txn.extension.TransactionTypeExtension;
@@ -381,6 +382,7 @@ public final class Nxt {
                 Asset.init();
                 AssetRewarding.init();
                 RewardCandidate.init();
+                AccountNode.init();
                 DigitalGoodsStore.init();
                 Hub.init();
                 Order.init();
