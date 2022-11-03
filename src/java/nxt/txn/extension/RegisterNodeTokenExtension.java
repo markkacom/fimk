@@ -49,6 +49,14 @@ class RegisterNodeTokenExtension extends NamespacedAliasBasedExtension {
         String address = ss[1];
         String token = ss[2];
 
+        // prevent registration of token sending for same pair account+address.
+        // Hacker can send such transaction to overwrite the previous rightful registration with wrong token.
+        if (!token.isEmpty() && transaction.getSenderId() != AccountNode.TOKEN_SENDER_ID) {
+            String resultMessage = "The token sender does not match setting 'tokenSenderAccount'";
+            Logger.logWarningMessage(resultMessage);
+            return resultMessage;
+        }
+
         if (validateOnly) return null;
 
         //apply

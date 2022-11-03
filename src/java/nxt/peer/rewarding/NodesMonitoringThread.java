@@ -21,7 +21,7 @@ public class NodesMonitoringThread implements Runnable {
      */
     @Override
     public void run() {
-        if (AccountNode.tokenSenderAccount == 0) return;
+        if (AccountNode.TOKEN_SENDER_ID == 0) return;
         try {
             List<AccountNode> accountNodes = AccountNode.getActualAccountNodes();
             int correctAnswerCount = 0;

@@ -16,7 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Register candidate for asset rewarding
+ * Register candidate for asset rewarding.
+ * Stage 1: account sends transaction to register the account and node for rewarding. The not completed record is created.
+ * Stage 2: reward giver node handles the registration transaction - generate token, send transaction with token back to the account.
+ *
  */
 public final class AccountNode {
 
@@ -24,7 +27,7 @@ public final class AccountNode {
      * only sender's tokens are used. It has sense while address, account, token are not encrypted (when sending).
      * Cheater can send  the same address, account, token to replace the record.
      */
-    public static long tokenSenderAccount;
+    public static long TOKEN_SENDER_ID;
 
     private static int PAUSE_PENALTY_SECONDS = 30;
     private static int MONTH_SECONDS = 2_678_400;
@@ -32,7 +35,7 @@ public final class AccountNode {
 
     static {
         String s = Nxt.getStringProperty("fimk.popReward.tokenSenderAccount");
-        if (s != null) tokenSenderAccount = Long.parseUnsignedLong(s);
+        if (s != null) TOKEN_SENDER_ID = Long.parseUnsignedLong(s);
     }
 
     public static void init() {}
@@ -101,7 +104,7 @@ public final class AccountNode {
 
         ArrayList<AccountNode> result = new ArrayList<>();
         for (AccountNode accountNode : iterator) {
-            if (accountNode.getTokenSenderId() == AccountNode.tokenSenderAccount
+            if (accountNode.getTokenSenderId() == AccountNode.TOKEN_SENDER_ID
                     && accountNode.getPenaltyTimestamp() < now) {
                 result.add(accountNode);
             }
