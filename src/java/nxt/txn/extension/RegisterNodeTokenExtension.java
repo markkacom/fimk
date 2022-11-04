@@ -31,27 +31,36 @@ class RegisterNodeTokenExtension extends NamespacedAliasBasedExtension {
         MofoAttachment.NamespacedAliasAssignmentAttachment a =
                 (MofoAttachment.NamespacedAliasAssignmentAttachment) transaction.getAttachment();
 
-        // payload format: accountId|address|token
-        // examples "12661257429910784930|11.22.333.44|394e8567c365a34c9856"
+        int stage = -1;
+
         String payload = a.getAliasURI();
         String[] ss = payload.split("\\|");
-        if (ss.length != 3) return "Payload format is wrong";
+
         long accountId;
-        try {
-            accountId = Long.parseUnsignedLong(ss[0]);
-            Account account = Account.getAccount(accountId);
-            if (account == null) return "Payload parameter account id is wrong, account is not found";
-        } catch (NumberFormatException e) {
-            String resultMessage = "Payload parameter account id is wrong";
-            Logger.logErrorMessage(resultMessage, e);
-            return resultMessage;
+        String address;
+        String token = null;
+
+        if (ss.length == 1) {
+            // stage 1
+            // payload format: address
+            accountId = transaction.getSenderId();
+            address = ss[0];
+            stage = 1;
+        } else if (ss.length == 2) {
+            // stage 2
+            // payload format: address|token
+            // examples "11.22.333.44|394e8567c365a34c9856", "macrohard.net|394e8567c365a34c9856"
+            accountId = transaction.getRecipientId();
+            address = ss[0];
+            token = ss[1];
+            stage = 2;
+        } else {
+            return "Payload format is wrong";
         }
-        String address = ss[1];
-        String token = ss[2];
 
         // prevent registration of token sending for same pair account+address.
         // Hacker can send such transaction to overwrite the previous rightful registration with wrong token.
-        if (!token.isEmpty() && transaction.getSenderId() != AccountNode.TOKEN_SENDER_ID) {
+        if (stage == 2 && transaction.getSenderId() != AccountNode.TOKEN_SENDER_ID) {
             String resultMessage = "The token sender does not match setting 'tokenSenderAccount'";
             Logger.logWarningMessage(resultMessage);
             return resultMessage;
@@ -61,7 +70,12 @@ class RegisterNodeTokenExtension extends NamespacedAliasBasedExtension {
 
         //apply
 
-        AccountNode.save(transaction, accountId, address, token);
+        if (stage == 1) {
+            AccountNode.saveApplicantStage(transaction, accountId, address);
+        }
+        if (stage == 2) {
+            AccountNode.save(transaction, accountId, address, token);
+        }
         return null;  //successful outcome
     }
 }
