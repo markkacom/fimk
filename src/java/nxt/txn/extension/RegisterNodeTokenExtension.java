@@ -4,14 +4,19 @@ import nxt.Account;
 import nxt.MofoAttachment;
 import nxt.Transaction;
 import nxt.reward.AccountNode;
+import nxt.util.Convert;
 import nxt.util.Logger;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Rewarding node sends this transaction as response on registration transaction from account.
  */
 class RegisterNodeTokenExtension extends NamespacedAliasBasedExtension {
 
-    // "(FTR.n.v)"  first number n to distinguish features (extensions), second number v to distinguish versions of the feature
+    // "(FTR.n.v)"  first number n to distinguish features (extensions),
+    // second number v to distinguish versions of the feature
     private static final String MARK = "(FTR.2.0)";
 
     @Override
@@ -31,51 +36,50 @@ class RegisterNodeTokenExtension extends NamespacedAliasBasedExtension {
         MofoAttachment.NamespacedAliasAssignmentAttachment a =
                 (MofoAttachment.NamespacedAliasAssignmentAttachment) transaction.getAttachment();
 
-        int stage = -1;
+        String payload = a.getAliasURI().trim();
 
-        String payload = a.getAliasURI();
+        // payload format: registerAccount|address
+        // examples "45987878967767|11.22.333.44", "45987878967767|macrohard.net"
         String[] ss = payload.split("\\|");
+        if (ss.length != 2) return "Payload format is wrong";
 
-        long accountId;
-        String address;
-        String token = null;
-
-        if (ss.length == 1) {
-            // stage 1
-            // payload format: address
-            accountId = transaction.getSenderId();
-            address = ss[0];
-            stage = 1;
-        } else if (ss.length == 2) {
-            // stage 2
-            // payload format: address|token
-            // examples "11.22.333.44|394e8567c365a34c9856", "macrohard.net|394e8567c365a34c9856"
-            accountId = transaction.getRecipientId();
-            address = ss[0];
-            token = ss[1];
-            stage = 2;
-        } else {
-            return "Payload format is wrong";
-        }
-
-        // prevent registration of token sending for same pair account+address.
-        // Hacker can send such transaction to overwrite the previous rightful registration with wrong token.
-        if (stage == 2 && transaction.getSenderId() != AccountNode.TOKEN_SENDER_ID) {
-            String resultMessage = "The token sender does not match setting 'tokenSenderAccount'";
-            Logger.logWarningMessage(resultMessage);
+        long registerAccountId;
+        try {
+            registerAccountId = Long.parseUnsignedLong(ss[0]);
+            Account account = Account.getAccount(registerAccountId);
+            if (account == null) return "Payload parameter register account id is wrong, account is not found";
+        } catch (NumberFormatException e) {
+            String resultMessage = "Payload parameter register account id is wrong, account is not found";
+            Logger.logErrorMessage(resultMessage, e);
             return resultMessage;
         }
+
+        long accountId = transaction.getSenderId();
+        String address = ss[1];
+        String addressCheckResult = checkAddressFormat(address);
+        if (addressCheckResult != null) return addressCheckResult;
+
+        String token = Convert.toHexString(transaction.getSenderPublicKey());
 
         if (validateOnly) return null;
 
         //apply
 
-        if (stage == 1) {
-            AccountNode.saveApplicantStage(transaction, accountId, address);
-        }
-        if (stage == 2) {
-            AccountNode.save(transaction, accountId, address, token);
-        }
+        AccountNode.save(transaction, registerAccountId, accountId, address, token);
+
         return null;  //successful outcome
+    }
+
+    private String checkAddressFormat(String address) {
+        try {
+            // WORKAROUND: add any scheme to make the resulting URI valid.
+            URI uri = new URI("my://" + address);
+            if (uri.getHost() == null) {
+                return "Address must have host and port parts";
+            }
+            return null; // result is OK
+        } catch (URISyntaxException ex) {
+            return "Address format is wrong";
+        }
     }
 }

@@ -1092,12 +1092,13 @@ class NxtDbVersion extends DbVersion {
                         "CREATE UNIQUE INDEX IF NOT EXISTS reward_candidate_asset_id_account_id_idx ON reward_candidate (asset_id, account_id);");
             case 437:
                 apply("CREATE TABLE IF NOT EXISTS account_node (db_id IDENTITY, " +
-                        "applicant_transaction_id BIGINT NOT NULL, address VARCHAR NOT NULL, account_id BIGINT NOT NULL, " +
-                        "applicant_timestamp INT NOT NULL, token VARCHAR, token_transaction_id BIGINT, token_height INT, " +
-                        "token_sender_id BIGINT, token_timestamp INT, score TINYINT, request_peer_timestamp INT); " +
+                        "address VARCHAR NOT NULL, account_id BIGINT NOT NULL, " +
+                        "token VARCHAR NOT NULL, transaction_id BIGINT NOT NULL, height INT NOT NULL, " +
+                        "registration_account_id BIGINT NOT NULL, timestamp INT NOT NULL, score TINYINT, request_peer_timestamp INT); " +
                         "CREATE UNIQUE INDEX IF NOT EXISTS account_node_address_account_id_idx " +
                         "ON account_node (address, account_id); " +
-                        "CREATE INDEX IF NOT EXISTS account_node_timestamp_idx ON account_node (applicant_timestamp);");
+                        "CREATE INDEX IF NOT EXISTS account_node_timestamp_idx ON account_node (timestamp); " +
+                        "CREATE INDEX IF NOT EXISTS account_node_score_idx ON account_node (score); ");
             case 438:
                 return;
             default:

@@ -21,7 +21,7 @@ public class NodesMonitoringThread implements Runnable {
      */
     @Override
     public void run() {
-        if (AccountNode.TOKEN_SENDER_ID == 0) return;
+        if (AccountNode.REGISTRATION_ACCOUNT_ID == 0) return;
         try {
             List<AccountNode> accountNodes = AccountNode.getActualAccountNodes();
             int correctAnswerCount = 0;
@@ -31,24 +31,30 @@ public class NodesMonitoringThread implements Runnable {
                     // todo create the peer
                     if (peer == null) {
                         if (accountNode.getScore() > 0) {
-                            accountNode.setRoundScore(accountNode.getScore() - 1);
+                            accountNode.setRoundScore(Math.max(accountNode.getScore() - 1, AccountNode.MIN_SCORE));
                         }
                     }
                     continue;
                 }
                 accountNode.updateRequestTimestamp();
+
                 JSONObject response = peer.send(Peers.myPeerInfoRequest);
+
                 if (response == null) {
-                    accountNode.setRoundScore(Math.max(accountNode.getScore() - 2, -4));
+                    accountNode.setRoundScore(Math.max(accountNode.getScore() - 2, AccountNode.MIN_SCORE));
                     continue;
                 }
                 String peerAccountNode = (String) response.get("nodeToken");
 
                 if (accountNode.getToken().equals(peerAccountNode)) {
-                    accountNode.setRoundScore(Math.min(accountNode.getScore() + 1, 4));
+                    if (accountNode.getScore() < -4) {
+                        accountNode.setRoundScore(-3);
+                    } else {
+                        accountNode.setRoundScore(Math.min(accountNode.getScore() + 1, 4));
+                    }
                     correctAnswerCount++;
                 } else {
-                    accountNode.setRoundScore(Math.max(accountNode.getScore() - 2, -8));
+                    accountNode.setRoundScore(Math.max(accountNode.getScore() - 3, AccountNode.MIN_SCORE));
                 }
             }
 

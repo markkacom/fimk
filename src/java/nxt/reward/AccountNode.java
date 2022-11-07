@@ -23,18 +23,18 @@ import java.util.List;
 public final class AccountNode {
 
     /**
-     * only sender's tokens are used. It has sense while address, account, token are not encrypted (when sending).
-     * Cheater can send  the same address, account, token to replace the record.
+     * Account used to register the applicant. Applicant sends transaction to this account to register itself
      */
-    public static long TOKEN_SENDER_ID;
+    public static long REGISTRATION_ACCOUNT_ID;
+    public static int MIN_SCORE = -20;
 
     private static int PAUSE_PENALTY_SECONDS = 30;
     private static int MONTH_SECONDS = 2_678_400;
     private static int REGISTRATION_AGE_LIMIT = 6 * MONTH_SECONDS;
 
     static {
-        String s = Nxt.getStringProperty("fimk.popReward.tokenSenderAccount");
-        if (s != null) TOKEN_SENDER_ID = Long.parseUnsignedLong(s);
+        String s = Nxt.getStringProperty("fimk.popReward.registrationAccount");
+        if (s != null) REGISTRATION_ACCOUNT_ID = Long.parseUnsignedLong(s);
     }
 
     public static void init() {
@@ -59,23 +59,8 @@ public final class AccountNode {
         }
     };
 
-    public static void saveApplicantStage(Transaction transaction, long accountId, String address) {
-        try (Connection con = Db.db.getConnection();
-             PreparedStatement pstmt = con.prepareStatement("MERGE INTO account_node " +
-                "(address, account_id, applicant_transaction_id, applicant_timestamp) "
-                + "KEY (address, account_id) VALUES (?, ?, ?, ?) ")) {
-            pstmt.setString(1, address);
-            pstmt.setLong(2, accountId);
-            pstmt.setLong(3, transaction.getId());
-            pstmt.setInt(4, transaction.getTimestamp());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void save(Transaction transaction, long accountId, String address, String token) {
-        accountNodeTable.insert(new AccountNode(transaction, accountId, address, token));
+    public static void save(Transaction transaction, long registerAccountId, long accountId, String address, String token) {
+        accountNodeTable.insert(new AccountNode(transaction, registerAccountId, accountId, address, token));
     }
 
     public static void update(List<AccountNode> accountNodes) {
@@ -85,7 +70,7 @@ public final class AccountNode {
             for (AccountNode accountNode : accountNodes) {
                 pstmt.setInt(1, accountNode.getScore());
                 pstmt.setLong(2, accountNode.getRequestPeerTimestamp());
-                pstmt.setLong(3, accountNode.getTokenTransactionId());
+                pstmt.setLong(3, accountNode.getTransactionId());
                 pstmt.executeUpdate();
             }
         } catch (SQLException e) {
@@ -119,7 +104,7 @@ public final class AccountNode {
 
         ArrayList<AccountNode> result = new ArrayList<>();
         for (AccountNode accountNode : iterator) {
-            if (accountNode.getTokenSenderId() == AccountNode.TOKEN_SENDER_ID
+            if (accountNode.registrationAccountId == AccountNode.REGISTRATION_ACCOUNT_ID
                     && accountNode.getPenaltyTimestamp() < now) {
                 result.add(accountNode);
             }
@@ -130,10 +115,10 @@ public final class AccountNode {
 
 
     private final DbKey dbKey;
-    int tokenTimestamp;  // timestamp of creation (transaction timestamp)
-    long tokenTransactionId;
-    int tokenHeight;
-    long tokenSenderId;
+    int timestamp;  // timestamp of creation (transaction timestamp)
+    long transactionId;
+    int height;
+    long registrationAccountId;
     long accountId;
     String address;
     String token;
@@ -141,28 +126,28 @@ public final class AccountNode {
     int requestPeerTimestamp; // timestamp of last request to peer
     int roundScore;
 
-    public AccountNode(Transaction transaction, long accountId, String address, String token) {
-        this.dbKey = accountNodeDbKeyFactory.newKey(this.tokenTransactionId);
-        this.tokenTransactionId = transaction.getId();
-        this.tokenHeight = transaction.getHeight();
-        this.tokenTimestamp = transaction.getTimestamp();
-        this.tokenSenderId = transaction.getSenderId();
+    public AccountNode(Transaction transaction, long registerAccountId, long accountId, String address, String token) {
+        this.dbKey = accountNodeDbKeyFactory.newKey(this.transactionId);
+        this.transactionId = transaction.getId();
+        this.height = transaction.getHeight();
+        this.timestamp = transaction.getTimestamp();
+        this.registrationAccountId = registerAccountId;
         this.accountId = accountId;
         this.address = address;
         this.token = token;
     }
 
     private AccountNode(ResultSet rs) throws SQLException {
-        this.tokenTransactionId = rs.getLong("transaction_id");
-        this.tokenHeight = rs.getInt("height");
-        this.dbKey = accountNodeDbKeyFactory.newKey(this.tokenTransactionId);
+        this.transactionId = rs.getLong("transaction_id");
+        this.height = rs.getInt("height");
+        this.dbKey = accountNodeDbKeyFactory.newKey(this.transactionId);
         this.accountId = rs.getLong("account_id");
         this.address = rs.getString("address");
         this.token = rs.getString("token");
         this.requestPeerTimestamp = rs.getInt("request_peer_timestamp");
-        this.tokenTimestamp = rs.getInt("timestamp");
+        this.timestamp = rs.getInt("timestamp");
         this.score = rs.getInt("score");
-        this.tokenSenderId = rs.getLong("token_sender_id");
+        this.registrationAccountId = rs.getLong("registration_account_id");
     }
 
     /*
@@ -186,19 +171,19 @@ public final class AccountNode {
     private void save(Connection con) throws SQLException {
         // overwrite previous record on same address and account
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO account_node " +
-                "(address, account_id, token, token_transaction_id, score, request_peer_timestamp, token_timestamp, " +
-                "token_height, token_sender_id) "
+                "(address, account_id, token, transaction_id, score, request_peer_timestamp, timestamp, " +
+                "height, registration_account_id) "
                 + "KEY (address, account_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ")) {
             int i = 0;
             pstmt.setString(++i, this.address);
             pstmt.setLong(++i, this.accountId);
             pstmt.setString(++i, this.token);
-            pstmt.setLong(++i, this.tokenTransactionId);
+            pstmt.setLong(++i, this.transactionId);
             pstmt.setInt(++i, this.score);
             pstmt.setInt(++i, this.requestPeerTimestamp);
-            pstmt.setInt(++i, this.tokenTimestamp);
-            pstmt.setLong(++i, this.tokenHeight);
-            pstmt.setLong(++i, this.tokenSenderId);
+            pstmt.setInt(++i, this.timestamp);
+            pstmt.setLong(++i, this.height);
+            pstmt.setLong(++i, this.registrationAccountId);
             pstmt.executeUpdate();
         }
     }
@@ -223,20 +208,20 @@ public final class AccountNode {
         return roundScore;
     }
 
-    public int getTokenTimestamp() {
-        return tokenTimestamp;
+    public int getTimestamp() {
+        return timestamp;
     }
 
-    public long getTokenTransactionId() {
-        return tokenTransactionId;
+    public long getTransactionId() {
+        return transactionId;
     }
 
     public long getAccountId() {
         return accountId;
     }
 
-    public long getTokenSenderId() {
-        return tokenSenderId;
+    public long getRegistrationAccountId() {
+        return registrationAccountId;
     }
 
     public void setRoundScore(int roundScore) {
