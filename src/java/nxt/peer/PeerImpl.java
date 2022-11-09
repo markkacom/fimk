@@ -16,43 +16,15 @@
 
 package nxt.peer;
 
-import nxt.Account;
-import nxt.AppVersion;
-import nxt.AppVersionManager;
-import nxt.BlockchainProcessor;
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.util.Convert;
-import nxt.util.CountingInputReader;
-import nxt.util.CountingInputStream;
-import nxt.util.CountingOutputWriter;
-import nxt.util.JSON;
-import nxt.util.Logger;
-
+import nxt.*;
+import nxt.util.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -584,7 +556,10 @@ final class PeerImpl implements Peer {
                 }
             }
             JSONObject response = send(Peers.myPeerInfoRequest);
-            if (response != null) {
+            if (response == null) {
+                //Logger.logDebugMessage("Failed to connect to peer " + peerAddress);
+                setState(State.NON_CONNECTED);
+            } else {
                 if (response.get("error") != null) {
                     setState(State.NON_CONNECTED);
                     return;
