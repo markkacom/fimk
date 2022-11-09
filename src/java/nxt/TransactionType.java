@@ -232,7 +232,7 @@ public abstract class TransactionType {
         }
         applyAttachment(transaction, senderAccount, recipientAccount);
 
-        //todo rollback of extension on rollback transaction
+        //todo rollback of extension on rollback transaction. Not critical because extension have to not affect the consensus
         applyExtension(transaction, senderAccount, recipientAccount);
     }
 
