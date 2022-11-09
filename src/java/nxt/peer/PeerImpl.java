@@ -231,14 +231,14 @@ final class PeerImpl implements Peer {
             throw new IllegalArgumentException("Announced address too long: " + announcedAddress.length());
         }
         this.announcedAddress = announcedAddress;
-        if (announcedAddress != null) {
+        if (announcedAddress == null) {
+            this.port = -1;
+        } else if (this.port == -1) {
             try {
                 this.port = new URI("http://" + announcedAddress).getPort();
             } catch (URISyntaxException e) {
                 this.port = -1;
             }
-        } else {
-            this.port = -1;
         }
     }
 
@@ -599,7 +599,9 @@ final class PeerImpl implements Peer {
 
                 if (!Peers.ignorePeerAnnouncedAddress) {
                     String newAnnouncedAddress = Convert.emptyToNull((String) response.get("announcedAddress"));
-                    if (newAnnouncedAddress != null) {
+                    if (newAnnouncedAddress == null) {
+                        Peers.setAnnouncedAddress(this, host);
+                    } else {
                         newAnnouncedAddress = Peers.addressWithPort(newAnnouncedAddress.toLowerCase());
                         if (newAnnouncedAddress != null) {
                             if (!verifyAnnouncedAddress(newAnnouncedAddress)) {
@@ -622,8 +624,6 @@ final class PeerImpl implements Peer {
                                 }
                             }
                         }
-                    } else {
-                        Peers.setAnnouncedAddress(this, host);
                     }
                 }
 
@@ -641,9 +641,6 @@ final class PeerImpl implements Peer {
                 } else if (!isBlacklisted()) {
                     blacklist("Old version: " + version);
                 }
-            } else {
-                //Logger.logDebugMessage("Failed to connect to peer " + peerAddress);
-                setState(State.NON_CONNECTED);
             }
         } catch (RuntimeException e) {
             blacklist(e);
@@ -756,4 +753,10 @@ final class PeerImpl implements Peer {
         return hallmark.getWeight();
     }
 
+    public String toString(int detail) {
+        if (detail == 2) {
+            return String.format("%s %s port %d websocket %s", getPlatform(), getState(), getPort(), webSocket.toString(2));
+        }
+        return toString();
+    }
 }

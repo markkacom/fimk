@@ -121,9 +121,6 @@ public final class Peers {
             throw new RuntimeException("fimk.myPlatform length exceeds " + MAX_PLATFORM_LENGTH);
         }
         String nodeToken = Nxt.getStringProperty("fimk.popReward.nodeToken");
-        if (nodeToken != null && nodeToken.length() > MAX_PLATFORM_LENGTH) {
-            throw new RuntimeException("fimk.nodeToken length exceeds " + MAX_PLATFORM_LENGTH);
-        }
         myAddress = Convert.emptyToNull(Nxt.getStringProperty("fimk.myAddress", "").trim());
         if (myAddress != null && myAddress.endsWith(":" + TESTNET_PEER_PORT) && !Constants.isTestnet) {
             throw new RuntimeException("Port " + TESTNET_PEER_PORT + " should only be used for testnet!!!");
