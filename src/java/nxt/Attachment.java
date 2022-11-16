@@ -82,7 +82,7 @@ public interface Attachment extends Appendix {
 
     abstract class EmptyAttachment extends AbstractAttachment {
 
-        private EmptyAttachment() {
+        protected EmptyAttachment() {
             super(0);
         }
 

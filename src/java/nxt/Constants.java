@@ -37,6 +37,12 @@ public final class Constants {
     public static final long FORGER_FEE_STAGE_CHANGE_AT_BLOCK = 889920;
     public static final long[] FORGER_FEE_AMOUNT_NQT_STAGES = { 200 * ONE_NXT, 100 * ONE_NXT, 50 * ONE_NXT, 25 * ONE_NXT };
 
+    /* POP Reward */
+    /**
+     * dont accept transaction same type and same sender in the height interval less than this limit
+     */
+    public static int REWARD_APPLICANT_REGISTRATION_HEIGHT_AGE_LIMIT = 1000;
+
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;

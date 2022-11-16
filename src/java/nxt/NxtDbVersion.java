@@ -1100,6 +1100,8 @@ class NxtDbVersion extends DbVersion {
                         "CREATE INDEX IF NOT EXISTS account_node_timestamp_idx ON account_node (timestamp); " +
                         "CREATE INDEX IF NOT EXISTS account_node_score_idx ON account_node (score); ");
             case 438:
+                apply("CREATE INDEX IF NOT EXISTS transaction_t_s_h_s_idx ON transaction (type, subtype, height, sender_id)");
+            case 439:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");

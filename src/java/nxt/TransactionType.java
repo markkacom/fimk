@@ -72,7 +72,7 @@ public abstract class TransactionType {
 
     public static final byte SUBTYPE_ACCOUNT_CONTROL_EFFECTIVE_BALANCE_LEASING = 0;
     static final byte SUBTYPE_ACCOUNT_CONTROL_POP_REWARD_CHALLENGE = 1;
-    static final byte SUBTYPE_ACCOUNT_CONTROL_POP_REWARD_CHALLENGE_ANSWER = 2;
+    public static final byte SUBTYPE_REWARD_APPLICANT_REGISTRATION = 2;
 
     static final byte SUBTYPE_DATA_TAGGED_DATA_UPLOAD = 0;
     static final byte SUBTYPE_DATA_TAGGED_DATA_EXTEND = 1;
@@ -159,6 +159,8 @@ public abstract class TransactionType {
                         return AccountControlTxnType.EFFECTIVE_BALANCE_LEASING;
                     case SUBTYPE_ACCOUNT_CONTROL_POP_REWARD_CHALLENGE:
                         return AccountControlTxnType.POP_REWARD_CHALLENGE;
+                    case SUBTYPE_REWARD_APPLICANT_REGISTRATION:
+                        return AccountControlTxnType.REWARD_APPLICANT_REGISTRATION;
                     default:
                         return null;
                 }

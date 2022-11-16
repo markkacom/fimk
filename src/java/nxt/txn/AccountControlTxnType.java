@@ -83,6 +83,75 @@ public abstract class AccountControlTxnType extends TransactionType {
 
     };
 
+    public static Attachment.EmptyAttachment REWARD_APPLICANT_REGISTRATION_ATTACHMENT = new Attachment.EmptyAttachment() {
+        @Override
+        public TransactionType getTransactionType() {
+            return REWARD_APPLICANT_REGISTRATION;
+        }
+    };
+
+    public static final TransactionType REWARD_APPLICANT_REGISTRATION = new AccountControlTxnType() {
+
+        @Override
+        public final byte getSubtype() {
+            return TransactionType.SUBTYPE_REWARD_APPLICANT_REGISTRATION;
+        }
+
+        @Override
+        public String getName() {
+            return "RewardApplicantRegistration";
+        }
+
+        @Override
+        public Fee getBaselineFee(Transaction transaction) {
+            return Fee.NONE;
+        }
+
+        @Override
+        protected Attachment.EmptyAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) {
+            return REWARD_APPLICANT_REGISTRATION_ATTACHMENT;
+        }
+
+        @Override
+        protected Attachment.EmptyAttachment parseAttachment(JSONObject attachmentData, int timestamp) {
+            return REWARD_APPLICANT_REGISTRATION_ATTACHMENT;
+        }
+
+        @Override
+        protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            if (transaction.getAmountNQT() != 0) {
+                throw new NxtException.NotValidException("Invalid amount (must be zero)");
+            }
+
+            // do not accept transaction if there is the same type previous txn (same sender) less than N blocks ago
+            int currentHeight = Nxt.getBlockchain().getHeight();
+            int preHeight = TransactionDb.hasTransaction(
+                    TransactionType.TYPE_ACCOUNT_CONTROL,
+                    TransactionType.SUBTYPE_REWARD_APPLICANT_REGISTRATION,
+                    currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_HEIGHT_AGE_LIMIT,
+                    currentHeight,
+                    transaction.getSenderId()
+            );
+            if (preHeight > 0) {
+                throw new NxtException.NotValidException("There is the previous transaction at height " + preHeight);
+            }
+        }
+
+        @Override
+        protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {}
+
+        @Override
+        public boolean canHaveRecipient() {
+            return true;
+        }
+
+        @Override
+        public boolean isPhasingSafe() {
+            return true;
+        }
+
+    };
+
     public static final TransactionType POP_REWARD_CHALLENGE = new AccountControlTxnType() {
 
         @Override
