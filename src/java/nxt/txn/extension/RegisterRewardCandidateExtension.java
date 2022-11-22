@@ -4,6 +4,9 @@ import nxt.*;
 import nxt.reward.RewardCandidate;
 import nxt.util.Logger;
 
+/**
+ * @deprecated instead of this the login registration transaction is used
+ */
 class RegisterRewardCandidateExtension extends NamespacedAliasBasedExtension {
 
     // "(FTR.n.v)"  first number n to distinguish features (extensions), second number v to distinguish versions of the feature
