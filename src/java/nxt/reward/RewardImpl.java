@@ -110,12 +110,7 @@ public class RewardImpl extends Reward {
         DbIterator<RewardCandidate> it = RewardCandidate.getActualCandidates(
                 Nxt.getBlockchain().getHeight() - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT);
         List<RewardCandidate> candidates = new ArrayList<>();
-        it.forEach(candidate -> {
-            Account a = Account.getAccount(candidate.getAccount());
-            if (a != null && a.getBalanceNQT() > Constants.REWARD_APPLICANT_MIN_BALANCE_FIMK) {
-                candidates.add(candidate);
-            }
-        });
+        it.forEach(candidates::add);
         return candidates;
     }
 

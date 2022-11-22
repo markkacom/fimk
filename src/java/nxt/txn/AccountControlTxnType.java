@@ -123,6 +123,11 @@ public abstract class AccountControlTxnType extends TransactionType {
             if (transaction.getAmountNQT() != 0) {
                 throw new NxtException.NotValidException("Invalid amount (must be zero)");
             }
+            Account a = Account.getAccount(transaction.getSenderId());
+            if (a == null || a.getGuaranteedBalanceNQT() < Constants.REWARD_APPLICANT_MIN_BALANCE_FIMK) {
+                throw new NxtException.NotValidException("Sender balance is less than the min "
+                        + Constants.REWARD_APPLICANT_MIN_BALANCE_FIMK + " FIMK");
+            }
 
             // do not accept transaction if there is the same type previous txn (same sender) less than N blocks ago
             int currentHeight = Nxt.getBlockchain().getHeight();
