@@ -1,6 +1,7 @@
 package nxt.txn;
 
 import nxt.*;
+import nxt.reward.RewardCandidate;
 import org.json.simple.JSONObject;
 
 import java.nio.ByteBuffer;
@@ -128,17 +129,23 @@ public abstract class AccountControlTxnType extends TransactionType {
             int preHeight = TransactionDb.hasTransaction(
                     TransactionType.TYPE_ACCOUNT_CONTROL,
                     TransactionType.SUBTYPE_REWARD_APPLICANT_REGISTRATION,
-                    currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_HEIGHT_AGE_LIMIT,
+                    currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT,
                     currentHeight,
                     transaction.getSenderId()
             );
             if (preHeight > 0) {
-                throw new NxtException.NotValidException("There is the previous transaction at height " + preHeight);
+                throw new NxtException.NotValidException(String.format(
+                        "Current height is %d, previous transaction at height %d, the difference %d is less required %d",
+                        currentHeight, preHeight, currentHeight - preHeight,
+                        Constants.REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT)
+                );
             }
         }
 
         @Override
-        protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {}
+        protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            RewardCandidate.save(transaction, -1);
+        }
 
         @Override
         public boolean canHaveRecipient() {

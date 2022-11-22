@@ -15,10 +15,11 @@ public abstract class TransactionTypeExtension {
                 MofoTransactions.NamespacedAliasAssignmentTransaction.NAMESPACED_ALIAS_ASSIGNMENT,
                 new ExpiryExtension()
         );
+        /* obsolete. The login registration candidate is used
         register(
                 MofoTransactions.NamespacedAliasAssignmentTransaction.NAMESPACED_ALIAS_ASSIGNMENT,
                 new RegisterRewardCandidateExtension()
-        );
+        );*/
         register(
                 MofoTransactions.NamespacedAliasAssignmentTransaction.NAMESPACED_ALIAS_ASSIGNMENT,
                 new RegisterNodeTokenExtension()

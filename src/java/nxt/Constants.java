@@ -41,7 +41,8 @@ public final class Constants {
     /**
      * dont accept transaction same type and same sender in the height interval less than this limit
      */
-    public static int REWARD_APPLICANT_REGISTRATION_HEIGHT_AGE_LIMIT = 1000;
+    public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 1000;
+    public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 2160;
 
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;

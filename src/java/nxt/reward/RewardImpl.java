@@ -1,9 +1,6 @@
 package nxt.reward;
 
-import nxt.Account;
-import nxt.Block;
-import nxt.Constants;
-import nxt.HardFork;
+import nxt.*;
 import nxt.db.DbIterator;
 import nxt.peer.rewarding.NodesMonitoringThread;
 import nxt.txn.AssetRewardingTxnType.LotteryType;
@@ -51,6 +48,9 @@ public class RewardImpl extends Reward {
      */
     private List<AssetRewarding.AssetReward> processPOPRewarding(Block block) {
         if (!HardFork.PRIVATE_ASSETS_REWARD_BLOCK(block.getHeight())) return null;
+
+        RewardCandidate.removeExpired(Nxt.getBlockchain().getHeight());
+
         List<AssetRewarding> ars = AssetRewarding.getApplicableRewardings(block.getHeight());
         List<AssetRewarding.AssetReward> result = ars.isEmpty() ? null : new ArrayList<>(ars.size());
         for (AssetRewarding ar : ars) {

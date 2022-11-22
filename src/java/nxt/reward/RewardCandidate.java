@@ -1,5 +1,7 @@
 package nxt.reward;
 
+import nxt.Constants;
+import nxt.Db;
 import nxt.Transaction;
 import nxt.db.DbClause;
 import nxt.db.DbIterator;
@@ -15,6 +17,8 @@ import java.sql.SQLException;
  * Register candidate for asset rewarding
  */
 public final class RewardCandidate {
+
+    private static int REMOVE_EXPIRED_EVERY_BLOCKS = 10;
 
     private static final DbKey.LongKeyFactory<RewardCandidate> rewardCandidateDbKeyFactory = new DbKey.LongKeyFactory<RewardCandidate>("id") {
         @Override
@@ -53,6 +57,21 @@ public final class RewardCandidate {
     public static DbIterator<RewardCandidate> getRewardCandidatesSorted(long asset, int from, int to) {
         return rewardCandidateTable.getManyBy(new DbClause.LongClause("asset_id", asset), from, to, "ORDER BY id");
     }
+
+    public static int removeExpired(int currentHeight) {
+        // do this every N blocks
+        if (!(currentHeight % REMOVE_EXPIRED_EVERY_BLOCKS == 0)) return 0;
+
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement("DELETE FROM reward_candidate WHERE height < ?"))
+        {
+             pstmt.setInt(1, currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT);
+             return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 //    public static DbIterator<AssetTransfer> getAccountAssetTransfers(long accountId, int from, int to) {
 //        Connection con = null;
@@ -127,9 +146,10 @@ FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)
 
     private void save(Connection con) throws SQLException {
         // overwrite previous transaction on same asset and candidate
-        try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO reward_candidate " +
-                "(id, height, account_id, asset_id) "
-                + "KEY (asset_id, account_id) VALUES (?, ?, ?, ?) ")) {
+        try (PreparedStatement pstmt = con.prepareStatement(
+                "MERGE INTO reward_candidate (id, height, account_id, asset_id) "
+                        + "KEY (asset_id, account_id) VALUES (?, ?, ?, ?) "
+        )) {
             int i = 0;
             pstmt.setLong(++i, this.id);
             pstmt.setInt(++i, this.height);

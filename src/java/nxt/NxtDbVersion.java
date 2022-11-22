@@ -1089,7 +1089,8 @@ class NxtDbVersion extends DbVersion {
                 apply("CREATE TABLE IF NOT EXISTS reward_candidate (id BIGINT NOT NULL, " +
                         "height INT NOT NULL, asset_id BIGINT NOT NULL, account_id BIGINT NOT NULL, " +
                         "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE); " +
-                        "CREATE UNIQUE INDEX IF NOT EXISTS reward_candidate_asset_id_account_id_idx ON reward_candidate (asset_id, account_id);");
+                        "CREATE UNIQUE INDEX IF NOT EXISTS reward_candidate_asset_id_account_id_idx ON reward_candidate (asset_id, account_id); " +
+                        "CREATE INDEX IF NOT EXISTS reward_candidate_height_idx ON reward_candidate (height); ");
             case 437:
                 apply("CREATE TABLE IF NOT EXISTS account_node (db_id IDENTITY, " +
                         "address VARCHAR NOT NULL, account_id BIGINT NOT NULL, " +
