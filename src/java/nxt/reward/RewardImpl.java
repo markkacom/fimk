@@ -62,7 +62,7 @@ public class RewardImpl extends Reward {
                 result.add(new AssetRewarding.AssetReward(ar.getTargetInfo(), ar.getAsset(), ar.getBaseAmount()));
             }
             if (target == Target.REGISTERED_POP_REWARD_RECEIVER) {
-                List<RewardCandidate> candidates = rewardCandidates(ar.getAsset());
+                List<RewardCandidate> candidates = rewardCandidates();
                 if (candidates.isEmpty()) continue;
                 long altAssetId = ar.getTargetInfo();   // altAssetId == 0 means fimk
                 LotteryType lotteryType = LotteryType.get(ar.getLotteryType());
@@ -106,11 +106,16 @@ public class RewardImpl extends Reward {
         return result;
     }
 
-    private List<RewardCandidate> rewardCandidates(long assetId) {
-        //todo filter expired candidate
+    private List<RewardCandidate> rewardCandidates() {
+        DbIterator<RewardCandidate> it = RewardCandidate.getActualCandidates(
+                Nxt.getBlockchain().getHeight() - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT);
         List<RewardCandidate> candidates = new ArrayList<>();
-        DbIterator<RewardCandidate> it = RewardCandidate.getRewardCandidatesSorted(assetId, 0, Integer.MAX_VALUE);
-        it.forEachRemaining(candidates::add);
+        it.forEach(candidate -> {
+            Account a = Account.getAccount(candidate.getAccount());
+            if (a != null && a.getBalanceNQT() > Constants.REWARD_APPLICANT_MIN_BALANCE_FIMK) {
+                candidates.add(candidate);
+            }
+        });
         return candidates;
     }
 

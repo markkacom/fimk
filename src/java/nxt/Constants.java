@@ -43,6 +43,7 @@ public final class Constants {
      */
     public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 1000;
     public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 2160;
+    public static long REWARD_APPLICANT_MIN_BALANCE_FIMK = 10 * ONE_NXT;
 
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;

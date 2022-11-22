@@ -52,10 +52,21 @@ public final class RewardCandidate {
     }
 
     /**
-     * "sorted by id" is important because is used in the consensus.
+     * "sorted by id" is important because it is used in the consensus.
      */
-    public static DbIterator<RewardCandidate> getRewardCandidatesSorted(long asset, int from, int to) {
+    public static DbIterator<RewardCandidate> getActualCandidates(long asset, int from, int to) {
         return rewardCandidateTable.getManyBy(new DbClause.LongClause("asset_id", asset), from, to, "ORDER BY id");
+    }
+
+    public static DbIterator<RewardCandidate> getActualCandidates(int sinceHeight) {
+        try {
+            Connection con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM reward_candidate WHERE height >= ?");
+            pstmt.setInt(1, sinceHeight);
+            return rewardCandidateTable.getManyBy(con, pstmt, false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static int removeExpired(int currentHeight) {
