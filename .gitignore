@@ -42,3 +42,4 @@ changelogs-fim/announcement*
 /fimservice.exe
 /main.iml
 /.tmp/
+/.patches/
