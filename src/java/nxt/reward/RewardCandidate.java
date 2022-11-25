@@ -61,7 +61,8 @@ public final class RewardCandidate {
     public static DbIterator<RewardCandidate> getActualCandidates(int sinceHeight) {
         try {
             Connection con = Db.db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM reward_candidate WHERE height >= ?");
+            PreparedStatement pstmt = con.prepareStatement(
+                    "SELECT * FROM reward_candidate WHERE height > ? ORDER BY account_id");
             pstmt.setInt(1, sinceHeight);
             return rewardCandidateTable.getManyBy(con, pstmt, false);
         } catch (SQLException e) {
@@ -69,14 +70,17 @@ public final class RewardCandidate {
         }
     }
 
-    public static int removeExpired(int currentHeight) {
+    /**
+     * Remove records that does not affect blockchain state even if max rollback (1440 height back) will happen.
+     */
+    public static int removeObsolete(int currentHeight) {
         // do this every N blocks
         if (!(currentHeight % REMOVE_EXPIRED_EVERY_BLOCKS == 0)) return 0;
 
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("DELETE FROM reward_candidate WHERE height < ?"))
         {
-             pstmt.setInt(1, currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT);
+             pstmt.setInt(1, currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT - 1440);
              return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -138,6 +142,7 @@ FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)
     private final long asset;
     private final long account;
     long balance = -1;  // -1 means not filled
+    long altBalance = -1;  // -1 means not filled
 
     private RewardCandidate(Transaction transaction, long assetId) {
         this.id = transaction.getId();
@@ -184,5 +189,9 @@ FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE)
 
     public long getAccount() {
         return account;
+    }
+
+    public long getBalanceLimitedBottom() {
+        return Math.max(balance, 200 * Constants.ONE_NXT);
     }
 }

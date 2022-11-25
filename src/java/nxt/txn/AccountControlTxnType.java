@@ -124,9 +124,9 @@ public abstract class AccountControlTxnType extends TransactionType {
                 throw new NxtException.NotValidException("Invalid amount (must be zero)");
             }
             Account a = Account.getAccount(transaction.getSenderId());
-            if (a == null || a.getGuaranteedBalanceNQT() < Constants.REWARD_APPLICANT_MIN_BALANCE_FIMK) {
+            if (a == null || a.getGuaranteedBalanceNQT() < Constants.REWARD_APPLICANT_MIN_BALANCE) {
                 throw new NxtException.NotValidException("Sender balance is less than the min "
-                        + Constants.REWARD_APPLICANT_MIN_BALANCE_FIMK + " FIMK");
+                        + Constants.REWARD_APPLICANT_MIN_BALANCE + " FIMK");
             }
 
             // do not accept transaction if there is the same type previous txn (same sender) less than N blocks ago

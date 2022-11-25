@@ -420,6 +420,8 @@ final class BlockImpl implements Block {
         generatorAccount.apply(getGeneratorPublicKey());
         generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(augmentedFeeNQT);
         generatorAccount.addToForgedBalanceNQT(augmentedFeeNQT);
+
+        Reward.get().applyPOPReward(this);
     }
 
     void setPrevious(BlockImpl block) {

@@ -4,6 +4,8 @@ import nxt.Block;
 
 public abstract class Reward {
 
+    public abstract void applyPOPReward(Block block);
+
     private static final class InstanceHolder {
         static final Reward instance = new RewardImpl();
     }

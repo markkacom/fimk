@@ -709,7 +709,7 @@ public final class Account {
         return publicKeyTable.get(publicKeyDbKeyFactory.newKey(id));
     }
 
-    static Account addOrGetAccount(long id) {
+    public static Account addOrGetAccount(long id) {
         return addOrGetAccount(id, 0);
     }
 

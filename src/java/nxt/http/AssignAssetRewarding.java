@@ -31,7 +31,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
         long targetInfo = 0;
         AssetRewardingTxnType.LotteryType lotteryType = null;
         if (target == AssetRewardingTxnType.Target.REGISTERED_POP_REWARD_RECEIVER) {
-            targetInfo = ParameterParser.getUnsignedLong(req, "balanceAssetId", true);
+            targetInfo = ParameterParser.getUnsignedLong(req, "balanceAssetId", false);
             lotteryType = AssetRewardingTxnType.LotteryType.get(
                     (byte) ParameterParser.getInt(req, "lotteryType", 0, 1,  false));
         }

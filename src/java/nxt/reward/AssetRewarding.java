@@ -21,11 +21,13 @@ public final class AssetRewarding {
      * Reward amount for asset and account
      */
     public static class AssetReward {
-         long accountId;
+        private String name;
+        long accountId;
          long assetId;
          long amount;
 
-        public AssetReward(long accountId, long assetId, long amount) {
+        public AssetReward(String name, long accountId, long assetId, long amount) {
+            this.name = name;
             this.accountId = accountId;
             this.assetId = assetId;
             this.amount = amount;
@@ -34,7 +36,8 @@ public final class AssetRewarding {
         @Override
         public String toString() {
             return "AssetReward{" +
-                    "accountId=" + Long.toUnsignedString(accountId) +
+                    "name=" + name +
+                    ", accountId=" + Long.toUnsignedString(accountId) +
                     ", assetId=" + Long.toUnsignedString(assetId) +
                     ", amount=" + amount +
                     '}';

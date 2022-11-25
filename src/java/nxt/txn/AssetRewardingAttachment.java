@@ -18,7 +18,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
      */
     private final byte lotteryType;  // case REGISTERED_POP_REWARD_RECEIVER
     private final long baseAmount;  // case REGISTERED_POP_REWARD_RECEIVER
-    private final long balanceDivider;  // case REGISTERED_POP_REWARD_RECEIVER. reward = accountBalance * baseAmount / balanceDivider   Reward is equal baseAmount when account balance is equal baseBalance.
+    private final long balanceDivider;  // case REGISTERED_POP_REWARD_RECEIVER. reward = accountBalance * baseAmount / balanceDivider   Reward is equal baseAmount when account balance is equal balanceDivider.
     private final long targetInfo;  // field plays roles: balanceAssetId (case REGISTERED_POP_REWARD_RECEIVER) or targetAccount (case CONSTANT_ACCOUNT) or nothing (case FORGER)
 //todo add field expiry
 
@@ -40,7 +40,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         this.target = ((Long) attachmentData.get("target")).byteValue();
         this.lotteryType = ((Long) attachmentData.get("privateLotteryType")).byteValue();
         this.baseAmount = Convert.parseLong(attachmentData.get("baseAmount"));
-        this.balanceDivider = Convert.parseLong(attachmentData.get("baseBalance"));
+        this.balanceDivider = Convert.parseLong(attachmentData.get("balanceDivider"));
         String fieldName = fieldName();
         this.targetInfo = fieldName == null ? 0 : Convert.parseUnsignedLong((String) attachmentData.get(fieldName));
     }
@@ -78,7 +78,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         attachment.put("target", target);
         attachment.put("privateLotteryType", lotteryType);
         attachment.put("baseAmount", baseAmount);
-        attachment.put("baseBalance", balanceDivider);
+        attachment.put("balanceDivider", balanceDivider);
         String fieldName = fieldName();
         if (fieldName != null) attachment.put(fieldName, Long.toUnsignedString(targetInfo));
     }
