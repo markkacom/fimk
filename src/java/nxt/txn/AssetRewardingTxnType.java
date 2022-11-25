@@ -144,10 +144,14 @@ public class AssetRewardingTxnType extends ColoredCoinsTxnTypes {
         if (a.getBaseAmount() < 0 || a.getBaseAmount() > Constants.MAX_ASSET_REWARDING_BASE_AMOUNT_QNT) {
             throw new NxtException.NotValidException("Wrong base amount");
         }
-        if (a.getBalanceDivider() < 0) throw new NxtException.NotValidException("Wrong balance divider");
         if (a.getTarget() == Target.REGISTERED_POP_REWARD_RECEIVER.code) {
-            Asset balanceAssetId = Asset.getAsset(a.getTargetInfo());
-            if (balanceAssetId == null) throw new NxtException.NotValidException("Balance's asset is not known");
+            if (a.getTargetInfo() != 0) {
+                Asset balanceAsset = Asset.getAsset(a.getTargetInfo());
+                if (balanceAsset == null) throw new NxtException.NotValidException("Balance's asset is not known");
+            }
+            if (a.getLotteryType() == LotteryType.RANDOM_ACCOUNT.code) {
+                if (a.getBalanceDivider() <= 0) throw new NxtException.NotValidException("Wrong balance divider");
+            }
         }
         if (a.getTarget() == Target.CONSTANT_ACCOUNT.code) {
             Account targetAccount = Account.getAccount(a.getTargetInfo());
