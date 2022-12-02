@@ -7,9 +7,7 @@ import nxt.txn.AssetRewardingTxnType.LotteryType;
 import nxt.txn.AssetRewardingTxnType.Target;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class RewardImpl extends Reward {
@@ -74,51 +72,76 @@ public class RewardImpl extends Reward {
         for (AssetRewarding ar : ars) {
             Target target = Target.get(ar.getTarget());
             if (target == Target.FORGER) {
-                result.add(new AssetRewarding.AssetReward("FORGER", block.getGeneratorId(), ar.getAsset(), ar.getBaseAmount()));
+                if (MofoAsset.getAccountAllowed(ar.getAsset(), block.getGeneratorId())) {
+                    result.add(new AssetRewarding.AssetReward(
+                            "FORGER", block.getGeneratorId(), ar.getAsset(), ar.getBaseAmount())
+                    );
+                }
             }
             if (target == Target.CONSTANT_ACCOUNT) {
-                result.add(new AssetRewarding.AssetReward("CONSTANT_ACCOUNT", ar.getTargetInfo(), ar.getAsset(), ar.getBaseAmount()));
+                if (MofoAsset.getAccountAllowed(ar.getAsset(), ar.getTargetInfo())) {
+                    result.add(new AssetRewarding.AssetReward(
+                            "CONSTANT_ACCOUNT", ar.getTargetInfo(), ar.getAsset(), ar.getBaseAmount())
+                    );
+                }
             }
             if (target == Target.REGISTERED_POP_REWARD_RECEIVER) {
-                //System.out.println("actual candidates " + candidates.candidates.size());
                 if (candidates.candidates.isEmpty()) continue;
+                List<RewardCandidate> privateAssetCandidates = new ArrayList<>();
+                for (RewardCandidate candidate : candidates.candidates) {
+                    if (MofoAsset.getAccountAllowed(ar.getAsset(), candidate.getAccount())) {
+                        privateAssetCandidates.add(candidate);
+                    }
+                }
+                if (privateAssetCandidates.isEmpty()) continue;
+                RewardCandidate winner = privateAssetCandidates.size() == 1 ? privateAssetCandidates.get(0) : null;
                 long altAssetId = ar.getTargetInfo();   // altAssetId == 0 means fimk
                 LotteryType lotteryType = LotteryType.get(ar.getLotteryType());
                 if (lotteryType == LotteryType.RANDOM_ACCOUNT) {
-                    int selectedIndex = (int) mapToBounded(candidates.candidates.size(), block.getId());
-                    RewardCandidate selected = candidates.candidates.get(selectedIndex);
-                    Account selectedAccount = Account.getAccount(selected.getAccount());
+                    if (winner == null) {
+                        int selectedIndex = (int) mapToBounded(privateAssetCandidates.size(), block.getId());
+                        winner = privateAssetCandidates.get(selectedIndex);
+                    }
+                    Account selectedAccount = Account.getAccount(winner.getAccount());
                     if (selectedAccount == null) continue;
-                    selected.altBalance = altAssetId == 0
+                    winner.altBalance = altAssetId == 0
                             ? selectedAccount.getGuaranteedBalanceNQT()
                             : selectedAccount.getAssetBalanceQNT(altAssetId);
                     // reward = baseAmount * balance / balanceDivider
-                    long rewardAmount = ar.getBaseAmount() * selected.altBalance / ar.getBalanceDivider();
+                    long rewardAmount = ar.getBaseAmount() * winner.altBalance / ar.getBalanceDivider();
                     // reward amount have min and max limits
                     rewardAmount = Math.max(rewardAmount, ar.getBaseAmount() / 10);
+                    rewardAmount = Math.max(rewardAmount, 1);
                     rewardAmount = Math.min(rewardAmount, ar.getBaseAmount() * 10);
-                    result.add(new AssetRewarding.AssetReward("RANDOM_ACCOUNT", selected.getAccount(), ar.getAsset(), rewardAmount));
+                    result.add(new AssetRewarding.AssetReward("RANDOM_ACCOUNT", winner.getAccount(), ar.getAsset(), rewardAmount));
                 }
                 if (lotteryType == LotteryType.RANDOM_WEIGHTED_ACCOUNT) {
-                    long accum = 0;
-                    for (RewardCandidate candidate : candidates.candidates) {
-                        if (altAssetId == 0) {
-                            Account account = Account.getAccount(candidate.getAccount());
-                            if (account == null) continue;
-                            candidate.altBalance = account.getBalanceNQT();
-                        } else {
-                            candidate.altBalance = Account.getAssetBalanceQNT(candidate.getAccount(), altAssetId);
+                    if (winner == null) {
+                        long accum = 0;
+                        for (RewardCandidate candidate : privateAssetCandidates) {
+                            if (altAssetId == 0) {
+                                Account account = Account.getAccount(candidate.getAccount());
+                                if (account == null) continue;
+                                candidate.altBalance = account.getBalanceNQT();
+                            } else {
+                                candidate.altBalance = Account.getAssetBalanceQNT(candidate.getAccount(), altAssetId);
+                            }
+                            accum += Math.max(candidate.altBalance, ar.getBaseAmount());
                         }
-                        accum += Math.max(candidate.altBalance, ar.getBaseAmount());
+                        long v = mapToBounded(accum, block.getId());
+                        accum = 0;
+                        for (RewardCandidate candidate : privateAssetCandidates) {
+                            accum += Math.max(candidate.altBalance, ar.getBaseAmount());
+                            if (accum > v) {
+                                winner = candidate;
+                                break;
+                            }
+                        }
                     }
-                    long v = mapToBounded(accum, block.getId());
-                    accum = 0;
-                    for (RewardCandidate candidate : candidates.candidates) {
-                        accum += Math.max(candidate.altBalance, ar.getBaseAmount());
-                        if (accum > v) {
-                            result.add(new AssetRewarding.AssetReward("RANDOM_WEIGHTED_ACCOUNT", candidate.getAccount(), ar.getAsset(), ar.getBaseAmount()));
-                            break;
-                        }
+                    if (winner != null) {
+                        result.add(new AssetRewarding.AssetReward(
+                                "RANDOM_WEIGHTED_ACCOUNT", winner.getAccount(), ar.getAsset(), ar.getBaseAmount())
+                        );
                     }
                 }
             }

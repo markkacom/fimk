@@ -111,6 +111,7 @@ public final class AssetRewarding {
 
 
     public static DbIterator<AssetRewarding> getAssetRewardings(int height) {
+        // result must be strong ordered because it affects consensus
         Connection con = null;
         try {
             con = Db.db.getConnection();

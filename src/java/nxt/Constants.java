@@ -25,7 +25,7 @@ public final class Constants {
     public static final boolean isTestnet = Nxt.getBooleanProperty("fimk.isTestnet");
     public static final boolean isOffline = Nxt.getBooleanProperty("fimk.isOffline");
 
-    public static final long ONE_NXT = 100000000;
+    public static final long ONE_NXT = 100_000_000;
 
     public static final long MIN_FEE_NQT = ONE_NXT / 10;
 
@@ -41,10 +41,10 @@ public final class Constants {
     /**
      * dont accept transaction same type and same sender in the height interval less than this limit
      */
-    public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 3;
-    public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 300;
+    public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 1000;
+    public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 2160;
     public static long REWARD_APPLICANT_MIN_BALANCE = 10 * ONE_NXT;
-    public static long POP_REWARD_MONEY_AMOUNT_NQT = 10 * ONE_NXT;
+    public static long POP_REWARD_MONEY_AMOUNT_NQT = 1 * ONE_NXT;
 
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
@@ -93,7 +93,7 @@ public final class Constants {
     public static final int MAX_ASSET_DESCRIPTION_LENGTH = 1000;
     public static final int MAX_ASSET_TRANSFER_COMMENT_LENGTH = 1000;
     public static final int MAX_DIVIDEND_PAYMENT_ROLLBACK = 1441;
-    public static final long MAX_ASSET_REWARDING_BASE_AMOUNT_QNT = 1_000_000 * 100_000_000L;
+    public static final long MAX_ASSET_REWARDING_BASE_AMOUNT_QNT = 1_000_000 * ONE_NXT;
 
     public static final int MAX_POLL_NAME_LENGTH = 100;
     public static final int MAX_POLL_DESCRIPTION_LENGTH = 1000;
