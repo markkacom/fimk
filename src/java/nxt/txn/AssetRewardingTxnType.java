@@ -155,7 +155,12 @@ public class AssetRewardingTxnType extends ColoredCoinsTxnTypes {
         }
         if (a.getTarget() == Target.CONSTANT_ACCOUNT.code) {
             Account targetAccount = Account.getAccount(a.getTargetInfo());
-            if (targetAccount == null) throw new NxtException.NotValidException("Rewarding account is not known");
+            if (targetAccount == null) {
+                throw new NxtException.NotValidException("Rewarding constant account is not known");
+            }
+            if (!MofoAsset.getAccountAllowed(a.getAsset(), a.getTargetInfo())) {
+                throw new NxtException.NotValidException("Rewarding constant account is not allowed for private asset");
+            }
         }
     }
 
