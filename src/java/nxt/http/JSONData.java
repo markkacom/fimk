@@ -243,7 +243,7 @@ public final class JSONData {
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block)));
+        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 
@@ -282,7 +282,7 @@ public final class JSONData {
         json.put("transactions", transactions);
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block)));
+        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 

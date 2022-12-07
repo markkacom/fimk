@@ -16,8 +16,6 @@ public abstract class Reward {
 
     public abstract long augmentFee(Block block, long totalFeeNQT);
 
-    public abstract long calculatePOSRewardNQT(Block block);
-
     public abstract long calculatePOSRewardNQT(int height);
 
 }

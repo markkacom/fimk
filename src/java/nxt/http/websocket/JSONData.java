@@ -245,7 +245,7 @@ public class JSONData {
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
-        json.put("totalPOSRewardNQT", Reward.get().calculatePOSRewardNQT(block));
+        json.put("totalPOSRewardNQT", Reward.get().calculatePOSRewardNQT(block.getHeight()));
         return json;
     }
 

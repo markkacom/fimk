@@ -13,13 +13,13 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RewardImpl extends Reward {
 
     public long augmentFee(Block block, long totalFeeNQT) {
-        long rewardNQT = calculatePOSRewardNQT(block);
+        long rewardNQT = calculatePOSRewardNQT(block.getHeight());
         return Math.addExact(rewardNQT, totalFeeNQT);
     }
 
     @Override
     public void applyPOPReward(Block block) {
-        if (!HardFork.PRIVATE_ASSETS_REWARD_BLOCK(block.getHeight())) return;
+        if (!HardFork.POS_POP_REWARD_BLOCK(block.getHeight())) return;
 
         RewardCandidate.removeObsolete(Nxt.getBlockchain().getHeight());
 
@@ -48,10 +48,6 @@ public class RewardImpl extends Reward {
         }
     }
 
-    public long calculatePOSRewardNQT(Block block) {
-        return calculatePOSRewardNQT(block.getHeight());
-    }
-
     public long calculatePOSRewardNQT(int height) {
         if (height >= Constants.FORGER_FEE_BLOCK) {
             for (int i = 0; i < Constants.FORGER_FEE_AMOUNT_NQT_STAGES.length; i++) {
@@ -60,6 +56,11 @@ public class RewardImpl extends Reward {
                 }
             }
         }
+
+        if (HardFork.POS_POP_REWARD_BLOCK(height)) {
+            return Constants.ONE_NXT;
+        }
+
         return 0;
     }
 
