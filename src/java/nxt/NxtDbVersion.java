@@ -1081,7 +1081,7 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
             case 435:
                 apply("CREATE TABLE IF NOT EXISTS asset_rewarding (db_id IDENTITY, id BIGINT NOT NULL, " +
-                        "asset_id BIGINT NOT NULL, height INT NOT NULL, frequency INT NOT NULL, target TINYINT NOT NULL, " +
+                        "asset_id BIGINT NOT NULL, height INT NOT NULL, frequency INT NOT NULL, halvingBlocks INT NOT NULL, target TINYINT NOT NULL, " +
                         "lotteryType TINYINT NOT NULL, baseAmount BIGINT NOT NULL, balanceDivider BIGINT NOT NULL, targetInfo BIGINT NOT NULL, " +
                         "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE); " +
                         "CREATE UNIQUE INDEX IF NOT EXISTS asset_rewarding_asset_id_idx ON asset_rewarding (asset_id);");

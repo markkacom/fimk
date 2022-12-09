@@ -20,7 +20,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
     private final long baseAmount;  // case REGISTERED_POP_REWARD_RECEIVER
     private final long balanceDivider;  // case REGISTERED_POP_REWARD_RECEIVER. reward = accountBalance * baseAmount / balanceDivider   Reward is equal baseAmount when account balance is equal balanceDivider.
     private final long targetInfo;  // field plays roles: balanceAssetId (case REGISTERED_POP_REWARD_RECEIVER) or targetAccount (case CONSTANT_ACCOUNT) or nothing (case FORGER)
-//todo add field expiry
+    private final int halvingBlocks;
 
     AssetRewardingAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) {
         super(buffer, transactionVersion);
@@ -31,6 +31,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         this.baseAmount = buffer.getLong();
         this.balanceDivider = buffer.getLong();
         this.targetInfo = buffer.getLong();
+        this.halvingBlocks = buffer.getInt();
     }
 
     AssetRewardingAttachment(JSONObject attachmentData, int timestamp) {
@@ -41,11 +42,12 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         this.lotteryType = ((Long) attachmentData.get("privateLotteryType")).byteValue();
         this.baseAmount = Convert.parseLong(attachmentData.get("baseAmount"));
         this.balanceDivider = Convert.parseLong(attachmentData.get("balanceDivider"));
+        this.halvingBlocks = ((Long) attachmentData.get("halvingBlocks")).intValue();
         String fieldName = fieldName();
         this.targetInfo = fieldName == null ? 0 : Convert.parseUnsignedLong((String) attachmentData.get(fieldName));
     }
 
-    public AssetRewardingAttachment(long asset, int frequency, byte target, byte lotteryType, long baseAmount, long balanceDivider, long targetInfo) {
+    public AssetRewardingAttachment(long asset, int frequency, byte target, byte lotteryType, long baseAmount, long balanceDivider, long targetInfo, int halvingBlocks) {
         this.asset = asset;
         this.frequency = frequency;
         this.target = target;
@@ -53,11 +55,12 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         this.baseAmount = baseAmount;
         this.balanceDivider = balanceDivider;
         this.targetInfo = targetInfo;
+        this.halvingBlocks = halvingBlocks;
     }
 
     @Override
     protected int getMySize() {
-        return 8 + 4 + 1 + 1 + 8 + 8 + 8;
+        return 8 + 4 + 1 + 1 + 8 + 8 + 8 + 4;
     }
 
     @Override
@@ -69,6 +72,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         buffer.putLong(baseAmount);
         buffer.putLong(balanceDivider);
         buffer.putLong(targetInfo);
+        buffer.putInt(halvingBlocks);
     }
 
     @Override
@@ -79,6 +83,7 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
         attachment.put("privateLotteryType", lotteryType);
         attachment.put("baseAmount", baseAmount);
         attachment.put("balanceDivider", balanceDivider);
+        attachment.put("halvingBlocks", halvingBlocks);
         String fieldName = fieldName();
         if (fieldName != null) attachment.put(fieldName, Long.toUnsignedString(targetInfo));
     }
@@ -114,6 +119,10 @@ public final class AssetRewardingAttachment extends Attachment.AbstractAttachmen
 
     public long getTargetInfo() {
         return targetInfo;
+    }
+
+    public int getHalvingBlocks() {
+        return halvingBlocks;
     }
 
     private String fieldName() {

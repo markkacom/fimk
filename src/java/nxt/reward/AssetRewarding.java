@@ -23,8 +23,8 @@ public final class AssetRewarding {
     public static class AssetReward {
         private String name;
         long accountId;
-         long assetId;
-         long amount;
+        long assetId;
+        long amount;
 
         public AssetReward(String name, long accountId, long assetId, long amount) {
             this.name = name;
@@ -136,7 +136,8 @@ public final class AssetRewarding {
     }
 
 
-    public static void init() {}
+    public static void init() {
+    }
 
 
     private final long id;
@@ -149,6 +150,7 @@ public final class AssetRewarding {
     private final long baseAmount;
     private final long balanceDivider;
     private final long targetInfo;
+    private final int halvingBlocks;
 
     private AssetRewarding(Transaction transaction, AssetRewardingAttachment attachment) {
         this.id = transaction.getId();
@@ -161,6 +163,7 @@ public final class AssetRewarding {
         this.baseAmount = attachment.getBaseAmount();
         this.balanceDivider = attachment.getBalanceDivider();
         this.targetInfo = attachment.getTargetInfo();
+        this.halvingBlocks = attachment.getHalvingBlocks();
     }
 
     private AssetRewarding(ResultSet rs) throws SQLException {
@@ -169,6 +172,7 @@ public final class AssetRewarding {
         this.height = rs.getInt("height");
         this.asset = rs.getLong("asset_id");
         this.frequency = rs.getInt("frequency");
+        this.halvingBlocks = rs.getInt("halvingBlocks");
         this.target = rs.getByte("target");
         this.lotteryType = rs.getByte("lotteryType");
         this.baseAmount = rs.getLong("baseAmount");
@@ -179,13 +183,14 @@ public final class AssetRewarding {
     private void save(Connection con) throws SQLException {
         // overwrite previous transaction on same asset. Only single one per asset
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO asset_rewarding " +
-                "(id, height, asset_id, frequency, target, lotteryType, baseAmount, balanceDivider, targetInfo) "
-                + "KEY (asset_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ")) {
+                "(id, height, asset_id, frequency, halvingBlocks, target, lotteryType, baseAmount, balanceDivider, targetInfo) "
+                + "KEY (asset_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ")) {
             int i = 0;
             pstmt.setLong(++i, this.id);
             pstmt.setInt(++i, this.height);
             pstmt.setLong(++i, this.asset);
             pstmt.setInt(++i, this.frequency);
+            pstmt.setInt(++i, this.halvingBlocks);
             pstmt.setByte(++i, this.target);
             pstmt.setByte(++i, this.lotteryType);
             pstmt.setLong(++i, this.baseAmount);
@@ -231,6 +236,10 @@ public final class AssetRewarding {
         return targetInfo;
     }
 
+    public int getHalvingBlocks() {
+        return halvingBlocks;
+    }
+
     @Override
     public String toString() {
         return "AssetRewarding{" +
@@ -239,6 +248,7 @@ public final class AssetRewarding {
                 ", height=" + height +
                 ", asset=" + asset +
                 ", frequency=" + frequency +
+                ", halvingBlocks=" + halvingBlocks +
                 ", target=" + target +
                 ", lotteryType=" + lotteryType +
                 ", baseAmount=" + baseAmount +

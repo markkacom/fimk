@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static nxt.reward.AssetRewarding.*;
+
 public class RewardImpl extends Reward {
 
     public long augmentFee(Block block, long totalFeeNQT) {
@@ -32,10 +34,11 @@ public class RewardImpl extends Reward {
             winnerAccount.addToBalanceAndUnconfirmedBalanceNQT(Constants.POP_REWARD_MONEY_AMOUNT_NQT);
         }
 
-        List<AssetRewarding.AssetReward> rewards = resolveAssetRewards(block, candidates);
+        List<AssetReward> rewards = resolveAssetRewards(block, candidates);
         //System.out.printf("block %d  pop rewards %d \n", block.getHeight(), rewards == null ? 0 : rewards.size());
+
         if (rewards != null) {
-            for (AssetRewarding.AssetReward reward : rewards) {
+            for (AssetReward reward : rewards) {
                 //System.out.println(reward.toString());
                 Account winnerAccount = Account.addOrGetAccount(reward.accountId);
                 // asset inflation
@@ -67,23 +70,25 @@ public class RewardImpl extends Reward {
     /**
      * @return array of 1) account id, 2) private asset id, 3) amount
      */
-    private List<AssetRewarding.AssetReward> resolveAssetRewards(Block block, Candidates candidates) {
-        List<AssetRewarding> ars = AssetRewarding.getApplicableRewardings(block.getHeight());
-        List<AssetRewarding.AssetReward> result = ars.isEmpty() ? null : new ArrayList<>(ars.size());
+    private List<AssetReward> resolveAssetRewards(Block block, Candidates candidates) {
+        List<AssetRewarding> ars = getApplicableRewardings(block.getHeight());
+        List<AssetReward> result = ars.isEmpty() ? null : new ArrayList<>(ars.size());
         for (AssetRewarding ar : ars) {
             Target target = Target.get(ar.getTarget());
             if (target == Target.FORGER) {
                 if (MofoAsset.getAccountAllowed(ar.getAsset(), block.getGeneratorId())) {
-                    result.add(new AssetRewarding.AssetReward(
-                            "FORGER", block.getGeneratorId(), ar.getAsset(), ar.getBaseAmount())
-                    );
+                    long amount = halving(ar.getBaseAmount(), ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
+                    if (amount > 0) {
+                        result.add(new AssetReward("FORGER", block.getGeneratorId(), ar.getAsset(), amount));
+                    }
                 }
             }
             if (target == Target.CONSTANT_ACCOUNT) {
                 if (MofoAsset.getAccountAllowed(ar.getAsset(), ar.getTargetInfo())) {
-                    result.add(new AssetRewarding.AssetReward(
-                            "CONSTANT_ACCOUNT", ar.getTargetInfo(), ar.getAsset(), ar.getBaseAmount())
-                    );
+                    long amount = halving(ar.getBaseAmount(), ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
+                    if (amount > 0) {
+                        result.add(new AssetReward("CONSTANT_ACCOUNT", ar.getTargetInfo(), ar.getAsset(), amount));
+                    }
                 }
             }
             if (target == Target.REGISTERED_POP_REWARD_RECEIVER) {
@@ -94,6 +99,7 @@ public class RewardImpl extends Reward {
                         privateAssetCandidates.add(candidate);
                     }
                 }
+                //System.out.println("actual candidates " + privateAssetCandidates.size());
                 if (privateAssetCandidates.isEmpty()) continue;
                 RewardCandidate winner = privateAssetCandidates.size() == 1 ? privateAssetCandidates.get(0) : null;
                 long altAssetId = ar.getTargetInfo();   // altAssetId == 0 means fimk
@@ -114,7 +120,10 @@ public class RewardImpl extends Reward {
                     rewardAmount = Math.max(rewardAmount, ar.getBaseAmount() / 10);
                     rewardAmount = Math.max(rewardAmount, 1);
                     rewardAmount = Math.min(rewardAmount, ar.getBaseAmount() * 10);
-                    result.add(new AssetRewarding.AssetReward("RANDOM_ACCOUNT", winner.getAccount(), ar.getAsset(), rewardAmount));
+                    long amount = halving(rewardAmount, ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
+                    if (amount > 0) {
+                        result.add(new AssetReward("RANDOM_ACCOUNT", winner.getAccount(), ar.getAsset(), amount));
+                    }
                 }
                 if (lotteryType == LotteryType.RANDOM_WEIGHTED_ACCOUNT) {
                     if (winner == null) {
@@ -140,9 +149,10 @@ public class RewardImpl extends Reward {
                         }
                     }
                     if (winner != null) {
-                        result.add(new AssetRewarding.AssetReward(
-                                "RANDOM_WEIGHTED_ACCOUNT", winner.getAccount(), ar.getAsset(), ar.getBaseAmount())
-                        );
+                        long amount = halving(ar.getBaseAmount(), ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
+                        if (amount > 0) {
+                            result.add(new AssetReward("RANDOM_WEIGHTED_ACCOUNT", winner.getAccount(), ar.getAsset(), amount));
+                        }
                     }
                 }
             }
@@ -177,6 +187,14 @@ public class RewardImpl extends Reward {
             }
         });
         return new Candidates(candidates, balanceTotal.get());
+    }
+
+    private long halving(long amount, int everyNum, int fromHeight, int height) {
+        if (everyNum == 0) return amount;
+        int n = (height - fromHeight) / everyNum;
+        // Math.pow(2, 1024) is infinitive
+        if (n > 1023) return 0;
+        return amount / (long) Math.pow(2, n);
     }
 
     /**

@@ -25,6 +25,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
         AssetRewardingTxnType.Target target = AssetRewardingTxnType.Target.get(
                 (byte) ParameterParser.getInt(req, "target", 0, 2,  true));
         int frequency = ParameterParser.getInt(req, "frequency", 0, Integer.MAX_VALUE,  true);
+        int halvingBlocks = ParameterParser.getInt(req, "halvingBlocks", 0, Integer.MAX_VALUE,  false);
         long baseAmount = ParameterParser.getLong(req, "baseAmount", 1, Long.MAX_VALUE,  true);
         long balanceDivider = ParameterParser.getLong(req, "balanceDivider", 1, Long.MAX_VALUE,  false);
 
@@ -43,7 +44,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
         Attachment attachment = new AssetRewardingAttachment(
                 asset.getId(), frequency, (byte) target.code,
                 lotteryType == null ? 0 : (byte) lotteryType.code,
-                baseAmount, balanceDivider, targetInfo);
+                baseAmount, balanceDivider, targetInfo, halvingBlocks);
         return createTransaction(req, account, attachment);
     }
 
