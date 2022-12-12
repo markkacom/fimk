@@ -17,20 +17,11 @@
 package nxt;
 
 import nxt.crypto.Crypto;
-import nxt.util.Convert;
-import nxt.util.Listener;
-import nxt.util.Listeners;
-import nxt.util.Logger;
-import nxt.util.ThreadPool;
+import nxt.util.*;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -124,7 +115,7 @@ public final class Generator implements Comparable<Generator> {
                     String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
                     StringBuilder sb = new StringBuilder(filled + padded);
                     sb.setCharAt(30, '|');
-                    Logger.logDebugMessage("target [" + sb.append(pos > 60 ? " x" + String.format("%.2f", diff) : "]"));
+                    Logger.logDebugMessage("target [" + sb.append("]").append(" x").append(String.format("%.2f", diff)));
                 }
             }
         }

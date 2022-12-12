@@ -414,7 +414,7 @@ final class BlockImpl implements Block {
 
     void apply() {
         /* XXX - Add the POS reward to the block forger */
-        long augmentedFeeNQT = Reward.get().augmentFee(this, totalFeeNQT);
+        long augmentedFeeNQT = Reward.get().augmentFee(getHeight(), totalFeeNQT, getGeneratorId());
 
         Account generatorAccount = Account.addOrGetAccount(getGeneratorId());
         generatorAccount.apply(getGeneratorPublicKey());

@@ -1103,6 +1103,11 @@ class NxtDbVersion extends DbVersion {
             case 438:
                 apply("CREATE INDEX IF NOT EXISTS transaction_t_s_h_s_idx ON transaction (type, subtype, height, sender_id)");
             case 439:
+                apply("CREATE TABLE IF NOT EXISTS reward_item (height INT NOT NULL, campaign_id BIGINT NOT NULL, " +
+                        "name VARCHAR NOT NULL, account_id BIGINT NOT NULL, asset_id BIGINT NOT NULL, amount BIGINT NOT NULL); " +
+                        "CREATE INDEX IF NOT EXISTS reward_item_height_idx ON reward_item (height); " +
+                        "CREATE INDEX IF NOT EXISTS reward_item_account_id_idx ON reward_item (account_id); ");
+            case 440:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");

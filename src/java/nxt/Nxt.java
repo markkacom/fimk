@@ -28,6 +28,7 @@ import nxt.peer.Peers;
 import nxt.reward.AccountNode;
 import nxt.reward.AssetRewarding;
 import nxt.reward.RewardCandidate;
+import nxt.reward.RewardItem;
 import nxt.txn.extension.TransactionTypeExtension;
 import nxt.user.Users;
 import nxt.util.Convert;
@@ -381,6 +382,7 @@ public final class Nxt {
                 NamespacedAlias.init();
                 Asset.init();
                 AssetRewarding.init();
+                RewardItem.init();
                 RewardCandidate.init();
                 AccountNode.init();
                 DigitalGoodsStore.init();

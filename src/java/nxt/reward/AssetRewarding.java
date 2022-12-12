@@ -17,33 +17,6 @@ import java.util.List;
  */
 public final class AssetRewarding {
 
-    /**
-     * Reward amount for asset and account
-     */
-    public static class AssetReward {
-        private String name;
-        long accountId;
-        long assetId;
-        long amount;
-
-        public AssetReward(String name, long accountId, long assetId, long amount) {
-            this.name = name;
-            this.accountId = accountId;
-            this.assetId = assetId;
-            this.amount = amount;
-        }
-
-        @Override
-        public String toString() {
-            return "AssetReward{" +
-                    "name=" + name +
-                    ", accountId=" + Long.toUnsignedString(accountId) +
-                    ", assetId=" + Long.toUnsignedString(assetId) +
-                    ", amount=" + amount +
-                    '}';
-        }
-    }
-
     private static final DbKey.LongKeyFactory<AssetRewarding> dbKeyFactory = new DbKey.LongKeyFactory<AssetRewarding>("id") {
 
         @Override
