@@ -1,14 +1,15 @@
 package nxt;
 
+import nxt.db.DbKey;
+import nxt.db.VersionedEntityDbTable;
+import nxt.util.Convert;
+import nxt.util.Utils;
+
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import nxt.db.DbKey;
-import nxt.db.VersionedEntityDbTable;
-import nxt.util.Convert;
 
 public final class MofoAsset {
 
@@ -184,16 +185,20 @@ public final class MofoAsset {
         if (Asset.privateEnabled()) {
             Asset asset = Asset.getAsset(assetId);
             if (asset != null) {
-                return isPrivateAsset(asset);
+                return isPrivateAsset(asset.getType());
             }
         }
         return false; 
     }
     
-    public static boolean isPrivateAsset(Asset asset) {
-        return asset.getType() == Asset.TYPE_PRIVATE_ASSET;
+    public static boolean isPrivateAsset(byte assetType) {
+        return Utils.getBit(assetType, Asset.TYPE_PRIVATE_BIT_POS) == 1;
     }
     
+    public static boolean isPrivateAsset(Asset asset) {
+        return Utils.getBit(asset.getType(), Asset.TYPE_PRIVATE_BIT_POS) == 1;
+    }
+
     public static boolean getAccountAllowed(long assetId, long accountId) {
         if (Asset.privateEnabled()) {
             Asset asset = Asset.getAsset(assetId);

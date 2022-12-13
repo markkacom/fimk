@@ -273,7 +273,7 @@ public class MintWorker {
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
             HttpsURLConnection.setDefaultHostnameVerifier(hostNameVerifier);
         }
-        int port = Constants.isTestnet ? API.TESTNET_API_PORT : Nxt.getIntProperty("fimk.apiServerPort");
+        int port = Nxt.getIntPropertyNew("apiServerPort", 0, API.TESTNET_API_PORT);
         String urlParams = getUrlParams(params);
         URL url;
         try {

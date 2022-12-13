@@ -18,14 +18,7 @@ package nxt;
 
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
-import nxt.db.DbClause;
-import nxt.db.DbIterator;
-import nxt.db.DbKey;
-import nxt.db.DbUtils;
-import nxt.db.DerivedDbTable;
-import nxt.db.EntityDbTable;
-import nxt.db.PersistentDbTable;
-import nxt.db.VersionedEntityDbTable;
+import nxt.db.*;
 import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
@@ -716,7 +709,7 @@ public final class Account {
         return publicKeyTable.get(publicKeyDbKeyFactory.newKey(id));
     }
 
-    static Account addOrGetAccount(long id) {
+    public static Account addOrGetAccount(long id) {
         return addOrGetAccount(id, 0);
     }
 
@@ -1113,7 +1106,7 @@ public final class Account {
         return creationHeight;
     }
 
-    int getKeyHeight() {
+    public int getKeyHeight() {
         return keyHeight;
     }
 
@@ -1351,7 +1344,7 @@ public final class Account {
         return getUnconfirmedCurrencyUnits(this.id, currencyId);
     }
 
-    void leaseEffectiveBalance(long lesseeId, short period) {
+    public void leaseEffectiveBalance(long lesseeId, short period) {
         Account lessee = Account.getAccount(lesseeId);
         if (lessee != null && lessee.getKeyHeight() > 0) {
             int height = Nxt.getBlockchain().getHeight();
@@ -1402,7 +1395,7 @@ public final class Account {
         }
     }
 
-    void addToAssetBalanceQNT(long assetId, long quantityQNT) {
+    public void addToAssetBalanceQNT(long assetId, long quantityQNT) {
         if (quantityQNT == 0) {
             return;
         }
@@ -1420,7 +1413,7 @@ public final class Account {
         assetListeners.notify(accountAsset, Event.ASSET_BALANCE);
     }
 
-    void addToUnconfirmedAssetBalanceQNT(long assetId, long quantityQNT) {
+    public void addToUnconfirmedAssetBalanceQNT(long assetId, long quantityQNT) {
         if (quantityQNT == 0) {
             return;
         }
@@ -1438,7 +1431,7 @@ public final class Account {
         assetListeners.notify(accountAsset, Event.UNCONFIRMED_ASSET_BALANCE);
     }
 
-    void addToAssetAndUnconfirmedAssetBalanceQNT(long assetId, long quantityQNT) {
+    public void addToAssetAndUnconfirmedAssetBalanceQNT(long assetId, long quantityQNT) {
         if (quantityQNT == 0) {
             return;
         }
@@ -1519,7 +1512,7 @@ public final class Account {
         currencyListeners.notify(accountCurrency, Event.UNCONFIRMED_CURRENCY_BALANCE);
     }
 
-    void addToBalanceNQT(long amountNQT) {
+    public void addToBalanceNQT(long amountNQT) {
         if (amountNQT == 0) {
             return;
         }
@@ -1530,7 +1523,7 @@ public final class Account {
         listeners.notify(this, Event.BALANCE);
     }
 
-    void addToUnconfirmedBalanceNQT(long amountNQT) {
+    public void addToUnconfirmedBalanceNQT(long amountNQT) {
         if (amountNQT == 0) {
             return;
         }
@@ -1540,7 +1533,7 @@ public final class Account {
         listeners.notify(this, Event.UNCONFIRMED_BALANCE);
     }
 
-    void addToBalanceAndUnconfirmedBalanceNQT(long amountNQT) {
+    public void addToBalanceAndUnconfirmedBalanceNQT(long amountNQT) {
         if (amountNQT == 0) {
             return;
         }
@@ -1603,7 +1596,7 @@ public final class Account {
         }
     }
 
-    void payDividends(final long assetId, final int height, final long amountNQTPerQNT) {
+    public void payDividends(final long assetId, final int height, final long amountNQTPerQNT) {
         long totalDividend = 0;
         List<AccountAsset> accountAssets = new ArrayList<>();
         try (DbIterator<AccountAsset> iterator = getAssetAccounts(assetId, height, 0, -1)) {

@@ -16,21 +16,16 @@
 
 package nxt;
 
-import java.util.ArrayList;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
-
 import nxt.util.Convert;
+
+import java.util.*;
 
 public final class Constants {
 
     public static final boolean isTestnet = Nxt.getBooleanProperty("fimk.isTestnet");
     public static final boolean isOffline = Nxt.getBooleanProperty("fimk.isOffline");
 
-    public static final long ONE_NXT = 100000000;
+    public static final long ONE_NXT = 100_000_000;
 
     public static final long MIN_FEE_NQT = ONE_NXT / 10;
 
@@ -42,6 +37,15 @@ public final class Constants {
     public static final long FORGER_FEE_STAGE_CHANGE_AT_BLOCK = 889920;
     public static final long[] FORGER_FEE_AMOUNT_NQT_STAGES = { 200 * ONE_NXT, 100 * ONE_NXT, 50 * ONE_NXT, 25 * ONE_NXT };
 
+    /* POP Reward */
+    /**
+     * dont accept transaction same type and same sender in the height interval less than this limit
+     */
+    public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 1000;
+    public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 2160;
+    public static long REWARD_APPLICANT_MIN_BALANCE = 10 * ONE_NXT;
+    public static long POP_REWARD_MONEY_AMOUNT_NQT = 1 * ONE_NXT;
+
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
@@ -52,7 +56,7 @@ public final class Constants {
     public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("fimk.testnetLeasingDelay", 1440) : 1440;
 
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
-    public static final int FORGING_DELAY = Nxt.getIntProperty("fimk.forgingDelay");
+    public static final int BLOCK_INTERVAL_THRESHOLD = isTestnet ? 300 : 3600;
     public static final int FORGING_SPEEDUP = Nxt.getIntProperty("fimk.forgingSpeedup");
 
     public static final byte MAX_PHASING_VOTE_TRANSACTIONS = 10;
@@ -89,6 +93,7 @@ public final class Constants {
     public static final int MAX_ASSET_DESCRIPTION_LENGTH = 1000;
     public static final int MAX_ASSET_TRANSFER_COMMENT_LENGTH = 1000;
     public static final int MAX_DIVIDEND_PAYMENT_ROLLBACK = 1441;
+    public static final long MAX_ASSET_REWARDING_BASE_AMOUNT_QNT = 1_000_000 * ONE_NXT;
 
     public static final int MAX_POLL_NAME_LENGTH = 100;
     public static final int MAX_POLL_DESCRIPTION_LENGTH = 1000;
@@ -163,7 +168,11 @@ public final class Constants {
     public static final int LAST_KNOWN_BLOCK = isTestnet ? 0 : 384000;
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
     public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
+    public static final int CONTROL_FORGING_TIME_BLOCK = isTestnet ? 1387 : Integer.MAX_VALUE;  //todo set this for mainnet
+    public static final int CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK = isTestnet ? 4925 : Integer.MAX_VALUE;  //todo set this for mainnet
+    public static final int CONTROL_FORGING_TUNED_HITTIME_BLOCK = isTestnet ? 6241 : Integer.MAX_VALUE;  //todo set this for mainnet
 
+    public static final int POS_POP_REWARD_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;  //todo set this for mainnet
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;

@@ -1,35 +1,20 @@
 package nxt.http.websocket;
 
+import nxt.*;
+import nxt.Account.AccountIdentifier;
+import nxt.Account.AccountInfo;
+import nxt.Attachment.MonetarySystemAttachment;
+import nxt.peer.Peer;
+import nxt.reward.Reward;
+import nxt.txn.*;
+import nxt.util.Convert;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import nxt.Account;
-import nxt.Appendix;
-import nxt.Asset;
-import nxt.Account.AccountIdentifier;
-import nxt.Account.AccountInfo;
-import nxt.Attachment.MonetarySystemAttachment;
-import nxt.Attachment.ColoredCoinsAssetTransfer;
-import nxt.Attachment.ColoredCoinsAskOrderPlacement;
-import nxt.Attachment.ColoredCoinsBidOrderPlacement;
-import nxt.Attachment.ColoredCoinsAskOrderCancellation;
-import nxt.Attachment.ColoredCoinsBidOrderCancellation;
-import nxt.AccountColor;
-import nxt.Block;
-import nxt.Currency;
-import nxt.DigitalGoodsStore;
-import nxt.Nxt;
-import nxt.Order;
-import nxt.RewardsImpl;
-import nxt.Trade;
-import nxt.Transaction;
-import nxt.peer.Peer;
-import nxt.util.Convert;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 public class JSONData {
 
@@ -130,26 +115,26 @@ public class JSONData {
                 if (transaction.getType().getSubtype() == 0) { // SUBTYPE_COLORED_COINS_ASSET_ISSUANCE
                     assetId = transaction.getId();
                 }
-                else if (transaction.getType().getSubtype() == 1 && appendage instanceof ColoredCoinsAssetTransfer) { // SUBTYPE_COLORED_COINS_ASSET_TRANSFER
-                    assetId = ((ColoredCoinsAssetTransfer) appendage).getAssetId();
+                else if (transaction.getType().getSubtype() == 1 && appendage instanceof AssetTransferAttachment) { // SUBTYPE_COLORED_COINS_ASSET_TRANSFER
+                    assetId = ((AssetTransferAttachment) appendage).getAssetId();
                 }
-                else if (transaction.getType().getSubtype() == 2 && appendage instanceof ColoredCoinsAskOrderPlacement) { // SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT
-                    assetId = ((ColoredCoinsAskOrderPlacement) appendage).getAssetId();
+                else if (transaction.getType().getSubtype() == 2 && appendage instanceof AskOrderPlacementAttachment) { // SUBTYPE_COLORED_COINS_ASK_ORDER_PLACEMENT
+                    assetId = ((AskOrderPlacementAttachment) appendage).getAssetId();
                 }
-                else if (transaction.getType().getSubtype() == 3 && appendage instanceof ColoredCoinsBidOrderPlacement) { // SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT
-                    assetId = ((ColoredCoinsBidOrderPlacement) appendage).getAssetId();
+                else if (transaction.getType().getSubtype() == 3 && appendage instanceof BidOrderPlacementAttachment) { // SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT
+                    assetId = ((BidOrderPlacementAttachment) appendage).getAssetId();
                 }
                 else {
-                    if (transaction.getType().getSubtype() == 4 && appendage instanceof ColoredCoinsAskOrderCancellation) { // SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION
-                        final long orderId = ((ColoredCoinsAskOrderCancellation) appendage).getOrderId();
+                    if (transaction.getType().getSubtype() == 4 && appendage instanceof AskOrderCancellationAttachment) { // SUBTYPE_COLORED_COINS_ASK_ORDER_CANCELLATION
+                        final long orderId = ((AskOrderCancellationAttachment) appendage).getOrderId();
                         Order order = Order.Ask.getAskOrder(orderId);
                         if (order == null) {
                             continue;
                         }
                         assetId = order.getAssetId();
                     }
-                    else if (transaction.getType().getSubtype() == 5 && appendage instanceof ColoredCoinsBidOrderCancellation) { // SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION
-                        final long orderId = ((ColoredCoinsBidOrderCancellation) appendage).getOrderId();
+                    else if (transaction.getType().getSubtype() == 5 && appendage instanceof BidOrderCancellationAttachment) { // SUBTYPE_COLORED_COINS_BID_ORDER_CANCELLATION
+                        final long orderId = ((BidOrderCancellationAttachment) appendage).getOrderId();
                         Order order = Order.Bid.getBidOrder(orderId);
                         if (order == null) {
                             continue;
@@ -260,7 +245,7 @@ public class JSONData {
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
-        json.put("totalPOSRewardNQT", RewardsImpl.calculatePOSRewardNQT(block));
+        json.put("totalPOSRewardNQT", Reward.get().calculatePOSRewardNQT(block.getHeight()));
         return json;
     }
 

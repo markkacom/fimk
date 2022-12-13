@@ -16,13 +16,9 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Asset;
-import nxt.Attachment;
-import nxt.MofoAsset;
-import nxt.NxtException;
+import nxt.*;
+import nxt.txn.BidOrderPlacementAttachment;
 import nxt.util.JSON;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -68,7 +64,7 @@ public final class PlaceBidOrder extends CreateTransaction {
             }
         }
 
-        Attachment attachment = new Attachment.ColoredCoinsBidOrderPlacement(asset.getId(), quantityQNT, priceNQT, orderFeeNQT);
+        Attachment attachment = new BidOrderPlacementAttachment(asset.getId(), quantityQNT, priceNQT, orderFeeNQT);
         return createTransaction(req, account, attachment);
     }
 

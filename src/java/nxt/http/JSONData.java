@@ -24,6 +24,7 @@ import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
+import nxt.reward.Reward;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -242,7 +243,7 @@ public final class JSONData {
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
+        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 
@@ -281,7 +282,7 @@ public final class JSONData {
         json.put("transactions", transactions);
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
+        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 

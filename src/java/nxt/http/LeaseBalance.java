@@ -20,6 +20,7 @@ import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
 import nxt.NxtException;
+import nxt.txn.EffectiveBalanceLeasingAttachment;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -46,7 +47,7 @@ public final class LeaseBalance extends CreateTransaction {
             response.put("errorDescription", "recipient account does not have public key");
             return response;
         }
-        Attachment attachment = new Attachment.AccountControlEffectiveBalanceLeasing(period);
+        Attachment attachment = new EffectiveBalanceLeasingAttachment(period);
         return createTransaction(req, account, recipient, 0, attachment);
 
     }

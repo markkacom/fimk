@@ -387,13 +387,10 @@ final class BlockImpl implements Block {
                 return false;
             }
 
-            BigInteger hit = new BigInteger(1, new byte[]{generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
-
-            String hitVerifyingResult = Generator.verifyHit(hit, BigInteger.valueOf(effectiveBalance), previousBlock, timestamp);
-            if (hitVerifyingResult == null) {
+            BigInteger[] hits = Generator.calculateHits(getGeneratorPublicKey(), previousBlock);
+            long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock);
+            if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
                 return true;
-            } else {
-                Logger.logMessage("Hit is wrong: " + hitVerifyingResult);
             }
             for (BadBlock badBlock : badBlocks) {
                 if (badBlock.height == (previousBlock.height + 1) &&
@@ -416,12 +413,14 @@ final class BlockImpl implements Block {
 
     void apply() {
         /* XXX - Add the POS reward to the block forger */
-        long augmentedFeeNQT = RewardsImpl.augmentFee(this, totalFeeNQT);
+        long augmentedFeeNQT = Reward.get().augmentFee(getHeight(), totalFeeNQT, getGeneratorId());
 
         Account generatorAccount = Account.addOrGetAccount(getGeneratorId());
         generatorAccount.apply(getGeneratorPublicKey());
         generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(augmentedFeeNQT);
         generatorAccount.addToForgedBalanceNQT(augmentedFeeNQT);
+
+        Reward.get().applyPOPReward(this);
     }
 
     void setPrevious(BlockImpl block) {
@@ -454,26 +453,27 @@ final class BlockImpl implements Block {
         if ((this.getId() != Genesis.GENESIS_BLOCK_ID || previousBlockId != 0) && cumulativeDifficulty.equals(BigInteger.ZERO)) {
             long curBaseTarget = previousBlock.baseTarget;
 
-            /* XXX - Replaced hardcoded 60 with Constants.SECONDS_BETWEEN_BLOCKS */
-            long newBaseTarget = BigInteger.valueOf(curBaseTarget)
-                    .multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
-                    .divide(BigInteger.valueOf(Constants.SECONDS_BETWEEN_BLOCKS)).longValue();
+            int desiredBlockInterval = Nxt.getBlockchain().desiredBlockInterval(previousBlock);
+            double coefficient = (double) (this.timestamp - previousBlock.timestamp) / desiredBlockInterval;
+
+            long newBaseTarget = (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK && Math.abs(1 - coefficient) < 0.1)
+                    ? curBaseTarget
+                    : BigInteger.valueOf(curBaseTarget).multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
+                    .divide(BigInteger.valueOf(desiredBlockInterval)).longValue();
+
             if (newBaseTarget < 0 || newBaseTarget > Constants.MAX_BASE_TARGET) {
                 newBaseTarget = Constants.MAX_BASE_TARGET;
             }
-            if (newBaseTarget < curBaseTarget / 2) {
-                newBaseTarget = curBaseTarget / 2;
+            newBaseTarget = Math.max(newBaseTarget, curBaseTarget / 2);
+
+            if (newBaseTarget == 0) newBaseTarget = 1;
+
+            long maxBaseTarget = curBaseTarget * (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK ? 4 : 2);
+            if (maxBaseTarget < 0) {
+                maxBaseTarget = Constants.MAX_BASE_TARGET;
             }
-            if (newBaseTarget == 0) {
-                newBaseTarget = 1;
-            }
-            long twofoldCurBaseTarget = curBaseTarget * 2;
-            if (twofoldCurBaseTarget < 0) {
-                twofoldCurBaseTarget = Constants.MAX_BASE_TARGET;
-            }
-            if (newBaseTarget > twofoldCurBaseTarget) {
-                newBaseTarget = twofoldCurBaseTarget;
-            }
+            newBaseTarget = Math.min(newBaseTarget, maxBaseTarget);
+
             baseTarget = newBaseTarget;
             cumulativeDifficulty = previousBlock.cumulativeDifficulty.add(Convert.two64.divide(BigInteger.valueOf(baseTarget)));
         }

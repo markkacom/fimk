@@ -26,11 +26,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 final class BlockchainImpl implements Blockchain {
 
     private static final BlockchainImpl instance = new BlockchainImpl();
+    private static final int CACHE_SIZE = 255;
 
     static BlockchainImpl getInstance() {
         return instance;
@@ -39,6 +42,7 @@ final class BlockchainImpl implements Blockchain {
     private BlockchainImpl() {}
 
     private final AtomicReference<BlockImpl> lastBlock = new AtomicReference<>();
+    private final ConcurrentMap<Long, BlockImpl> blockCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
     @Override
     public BlockImpl getLastBlock() {
@@ -47,12 +51,14 @@ final class BlockchainImpl implements Blockchain {
 
     void setLastBlock(BlockImpl block) {
         lastBlock.set(block);
+        addToCache(block);
     }
 
     void setLastBlock(BlockImpl previousBlock, BlockImpl block) {
         if (! lastBlock.compareAndSet(previousBlock, block)) {
             throw new IllegalStateException("Last block is no longer previous block");
         }
+        addToCache(block);
     }
 
     @Override
@@ -79,10 +85,15 @@ final class BlockchainImpl implements Blockchain {
     @Override
     public BlockImpl getBlock(long blockId) {
         BlockImpl block = lastBlock.get();
-        if (block.getId() == blockId) {
-            return block;
+        if (block.getId() == blockId) return block;
+
+        BlockImpl b = blockCache.get(blockId);
+        if (b == null) {
+            b = BlockDb.findBlock(blockId);
+            if (b != null) addToCache(b);
         }
-        return BlockDb.findBlock(blockId);
+        return b;
+//        return BlockDb.findBlock(blockId);
     }
 
     @Override
@@ -437,6 +448,17 @@ final class BlockchainImpl implements Blockchain {
         return new DbIterator<>(con, pstmt, TransactionDb::loadTransaction);
     }
 
+    /**
+     * Desired interval between passed block and next block
+     */
+    @Override
+    public int desiredBlockInterval(Block block) {
+        if (block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK) return Constants.SECONDS_BETWEEN_BLOCKS;
+        return block.getTransactions().isEmpty()
+                ? Constants.SECONDS_BETWEEN_BLOCKS
+                : Constants.SECONDS_BETWEEN_BLOCKS / 2;
+    }
+
     @Override
     public DbIterator<TransactionImpl> getTransactions(int numberOfConfirmations, byte type, byte subtype,
                                                        int blockTimestamp, boolean withMessage, boolean phasedOnly, boolean nonPhasedOnly,
@@ -542,4 +564,10 @@ final class BlockchainImpl implements Blockchain {
             throw new RuntimeException(e.toString(), e);
         }
     }
+
+    private void addToCache(BlockImpl b) {
+        if (blockCache.size() >= CACHE_SIZE) blockCache.clear();
+        blockCache.put(b.getId(), b);
+    }
+
 }

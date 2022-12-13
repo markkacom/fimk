@@ -25,6 +25,11 @@ import nxt.http.API;
 import nxt.http.websocket.BlockchainEvents;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
+import nxt.reward.AccountNode;
+import nxt.reward.AssetRewarding;
+import nxt.reward.RewardCandidate;
+import nxt.reward.RewardItem;
+import nxt.txn.extension.TransactionTypeExtension;
 import nxt.user.Users;
 import nxt.util.Convert;
 import nxt.util.Logger;
@@ -223,6 +228,11 @@ public final class Nxt {
         return getIntProperty(name, 0);
     }
 
+    public static int getIntPropertyNew(String suffix, int defaultValue, int testnetDefaultValue) {
+        String name = (Constants.isTestnet ? "fimk.testnet." : "fimk.") + suffix;
+        return getIntProperty(name, Constants.isTestnet ? testnetDefaultValue : defaultValue);
+    }
+
     public static int getIntProperty(String name, int defaultValue) {
         try {
             int result = Integer.parseInt(properties.getProperty(name));
@@ -371,6 +381,10 @@ public final class Nxt {
                 Alias.init();
                 NamespacedAlias.init();
                 Asset.init();
+                AssetRewarding.init();
+                RewardItem.init();
+                RewardCandidate.init();
+                AccountNode.init();
                 DigitalGoodsStore.init();
                 Hub.init();
                 Order.init();

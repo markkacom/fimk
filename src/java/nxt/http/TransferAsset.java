@@ -20,6 +20,7 @@ import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
 import nxt.NxtException;
+import nxt.txn.AssetTransferAttachment;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +49,7 @@ public final class TransferAsset extends CreateTransaction {
             return NOT_ENOUGH_ASSETS;
         }
 
-        Attachment attachment = new Attachment.ColoredCoinsAssetTransfer(asset.getId(), quantityQNT);
+        Attachment attachment = new AssetTransferAttachment(asset.getId(), quantityQNT);
         return createTransaction(req, account, recipient, 0, attachment);
 
     }

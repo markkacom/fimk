@@ -59,7 +59,7 @@ public final class Generator implements Comparable<Generator> {
     private static final Collection<Generator> allGenerators = Collections.unmodifiableCollection(generators.values());
     private static volatile List<Generator> sortedForgers = null;
     private static long lastBlockId;
-    private static int delayTime = Constants.FORGING_DELAY;
+    private static int delayTime = 0;
 
     private static final Runnable generateBlocksThread = new Runnable() {
 
@@ -90,11 +90,10 @@ public final class Generator implements Comparable<Generator> {
                             logged = false;
                         }
                         int generationLimit = Nxt.getEpochTime() - delayTime;
-                        log(generationLimit);
+                        log(generationLimit, lastBlock);
                         for (Generator generator : sortedForgers) {
-                            if (generator.getHitTime() > generationLimit || generator.forge(lastBlock, generationLimit)) {
-                                return;
-                            }
+                            if (generator.getHitTime() > generationLimit) return;
+                            if (generator.forge(lastBlock, generationLimit)) return;
                         }
                     } // synchronized
                 } catch (Exception e) {
@@ -108,7 +107,7 @@ public final class Generator implements Comparable<Generator> {
 
         }
 
-        private void log(int generationLimit) {
+        private void log(int generationLimit, Block lastBlock) {
             if (!logged) {
                 for (Generator generator : sortedForgers) {
                     if (generator.getHitTime() - generationLimit > 60) {
@@ -116,6 +115,16 @@ public final class Generator implements Comparable<Generator> {
                     }
                     Logger.logDebugMessage(generator.toString());
                     logged = true;
+                }
+                if (logged && Logger.isDebugEnabled()) {
+                    //report target state
+                    double diff = (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET;
+                    int pos = (int) (diff * 30);
+                    String filled = pos <= 0 ? "" : String.format("%1$" + Math.min(pos, 60) + "s", "").replace(' ', '=');
+                    String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
+                    StringBuilder sb = new StringBuilder(filled + padded);
+                    sb.setCharAt(30, '|');
+                    Logger.logDebugMessage("target [" + sb.append("]").append(" x").append(String.format("%.2f", diff)));
                 }
             }
         }
@@ -222,7 +231,7 @@ public final class Generator implements Comparable<Generator> {
         synchronized (Nxt.getBlockchain()) {
             if (lastBlockId == Generator.lastBlockId && sortedForgers != null) {
                 for (Generator generator : sortedForgers) {
-                    if (generator.getHitTime() >= curTime - Constants.FORGING_DELAY) {
+                    if (generator.getHitTime() >= curTime) {
                         return generator.getHitTime();
                     }
                 }
@@ -237,53 +246,139 @@ public final class Generator implements Comparable<Generator> {
         }
     }
 
-    /**
-     * Verify hit. Return the cause of not valid hit.
-     */
-    static String verifyHit(BigInteger hit, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
-        int elapsedTime = timestamp - previousBlock.getTimestamp();
-        if (elapsedTime <= 0) return "Elapsed time is not positive " + elapsedTime;
+    static String verifyHit(BigInteger[] hits, int selectedHitIndex, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
+        int interval = timestamp - previousBlock.getTimestamp();
+        if (interval <= 0)  return "Elapsed time is not positive " + interval;
 
-        BigInteger effectiveBaseTarget = BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance);
-        BigInteger prevTarget = effectiveBaseTarget.multiply(BigInteger.valueOf(elapsedTime - 1));
-        BigInteger target = prevTarget.add(effectiveBaseTarget);
+        // hit time calculation:  hit / (block.baseTarget * effectiveBalance) and then +1
+        // so   hit = (elapsedTime - 1) * (block.baseTarget * effectiveBalance)  but we dont to get hit back due the loss of accuracy during rounding
 
-        if (hit.compareTo(target) >= 0) return String.format("Hit %s exceeds the upper threshold %s", hit, target);
+        int expectedInterval = hits[selectedHitIndex].divide(
+                BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance)).intValue() + 1;
+
+        if (expectedInterval > interval) return String.format("Expected interval %s less than fact interval %s", expectedInterval, interval);
 
         if (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
-                || (Constants.isTestnet ? elapsedTime > 300 : elapsedTime > 3600)
-                || Constants.isOffline) return null;
+                        || interval > Constants.BLOCK_INTERVAL_THRESHOLD
+                        || Constants.isOffline) return null;
 
-        if (hit.compareTo(prevTarget) < 0) return String.format("Hit %s is less than the lower threshold %s", hit, target);
+        if (expectedInterval != interval) return String.format("Expected interval %s is not equal fact interval %s", expectedInterval, interval);
         return null;
-    }
-
-    static long getHitTime(Account account, Block block) {
-        return getHitTime(BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())), getHit(account.getPublicKey(), block), block);
     }
 
     static boolean allowsFakeForging(byte[] publicKey) {
         return Constants.isTestnet && publicKey != null && Arrays.equals(publicKey, fakeForgingPublicKey);
     }
 
-    static BigInteger getHit(byte[] publicKey, Block block) {
+    static BigInteger[] calculateHits(byte[] publicKey, Block block) {
         if (allowsFakeForging(publicKey)) {
-            return BigInteger.ZERO;
+            return new BigInteger[]{BigInteger.ZERO};
         }
         /* XXX - Enable forging below TRANSPARENT_FORGING_BLOCK */
         //if (block.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK) {
         //    throw new IllegalArgumentException("Not supported below Transparent Forging Block");
         //}
+
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
+        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 117];
         byte[] generationSignatureHash = digest.digest(publicKey);
-        return new BigInteger(1, new byte[] {generationSignatureHash[7], generationSignatureHash[6], generationSignatureHash[5], generationSignatureHash[4], generationSignatureHash[3], generationSignatureHash[2], generationSignatureHash[1], generationSignatureHash[0]});
+        result[0] = new BigInteger(1, new byte[]{
+                generationSignatureHash[7],
+                generationSignatureHash[6],
+                generationSignatureHash[5],
+                generationSignatureHash[4],
+                generationSignatureHash[3],
+                generationSignatureHash[2],
+                generationSignatureHash[1],
+                generationSignatureHash[0]
+        });
+
+        /*
+        byte[] a1 = new byte[generationSignatureHash.length + 1] ;
+        System.arraycopy(generationSignatureHash, 0, a1, 1, generationSignatureHash.length);
+        byte[] a2 = new byte[generationSignatureHash.length + 1] ;
+        System.arraycopy(generationSignatureHash, 0, a2, 1, generationSignatureHash.length);
+        a2[0] = 1;
+        byte[] a3 = new byte[generationSignatureHash.length + 1] ;
+        System.arraycopy(generationSignatureHash, 0, a3, 1, generationSignatureHash.length);
+        a3[0] = 2;
+        //...
+        // todo 8 byte arrays for parallel digest computation (optimal for cpu 8 cores).
+        //  Warning: result of parallel computation MUST have the same order (sync results): result1 concat result2 concat result3...
+        */
+
+        byte[] digestSource = generationSignatureHash;
+        for (int i = 1; i < result.length; i++) {
+            byte[] nextHash = digest.digest(digestSource);
+            result[i] = new BigInteger(1, new byte[]{
+                    nextHash[7],
+                    nextHash[6],
+                    nextHash[5],
+                    nextHash[4],
+                    nextHash[3],
+                    nextHash[2],
+                    nextHash[1],
+                    nextHash[0]
+            });
+            digestSource = nextHash;
+        }
+        return result;
     }
 
-    static long getHitTime(BigInteger effectiveBalance, BigInteger hit, Block block) {
+    static long[] calculateHitTime(Account account, Block block) {
+        return calculateHitTime(
+                BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())),
+                calculateHits(account.getPublicKey(), block),
+                block
+        );
+    }
+
+    static long[] calculateHitTime(BigInteger effectiveBalance, BigInteger[] hits, Block block) {
         // blockTimestamp + hit / (block.baseTarget * effectiveBalance)
-        return block.getTimestamp()
-                + hit.divide(BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance)).longValue();
+
+        /* Desired interval is Constants.SECONDS_BETWEEN_BLOCKS. Select two hits that provide nearest to desired the hit time.
+        If previous interval is less the desired interval the hit time
+        */
+
+        int candidateInterval;
+        int interval = Constants.SECONDS_BETWEEN_BLOCKS;
+        int altInterval = interval;  // altInterval and altIndex are the second selected ones
+        int index = -1;
+        int altIndex = -1;
+        int diff = Integer.MAX_VALUE;
+        BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
+
+        //in fact the desired interval is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this leads to 30s between blocks and stabilised base target
+        int desiredInterval = Math.abs(Nxt.getBlockchain().desiredBlockInterval(block)) - 1;
+
+        for (int i = 0; i < hits.length; i++) {
+            BigInteger hit = hits[i];
+            candidateInterval = hit.divide(divider).intValue();
+            int d = Math.abs(desiredInterval - candidateInterval);
+            if (d < diff) {
+                diff = d;
+                altInterval = interval;
+                altIndex = index;
+                interval = candidateInterval;
+                index = i;
+            }
+        }
+
+        if (block.getHeight() > Constants.CONTROL_FORGING_TUNED_HITTIME_BLOCK && altIndex != -1) {
+            Block preBlock = Nxt.getBlockchain().getBlock(block.getPreviousBlockId());
+            int preDesiredInterval = Math.abs(Nxt.getBlockchain().desiredBlockInterval(preBlock)) - 1;
+            if (preBlock != null) {
+                int preInterval = block.getTimestamp() - preBlock.getTimestamp();
+                if ((preInterval > preDesiredInterval && interval > desiredInterval && altInterval < interval)
+                        || (preInterval < preDesiredInterval && interval < desiredInterval && altInterval > interval)) {
+                    interval = altInterval;
+                    index = altIndex;
+                }
+            }
+        }
+
+        return new long[]{block.getTimestamp() + interval, index};
     }
 
 
@@ -291,7 +386,8 @@ public final class Generator implements Comparable<Generator> {
     private final String secretPhrase;
     private final byte[] publicKey;
     private volatile long hitTime;
-    private volatile BigInteger hit;
+    private volatile BigInteger[] hits;
+    private volatile int selectedHitIndex;
     private volatile BigInteger effectiveBalance;
 
     private Generator(String secretPhrase) {
@@ -322,7 +418,8 @@ public final class Generator implements Comparable<Generator> {
 
     @Override
     public int compareTo(Generator g) {
-        int i = this.hit.multiply(g.effectiveBalance).compareTo(g.hit.multiply(this.effectiveBalance));
+        //todo confused effectiveBalance between this and other (g)
+        int i = this.hits[selectedHitIndex].multiply(g.effectiveBalance).compareTo(g.hits[g.selectedHitIndex].multiply(this.effectiveBalance));
         if (i != 0) {
             return i;
         }
@@ -340,14 +437,16 @@ public final class Generator implements Comparable<Generator> {
         if (effectiveBalance.signum() == 0) {
             return;
         }
-        hit = getHit(publicKey, lastBlock);
-        hitTime = getHitTime(effectiveBalance, hit, lastBlock);
+        hits = calculateHits(publicKey, lastBlock);
+        long[] hitTimeAndIndex = calculateHitTime(effectiveBalance, hits, lastBlock);
+        hitTime = hitTimeAndIndex[0];
+        selectedHitIndex = (int) hitTimeAndIndex[1];
         listeners.notify(this, Event.GENERATION_DEADLINE);
     }
 
     boolean forge(Block lastBlock, int generationLimit) throws BlockchainProcessor.BlockNotAcceptedException {
-        int timestamp = (generationLimit - hitTime > 3600) ? generationLimit : (int)hitTime + 1;
-        String hitVerifyingResult = verifyHit(hit, effectiveBalance, lastBlock, timestamp);
+        int timestamp = (generationLimit - hitTime > Constants.BLOCK_INTERVAL_THRESHOLD) ? generationLimit : (int) hitTime + 1;
+        String hitVerifyingResult = verifyHit(hits, selectedHitIndex, effectiveBalance, lastBlock, timestamp);
         if (hitVerifyingResult != null) {
             Logger.logDebugMessage(this + " failed to forge at " + timestamp + ". Hit is wrong: " + hitVerifyingResult);
             return false;
@@ -356,7 +455,6 @@ public final class Generator implements Comparable<Generator> {
         while (true) {
             try {
                 BlockchainProcessorImpl.getInstance().generateBlock(secretPhrase, timestamp);
-                setDelay(Constants.FORGING_DELAY);
                 return true;
             } catch (BlockchainProcessor.TransactionNotAcceptedException e) {
                 // the bad transaction has been expunged, try again

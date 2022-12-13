@@ -1,28 +1,18 @@
 package nxt.virtualexchange;
 
+import nxt.*;
+import nxt.Order.Ask;
+import nxt.Order.Bid;
+import nxt.http.websocket.JSONData;
+import nxt.txn.*;
+import nxt.util.Listener;
+import nxt.virtualexchange.VirtualOrder.VirtualAsk;
+import nxt.virtualexchange.VirtualOrder.VirtualBid;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import nxt.Block;
-import nxt.BlockchainProcessor;
-import nxt.Nxt;
-import nxt.Order;
-import nxt.Order.Ask;
-import nxt.Order.Bid;
-import nxt.Trade;
-import nxt.Transaction;
-import nxt.TransactionProcessor;
-import nxt.TransactionType;
-import nxt.Attachment.ColoredCoinsAskOrderCancellation;
-import nxt.Attachment.ColoredCoinsAskOrderPlacement;
-import nxt.Attachment.ColoredCoinsBidOrderCancellation;
-import nxt.Attachment.ColoredCoinsBidOrderPlacement;
-import nxt.http.websocket.JSONData;
-import nxt.util.Listener;
-import nxt.virtualexchange.VirtualOrder.VirtualAsk;
-import nxt.virtualexchange.VirtualOrder.VirtualBid;
 
 public class ExchangeObserver {
   
@@ -123,21 +113,21 @@ public class ExchangeObserver {
 
     private static void processTransaction(Transaction transaction) {
         TransactionType type = transaction.getType();
-        if (type.equals(TransactionType.ColoredCoins.ASK_ORDER_PLACEMENT)) {
-            ColoredCoinsAskOrderPlacement attachment = (ColoredCoinsAskOrderPlacement) transaction.getAttachment();
+        if (type.equals(ColoredCoinsTxnTypes.ASK_ORDER_PLACEMENT)) {
+            AskOrderPlacementAttachment attachment = (AskOrderPlacementAttachment) transaction.getAttachment();
             VirtualAsk ask = VirtualAsk.addOrder(transaction, attachment, transactionIndex++);
         }
-        else if (type.equals(TransactionType.ColoredCoins.ASK_ORDER_CANCELLATION)) {
-            ColoredCoinsAskOrderCancellation attachment = (ColoredCoinsAskOrderCancellation) transaction.getAttachment();
+        else if (type.equals(ColoredCoinsTxnTypes.ASK_ORDER_CANCELLATION)) {
+            AskOrderCancellationAttachment attachment = (AskOrderCancellationAttachment) transaction.getAttachment();
             VirtualAsk ask = VirtualAsk.removeOrder(attachment.getOrderId());
             //ask.setTransactionIndex(transactionIndex++);
         }
-        else if (type.equals(TransactionType.ColoredCoins.BID_ORDER_PLACEMENT)) {
-            ColoredCoinsBidOrderPlacement attachment = (ColoredCoinsBidOrderPlacement) transaction.getAttachment();
+        else if (type.equals(ColoredCoinsTxnTypes.BID_ORDER_PLACEMENT)) {
+            BidOrderPlacementAttachment attachment = (BidOrderPlacementAttachment) transaction.getAttachment();
             VirtualBid bid = VirtualBid.addOrder(transaction, attachment, transactionIndex++);
         }
-        else if (type.equals(TransactionType.ColoredCoins.BID_ORDER_CANCELLATION)) {
-            ColoredCoinsBidOrderCancellation attachment = (ColoredCoinsBidOrderCancellation) transaction.getAttachment();
+        else if (type.equals(ColoredCoinsTxnTypes.BID_ORDER_CANCELLATION)) {
+            BidOrderCancellationAttachment attachment = (BidOrderCancellationAttachment) transaction.getAttachment();
             VirtualBid bid = VirtualBid.removeOrder(attachment.getOrderId());
             //bid.setTransactionIndex(transactionIndex++);
         }

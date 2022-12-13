@@ -20,6 +20,9 @@ import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
+import nxt.txn.AskOrderPlacementAttachment;
+import nxt.txn.BidOrderPlacementAttachment;
+import nxt.txn.OrderPlacementAttachment;
 import nxt.util.Listener;
 import nxt.util.Listeners;
 
@@ -112,7 +115,7 @@ public abstract class Order {
 
     private long quantityQNT;
 
-    private Order(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+    private Order(Transaction transaction, OrderPlacementAttachment attachment) {
         this.id = transaction.getId();
         this.accountId = transaction.getSenderId();
         this.assetId = attachment.getAssetId();
@@ -303,7 +306,7 @@ public abstract class Order {
             }
         }
 
-        static void addOrder(Transaction transaction, Attachment.ColoredCoinsAskOrderPlacement attachment) {
+        public static void addOrder(Transaction transaction, AskOrderPlacementAttachment attachment) {
             Ask order = new Ask(transaction, attachment);
             askOrderTable.insert(order);
             try {
@@ -313,7 +316,7 @@ public abstract class Order {
             }
         }
 
-        static void removeOrder(long orderId) {
+        public static void removeOrder(long orderId) {
             Ask order = getAskOrder(orderId);
             try {
                 if (order != null) {
@@ -329,7 +332,7 @@ public abstract class Order {
 
         private final DbKey dbKey;
 
-        private Ask(Transaction transaction, Attachment.ColoredCoinsAskOrderPlacement attachment) {
+        private Ask(Transaction transaction, AskOrderPlacementAttachment attachment) {
             super(transaction, attachment);
             this.dbKey = askOrderDbKeyFactory.newKey(super.id);
         }
@@ -463,7 +466,7 @@ public abstract class Order {
             }
         }
 
-        static void addOrder(Transaction transaction, Attachment.ColoredCoinsBidOrderPlacement attachment) {
+        public static void addOrder(Transaction transaction, BidOrderPlacementAttachment attachment) {
             Bid order = new Bid(transaction, attachment);
             bidOrderTable.insert(order);
             try {
@@ -473,7 +476,7 @@ public abstract class Order {
             }
         }
 
-        static void removeOrder(long orderId) {
+        public static void removeOrder(long orderId) {
             Bid order = getBidOrder(orderId);
             try {
                 if (order != null) {
@@ -489,7 +492,7 @@ public abstract class Order {
 
         private final DbKey dbKey;
 
-        private Bid(Transaction transaction, Attachment.ColoredCoinsBidOrderPlacement attachment) {
+        private Bid(Transaction transaction, BidOrderPlacementAttachment attachment) {
             super(transaction, attachment);
             this.dbKey = bidOrderDbKeyFactory.newKey(super.id);
         }

@@ -1080,6 +1080,34 @@ class NxtDbVersion extends DbVersion {
                 apply("ALTER TABLE asset ADD COLUMN IF NOT EXISTS block_timestamp INT;");
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
             case 435:
+                apply("CREATE TABLE IF NOT EXISTS asset_rewarding (db_id IDENTITY, id BIGINT NOT NULL, " +
+                        "asset_id BIGINT NOT NULL, height INT NOT NULL, frequency INT NOT NULL, halvingBlocks INT NOT NULL, target TINYINT NOT NULL, " +
+                        "lotteryType TINYINT NOT NULL, baseAmount BIGINT NOT NULL, balanceDivider BIGINT NOT NULL, targetInfo BIGINT NOT NULL, " +
+                        "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE); " +
+                        "CREATE UNIQUE INDEX IF NOT EXISTS asset_rewarding_asset_id_idx ON asset_rewarding (asset_id);");
+            case 436:
+                apply("CREATE TABLE IF NOT EXISTS reward_candidate (id BIGINT NOT NULL, " +
+                        "height INT NOT NULL, asset_id BIGINT NOT NULL, account_id BIGINT NOT NULL, " +
+                        "FOREIGN KEY (height) REFERENCES block (height) ON DELETE CASCADE); " +
+                        "CREATE UNIQUE INDEX IF NOT EXISTS reward_candidate_asset_id_account_id_idx ON reward_candidate (asset_id, account_id); " +
+                        "CREATE INDEX IF NOT EXISTS reward_candidate_height_idx ON reward_candidate (height); ");
+            case 437:
+                apply("CREATE TABLE IF NOT EXISTS account_node (db_id IDENTITY, " +
+                        "address VARCHAR NOT NULL, account_id BIGINT NOT NULL, " +
+                        "token VARCHAR NOT NULL, transaction_id BIGINT NOT NULL, height INT NOT NULL, " +
+                        "registration_account_id BIGINT NOT NULL, timestamp INT NOT NULL, score TINYINT, request_peer_timestamp INT); " +
+                        "CREATE UNIQUE INDEX IF NOT EXISTS account_node_address_account_id_idx " +
+                        "ON account_node (address, account_id); " +
+                        "CREATE INDEX IF NOT EXISTS account_node_timestamp_idx ON account_node (timestamp); " +
+                        "CREATE INDEX IF NOT EXISTS account_node_score_idx ON account_node (score); ");
+            case 438:
+                apply("CREATE INDEX IF NOT EXISTS transaction_t_s_h_s_idx ON transaction (type, subtype, height, sender_id)");
+            case 439:
+                apply("CREATE TABLE IF NOT EXISTS reward_item (height INT NOT NULL, campaign_id BIGINT NOT NULL, " +
+                        "name VARCHAR NOT NULL, account_id BIGINT NOT NULL, asset_id BIGINT NOT NULL, amount BIGINT NOT NULL); " +
+                        "CREATE INDEX IF NOT EXISTS reward_item_height_idx ON reward_item (height); " +
+                        "CREATE INDEX IF NOT EXISTS reward_item_account_id_idx ON reward_item (account_id); ");
+            case 440:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");

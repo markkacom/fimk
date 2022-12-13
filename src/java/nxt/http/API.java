@@ -96,8 +96,8 @@ public final class API {
 
         boolean enableAPIServer = Nxt.getBooleanProperty("fimk.enableAPIServer");
         if (enableAPIServer) {
-            final int port = Constants.isTestnet ? TESTNET_API_PORT : Nxt.getIntProperty("fimk.apiServerPort");
-            final int sslPort = Constants.isTestnet ? TESTNET_API_SSLPORT : Nxt.getIntProperty("fimk.apiServerSSLPort");
+            final int port = Nxt.getIntPropertyNew("apiServerPort", 0, API.TESTNET_API_PORT);
+            final int sslPort = Nxt.getIntPropertyNew("apiServerSSLPort", 0, API.TESTNET_API_SSLPORT);
             final String host = Nxt.getStringProperty("fimk.apiServerHost");
             disableAdminPassword = Nxt.getBooleanProperty("fimk.disableAdminPassword") || ("127.0.0.1".equals(host) && adminPassword.isEmpty());
 

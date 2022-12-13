@@ -20,6 +20,7 @@ import nxt.db.DbClause;
 import nxt.db.DbIterator;
 import nxt.db.DbKey;
 import nxt.db.EntityDbTable;
+import nxt.txn.AssetIssuanceAttachment;
 import org.json.simple.JSONObject;
 
 import java.sql.Connection;
@@ -29,8 +30,7 @@ import java.sql.SQLException;
 
 public final class Asset {
 
-    public final static byte TYPE_REGULAR_ASSET = (byte) 0;
-    public final static byte TYPE_PRIVATE_ASSET = (byte) 1;
+    public final static byte TYPE_PRIVATE_BIT_POS = 0;     // private  BIN 00000001
 
     private static final DbKey.LongKeyFactory<Asset> assetDbKeyFactory = new DbKey.LongKeyFactory<Asset>("id") {
 
@@ -97,7 +97,7 @@ public final class Asset {
         return assetTable.search(query, DbClause.EMPTY_CLAUSE, from, to, " ORDER BY ft.score DESC, asset.height DESC, asset.db_id DESC ");
     }
 
-    static void addAsset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
+    public static void addAsset(Transaction transaction, AssetIssuanceAttachment attachment) {
         assetTable.insert(new Asset(transaction, attachment));
     }
 
@@ -128,7 +128,7 @@ public final class Asset {
     private final int blockTimestamp;
     private final int height;
 
-    private Asset(Transaction transaction, Attachment.ColoredCoinsAssetIssuance attachment) {
+    private Asset(Transaction transaction, AssetIssuanceAttachment attachment) {
         this.assetId = transaction.getId();
         this.dbKey = assetDbKeyFactory.newKey(this.assetId);
         this.accountId = transaction.getSenderId();
@@ -210,6 +210,9 @@ public final class Asset {
         return decimals;
     }
 
+    /**
+     * Used as bit array, see {@link #TYPE_PRIVATE_BIT_POS}
+     */
     public byte getType() {
       return type;
     }

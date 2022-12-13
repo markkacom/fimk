@@ -1,5 +1,13 @@
 package nxt;
 
+import nxt.Appendix.Message;
+import nxt.db.DbIterator;
+import nxt.db.DbUtils;
+import nxt.http.websocket.JSONData;
+import nxt.reward.Reward;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
@@ -8,19 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import nxt.Appendix.Message;
-import nxt.db.DbIterator;
-import nxt.db.DbUtils;
-import nxt.http.websocket.JSONData;
+import java.util.*;
 
 public final class MofoQueries {
 
@@ -198,7 +194,7 @@ public final class MofoQueries {
 
                     /* Must implement a catch here in case we are on NXT and not on FIMK */
                     if ("FIMK".equals(Nxt.APPLICATION)) {
-                        stat.add(total_fee + RewardsImpl.calculatePOSRewardNQT(height));
+                        stat.add(total_fee + Reward.get().calculatePOSRewardNQT(height));
                     }
                     else {
                         stat.add(total_fee);
@@ -596,7 +592,7 @@ public final class MofoQueries {
         try {
             con = Db.db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT * FROM transaction "
-                    + " WHERE (timestamp BETWEEN ? AND ?) "
+                    + " WHERE (timestamp BETWEEN ? AND ?) AND NOT (type = 4 AND subtype = 2) "
                     + filterClause(filters)
                     + " ORDER BY timestamp DESC LIMIT ?");
 
@@ -621,12 +617,12 @@ public final class MofoQueries {
 
             b.append("SELECT * FROM (");
             b.append("(SELECT * FROM transaction WHERE (timestamp BETWEEN ? AND ?) "
-                    + "AND recipient_id = ? AND sender_id <> ? "
+                    + "AND recipient_id = ? AND sender_id <> ? AND NOT (type = 4 AND subtype = 2) "
                     + filterClause(filters)
                     + " ORDER BY timestamp DESC LIMIT ?) ");
             b.append("UNION ALL ");
             b.append("(SELECT * FROM transaction WHERE (timestamp BETWEEN ? AND ?) "
-                    + "AND sender_id = ? "
+                    + "AND sender_id = ? AND NOT (type = 4 AND subtype = 2) "
                     + filterClause(filters)
                     + " ORDER BY timestamp DESC LIMIT ?)");
             b.append(")");
@@ -680,6 +676,12 @@ public final class MofoQueries {
 
                 /* skip those that are younger than timestamp */
                 if (timestamp != 0 && transaction.getTimestamp() > timestamp) {
+                    continue;
+                }
+
+                // skip login register transactions (fee free)
+                TransactionType tt = transaction.getType();
+                if (tt.getType() == 4 && tt.getSubtype() == 2) {
                     continue;
                 }
 
@@ -773,7 +775,8 @@ public final class MofoQueries {
 
     public static int getTransactionCountSince(int timestamp) {
         try (Connection con = Db.db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement("SELECT COUNT(*) FROM transaction WHERE timestamp >= ?")) {
+            PreparedStatement pstmt = con.prepareStatement(
+                    "SELECT COUNT(*) FROM transaction WHERE timestamp >= ? AND NOT (type = 4 AND subtype = 2)")) {
             pstmt.setInt(1, timestamp);
             try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
