@@ -21,7 +21,7 @@ public class RewardItem {
 
     public static void registerReward(RewardItem rewardItem) {
         rewardItemTable.insert(rewardItem);
-        System.out.printf("reward %s \n", rewardItem);
+        //System.out.printf("reward %s \n", rewardItem);
     }
 
     private static final DbKey.LongKeyFactory<RewardItem> dbKeyFactory = new DbKey.LongKeyFactory<RewardItem>("id") {
@@ -86,7 +86,7 @@ public class RewardItem {
 
     @Override
     public String toString() {
-        return "AssetReward{" +
+        return "RewardItem{" +
                 "name=" + name +
                 ", campaignId=" + Long.toUnsignedString(campaignId) +
                 ", accountId=" + Long.toUnsignedString(accountId) +

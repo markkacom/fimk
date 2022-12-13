@@ -70,8 +70,8 @@ public final class Peers {
     static final int webSocketIdleTimeout;
     static final boolean useProxy = System.getProperty("socksProxyHost") != null || System.getProperty("http.proxyHost") != null;
 
-    private static final int DEFAULT_PEER_PORT = Nxt.getIntPropertyNew("peerServerPort", 7884, 6884);
-    private static final int TESTNET_PEER_PORT = Nxt.getIntPropertyNew("peerServerPort", 7884, 6884);
+    private static final int DEFAULT_PEER_PORT = 7884;
+    private static final int TESTNET_PEER_PORT = 6884;
     private static final String myPlatform;
     private static final String myAddress;
     private static final int myPeerServerPort;

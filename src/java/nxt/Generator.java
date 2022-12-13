@@ -124,7 +124,7 @@ public final class Generator implements Comparable<Generator> {
                     String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
                     StringBuilder sb = new StringBuilder(filled + padded);
                     sb.setCharAt(30, '|');
-                    Logger.logDebugMessage("target [" + sb.append("]").append(" x").append(String.format("%.2f", diff)));
+                    Logger.logDebugMessage("target [" + sb.append("]").append(" x").append(String.format("%.3f", diff)));
                 }
             }
         }
@@ -281,17 +281,17 @@ public final class Generator implements Comparable<Generator> {
 
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
-        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 117];
-        byte[] generationSignatureHash = digest.digest(publicKey);
+        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 17];
+        byte[] hash = digest.digest(publicKey);
         result[0] = new BigInteger(1, new byte[]{
-                generationSignatureHash[7],
-                generationSignatureHash[6],
-                generationSignatureHash[5],
-                generationSignatureHash[4],
-                generationSignatureHash[3],
-                generationSignatureHash[2],
-                generationSignatureHash[1],
-                generationSignatureHash[0]
+                hash[7],
+                hash[6],
+                hash[5],
+                hash[4],
+                hash[3],
+                hash[2],
+                hash[1],
+                hash[0]
         });
 
         /*
@@ -308,20 +308,11 @@ public final class Generator implements Comparable<Generator> {
         //  Warning: result of parallel computation MUST have the same order (sync results): result1 concat result2 concat result3...
         */
 
-        byte[] digestSource = generationSignatureHash;
+        byte[] digestSource = hash;
         for (int i = 1; i < result.length; i++) {
-            byte[] nextHash = digest.digest(digestSource);
-            result[i] = new BigInteger(1, new byte[]{
-                    nextHash[7],
-                    nextHash[6],
-                    nextHash[5],
-                    nextHash[4],
-                    nextHash[3],
-                    nextHash[2],
-                    nextHash[1],
-                    nextHash[0]
-            });
-            digestSource = nextHash;
+            byte[] h = digest.digest(digestSource);
+            result[i] = new BigInteger(1, new byte[]{h[7], h[6], h[5], h[4], h[3], h[2], h[1], h[0]});
+            digestSource = h;
         }
         return result;
     }

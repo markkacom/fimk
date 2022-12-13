@@ -17,6 +17,7 @@
 package nxt;
 
 import nxt.crypto.Crypto;
+import nxt.reward.Reward;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
@@ -389,9 +390,13 @@ final class BlockImpl implements Block {
 
             BigInteger[] hits = Generator.calculateHits(getGeneratorPublicKey(), previousBlock);
             long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock);
-            if (Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp)) {
+            String hitVerifyingResult = Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp);
+            if (hitVerifyingResult == null) {
                 return true;
+            } else {
+                Logger.logMessage("Hit is wrong: " + hitVerifyingResult);
             }
+
             for (BadBlock badBlock : badBlocks) {
                 if (badBlock.height == (previousBlock.height + 1) &&
                         badBlock.generatorId == getGeneratorId() &&
@@ -465,8 +470,7 @@ final class BlockImpl implements Block {
                 newBaseTarget = Constants.MAX_BASE_TARGET;
             }
             newBaseTarget = Math.max(newBaseTarget, curBaseTarget / 2);
-
-            if (newBaseTarget == 0) newBaseTarget = 1;
+            newBaseTarget = Math.max(newBaseTarget, Constants.INITIAL_BASE_TARGET / 64);
 
             long maxBaseTarget = curBaseTarget * (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK ? 4 : 2);
             if (maxBaseTarget < 0) {
