@@ -120,6 +120,10 @@ public abstract class AccountControlTxnType extends TransactionType {
 
         @Override
         protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            if (! HardFork.POS_POP_REWARD_BLOCK(-1)) {
+                throw new NxtException.NotYetEnabledException("Reward applicant registration not yet enabled at height " + Nxt.getBlockchain().getHeight());
+            }
+
             if (transaction.getAmountNQT() != 0) {
                 throw new NxtException.NotValidException("Invalid amount (must be zero)");
             }
