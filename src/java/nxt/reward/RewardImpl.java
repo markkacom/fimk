@@ -16,8 +16,11 @@ public class RewardImpl extends Reward {
 
     public long augmentFee(int height, long totalFeeNQT, long accountId) {
         long rewardNQT = calculatePOSRewardNQT(height);
-        RewardItem.registerReward(new RewardItem(height, 0, "POS_REWARD", accountId, 0, rewardNQT));
-        return Math.addExact(rewardNQT, totalFeeNQT);
+        if (rewardNQT > 0) {
+            RewardItem.registerReward(new RewardItem(height, 0, "POS_REWARD", accountId, 0, rewardNQT));
+            return Math.addExact(rewardNQT, totalFeeNQT);
+        }
+        return totalFeeNQT;
     }
 
     @Override
