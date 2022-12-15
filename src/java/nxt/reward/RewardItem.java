@@ -1,7 +1,10 @@
 package nxt.reward;
 
+import nxt.Db;
 import nxt.crypto.Crypto;
+import nxt.db.DbIterator;
 import nxt.db.DbKey;
+import nxt.db.DbUtils;
 import nxt.db.EntityDbTable;
 
 import java.math.BigInteger;
@@ -47,6 +50,24 @@ public class RewardItem {
 
     };
 
+    public static DbIterator<RewardItem> getRewardItems(long accountId, int fromHeight, int from, int to) {
+        Connection con = null;
+        try {
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(
+                    "SELECT * FROM reward_item WHERE account_id = ? AND height >= ? ORDER BY height DESC "
+                            + DbUtils.limitsClause(from, to));
+            int i = 0;
+            pstmt.setLong(++i, accountId);
+            pstmt.setInt(++i, fromHeight);
+            DbUtils.setLimits(++i, pstmt, from, to);
+            return rewardItemTable.getManyBy(con, pstmt, false);
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
     private final DbKey dbKey;
     int height;
     long campaignId;
@@ -56,7 +77,6 @@ public class RewardItem {
     long amount;
 
     /**
-     *
      * @param height
      * @param campaignId rewarding campaign id or one of constants: 0 FIM POS reward, -1 FIM POP reward
      * @param name
@@ -77,11 +97,36 @@ public class RewardItem {
     private RewardItem(ResultSet rs) throws SQLException {
         this.height = rs.getInt("height");
         this.campaignId = rs.getLong("campaign_id");
-        this.name = rs.getString("name");;
+        this.name = rs.getString("name");
+        ;
         this.accountId = rs.getLong("account_id");
         this.assetId = rs.getLong("asset_id");
         this.amount = rs.getLong("amount");
         this.dbKey = dbKeyFactory.newKey(hash(height, accountId, assetId, campaignId));
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public long getCampaignId() {
+        return campaignId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public long getAccountId() {
+        return accountId;
+    }
+
+    public long getAssetId() {
+        return assetId;
+    }
+
+    public long getAmount() {
+        return amount;
     }
 
     @Override
