@@ -172,6 +172,11 @@ public final class Constants {
     public static final int CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK = isTestnet ? 1389 : Integer.MAX_VALUE;  //todo set this for mainnet
     public static final int CONTROL_FORGING_TUNED_HITTIME_BLOCK = isTestnet ? 6241 : Integer.MAX_VALUE;  //todo set this for mainnet
 
+    /**
+     * Number of hit values generated to select the suitable
+     */
+    public static final int HITS_NUMBER = 17;
+
     public static final int POS_POP_REWARD_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : Integer.MAX_VALUE;  //todo set this for mainnet
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;

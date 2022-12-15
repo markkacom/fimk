@@ -389,7 +389,7 @@ final class BlockImpl implements Block {
             }
 
             BigInteger[] hits = Generator.calculateHits(getGeneratorPublicKey(), previousBlock);
-            long[] hitTimeAndIndex = Generator.calculateHitTime(account, previousBlock);
+            long[] hitTimeAndIndex = Generator.calculateHitTime(getGeneratorPublicKey(), account.getEffectiveBalanceNXT(previousBlock.getHeight()), previousBlock);
             String hitVerifyingResult = Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp);
             if (hitVerifyingResult == null) {
                 return true;

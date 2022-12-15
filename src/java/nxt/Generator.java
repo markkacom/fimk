@@ -281,18 +281,9 @@ public final class Generator implements Comparable<Generator> {
 
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
-        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : 17];
-        byte[] hash = digest.digest(publicKey);
-        result[0] = new BigInteger(1, new byte[]{
-                hash[7],
-                hash[6],
-                hash[5],
-                hash[4],
-                hash[3],
-                hash[2],
-                hash[1],
-                hash[0]
-        });
+        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : Constants.HITS_NUMBER];
+        byte[] h = digest.digest(publicKey);
+        result[0] = new BigInteger(1, new byte[]{h[7], h[6], h[5], h[4], h[3], h[2], h[1], h[0]});
 
         /*
         byte[] a1 = new byte[generationSignatureHash.length + 1] ;
@@ -308,19 +299,19 @@ public final class Generator implements Comparable<Generator> {
         //  Warning: result of parallel computation MUST have the same order (sync results): result1 concat result2 concat result3...
         */
 
-        byte[] digestSource = hash;
+        byte[] digestSource = h;
         for (int i = 1; i < result.length; i++) {
-            byte[] h = digest.digest(digestSource);
-            result[i] = new BigInteger(1, new byte[]{h[7], h[6], h[5], h[4], h[3], h[2], h[1], h[0]});
-            digestSource = h;
+            byte[] hash = digest.digest(digestSource);
+            result[i] = new BigInteger(1, new byte[]{hash[7], hash[6], hash[5], hash[4], hash[3], hash[2], hash[1], hash[0]});
+            digestSource = hash;
         }
         return result;
     }
 
-    static long[] calculateHitTime(Account account, Block block) {
+    static long[] calculateHitTime(byte[] publicKey, long effectiveBalance, Block block) {
         return calculateHitTime(
-                BigInteger.valueOf(account.getEffectiveBalanceNXT(block.getHeight())),
-                calculateHits(account.getPublicKey(), block),
+                BigInteger.valueOf(effectiveBalance),
+                calculateHits(publicKey, block),
                 block
         );
     }
