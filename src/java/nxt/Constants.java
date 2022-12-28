@@ -173,7 +173,7 @@ public final class Constants {
      * Number of hit values generated to select the suitable
      */
     public static final int HITS_NUMBER = 17;
-    public static final int CONTROL_FORGING_TIME_BLOCK = isTestnet ? 1387 : 5_550_000;
+    public static final int CONTROL_FORGING_TIME_BLOCK = isTestnet ? 1387 : 5_540_000;
     public static final int POS_POP_REWARD_BLOCK = CONTROL_FORGING_TIME_BLOCK;
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;
