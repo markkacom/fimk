@@ -17,26 +17,15 @@
 package nxt;
 
 import nxt.crypto.EncryptedData;
-import nxt.db.DbClause;
-import nxt.db.DbIterator;
-import nxt.db.DbKey;
-import nxt.db.VersionedEntityDbTable;
-import nxt.db.VersionedValuesDbTable;
+import nxt.db.*;
 import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Search;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.sql.*;
 import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public final class DigitalGoodsStore {
 
@@ -280,8 +269,9 @@ public final class DigitalGoodsStore {
         }
 
         public static DbIterator<Goods> getSellerGoods(final long sellerId, final boolean inStockOnly, int from, int to) {
+            // seller's goods are not filtered by goods expiry. Seller is the sender, so sender sees expired goods
             return goodsTable.getManyBy(
-                    new SellerDbClause(sellerId, inStockOnly).and(goodsTermLimitClause()),
+                    new SellerDbClause(sellerId, inStockOnly),
                     from, to, " ORDER BY name ASC, timestamp DESC, id ASC "
             );
         }
