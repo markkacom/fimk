@@ -303,6 +303,7 @@ public final class APIServlet extends HttpServlet {
         map.put("trimDerivedTables", TrimDerivedTables.instance);
         map.put("registerRewardApplicant", RegisterRewardApplicant.instance);
         map.put("getRewards", GetRewards.instance);
+        map.put("getAssetRewardings", GetAssetRewardings.instance);
 
         registerFIMKAPI(map);
 

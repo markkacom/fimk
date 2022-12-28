@@ -24,6 +24,7 @@ import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
+import nxt.reward.AssetRewarding;
 import nxt.reward.Reward;
 import nxt.reward.RewardItem;
 import nxt.util.Convert;
@@ -859,6 +860,20 @@ public final class JSONData {
         json.put("height", item.getHeight());
         json.put("amount", item.getAmount());
         json.put("name", item.getName());
+        return json;
+    }
+
+    public static Object assetRewarding(AssetRewarding ar) {
+        JSONObject json = new JSONObject();
+        json.put("id", Long.toUnsignedString(ar.getId()));
+        json.put("asset", Long.toUnsignedString(ar.getAsset()));
+        json.put("height", ar.getHeight());
+        json.put("frequency", ar.getFrequency());
+        json.put("halvingBlocks", ar.getHalvingBlocks());
+        json.put("baseAmount", ar.getBaseAmount());
+        json.put("lotteryType", ar.getLotteryType());
+        json.put("target", ar.getTarget());
+        json.put("targetInfo", ar.getTargetInfo());
         return json;
     }
 }

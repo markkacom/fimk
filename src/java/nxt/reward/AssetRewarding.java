@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Rules described rewarding for private asset
+ * Rules described rewarding for private asset. Only one per asset is allowed at moment.
  */
 public final class AssetRewarding {
 
@@ -50,6 +50,27 @@ public final class AssetRewarding {
 
     public static int getCount() {
         return assetRewardingTable.getCount();
+    }
+
+    public static DbIterator<AssetRewarding> getList(long assetId, int from, int to) {
+        String sql = assetId == 0
+                ? "SELECT * FROM asset_rewarding ORDER BY height, id DESC "
+                : "SELECT * FROM asset_rewarding WHERE asset_id = ? ";
+        sql = sql + DbUtils.limitsClause(from, to);
+        Connection con = null;
+        try {
+            con = Db.db.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            int i = 1;
+            if (assetId != 0) {
+                pstmt.setLong(i++, assetId);
+            }
+            DbUtils.setLimits(i, pstmt, from, to);
+            return assetRewardingTable.getManyBy(con, pstmt, false);
+        } catch (SQLException e) {
+            DbUtils.close(con);
+            throw new RuntimeException(e.toString(), e);
+        }
     }
 
     public static DbIterator<AssetRewarding> getAssetRewardings(long asset, int from, int to) {

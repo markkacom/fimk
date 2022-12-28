@@ -16,28 +16,13 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Alias;
-import nxt.Appendix;
+import nxt.*;
 import nxt.MofoQueries.TransactionFilter;
-import nxt.NamespacedAlias;
-import nxt.Asset;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.Currency;
-import nxt.CurrencyBuyOffer;
-import nxt.CurrencySellOffer;
-import nxt.DigitalGoodsStore;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.Poll;
-import nxt.Transaction;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import nxt.util.Search;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -45,7 +30,6 @@ import org.json.simple.parser.ParseException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,6 +100,10 @@ final class ParameterParser {
     }
 
     static long getUnsignedLong(HttpServletRequest req, String name, boolean isMandatory) throws ParameterException {
+        return getUnsignedLong(req, name, isMandatory, false);
+    }
+
+    static long getUnsignedLong(HttpServletRequest req, String name, boolean isMandatory, boolean allowZero) throws ParameterException {
         String paramValue = Convert.emptyToNull(req.getParameter(name));
         if (paramValue == null) {
             if (isMandatory) {
@@ -125,7 +113,7 @@ final class ParameterParser {
         }
         try {
             long value = Convert.parseUnsignedLong(paramValue);
-            if (value == 0) { // 0 is not allowed as an id
+            if (! allowZero && value == 0) {
                 throw new ParameterException(incorrect(name));
             }
             return value;

@@ -461,7 +461,7 @@ final class BlockImpl implements Block {
             int desiredBlockInterval = Nxt.getBlockchain().desiredBlockInterval(previousBlock);
             double coefficient = (double) (this.timestamp - previousBlock.timestamp) / desiredBlockInterval;
 
-            long newBaseTarget = (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK && Math.abs(1 - coefficient) < 0.1)
+            long newBaseTarget = (this.height > Constants.CONTROL_FORGING_TIME_BLOCK && Math.abs(1 - coefficient) < 0.1)
                     ? curBaseTarget
                     : BigInteger.valueOf(curBaseTarget).multiply(BigInteger.valueOf(this.timestamp - previousBlock.timestamp))
                     .divide(BigInteger.valueOf(desiredBlockInterval)).longValue();
@@ -472,7 +472,7 @@ final class BlockImpl implements Block {
             newBaseTarget = Math.max(newBaseTarget, curBaseTarget / 2);
             newBaseTarget = Math.max(newBaseTarget, Constants.INITIAL_BASE_TARGET / 64);
 
-            long maxBaseTarget = curBaseTarget * (this.height > Constants.CONTROL_FORGING_MAX_BASETARGET_COEFF_BLOCK ? 4 : 2);
+            long maxBaseTarget = curBaseTarget * (this.height > Constants.CONTROL_FORGING_TIME_BLOCK ? 4 : 2);
             if (maxBaseTarget < 0) {
                 maxBaseTarget = Constants.MAX_BASE_TARGET;
             }
