@@ -876,4 +876,18 @@ public final class JSONData {
         json.put("targetInfo", ar.getTargetInfo());
         return json;
     }
+
+    public static Object rewardTotalItem(RewardItem.TotalItem total) {
+        JSONObject json = new JSONObject();
+        json.put("name", total.name);
+        json.put("fromHeight", total.fromHeight);
+        json.put("toHeight", total.toHeight);
+        json.put("campaignId", Long.toUnsignedString(total.campaignId));
+        json.put("asset", Long.toUnsignedString(total.assetId));
+        json.put("assetName", total.assetName);
+        json.put("decimals", total.decimals);
+        json.put("amount", total.amount);
+        return json;
+    }
+
 }

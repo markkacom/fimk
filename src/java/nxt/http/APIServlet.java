@@ -304,6 +304,7 @@ public final class APIServlet extends HttpServlet {
         map.put("registerRewardApplicant", RegisterRewardApplicant.instance);
         map.put("getRewards", GetRewards.instance);
         map.put("getAssetRewardings", GetAssetRewardings.instance);
+        map.put("getRewardTotals", GetRewardTotals.instance);
 
         registerFIMKAPI(map);
 

@@ -17,7 +17,7 @@ public class RewardImpl extends Reward {
     public long augmentFee(int height, long totalFeeNQT, long accountId) {
         long rewardNQT = calculatePOSRewardNQT(height);
         if (rewardNQT > 0) {
-            RewardItem.registerReward(new RewardItem(height, 0, "POS_REWARD", accountId, 0, rewardNQT));
+            RewardItem.registerReward(new RewardItem(height, 0, RewardItem.NAME.POS_REWARD, accountId, 0, rewardNQT));
             return Math.addExact(rewardNQT, totalFeeNQT);
         }
         return totalFeeNQT;
@@ -37,7 +37,7 @@ public class RewardImpl extends Reward {
             // money inflation
             winnerAccount.addToBalanceAndUnconfirmedBalanceNQT(Constants.POP_REWARD_MONEY_AMOUNT_NQT);
             RewardItem.registerReward(new RewardItem(
-                    block.getHeight(), -1, "POP_REWARD_MONEY", winnerAccount.getId(),
+                    block.getHeight(), -1, RewardItem.NAME.POP_REWARD_MONEY, winnerAccount.getId(),
                     0, Constants.POP_REWARD_MONEY_AMOUNT_NQT
             ));
         }
@@ -88,7 +88,7 @@ public class RewardImpl extends Reward {
                 if (MofoAsset.getAccountAllowed(ar.getAsset(), block.getGeneratorId())) {
                     long amount = halving(ar.getBaseAmount(), ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
                     if (amount > 0) {
-                        result.add(new RewardItem(block.getHeight(), ar.getId(), "FORGER", block.getGeneratorId(), ar.getAsset(), amount));
+                        result.add(new RewardItem(block.getHeight(), ar.getId(), RewardItem.NAME.FORGER, block.getGeneratorId(), ar.getAsset(), amount));
                     }
                 }
             }
@@ -96,7 +96,7 @@ public class RewardImpl extends Reward {
                 if (MofoAsset.getAccountAllowed(ar.getAsset(), ar.getTargetInfo())) {
                     long amount = halving(ar.getBaseAmount(), ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
                     if (amount > 0) {
-                        result.add(new RewardItem(block.getHeight(), ar.getId(), "CONSTANT_ACCOUNT", ar.getTargetInfo(), ar.getAsset(), amount));
+                        result.add(new RewardItem(block.getHeight(), ar.getId(), RewardItem.NAME.CONSTANT_ACCOUNT, ar.getTargetInfo(), ar.getAsset(), amount));
                     }
                 }
             }
@@ -131,7 +131,7 @@ public class RewardImpl extends Reward {
                     rewardAmount = Math.min(rewardAmount, ar.getBaseAmount() * 10);
                     long amount = halving(rewardAmount, ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
                     if (amount > 0) {
-                        result.add(new RewardItem(block.getHeight(), ar.getId(), "RANDOM_ACCOUNT", winner.getAccount(), ar.getAsset(), amount));
+                        result.add(new RewardItem(block.getHeight(), ar.getId(), RewardItem.NAME.RANDOM_ACCOUNT, winner.getAccount(), ar.getAsset(), amount));
                     }
                 }
                 if (lotteryType == LotteryType.RANDOM_WEIGHTED_ACCOUNT) {
@@ -160,7 +160,7 @@ public class RewardImpl extends Reward {
                     if (winner != null) {
                         long amount = halving(ar.getBaseAmount(), ar.getHalvingBlocks(), ar.getHeight(), block.getHeight());
                         if (amount > 0) {
-                            result.add(new RewardItem(block.getHeight(), ar.getId(), "RANDOM_WEIGHTED_ACCOUNT", winner.getAccount(), ar.getAsset(), amount));
+                            result.add(new RewardItem(block.getHeight(), ar.getId(), RewardItem.NAME.RANDOM_WEIGHTED_ACCOUNT, winner.getAccount(), ar.getAsset(), amount));
                         }
                     }
                 }

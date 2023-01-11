@@ -1,5 +1,6 @@
 package nxt.reward;
 
+import nxt.Asset;
 import nxt.Db;
 import nxt.crypto.Crypto;
 import nxt.db.DbIterator;
@@ -13,11 +14,78 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Reward amount for asset/money and account
  */
 public class RewardItem {
+
+    /**
+     * This enum provides human-readable names for each registered reward
+     */
+    enum NAME {
+        // do not rename enum items since it is saved to db. Until it is refactored to use code instead name of enum item.
+        POS_REWARD(1, "POS Block Reward"),
+        POP_REWARD_MONEY(2, "POP Block Reward"),
+        FORGER(3, "POP Forger Reward"),
+        CONSTANT_ACCOUNT(4, "POP Constant Account Reward"),
+        RANDOM_ACCOUNT(5, "POP Random Account Reward"),
+        RANDOM_WEIGHTED_ACCOUNT(6, "POP Random Weighted Account Reward");
+
+        private static final HashMap<Integer, NAME> map;
+
+        static {
+            map = new HashMap<>(NAME.values().length);
+            Arrays.stream(NAME.values()).forEach(value -> map.put(value.code, value));
+        }
+
+        private int code;
+        private String text;
+
+        NAME(int code, String text) {
+            this.code = code;
+            this.text = text;
+        }
+
+        public static NAME resolve(int code) {
+            return map.get(code);
+        }
+    }
+
+    public static class TotalItem {
+        public String assetName;
+        public int decimals;
+        public int fromHeight;
+        public int toHeight;
+        public long campaignId;
+        public long assetId;
+        public String name;
+        public long amount;
+
+        public TotalItem(int fromHeight, int toHeight, long campaignId, long assetId, String name, long amount) {
+            this.fromHeight = fromHeight;
+            this.toHeight = toHeight;
+            this.campaignId = campaignId;
+            this.assetId = assetId;
+            this.name = name;
+            this.amount = amount;
+
+            if (assetId == 0) {
+                this.decimals = 8;
+                this.assetName = "FIM";
+            } else {
+                Asset asset = Asset.getAsset(assetId);
+                if (asset != null) {
+                    this.decimals = asset.getDecimals();
+                    this.assetName = asset.getName();
+                }
+            }
+        }
+    }
 
     public static void init() {
     }
@@ -68,10 +136,44 @@ public class RewardItem {
         }
     }
 
+    /**
+     * Total amounts grouped by reward kind in the height range.
+     *
+     * @param fromHeight inclusive min limit
+     * @param toHeight   exclusive max limit
+     * @return
+     */
+    public static List<TotalItem> getTotals(int fromHeight, int toHeight) {
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(
+                     "select campaign_id, asset_id, name_code, sum(amount) from reward_item ri " +
+                             "where height>= ? and height < ? group by campaign_id, name_code, asset_id ")) {
+            pstmt.setInt(1, fromHeight);
+            pstmt.setInt(2, toHeight);
+            List<TotalItem> result = new ArrayList<>();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    NAME name = NAME.resolve(rs.getInt(3));
+                    result.add(new TotalItem(
+                            fromHeight,
+                            toHeight,
+                            rs.getLong(1),
+                            rs.getLong(2),
+                            name == null ? null : name.text,
+                            rs.getLong(4)
+                    ));
+                }
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
     private final DbKey dbKey;
     int height;
     long campaignId;
-    String name;
+    NAME name;
     long accountId;
     long assetId;
     long amount;
@@ -84,7 +186,7 @@ public class RewardItem {
      * @param assetId
      * @param amount
      */
-    public RewardItem(int height, long campaignId, String name, long accountId, long assetId, long amount) {
+    public RewardItem(int height, long campaignId, NAME name, long accountId, long assetId, long amount) {
         this.height = height;
         this.dbKey = dbKeyFactory.newKey(hash(height, accountId, assetId, campaignId));
         this.campaignId = campaignId;
@@ -97,8 +199,7 @@ public class RewardItem {
     private RewardItem(ResultSet rs) throws SQLException {
         this.height = rs.getInt("height");
         this.campaignId = rs.getLong("campaign_id");
-        this.name = rs.getString("name");
-        ;
+        this.name = NAME.resolve(rs.getInt("name_code"));
         this.accountId = rs.getLong("account_id");
         this.assetId = rs.getLong("asset_id");
         this.amount = rs.getLong("amount");
@@ -113,7 +214,7 @@ public class RewardItem {
         return campaignId;
     }
 
-    public String getName() {
+    public NAME getName() {
         return name;
     }
 
@@ -142,12 +243,12 @@ public class RewardItem {
 
     private void save(Connection con) throws SQLException {
         try (PreparedStatement pstmt = con.prepareStatement("INSERT INTO reward_item " +
-                "(height, campaign_id, name, account_id, asset_id, amount) VALUES (?, ?, ?, ?, ?, ?) "
+                "(height, campaign_id, name_code, account_id, asset_id, amount) VALUES (?, ?, ?, ?, ?, ?) "
         )) {
             int i = 0;
             pstmt.setInt(++i, this.height);
             pstmt.setLong(++i, this.campaignId);
-            pstmt.setString(++i, this.name);
+            pstmt.setInt(++i, this.name.code);
             pstmt.setLong(++i, this.accountId);
             pstmt.setLong(++i, this.assetId);
             pstmt.setLong(++i, this.amount);
