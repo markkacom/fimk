@@ -858,7 +858,7 @@ public final class JSONData {
         json.put("asset", Long.toUnsignedString(item.getAssetId()));
         json.put("campaign", Long.toUnsignedString(item.getCampaignId()));
         json.put("height", item.getHeight());
-        json.put("amount", item.getAmount());
+        json.put("amount", String.valueOf(item.getAmount()));
         json.put("name", item.getName());
         return json;
     }
@@ -870,7 +870,7 @@ public final class JSONData {
         json.put("height", ar.getHeight());
         json.put("frequency", ar.getFrequency());
         json.put("halvingBlocks", ar.getHalvingBlocks());
-        json.put("baseAmount", ar.getBaseAmount());
+        json.put("baseAmount", String.valueOf(ar.getBaseAmount()));
         json.put("lotteryType", ar.getLotteryType());
         json.put("target", ar.getTarget());
         json.put("targetInfo", ar.getTargetInfo());
@@ -882,11 +882,10 @@ public final class JSONData {
         json.put("name", total.name);
         json.put("fromHeight", total.fromHeight);
         json.put("toHeight", total.toHeight);
-        json.put("campaignId", Long.toUnsignedString(total.campaignId));
         json.put("asset", Long.toUnsignedString(total.assetId));
         json.put("assetName", total.assetName);
         json.put("decimals", total.decimals);
-        json.put("amount", total.amount);
+        json.put("amount", String.valueOf(total.amount));
         return json;
     }
 
