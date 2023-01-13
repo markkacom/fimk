@@ -5,7 +5,7 @@ import nxt.Account.AccountIdentifier;
 import nxt.Account.AccountInfo;
 import nxt.Attachment.MonetarySystemAttachment;
 import nxt.peer.Peer;
-import nxt.reward.Reward;
+import nxt.reward.RewardItem;
 import nxt.txn.*;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -245,7 +245,29 @@ public class JSONData {
         json.put("numberOfTransactions", block.getTransactions().size());
         json.put("totalAmountNQT", String.valueOf(block.getTotalAmountNQT()));
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
-        json.put("totalPOSRewardNQT", Reward.get().calculatePOSRewardNQT(block.getHeight()));
+        json.put("totalPOSRewardNQT", String.valueOf(block.getTotalFeeNQT()));
+
+        List<RewardItem.TotalItem> rewardTotals = RewardItem.getTotals(block.getHeight(), block.getHeight() + 1);
+        StringBuilder sb = new StringBuilder();
+        int others = 0;
+        for (RewardItem.TotalItem item : rewardTotals) {
+            if (item.name.code == RewardItem.NAME.POS_REWARD.code) {
+                if (sb.length() > 0) sb.append("; ");
+                sb.append("POS ").append(item.amount / Constants.ONE_NXT).append(" FIM");
+            } else if (item.name.code == RewardItem.NAME.POP_REWARD_MONEY.code) {
+                if (sb.length() > 0) sb.append("; ");
+                sb.append("POP ").append(item.amount / Constants.ONE_NXT).append(" FIM");
+            } else {
+                others++;
+            }
+        }
+        if (others > 0) {
+            if (sb.length() > 0) sb.append("; ");
+            sb.append("others ").append(others);
+        }
+
+        json.put("rewardTotals", sb.toString().trim());
+
         return json;
     }
 

@@ -1109,7 +1109,9 @@ class NxtDbVersion extends DbVersion {
                         "CREATE INDEX IF NOT EXISTS reward_item_account_id_idx ON reward_item (account_id); ");
             case 440:
                 apply("ALTER TABLE reward_item DROP COLUMN IF EXISTS name; " +
-                        "ALTER TABLE reward_item ADD COLUMN IF NOT EXISTS name_code TINYINT; ");
+                        "ALTER TABLE reward_item ADD COLUMN IF NOT EXISTS name_code TINYINT; " +
+                        "CREATE INDEX IF NOT EXISTS reward_item_name_code_idx ON reward_item (name_code); " +
+                        "CREATE INDEX IF NOT EXISTS reward_item_asset_id_idx ON reward_item (asset_id); ");
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
             case 441:
                 return;

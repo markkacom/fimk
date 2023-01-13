@@ -43,7 +43,7 @@ public class RewardImpl extends Reward {
         }
 
         List<RewardItem> rewards = resolveAssetRewards(block, candidates);
-        //System.out.printf("block %d  pop rewards %d \n", block.getHeight(), rewards == null ? 0 : rewards.size());
+        //System.out.printf("block %d  POP rewards %d \n", block.getHeight(), rewards == null ? 0 : rewards.size());
 
         if (rewards != null) {
             for (RewardItem reward : rewards) {

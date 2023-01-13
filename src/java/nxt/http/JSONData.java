@@ -879,7 +879,7 @@ public final class JSONData {
 
     public static Object rewardTotalItem(RewardItem.TotalItem total) {
         JSONObject json = new JSONObject();
-        json.put("name", total.name);
+        json.put("name", total.name == null ? null : total.name.text);
         json.put("fromHeight", total.fromHeight);
         json.put("toHeight", total.toHeight);
         json.put("asset", Long.toUnsignedString(total.assetId));

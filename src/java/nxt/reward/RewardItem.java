@@ -27,7 +27,7 @@ public class RewardItem {
     /**
      * This enum provides human-readable names for each registered reward
      */
-    enum NAME {
+    public enum NAME {
         // do not rename enum items since it is saved to db. Until it is refactored to use code instead name of enum item.
         POS_REWARD(1, "POS Block Reward"),
         POP_REWARD_MONEY(2, "POP Block Reward"),
@@ -43,8 +43,8 @@ public class RewardItem {
             Arrays.stream(NAME.values()).forEach(value -> map.put(value.code, value));
         }
 
-        private int code;
-        private String text;
+        public final int code;
+        public final String text;
 
         NAME(int code, String text) {
             this.code = code;
@@ -57,19 +57,17 @@ public class RewardItem {
     }
 
     public static class TotalItem {
-        public String assetName;
-        public int decimals;
-        public int fromHeight;
-        public int toHeight;
-        public long campaignId;
-        public long assetId;
-        public String name;
+        public final String assetName;
+        public final int decimals;
+        public final int fromHeight;
+        public final int toHeight;
+        public final long assetId;
+        public final NAME name;
         public long amount;
 
-        public TotalItem(int fromHeight, int toHeight, long campaignId, long assetId, String name, long amount) {
+        public TotalItem(int fromHeight, int toHeight, long assetId, NAME name, long amount) {
             this.fromHeight = fromHeight;
             this.toHeight = toHeight;
-            this.campaignId = campaignId;
             this.assetId = assetId;
             this.name = name;
             this.amount = amount;
@@ -79,7 +77,10 @@ public class RewardItem {
                 this.assetName = "FIM";
             } else {
                 Asset asset = Asset.getAsset(assetId);
-                if (asset != null) {
+                if (asset == null) {
+                    this.decimals = 0;
+                    this.assetName = null;
+                } else {
                     this.decimals = asset.getDecimals();
                     this.assetName = asset.getName();
                 }
@@ -146,21 +147,21 @@ public class RewardItem {
     public static List<TotalItem> getTotals(int fromHeight, int toHeight) {
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement(
-                     "select campaign_id, asset_id, name_code, sum(amount) from reward_item ri " +
-                             "where height>= ? and height < ? group by campaign_id, name_code, asset_id ")) {
+                     "select asset_id, name_code, sum(amount) from reward_item ri " +
+                             "where height>= ? and height < ? group by name_code, asset_id " +
+                             "order by name_code ")) {
             pstmt.setInt(1, fromHeight);
             pstmt.setInt(2, toHeight);
             List<TotalItem> result = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    NAME name = NAME.resolve(rs.getInt(3));
+                    NAME name = NAME.resolve(rs.getInt(2));
                     result.add(new TotalItem(
                             fromHeight,
                             toHeight,
                             rs.getLong(1),
-                            rs.getLong(2),
-                            name == null ? null : name.text,
-                            rs.getLong(4)
+                            name,
+                            rs.getLong(3)
                     ));
                 }
             }
