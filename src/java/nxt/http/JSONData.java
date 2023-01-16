@@ -882,6 +882,8 @@ public final class JSONData {
         json.put("name", total.name == null ? null : total.name.text);
         json.put("fromHeight", total.fromHeight);
         json.put("toHeight", total.toHeight);
+        json.put("accountId", Long.toUnsignedString(total.accountId));
+        json.put("accountRS", Convert.rsAccount(total.accountId));
         json.put("asset", Long.toUnsignedString(total.assetId));
         json.put("assetName", total.assetName);
         json.put("decimals", total.decimals);

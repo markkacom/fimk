@@ -61,13 +61,15 @@ public class RewardItem {
         public final int decimals;
         public final int fromHeight;
         public final int toHeight;
+        public long accountId;
         public final long assetId;
         public final NAME name;
         public long amount;
 
-        public TotalItem(int fromHeight, int toHeight, long assetId, NAME name, long amount) {
+        public TotalItem(int fromHeight, int toHeight, long accountId,  long assetId, NAME name, long amount) {
             this.fromHeight = fromHeight;
             this.toHeight = toHeight;
+            this.accountId = accountId;
             this.assetId = assetId;
             this.name = name;
             this.amount = amount;
@@ -147,21 +149,22 @@ public class RewardItem {
     public static List<TotalItem> getTotals(int fromHeight, int toHeight) {
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement(
-                     "select asset_id, name_code, sum(amount) from reward_item ri " +
-                             "where height>= ? and height < ? group by name_code, asset_id " +
+                     "select account_id, asset_id, name_code, sum(amount) from reward_item ri " +
+                             "where height>= ? and height < ? group by account_id, asset_id, name_code " +
                              "order by name_code ")) {
             pstmt.setInt(1, fromHeight);
             pstmt.setInt(2, toHeight);
             List<TotalItem> result = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    NAME name = NAME.resolve(rs.getInt(2));
+                    NAME name = NAME.resolve(rs.getInt(3));
                     result.add(new TotalItem(
                             fromHeight,
                             toHeight,
                             rs.getLong(1),
+                            rs.getLong(2),
                             name,
-                            rs.getLong(3)
+                            rs.getLong(4)
                     ));
                 }
             }
