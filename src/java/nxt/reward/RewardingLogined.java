@@ -12,25 +12,26 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static nxt.reward.AssetRewarding.getApplicableRewardings;
 
-public class RewardImpl extends Reward {
-
-    public long augmentFee(int height, long totalFeeNQT, long accountId) {
-        long rewardNQT = calculatePOSRewardNQT(height);
-        if (rewardNQT > 0) {
-            RewardItem.registerReward(new RewardItem(height, 0, RewardItem.NAME.POS_REWARD, accountId, 0, rewardNQT));
-            return Math.addExact(rewardNQT, totalFeeNQT);
-        }
-        return totalFeeNQT;
-    }
+public class RewardingLogined extends Rewarding {
 
     @Override
-    public void applyPOPReward(Block block) {
+    public void applyPOPRewards(Block block) {
         if (!HardFork.POS_POP_REWARD_BLOCK(block.getHeight())) return;
 
         RewardCandidate.removeObsolete(Nxt.getBlockchain().getHeight());
 
-        Candidates candidates = rewardCandidates();
+        Candidates candidates = getRewardCandidates();
 
+        applyBlockPOPRewards(block, candidates);
+
+        applyAssetPOPRewards(block, candidates);
+
+        if (NodesMonitoringThread.roundSuccess) {
+            // send rewards
+        }
+    }
+
+    private void applyBlockPOPRewards(Block block, Candidates candidates) {
         RewardCandidate winner = resolveMoneyWinner(candidates, block);
         if (winner != null) {
             Account winnerAccount = Account.addOrGetAccount(winner.getAccount());
@@ -41,7 +42,9 @@ public class RewardImpl extends Reward {
                     0, Constants.POP_REWARD_MONEY_AMOUNT_NQT
             ));
         }
+    }
 
+    private void applyAssetPOPRewards(Block block, Candidates candidates) {
         List<RewardItem> rewards = resolveAssetRewards(block, candidates);
         //System.out.printf("block %d  POP rewards %d \n", block.getHeight(), rewards == null ? 0 : rewards.size());
 
@@ -54,26 +57,6 @@ public class RewardImpl extends Reward {
                 RewardItem.registerReward(reward);
             }
         }
-
-        if (NodesMonitoringThread.roundSuccess) {
-            // send rewards
-        }
-    }
-
-    public long calculatePOSRewardNQT(int height) {
-        if (height >= Constants.FORGER_FEE_BLOCK) {
-            for (int i = 0; i < Constants.FORGER_FEE_AMOUNT_NQT_STAGES.length; i++) {
-                if (height < (Constants.FORGER_FEE_STAGE_CHANGE_AT_BLOCK * (i + 1))) {
-                    return Constants.FORGER_FEE_AMOUNT_NQT_STAGES[i];
-                }
-            }
-        }
-
-        if (HardFork.POS_POP_REWARD_BLOCK(height)) {
-            return Constants.ONE_NXT;
-        }
-
-        return 0;
     }
 
     /**
@@ -182,7 +165,7 @@ public class RewardImpl extends Reward {
         return null;
     }
 
-    private Candidates rewardCandidates() {
+    Candidates getRewardCandidates() {
         DbIterator<RewardCandidate> it = RewardCandidate.getActualCandidates(
                 Nxt.getBlockchain().getHeight() - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT);
         List<RewardCandidate> candidates = new ArrayList<>();

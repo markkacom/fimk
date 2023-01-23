@@ -4,7 +4,7 @@ import nxt.Appendix.Message;
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
 import nxt.http.websocket.JSONData;
-import nxt.reward.Reward;
+import nxt.reward.Rewarding;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -194,7 +194,7 @@ public final class MofoQueries {
 
                     /* Must implement a catch here in case we are on NXT and not on FIMK */
                     if ("FIMK".equals(Nxt.APPLICATION)) {
-                        stat.add(total_fee + Reward.get().calculatePOSRewardNQT(height));
+                        stat.add(total_fee + Rewarding.get().calculatePOSRewardNQT(height));
                     }
                     else {
                         stat.add(total_fee);

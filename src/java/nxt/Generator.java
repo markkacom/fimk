@@ -247,7 +247,7 @@ public final class Generator implements Comparable<Generator> {
         int expectedInterval = hits[selectedHitIndex].divide(
                 BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance)).intValue() + 1;
 
-        if (expectedInterval > interval) return String.format("Expected interval %s less than fact interval %s", expectedInterval, interval);
+        if (expectedInterval > interval) return String.format("Fact interval %s less than expected interval %s", interval, expectedInterval);
 
         if (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
                         || interval > Constants.BLOCK_INTERVAL_THRESHOLD

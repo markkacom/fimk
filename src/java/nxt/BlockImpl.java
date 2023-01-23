@@ -17,7 +17,7 @@
 package nxt;
 
 import nxt.crypto.Crypto;
-import nxt.reward.Reward;
+import nxt.reward.Rewarding;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import org.json.simple.JSONArray;
@@ -418,14 +418,14 @@ final class BlockImpl implements Block {
 
     void apply() {
         /* XXX - Add the POS reward to the block forger */
-        long augmentedFeeNQT = Reward.get().augmentFee(getHeight(), totalFeeNQT, getGeneratorId());
+        long augmentedFeeNQT = Rewarding.get().augmentFee(getHeight(), totalFeeNQT, getGeneratorId());
 
         Account generatorAccount = Account.addOrGetAccount(getGeneratorId());
         generatorAccount.apply(getGeneratorPublicKey());
         generatorAccount.addToBalanceAndUnconfirmedBalanceNQT(augmentedFeeNQT);
         generatorAccount.addToForgedBalanceNQT(augmentedFeeNQT);
 
-        Reward.get().applyPOPReward(this);
+        Rewarding.get().applyPOPRewards(this);
     }
 
     void setPrevious(BlockImpl block) {

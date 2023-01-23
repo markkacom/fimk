@@ -64,14 +64,16 @@ public class RewardItem {
         public long accountId;
         public final long assetId;
         public final NAME name;
+        public long campaignId;
         public long amount;
 
-        public TotalItem(int fromHeight, int toHeight, long accountId,  long assetId, NAME name, long amount) {
+        public TotalItem(int fromHeight, int toHeight, long accountId,  long assetId, NAME name, long campaignId, long amount) {
             this.fromHeight = fromHeight;
             this.toHeight = toHeight;
             this.accountId = accountId;
             this.assetId = assetId;
             this.name = name;
+            this.campaignId = campaignId;
             this.amount = amount;
 
             if (assetId == 0) {
@@ -149,8 +151,9 @@ public class RewardItem {
     public static List<TotalItem> getTotals(int fromHeight, int toHeight) {
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement(
-                     "select account_id, asset_id, name_code, sum(amount) from reward_item ri " +
-                             "where height>= ? and height < ? group by account_id, asset_id, name_code " +
+                     "select account_id, asset_id, name_code, campaign_id, sum(amount) from reward_item ri " +
+                             "where height>= ? and height < ? " +
+                             "group by account_id, asset_id, name_code, campaign_id " +
                              "order by name_code ")) {
             pstmt.setInt(1, fromHeight);
             pstmt.setInt(2, toHeight);
@@ -164,7 +167,8 @@ public class RewardItem {
                             rs.getLong(1),
                             rs.getLong(2),
                             name,
-                            rs.getLong(4)
+                            rs.getLong(4),
+                            rs.getLong(5)
                     ));
                 }
             }

@@ -25,7 +25,7 @@ import nxt.crypto.EncryptedData;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
 import nxt.reward.AssetRewarding;
-import nxt.reward.Reward;
+import nxt.reward.Rewarding;
 import nxt.reward.RewardItem;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -245,7 +245,7 @@ public final class JSONData {
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block.getHeight())));
+        json.put("totalPOSRewardNQT", String.valueOf(Rewarding.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 
@@ -284,7 +284,7 @@ public final class JSONData {
         json.put("transactions", transactions);
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(Reward.get().calculatePOSRewardNQT(block.getHeight())));
+        json.put("totalPOSRewardNQT", String.valueOf(Rewarding.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 
@@ -882,6 +882,7 @@ public final class JSONData {
         json.put("name", total.name == null ? null : total.name.text);
         json.put("fromHeight", total.fromHeight);
         json.put("toHeight", total.toHeight);
+        json.put("campaignId", total.campaignId == 0 || total.campaignId == -1 ? Long.toString(total.campaignId) : Long.toUnsignedString(total.campaignId));
         json.put("accountId", Long.toUnsignedString(total.accountId));
         json.put("accountRS", Convert.rsAccount(total.accountId));
         json.put("asset", Long.toUnsignedString(total.assetId));
