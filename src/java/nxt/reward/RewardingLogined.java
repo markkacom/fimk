@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static nxt.reward.AssetRewarding.getApplicableRewardings;
 
+/**
+ * POP rewards for candidates formed on login actions.
+ */
 public class RewardingLogined extends Rewarding {
 
     @Override

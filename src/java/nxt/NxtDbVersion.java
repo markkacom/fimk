@@ -1114,6 +1114,9 @@ class NxtDbVersion extends DbVersion {
                         "CREATE INDEX IF NOT EXISTS reward_item_asset_id_idx ON reward_item (asset_id); ");
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
             case 441:
+                BlockchainProcessorImpl.getInstance().scheduleScan(0, false);
+                apply(null);
+            case 442:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
