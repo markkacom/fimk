@@ -445,7 +445,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 for (BlockImpl block : forkBlocks) {
                     if (blockchain.getLastBlock().getId() == block.getPreviousBlockId()) {
                         try {
-                            pushBlock(block);
+                            pushBlock(block, peer);
                             pushedForkBlocks += 1;
                         } catch (BlockNotAcceptedException e) {
                             peer.blacklist(e);
@@ -837,12 +837,12 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     }
 
     @Override
-    public void processPeerBlock(JSONObject request) throws NxtException {
+    public void processPeerBlock(JSONObject request, Peer peer) throws NxtException {
         BlockImpl block = BlockImpl.parseBlock(request);
         synchronized (blockchain) {
             BlockImpl lastBlock = blockchain.getLastBlock();
             if (block.getPreviousBlockId() == lastBlock.getId()) {
-                pushBlock(block);
+                pushBlock(block, peer);
             } else if (block.getPreviousBlockId() == lastBlock.getPreviousBlockId() && block.getTimestamp() < lastBlock.getTimestamp()) {
                 if (lastBlock.getId() != blockchain.getLastBlock().getId()) {
                     return; // blockchain changed, ignore the block
@@ -850,7 +850,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 BlockImpl previousBlock = blockchain.getBlock(lastBlock.getPreviousBlockId());
                 lastBlock = popOffTo(previousBlock).get(0);
                 try {
-                    pushBlock(block);
+                    pushBlock(block, peer);
                     TransactionProcessorImpl.getInstance().processLater(lastBlock.getTransactions());
                     Logger.logDebugMessage("Last block " + lastBlock.getStringId() + " was replaced by " + block.getStringId());
                 } catch (BlockNotAcceptedException e) {
