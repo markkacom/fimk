@@ -247,22 +247,13 @@ public final class Generator implements Comparable<Generator> {
         int expectedInterval = hits[selectedHitIndex].divide(
                 BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance)).intValue() + 1;
 
-        //fork height POS_POP_REWARD_BLOCK is shifted to future so rewards are recalculated to 0 so effective balance become less
-        // so calculated expectedInterval is changed between POS_POP_REWARD_BLOCK_PRE and POS_POP_REWARD_BLOCK
-        boolean ignoreCheckHit = previousBlock.getHeight() > Constants.POS_POP_REWARD_BLOCK_PRE
-                && previousBlock.getHeight() < Constants.POS_POP_REWARD_BLOCK;
-
-        if (expectedInterval > interval && !ignoreCheckHit ) {
-            return String.format("Fact interval %s less than expected interval %s", interval, expectedInterval);
-        }
+        if (expectedInterval > interval) return String.format("Fact interval %s less than expected interval %s", interval, expectedInterval);
 
         if (previousBlock.getHeight() < Constants.TRANSPARENT_FORGING_BLOCK_8
                         || interval > Constants.BLOCK_INTERVAL_THRESHOLD
                         || Constants.isOffline) return null;
 
-        if (expectedInterval != interval && !ignoreCheckHit ) {
-            return String.format("Expected interval %s is not equal fact interval %s", expectedInterval, interval);
-        }
+        if (expectedInterval != interval) return String.format("Expected interval %s is not equal fact interval %s", expectedInterval, interval);
         return null;
     }
 
