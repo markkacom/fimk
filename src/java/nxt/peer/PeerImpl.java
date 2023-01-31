@@ -51,7 +51,7 @@ final class PeerImpl implements Peer {
     private volatile long downloadedVolume;
     private volatile long uploadedVolume;
     private volatile int lastUpdated;
-    private volatile long[] lastBlock; // [blockId, height]
+    private volatile long[] providedBlockIdHeight; // [blockId, height]
     private volatile int lastConnectAttempt;
     private volatile int lastInboundRequest;
     private volatile long hallmarkBalance = -1;
@@ -332,14 +332,20 @@ final class PeerImpl implements Peer {
     }
 
     @Override
-    public void setLastBlockIdHeight(long blockId, int height) {
-        if (this.lastBlock == null) this.lastBlock = new long[2];
-        this.lastBlock[0] = blockId;
-        this.lastBlock[1] = height;
+    public void setProvidedBlockIdHeight(long blockId, int height) {
+        if (this.providedBlockIdHeight == null) this.providedBlockIdHeight = new long[2];
+        this.providedBlockIdHeight[0] = blockId;
+        this.providedBlockIdHeight[1] = height;
+    }
+
+    public long[] getProvidedBlockIdHeight() {
+        return providedBlockIdHeight;
     }
 
     public long[] getLastBlockIdHeight() {
-        return lastBlock;
+        Block block = Nxt.getBlockchain().getLastBlock();
+        if (block == null) return null;
+        return new long [] {block.getId(), block.getHeight()};
     }
 
     void setLastUpdated(int lastUpdated) {

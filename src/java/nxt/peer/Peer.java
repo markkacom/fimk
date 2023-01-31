@@ -67,7 +67,9 @@ public interface Peer extends Comparable<Peer> {
 
     int getLastUpdated();
 
-    void setLastBlockIdHeight(long blockId, int height);
+    void setProvidedBlockIdHeight(long blockId, int height);
+
+    public long[] getProvidedBlockIdHeight();
 
     public long[] getLastBlockIdHeight();
 
