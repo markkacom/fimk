@@ -51,6 +51,11 @@ public final class GetPeers extends APIServlet.APIRequestHandler {
 
         JSONObject response = new JSONObject();
         response.put("peers", peersJSON);
+
+        if (Peers.inetAddress != null) {
+            response.put("inetAddress", Peers.inetAddress);
+        }
+
         return response;
     }
 

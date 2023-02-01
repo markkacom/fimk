@@ -39,7 +39,6 @@ import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class Peers {
 
@@ -73,7 +72,8 @@ public final class Peers {
     private static final int DEFAULT_PEER_PORT = 7884;
     private static final int TESTNET_PEER_PORT = 6884;
     private static final String myPlatform;
-    private static final String myAddress;
+    public static final String myAddress;
+    public static String inetAddress;
     private static final int myPeerServerPort;
 
     private static int defaultPeerPort;
@@ -172,7 +172,9 @@ public final class Peers {
                     throw new RuntimeException("Invalid announced address length: " + announcedAddress);
                 }
                 json.put("announcedAddress", announcedAddress);
-            } catch (URISyntaxException e) {
+
+                Peers.inetAddress = InetAddress.getByName(host).toString();
+            } catch (URISyntaxException | UnknownHostException e) {
                 Logger.logMessage("Your announce address is invalid: " + myAddress);
                 throw new RuntimeException(e.toString(), e);
             }

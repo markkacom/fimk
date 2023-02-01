@@ -38,7 +38,6 @@ import nxt.util.Time;
 import nxt.virtualexchange.ExchangeObserver;
 import org.json.simple.JSONObject;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -57,7 +56,7 @@ public final class Nxt {
 
     public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.7.2-b10"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
+    public static final String VERSION = "0.7.2-b11"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
     public static final String MIN_VERSION = "0.6.1"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
@@ -432,7 +431,7 @@ public final class Nxt {
                 Logger.logMessage("FIM server " + VERSION + " started successfully.");
                 Logger.logMessage("Copyright (c) 2013-2015 The Nxt Core Developers.");
                 Logger.logMessage("Copyright (c) 2014-2016 Krypto Fin ry and the FIMKrypto Developers.");
-                Logger.logMessage("Copyright (c) 2017-2021 The FIMK Developers.");
+                Logger.logMessage("Copyright (c) 2017-2023 The FIMK Developers.");
                 Logger.logMessage("Distributed under GPLv2, with ABSOLUTELY NO WARRANTY.");
                 if (API.getBrowserUri() != null) {
                     Logger.logMessage("Client UI is at " + API.getBrowserUri());
