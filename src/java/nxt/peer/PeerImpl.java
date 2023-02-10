@@ -343,9 +343,14 @@ final class PeerImpl implements Peer {
     }
 
     public long[] getLastBlockIdHeight() {
-        Block block = Nxt.getBlockchain().getLastBlock();
-        if (block == null) return null;
-        return new long [] {block.getId(), block.getHeight()};
+        JSONObject info = PeerLastBlockInfo.get().getPeerInfos().get(this.getHost());
+        if (info == null) return null;
+        try {
+            return new long [] {Long.parseUnsignedLong((String) info.get("id")), (long) info.get("height")};
+        } catch (Exception e) {
+            Logger.logErrorMessage("wrong last block info from peer " + toString(0), e);
+            return null;
+        }
     }
 
     void setLastUpdated(int lastUpdated) {
@@ -738,6 +743,6 @@ final class PeerImpl implements Peer {
         if (detail == 2) {
             return String.format("%s %s port %d websocket %s", getPlatform(), getState(), getPort(), webSocket.toString(2));
         }
-        return toString();
+        return announcedAddress + " " + getState();
     }
 }

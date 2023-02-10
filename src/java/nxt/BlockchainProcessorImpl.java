@@ -95,12 +95,10 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
                 // Download blocks until we are up-to-date
                 //
                 while (true) {
-                    if (!getMoreBlocks)
-                        return;
+                    if (!getMoreBlocks) return;
                     int chainHeight = blockchain.getHeight();
                     downloadPeer();
-                    if (blockchain.getHeight() == chainHeight)
-                        break;
+                    if (blockchain.getHeight() == chainHeight) break;
                 }
             } catch (InterruptedException e) {
                 Logger.logDebugMessage("Blockchain download thread interrupted");
@@ -339,8 +337,9 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
             List<GetNextBlocks> getList = new ArrayList<>();
             int segSize = (blockchain.getHeight() >= nxt.Constants.PHASING_BLOCK ? 36 : 720);
             int stop = chainBlockIds.size()-1;
-            for (int start=0; start<stop; start+=segSize)
-                getList.add(new GetNextBlocks(chainBlockIds, start, Math.min(start+segSize, stop)));
+            for (int start = 0; start < stop; start += segSize) {
+                getList.add(new GetNextBlocks(chainBlockIds, start, Math.min(start + segSize, stop)));
+            }
             //
             // Issue the getNextBlocks requests and get the results.  We will repeat
             // a request if the peer didn't respond or returned a partial block list.

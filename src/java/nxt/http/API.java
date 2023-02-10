@@ -20,12 +20,7 @@ import nxt.Constants;
 import nxt.Nxt;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -41,16 +36,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.*;
+import java.util.*;
 import java.util.function.Function;
 
 import static nxt.http.JSONResponses.INCORRECT_ADMIN_PASSWORD;
@@ -298,6 +285,10 @@ public final class API {
 
     public static URI getBrowserUri() {
         return browserUri;
+    }
+
+    public static boolean enabled() {
+        return apiServer != null;
     }
 
     private API() {} // never

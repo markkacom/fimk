@@ -18,6 +18,7 @@ package nxt.peer;
 
 import nxt.*;
 import nxt.gossip.Gossip;
+import nxt.http.API;
 import nxt.peer.rewarding.NodesMonitoringThread;
 import nxt.util.*;
 import org.eclipse.jetty.server.Server;
@@ -54,7 +55,7 @@ public final class Peers {
     static final int LOGGING_MASK_200_RESPONSES = 4;
     static volatile int communicationLoggingMask;
 
-    private static final List<String> wellKnownPeers;
+    static final List<String> wellKnownPeers;
     static final Set<String> knownBlacklistedPeers;
     static final Set<String> knownWhitelistedPeers;
 
@@ -81,10 +82,10 @@ public final class Peers {
     private static final boolean shareMyAddress;
     private static final int maxNumberOfInboundConnections;
     private static final int maxNumberOfOutboundConnections;
-    private static final int maxNumberOfConnectedPublicPeers;
+    static final int maxNumberOfConnectedPublicPeers;
     private static final int maxNumberOfKnownPeers;
-    private static final int minNumberOfKnownPeers;
-    private static final boolean enableHallmarkProtection;
+    static final int minNumberOfKnownPeers;
+    static final boolean enableHallmarkProtection;
     private static final int pushThreshold;
     private static final int pullThreshold;
     private static final int sendToPeersLimit;
@@ -370,122 +371,6 @@ public final class Peers {
 
     }
 
-    private static final Runnable peerUnBlacklistingThread = () -> {
-
-        try {
-            try {
-
-                long curTime = System.currentTimeMillis();
-                for (PeerImpl peer : peers.values()) {
-                    peer.updateBlacklistedStatus(curTime);
-                }
-
-            } catch (Exception e) {
-                Logger.logDebugMessage("Error un-blacklisting peer", e);
-            }
-        } catch (Throwable t) {
-            Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
-            t.printStackTrace();
-            System.exit(1);
-        }
-
-    };
-
-    private static final Runnable peerConnectingThread = new Runnable() {
-
-        @Override
-        public void run() {
-
-            try {
-                try {
-                    final int now = Nxt.getEpochTime();
-                    if (!hasEnoughConnectedPublicPeers(Peers.maxNumberOfConnectedPublicPeers)) {
-                        List<Future> futures = new ArrayList<>();
-                        for (int i = 0; i < 10; i++) {
-                            futures.add(peersService.submit(() -> {
-                                PeerImpl peer = (PeerImpl) getAnyPeer(ThreadLocalRandom.current().nextInt(2) == 0 ? Peer.State.NON_CONNECTED : Peer.State.DISCONNECTED, false);
-                                if (peer != null &&
-                                            now - peer.getLastConnectAttempt() > 600 &&
-                                            (!enableHallmarkProtection || peer.getVersion() == null || peer.getWeight() > 0)) {
-                                    peer.connect();
-                                    if (peer.getState() == Peer.State.CONNECTED &&
-                                            enableHallmarkProtection && peer.getWeight() == 0 &&
-                                            hasTooManyOutboundConnections()) {
-                                        Logger.logDebugMessage("Too many outbound connections, deactivating peer "+peer.getHost());
-                                        peer.deactivate();
-                                    }
-                                }
-                            }));
-                        }
-                        for (Future future : futures) {
-                            future.get();
-                        }
-                    }
-
-                    peers.values().parallelStream().unordered()
-                            .filter(peer -> peer.getState() == Peer.State.CONNECTED
-                                    && now - peer.getLastUpdated() > 3600
-                                    && now - peer.getLastConnectAttempt() > 600)
-                            .forEach(PeerImpl::connect);
-
-                    if (hasTooManyKnownPeers() && hasEnoughConnectedPublicPeers(Peers.maxNumberOfConnectedPublicPeers)) {
-                        int initialSize = peers.size();
-                        for (PeerImpl peer : peers.values()) {
-                            if (now - peer.getLastUpdated() > 24 * 3600) {
-                                peer.remove();
-                            }
-                            if (hasTooFewKnownPeers()) {
-                                break;
-                            }
-                        }
-                        if (hasTooManyKnownPeers()) {
-                            PriorityQueue<PeerImpl> sortedPeers = new PriorityQueue<>(peers.values());
-                            int skipped = 0;
-                            while (skipped < Peers.minNumberOfKnownPeers) {
-                                if (sortedPeers.poll() == null) {
-                                    break;
-                                }
-                                skipped += 1;
-                            }
-                            while (!sortedPeers.isEmpty()) {
-                                sortedPeers.poll().remove();
-                            }
-                        }
-                        Logger.logDebugMessage("Reduced peer pool size from " + initialSize + " to " + peers.size());
-                    }
-
-                    for (String wellKnownPeer : wellKnownPeers) {
-                        PeerImpl peer = findOrCreatePeer(wellKnownPeer, true);
-                        if (peer != null && now - peer.getLastUpdated() > 3600 && now - peer.getLastConnectAttempt() > 600) {
-                            peersService.submit(() -> {
-                                addPeer(peer);
-                                connectPeer(peer);
-                            });
-                        }
-                    }
-
-                    peers.values().parallelStream().unordered()
-                            .filter(peer -> peer.getLastInboundRequest() != 0 && now - peer.getLastInboundRequest() > 1800)
-                            .forEach(peer -> {
-                                peer.setLastInboundRequest(0);
-                                notifyListeners(peer, Event.REMOVE_INBOUND);
-                            });
-
-                } catch (Exception e) {
-                    Logger.logDebugMessage("Error connecting to peer", e);
-                }
-            } catch (Throwable t) {
-                Logger.logErrorMessage("CRITICAL ERROR. PLEASE REPORT TO THE DEVELOPERS.\n" + t.toString());
-                t.printStackTrace();
-                System.exit(1);
-            }
-
-        }
-
-    };
-
-    private static final Runnable getMorePeersThread = new GetMorePeersThread();
-
     static {
         Account.addListener(account -> peers.values().parallelStream().unordered()
                 .filter(peer -> peer.getHallmark() != null && peer.getHallmark().getAccountId() == account.getId())
@@ -494,13 +379,18 @@ public final class Peers {
 
     static {
         if (! Constants.isOffline) {
-            ThreadPool.scheduleThread("PeerConnecting", Peers.peerConnectingThread, 20);
-            ThreadPool.scheduleThread("PeerUnBlacklisting", Peers.peerUnBlacklistingThread, 60);
+            ThreadPool.scheduleThread("PeerConnecting", new PeerConnectingThread(), 20);
+            ThreadPool.scheduleThread("PeerUnBlacklisting", new PeerUnblacklistingThread(), 60);
             if (Peers.getMorePeers) {
-                ThreadPool.scheduleThread("GetMorePeers", Peers.getMorePeersThread, 20);
+                ThreadPool.scheduleThread("GetMorePeers", new GetMorePeersThread(), 20);
             }
             if (Peers.nodesRewardingEnabled) {
                 ThreadPool.scheduleThread("NodesMonitoring", new NodesMonitoringThread(), 10);
+            }
+            if (API.enabled()) {
+                // provide via API the extra info about peers (displayed in the client app)
+                // Note PeerLastBlockInfo is invoked on block pushed so no need to do this extra times by this schedule (argument debounceGap)
+                ThreadPool.scheduleThread("GetLastBlockInfo", PeerLastBlockInfo.get().getUpdater(28), 29);
             }
         }
     }
@@ -878,7 +768,7 @@ public final class Peers {
         return peers.size() > Peers.maxNumberOfKnownPeers;
     }
 
-    private static boolean hasEnoughConnectedPublicPeers(int limit) {
+    static boolean hasEnoughConnectedPublicPeers(int limit) {
         return getPeers(peer -> !peer.isBlacklisted() && peer.getState() == Peer.State.CONNECTED && peer.getAnnouncedAddress() != null
                 && (! Peers.enableHallmarkProtection || peer.getWeight() > 0), limit).size() >= limit;
     }

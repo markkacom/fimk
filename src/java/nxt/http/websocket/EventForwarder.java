@@ -1,24 +1,15 @@
 package nxt.http.websocket;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import nxt.Block;
-import nxt.BlockchainProcessor;
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.Trade;
-import nxt.Transaction;
-import nxt.TransactionProcessor;
+import nxt.*;
 import nxt.gossip.Gossip;
 import nxt.gossip.GossipProcessor;
 import nxt.peer.Peer;
+import nxt.peer.PeerLastBlockInfo;
 import nxt.peer.Peers;
 import nxt.util.Listener;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public final class EventForwarder {
   
@@ -195,34 +186,36 @@ public final class EventForwarder {
         Nxt.getBlockchainProcessor().addListener(new Listener<Block>() {
             @Override
             public void notify(Block block) {
-              
+
                 if ((Nxt.getEpochTime() - block.getTimestamp()) < ONE_DAY_SECONDS) {
                     MofoSocketServer.notifyBlock("BLOCKPUSHEDNEW", block);
-                    
+
                     if ( ! currentBlockTradeCache.isEmpty()) {
                         MofoSocketServer.notifyTrades("ADDEDTRADES", currentBlockTradeCache);
-                    }                    
+                    }
                 }
-              
+
                 MofoSocketServer.notifyBlockMinimal("BLOCKPUSHED", block);
-                
+
                 String topic = "BLOCKPUSHED-" + Long.toUnsignedString(block.getGeneratorId());
-                MofoSocketServer.notifyBlock(topic, block);              
-                
+                MofoSocketServer.notifyBlock(topic, block);
+
                 if ( ! currentBlockTradeCache.isEmpty()) {
-                  
+
                     Map<Long, List<Trade>> grouped = groupTradesAccount(currentBlockTradeCache);
                     for (Long accountId : grouped.keySet()) {
                         topic = "ADDEDTRADES-" + Long.toUnsignedString(accountId);
                         MofoSocketServer.notifyTrades(topic, grouped.get(accountId));
                     }
-                    
+
                     grouped = groupTradesAsset(currentBlockTradeCache);
                     for (Long assetId : grouped.keySet()) {
                         topic = "ADDEDTRADES*" + Long.toUnsignedString(assetId);
                         MofoSocketServer.notifyTrades(topic, grouped.get(assetId));
                     }
                 }
+
+                PeerLastBlockInfo.get().requestInfos(2000);
             }
         }, BlockchainProcessor.Event.BLOCK_PUSHED);
         
