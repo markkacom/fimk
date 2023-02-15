@@ -24,14 +24,12 @@ public class PeerConnectingThread implements Runnable {
                                     ? Peer.State.NON_CONNECTED
                                     : Peer.State.DISCONNECTED, false);
                             if (peer != null && now - peer.getLastConnectAttempt() > 600) {
-                                if (!Peers.enableHallmarkProtection || peer.getVersion() == null || peer.getWeight() > 0) {
-                                    peer.connect();
-                                    if (peer.getState() == Peer.State.CONNECTED &&
-                                            Peers.enableHallmarkProtection && peer.getWeight() == 0 &&
-                                            Peers.hasTooManyOutboundConnections()) {
-                                        Logger.logDebugMessage("Too many outbound connections, deactivating peer " + peer.getHost());
-                                        peer.deactivate();
-                                    }
+                                peer.connect();
+                                if (peer.getState() == Peer.State.CONNECTED &&
+                                        Peers.enableHallmarkProtection && peer.getWeight() == 0 &&
+                                        Peers.hasTooManyOutboundConnections()) {
+                                    Logger.logDebugMessage("Too many outbound connections, deactivating peer " + peer.getHost());
+                                    peer.deactivate();
                                 }
                             }
                         }));
@@ -41,11 +39,11 @@ public class PeerConnectingThread implements Runnable {
                     }
                 }
 
-                Peers.peers.values().parallelStream().unordered()
-                        .filter(peer -> peer.getState() == Peer.State.CONNECTED
-                                && now - peer.getLastUpdated() > 3600
-                                && now - peer.getLastConnectAttempt() > 600)
-                        .forEach(PeerImpl::connect);
+                for (PeerImpl peer : Peers.peers.values()) {
+                    if (peer.getState() == Peer.State.CONNECTED && now - peer.getLastUpdated() > 3600) {
+                        peer.connect();
+                    }
+                }
 
                 if (Peers.hasTooManyKnownPeers() && Peers.hasEnoughConnectedPublicPeers(Peers.maxNumberOfConnectedPublicPeers)) {
                     int initialSize = Peers.peers.size();
