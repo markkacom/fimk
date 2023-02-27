@@ -248,7 +248,6 @@ public final class DigitalGoodsStore {
 
         public static DbIterator<Goods> getAllGoods(int from, int to) {
             return goodsTable.getManyBy(goodsTermLimitClause(), from, to);
-            //return goodsTable.getAll(from, to);
         }
 
         public static DbIterator<Goods> getGoodsInStock(int from, int to) {
@@ -265,7 +264,11 @@ public final class DigitalGoodsStore {
             cal.add(Calendar.MONTH, -6);
             int maxGoodsTerm = Convert.toEpochTime(cal.getTimeInMillis());
             int now = Nxt.getEpochTime();
-            return new DbClause.FixedClause(String.format(" (goods.expiry IS NULL OR goods.expiry > %d) AND goods.timestamp > %d ", now, maxGoodsTerm));
+            // "goods.expiry = Integer.MAX_VALUE" means expiry is not set so default expiry interval since the good was created
+            return new DbClause.FixedClause(String.format(
+                    " ((goods.expiry > %d AND goods.expiry != %d) OR (goods.expiry = %d AND goods.timestamp > %d)) ",
+                    now, Integer.MAX_VALUE, Integer.MAX_VALUE, maxGoodsTerm
+            ));
         }
 
         public static DbIterator<Goods> getSellerGoods(final long sellerId, final boolean inStockOnly, int from, int to) {
