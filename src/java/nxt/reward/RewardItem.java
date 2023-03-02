@@ -67,7 +67,7 @@ public class RewardItem {
         public long campaignId;
         public long amount;
 
-        public TotalItem(int fromHeight, int toHeight, long accountId,  long assetId, NAME name, long campaignId, long amount) {
+        public TotalItem(int fromHeight, int toHeight, long accountId, long assetId, NAME name, long campaignId, long amount) {
             this.fromHeight = fromHeight;
             this.toHeight = toHeight;
             this.accountId = accountId;
@@ -169,6 +169,38 @@ public class RewardItem {
                             name,
                             rs.getLong(4),
                             rs.getLong(5)
+                    ));
+                }
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
+    /**
+     * Total reward amounts for account.
+     */
+    public static List<TotalItem> getTotals(long accountId) {
+        String sql = "select asset_id, name_code, sum(amount) from reward_item " +
+                "where account_id = ? " +
+                "group by asset_id, name_code ";
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+
+            pstmt.setLong(1, accountId);
+            List<TotalItem> result = new ArrayList<>();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    NAME name = NAME.resolve(rs.getInt(2));
+                    result.add(new TotalItem(
+                            0,
+                            Integer.MAX_VALUE,
+                            accountId,
+                            rs.getLong(1),
+                            name,
+                            0,
+                            rs.getLong(3)
                     ));
                 }
             }
