@@ -1113,6 +1113,8 @@ class NxtDbVersion extends DbVersion {
                         "CREATE INDEX IF NOT EXISTS reward_item_name_code_idx ON reward_item (name_code); " +
                         "CREATE INDEX IF NOT EXISTS reward_item_asset_id_idx ON reward_item (asset_id); ");
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
+//            case 441:
+//                apply("CALL FTL_CREATE_INDEX('PUBLIC', 'GOODS', 'NAME,DESCRIPTION,TAGS')");
             case 441:
                 return;
             default:
