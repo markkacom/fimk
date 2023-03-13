@@ -248,7 +248,7 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
         try {
             con = db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT " + table + ".*, ft.score FROM " + table + ", ftl_search_data(?, 2147483647, 0) ft "
-                    + " WHERE " + table + ".db_id = ft.keys[0] AND ft.`table` = ? " + (multiversion ? " AND " + table + ".latest = TRUE " : " ")
+                    + " WHERE " + table + ".db_id = ft.keys[1] AND ft.`table` = ? " + (multiversion ? " AND " + table + ".latest = TRUE " : " ")
                     + " AND " + dbClause.getClause() + sort
                     + DbUtils.limitsClause(from, to));
             int i = 0;
