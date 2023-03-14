@@ -244,6 +244,11 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final DbIterator<T> search(String query, DbClause dbClause, int from, int to, String sort) {
+        //Leading wildcard is not allowed (lucene feature)
+        while (query.startsWith("*")) {
+            query = query.substring(1);
+        }
+
         Connection con = null;
         try {
             con = db.getConnection();
