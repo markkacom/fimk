@@ -64,9 +64,26 @@ public class Starter {
                 if ("stopforging".equals(command)) {
                     Generator.stopForging();
                 }
+                // scan height validate
+                // for example: scan 5799989 true
+                if ("scan".equals(command)) {
+                    int height = 0;
+                    if (tokens.hasNext()) {
+                        height = Integer.parseInt(tokens.next());
+                    }
+                    boolean validate = false;
+                    if (tokens.hasNext()) {
+                        validate = Boolean.parseBoolean(tokens.next());
+                    }
+                    try {
+                        Nxt.getBlockchainProcessor().setGetMoreBlocks(false);
+                        Nxt.getBlockchainProcessor().scan(height, validate);
+                    } finally {
+                        Nxt.getBlockchainProcessor().setGetMoreBlocks(true);
+                    }
+                }
             }
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
