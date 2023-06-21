@@ -1,17 +1,8 @@
 /******************************************************************************
- * Copyright © 2014-2016 FIMK Developers                                      *
+ * Copyright Â© 2014-2023 FIMK Developers                                      *
  ******************************************************************************/
 
 Welcome to FIMK.
-
-FIMK is open source software and based on NXT 
-(https://bitbucket.org/JeanLucPicard/nxt/overview). 
-
-This is FIMK version 0.6.0 which is based on NXT 1.5.10.
-
-FIMK 0.6.0 is a mandatory update, you must update to this version before:
-
-                    Jan 18th 2016 - 21.00 GMT
 
 Running the FIMK software:
 
