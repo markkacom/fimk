@@ -1243,6 +1243,21 @@ public abstract class TransactionType {
             @Override
             void doValidateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 Attachment.DigitalGoodsListing attachment = (Attachment.DigitalGoodsListing) transaction.getAttachment();
+
+                // before fork LISTING attachment version must be 1 after must be > 1
+                boolean isFork = HardFork.MARKETPLACE_PRICE_IN_ASSET_BLOCK(transaction.getHeight());
+                if (isFork) {
+                    if (attachment.getVersion() < 2) {
+                        throw new NxtException.NotValidException(String.format(
+                                "Version mismatch, actual %d, expected not less 2", attachment.getVersion()
+                        ));
+                    }
+                } else {
+                    if (attachment.getVersion() > 1) {
+                        throw new NxtException.NotYetEnabledException("Marketplace pricing in asset not yet enabled");
+                    }
+                }
+
                 if (attachment.getName().length() == 0
                         || attachment.getName().length() > Constants.MAX_DGS_LISTING_NAME_LENGTH
                         || attachment.getDescription().length() > Constants.MAX_DGS_LISTING_DESCRIPTION_LENGTH
@@ -1471,10 +1486,22 @@ public abstract class TransactionType {
 
             @Override
             protected boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+                /* 1) check asset/fimk balance; 2) update balance */
                 Attachment.DigitalGoodsPurchase attachment = (Attachment.DigitalGoodsPurchase) transaction.getAttachment();
-                if (senderAccount.getUnconfirmedBalanceNQT() >= Math.multiplyExact((long) attachment.getQuantity(), attachment.getPriceNQT())) {
-                    senderAccount.addToUnconfirmedBalanceNQT(-Math.multiplyExact((long) attachment.getQuantity(), attachment.getPriceNQT()));
-                    return true;
+                DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(attachment.getGoodsId());
+                long assetId = goods.getAssetId();
+                long sum = Math.multiplyExact(attachment.getQuantity(), attachment.getPriceNQT());
+                if (assetId == 0) {
+                    if (senderAccount.getUnconfirmedBalanceNQT() >= sum) {
+                        senderAccount.addToUnconfirmedBalanceNQT(-sum);
+                        return true;
+                    }
+                } else {
+                    long assetBalance = Account.getUnconfirmedAssetBalanceQNT(senderAccount.getId(), assetId);
+                    if (assetBalance >= sum) {
+                        senderAccount.addToUnconfirmedAssetBalanceQNT(assetId, -sum);
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -1482,7 +1509,14 @@ public abstract class TransactionType {
             @Override
             protected void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
                 Attachment.DigitalGoodsPurchase attachment = (Attachment.DigitalGoodsPurchase) transaction.getAttachment();
-                senderAccount.addToUnconfirmedBalanceNQT(Math.multiplyExact((long) attachment.getQuantity(), attachment.getPriceNQT()));
+                DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(attachment.getGoodsId());
+                long assetId = goods.getAssetId();
+                long sum = Math.multiplyExact(attachment.getQuantity(), attachment.getPriceNQT());
+                if (assetId == 0) {
+                    senderAccount.addToUnconfirmedBalanceNQT(sum);
+                } else {
+                    senderAccount.addToUnconfirmedAssetBalanceQNT(assetId, sum);
+                }
             }
 
             @Override
@@ -1495,17 +1529,18 @@ public abstract class TransactionType {
             void doValidateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 Attachment.DigitalGoodsPurchase attachment = (Attachment.DigitalGoodsPurchase) transaction.getAttachment();
                 DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(attachment.getGoodsId());
+                if (goods == null || goods.isDelisted()) {
+                    throw new NxtException.NotCurrentlyValidException("Goods " + Long.toUnsignedString(attachment.getGoodsId()) +
+                            "not yet listed or already delisted");
+                }
                 if (attachment.getQuantity() <= 0 || attachment.getQuantity() > Constants.MAX_DGS_LISTING_QUANTITY
-                        || attachment.getPriceNQT() <= 0 || attachment.getPriceNQT() > Constants.MAX_BALANCE_NQT
-                        || (goods != null && goods.getSellerId() != transaction.getRecipientId())) {
+                        || attachment.getPriceNQT() <= 0
+                        || (goods.getAssetId() == 0 && attachment.getPriceNQT() > Constants.MAX_BALANCE_NQT)
+                        || (goods.getSellerId() != transaction.getRecipientId())) {
                     throw new NxtException.NotValidException("Invalid digital goods purchase: " + attachment.getJSONObject());
                 }
                 if (transaction.getEncryptedMessage() != null && ! transaction.getEncryptedMessage().isText()) {
                     throw new NxtException.NotValidException("Only text encrypted messages allowed");
-                }
-                if (goods == null || goods.isDelisted()) {
-                    throw new NxtException.NotCurrentlyValidException("Goods " + Long.toUnsignedString(attachment.getGoodsId()) +
-                            "not yet listed or already delisted");
                 }
                 if (attachment.getQuantity() > goods.getQuantity()) {
                     throw new NxtException.NotCurrentlyValidException("Goods quantity exceeds the available balance: " + attachment.getJSONObject());
@@ -1572,16 +1607,22 @@ public abstract class TransactionType {
             void doValidateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 Attachment.DigitalGoodsDelivery attachment = (Attachment.DigitalGoodsDelivery) transaction.getAttachment();
                 DigitalGoodsStore.Purchase purchase = DigitalGoodsStore.Purchase.getPendingPurchase(attachment.getPurchaseId());
+                long assetId = 0;
+                if (purchase != null) {
+                    DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(purchase.getGoodsId());
+                    assetId = goods.getAssetId();
+                }
                 int maxGoodsLength = Nxt.getBlockchain().getHeight() > Constants.VOTING_SYSTEM_BLOCK
                         ? Constants.MAX_DGS_GOODS_LENGTH_2 : Constants.MAX_DGS_GOODS_LENGTH;
                 if (attachment.getGoods().getData().length > maxGoodsLength
                         || attachment.getGoods().getData().length == 0
                         || attachment.getGoods().getNonce().length != 32
-                        || attachment.getDiscountNQT() < 0 || attachment.getDiscountNQT() > Constants.MAX_BALANCE_NQT
+                        || attachment.getDiscountNQT() < 0
+                        || (assetId == 0 && attachment.getDiscountNQT() > Constants.MAX_BALANCE_NQT)
                         || (purchase != null &&
                         (purchase.getBuyerId() != transaction.getRecipientId()
                                 || transaction.getSenderId() != purchase.getSellerId()
-                                || attachment.getDiscountNQT() > Math.multiplyExact(purchase.getPriceNQT(), (long) purchase.getQuantity())))) {
+                                || attachment.getDiscountNQT() > Math.multiplyExact(purchase.getPriceNQT(), purchase.getQuantity())))) {
                     throw new NxtException.NotValidException("Invalid digital goods delivery: " + attachment.getJSONObject());
                 }
                 if (purchase == null || purchase.getEncryptedGoods() != null) {

@@ -85,6 +85,10 @@ public class HardFork {
         return (height == -1 ? Nxt.getBlockchain().getHeight() : height) > Constants.POS_POP_REWARD_BLOCK;
     }
 
+    public static boolean MARKETPLACE_PRICE_IN_ASSET_BLOCK(int height) {
+        return (height == -1 ? Nxt.getBlockchain().getHeight() : height) > Constants.MARKETPLACE_PRICE_IN_ASSET_BLOCK;
+    }
+
     public static boolean PRIVATE_ASSETS_BLOCK() {
         return Nxt.getBlockchain().getHeight() > Constants.PRIVATE_ASSETS_BLOCK;
     }

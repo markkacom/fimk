@@ -302,6 +302,9 @@ public final class JSONData {
         json.put("description", goods.getDescription());
         json.put("quantity", goods.getQuantity());
         json.put("priceNQT", String.valueOf(goods.getPriceNQT()));
+
+        addAssetInfo(json, goods.getAssetId());
+
         putAccount(json, "seller", goods.getSellerId());
         json.put("tags", goods.getTags());
         JSONArray tagsJSON = new JSONArray();
@@ -554,6 +557,10 @@ public final class JSONData {
         if (purchase.getRefundNQT() > 0) {
             json.put("refundNQT", String.valueOf(purchase.getRefundNQT()));
         }
+
+        DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(purchase.getGoodsId());
+        addAssetInfo(json, goods.getAssetId());
+
         return json;
     }
 
@@ -890,6 +897,22 @@ public final class JSONData {
         json.put("decimals", total.decimals);
         json.put("amount", String.valueOf(total.amount));
         return json;
+    }
+
+    private static void addAssetInfo(JSONObject json, long assetId) {
+        json.put("asset", Long.toUnsignedString(assetId));
+        String assetName;
+        int assetDecimals;
+        if (assetId == 0) {
+            assetName = "FIM";
+            assetDecimals = 8;
+        } else {
+            Asset asset = Asset.getAsset(assetId);
+            assetName = asset.getName();
+            assetDecimals = asset.getDecimals();
+        }
+        json.put("assetName", assetName);
+        json.put("assetDecimals", assetDecimals);
     }
 
 }

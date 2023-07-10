@@ -16,19 +16,13 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.NxtException;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.INCORRECT_DGS_LISTING_DESCRIPTION;
-import static nxt.http.JSONResponses.INCORRECT_DGS_LISTING_NAME;
-import static nxt.http.JSONResponses.INCORRECT_DGS_LISTING_TAGS;
-import static nxt.http.JSONResponses.MISSING_NAME;
+import static nxt.http.JSONResponses.*;
 
 public final class DGSListing extends CreateTransaction {
 
@@ -46,6 +40,7 @@ public final class DGSListing extends CreateTransaction {
         String description = Convert.nullToEmpty(req.getParameter("description"));
         String tags = Convert.nullToEmpty(req.getParameter("tags"));
         long priceNQT = ParameterParser.getPriceNQT(req);
+        long assetId = ParameterParser.getUnsignedLong(req, "asset", false, true);
         int quantity = ParameterParser.getGoodsQuantity(req);
 
         if (name == null) {
@@ -64,8 +59,13 @@ public final class DGSListing extends CreateTransaction {
             return INCORRECT_DGS_LISTING_TAGS;
         }
 
+        if (assetId != 0) {
+            Asset asset = Asset.getAsset(assetId);
+            if (asset == null) throw new ParameterException(UNKNOWN_ASSET);
+        }
+
         Account account = ParameterParser.getSenderAccount(req);
-        Attachment attachment = new Attachment.DigitalGoodsListing(name, description, tags, quantity, priceNQT);
+        Attachment attachment = new Attachment.DigitalGoodsListing(name, description, tags, quantity, priceNQT, assetId);
         return createTransaction(req, account, attachment);
 
     }

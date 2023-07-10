@@ -198,6 +198,14 @@ final class ParameterParser {
         return getLong(req, "amountNQT", 1L, Constants.MAX_BALANCE_NQT, true);
     }
 
+    static long getQuantityQNT(HttpServletRequest req) throws ParameterException {
+        return getLong(req, "quantityQNT", 1L, Constants.MAX_ASSET_QUANTITY_QNT, true);
+    }
+
+    static long getAmountNQTPerQNT(HttpServletRequest req) throws ParameterException {
+        return getLong(req, "amountNQTPerQNT", 1L, Constants.MAX_BALANCE_NQT, true);
+    }
+
     static long getFeeNQT(HttpServletRequest req) throws ParameterException {
         return getLong(req, "feeNQT", 0L, Constants.MAX_BALANCE_NQT, true);
     }
@@ -252,14 +260,6 @@ final class ParameterParser {
             throw new ParameterException(UNKNOWN_OFFER);
         }
         return offer;
-    }
-
-    static long getQuantityQNT(HttpServletRequest req) throws ParameterException {
-        return getLong(req, "quantityQNT", 1L, Constants.MAX_ASSET_QUANTITY_QNT, true);
-    }
-
-    static long getAmountNQTPerQNT(HttpServletRequest req) throws ParameterException {
-        return getLong(req, "amountNQTPerQNT", 1L, Constants.MAX_BALANCE_NQT, true);
     }
 
     static DigitalGoodsStore.Goods getGoods(HttpServletRequest req) throws ParameterException {

@@ -47,8 +47,15 @@ public final class DigitalGoodsStore {
             }
             for (Purchase purchase : expiredPurchases) {
                 Account buyer = Account.getAccount(purchase.getBuyerId());
-                buyer.addToUnconfirmedBalanceNQT(Math.multiplyExact((long) purchase.getQuantity(), purchase.getPriceNQT()));
-                Goods.getGoods(purchase.getGoodsId()).changeQuantity(purchase.getQuantity());
+                Goods goods = Goods.getGoods(purchase.getGoodsId());
+                long assetId = goods.getAssetId();
+                long sum = Math.multiplyExact(purchase.getQuantity(), purchase.getPriceNQT());
+                if (assetId == 0) {
+                    buyer.addToUnconfirmedBalanceNQT(sum);
+                } else {
+                    buyer.addToUnconfirmedAssetBalanceQNT(assetId, sum);
+                }
+                goods.changeQuantity(purchase.getQuantity());
                 purchase.setPending(false);
             }
         }, BlockchainProcessor.Event.AFTER_BLOCK_APPLY);
@@ -314,6 +321,7 @@ public final class DigitalGoodsStore {
         private final int timestamp;
         private int quantity;
         private long priceNQT;
+        private final long assetId;
         private boolean delisted;
         private int expiry;
 
@@ -327,6 +335,7 @@ public final class DigitalGoodsStore {
             this.parsedTags = Search.parseTags(this.tags, 3, 20, 3);
             this.quantity = attachment.getQuantity();
             this.priceNQT = attachment.getPriceNQT();
+            this.assetId = attachment.getAssetId();
             this.delisted = false;
             this.timestamp = Nxt.getBlockchain().getLastBlockTimestamp();
             this.expiry = Integer.MAX_VALUE;  // MAX_VALUE means "no expiry"
@@ -343,6 +352,8 @@ public final class DigitalGoodsStore {
             this.parsedTags = Arrays.copyOf(array, array.length, String[].class);
             this.quantity = rs.getInt("quantity");
             this.priceNQT = rs.getLong("price");
+            this.priceNQT = rs.getLong("price");
+            this.assetId = rs.getLong("asset_id");
             this.delisted = rs.getBoolean("delisted");
             this.timestamp = rs.getInt("timestamp");
             int v = rs.getInt("expiry");
@@ -351,8 +362,8 @@ public final class DigitalGoodsStore {
 
         private void save(Connection con) throws SQLException {
             try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO goods (id, seller_id, name, "
-                    + "description, tags, parsed_tags, timestamp, quantity, price, delisted, height, expiry, latest) KEY (id, height) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
+                    + "description, tags, parsed_tags, timestamp, quantity, price, asset_id, delisted, height, expiry, latest) KEY (id, height) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
                 int i = 0;
                 pstmt.setLong(++i, this.id);
                 pstmt.setLong(++i, this.sellerId);
@@ -363,6 +374,7 @@ public final class DigitalGoodsStore {
                 pstmt.setInt(++i, this.timestamp);
                 pstmt.setInt(++i, this.quantity);
                 pstmt.setLong(++i, this.priceNQT);
+                pstmt.setLong(++i, this.assetId);
                 pstmt.setBoolean(++i, this.delisted);
                 pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
                 pstmt.setInt(++i, this.expiry);
@@ -429,6 +441,15 @@ public final class DigitalGoodsStore {
             return priceNQT;
         }
 
+        /**
+         * Pricing asset/FIMK.
+         * 0 means FIMK, otherwise it is the asset id.
+         * @return asset id or 0 (FIMK) of pricing
+         */
+        public long getAssetId() {
+            return assetId;
+        }
+
         private void changePrice(long priceNQT) {
             this.priceNQT = priceNQT;
             goodsTable.insert(this);
@@ -453,7 +474,6 @@ public final class DigitalGoodsStore {
         public String[] getParsedTags() {
             return parsedTags;
         }
-
     }
 
     public static final class Purchase {
@@ -955,7 +975,7 @@ public final class DigitalGoodsStore {
     }
 
     static void changeQuantity(long goodsId, int deltaQuantity) {
-        Goods goods = Goods.goodsTable.get(Goods.goodsDbKeyFactory.newKey(goodsId));
+        Goods goods = Goods.getGoods(goodsId);
         if (! goods.isDelisted()) {
             goods.changeQuantity(deltaQuantity);
             goodsListeners.notify(goods, Event.GOODS_QUANTITY_CHANGE);
@@ -965,7 +985,7 @@ public final class DigitalGoodsStore {
     }
 
     static void purchase(Transaction transaction,  Attachment.DigitalGoodsPurchase attachment) {
-        Goods goods = Goods.goodsTable.get(Goods.goodsDbKeyFactory.newKey(attachment.getGoodsId()));
+        Goods goods = Goods.getGoods(attachment.getGoodsId());
         if (! goods.isDelisted() && attachment.getQuantity() <= goods.getQuantity() && attachment.getPriceNQT() == goods.getPriceNQT()
                 && (attachment.getDeliveryDeadlineTimestamp() > Nxt.getBlockchain().getLastBlockTimestamp()
                 || Nxt.getBlockchain().getHeight() >= Constants.VOTING_SYSTEM_BLOCK)) { // temporary
@@ -974,21 +994,43 @@ public final class DigitalGoodsStore {
             Purchase.purchaseTable.insert(purchase);
             purchaseListeners.notify(purchase, Event.PURCHASE);
         } else {
-            Account buyer = Account.getAccount(transaction.getSenderId());
-            buyer.addToUnconfirmedBalanceNQT(Math.multiplyExact((long) attachment.getQuantity(), attachment.getPriceNQT()));
             // restoring the unconfirmed balance if purchase not successful, however buyer still lost the transaction fees
+            Account buyer = Account.getAccount(transaction.getSenderId());
+            long assetId = goods.getAssetId();
+            long sum = Math.multiplyExact(attachment.getQuantity(), attachment.getPriceNQT());
+            if (assetId == 0) {
+                buyer.addToUnconfirmedBalanceNQT(sum);
+            } else {
+                buyer.addToUnconfirmedAssetBalanceQNT(assetId, sum);
+            }
         }
     }
 
     static void deliver(Transaction transaction, Attachment.DigitalGoodsDelivery attachment) {
         Purchase purchase = Purchase.getPendingPurchase(attachment.getPurchaseId());
         purchase.setPending(false);
-        long totalWithoutDiscount = Math.multiplyExact((long) purchase.getQuantity(), purchase.getPriceNQT());
+        long totalWithoutDiscount = Math.multiplyExact(purchase.getQuantity(), purchase.getPriceNQT());
+        Goods goods = Goods.getGoods(purchase.getGoodsId());
+        long assetId = goods.getAssetId();
+
         Account buyer = Account.getAccount(purchase.getBuyerId());
-        buyer.addToBalanceNQT(Math.subtractExact(attachment.getDiscountNQT(), totalWithoutDiscount));
-        buyer.addToUnconfirmedBalanceNQT(attachment.getDiscountNQT());
+        long sum = Math.subtractExact(attachment.getDiscountNQT(), totalWithoutDiscount);
+        if (assetId == 0) {
+            buyer.addToBalanceNQT(sum);
+            buyer.addToUnconfirmedBalanceNQT(attachment.getDiscountNQT());
+        } else {
+            buyer.addToAssetBalanceQNT(assetId, sum);
+            buyer.addToUnconfirmedAssetBalanceQNT(assetId, attachment.getDiscountNQT());
+        }
+
         Account seller = Account.getAccount(transaction.getSenderId());
-        seller.addToBalanceAndUnconfirmedBalanceNQT(Math.subtractExact(totalWithoutDiscount, attachment.getDiscountNQT()));
+        sum = Math.subtractExact(totalWithoutDiscount, attachment.getDiscountNQT());
+        if (assetId == 0) {
+            seller.addToBalanceAndUnconfirmedBalanceNQT(sum);
+        } else {
+            seller.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, sum);
+        }
+
         purchase.setEncryptedGoods(attachment.getGoods(), attachment.goodsIsText());
         purchase.setDiscountNQT(attachment.getDiscountNQT());
         purchaseListeners.notify(purchase, Event.DELIVERY);
@@ -996,10 +1038,17 @@ public final class DigitalGoodsStore {
 
     static void refund(long sellerId, long purchaseId, long refundNQT, Appendix.EncryptedMessage encryptedMessage) {
         Purchase purchase = Purchase.purchaseTable.get(Purchase.purchaseDbKeyFactory.newKey(purchaseId));
+        Goods goods = Goods.getGoods(purchase.getGoodsId());
+        long assetId = goods.getAssetId();
         Account seller = Account.getAccount(sellerId);
-        seller.addToBalanceNQT(-refundNQT);
         Account buyer = Account.getAccount(purchase.getBuyerId());
-        buyer.addToBalanceAndUnconfirmedBalanceNQT(refundNQT);
+        if (assetId == 0) {
+            seller.addToBalanceNQT(-refundNQT);
+            buyer.addToBalanceAndUnconfirmedBalanceNQT(refundNQT);
+        } else {
+            seller.addToAssetBalanceQNT(assetId, -refundNQT);
+            buyer.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, refundNQT);
+        }
         if (encryptedMessage != null) {
             purchase.setRefundNote(encryptedMessage.getEncryptedData());
         }

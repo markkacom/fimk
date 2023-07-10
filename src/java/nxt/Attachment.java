@@ -865,6 +865,7 @@ public interface Attachment extends Appendix {
         private final String tags;
         private final int quantity;
         private final long priceNQT;
+        private final long assetId;
 
         DigitalGoodsListing(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
@@ -873,6 +874,7 @@ public interface Attachment extends Appendix {
             this.tags = Convert.readString(buffer, buffer.getShort(), Constants.MAX_DGS_LISTING_TAGS_LENGTH);
             this.quantity = buffer.getInt();
             this.priceNQT = buffer.getLong();
+            this.assetId = getVersion() > 1 ? buffer.getLong() : 0;
         }
 
         DigitalGoodsListing(JSONObject attachmentData) {
@@ -882,20 +884,24 @@ public interface Attachment extends Appendix {
             this.tags = (String) attachmentData.get("tags");
             this.quantity = ((Long) attachmentData.get("quantity")).intValue();
             this.priceNQT = Convert.parseLong(attachmentData.get("priceNQT"));
+            this.assetId = getVersion() > 1 ? Convert.parseLong(attachmentData.get("asset")) : 0;
         }
 
-        public DigitalGoodsListing(String name, String description, String tags, int quantity, long priceNQT) {
+        public DigitalGoodsListing(String name, String description, String tags, int quantity, long priceNQT, long assetId) {
+            super(HardFork.MARKETPLACE_PRICE_IN_ASSET_BLOCK(-1) ? 2 : 1);
             this.name = name;
             this.description = description;
             this.tags = tags;
             this.quantity = quantity;
             this.priceNQT = priceNQT;
+            this.assetId = getVersion() > 1 ? assetId : 0;
         }
 
         @Override
         protected int getMySize() {
             return 2 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 2
-                        + Convert.toBytes(tags).length + 4 + 8;
+                    + Convert.toBytes(tags).length + 4 + 8
+                    + (getVersion() > 1 ? 8 : 0);
         }
 
         @Override
@@ -911,6 +917,7 @@ public interface Attachment extends Appendix {
             buffer.put(tagsBytes);
             buffer.putInt(quantity);
             buffer.putLong(priceNQT);
+            if (getVersion() > 1) buffer.putLong(assetId);
         }
 
         @Override
@@ -920,6 +927,7 @@ public interface Attachment extends Appendix {
             attachment.put("tags", tags);
             attachment.put("quantity", quantity);
             attachment.put("priceNQT", priceNQT);
+            if (getVersion() > 1) attachment.put("asset", assetId);
         }
 
         @Override
@@ -936,6 +944,10 @@ public interface Attachment extends Appendix {
         public int getQuantity() { return quantity; }
 
         public long getPriceNQT() { return priceNQT; }
+
+        public long getAssetId() {
+            return assetId;
+        }
 
     }
 
