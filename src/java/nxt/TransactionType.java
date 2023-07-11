@@ -1734,20 +1734,34 @@ public abstract class TransactionType {
                 return new Attachment.DigitalGoodsRefund(attachmentData);
             }
 
-            @Override
-            protected boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
-                Attachment.DigitalGoodsRefund attachment = (Attachment.DigitalGoodsRefund) transaction.getAttachment();
-                if (senderAccount.getUnconfirmedBalanceNQT() >= attachment.getRefundNQT()) {
-                    senderAccount.addToUnconfirmedBalanceNQT(-attachment.getRefundNQT());
-                    return true;
+            private boolean applyUnconfirmedInternal(Attachment.DigitalGoodsRefund attachment, Account senderAccount, int coef) {
+                DigitalGoodsStore.Purchase purchase = DigitalGoodsStore.Purchase.getPurchase(attachment.getPurchaseId());
+                DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(purchase.getGoodsId());
+                long assetId = goods.getAssetId();
+                if (assetId == 0) {
+                    if (senderAccount.getUnconfirmedBalanceNQT() >= attachment.getRefundNQT()) {
+                        senderAccount.addToUnconfirmedBalanceNQT(coef * attachment.getRefundNQT());
+                        return true;
+                    }
+                } else {
+                    if (senderAccount.getUnconfirmedAssetBalanceQNT(assetId) >= attachment.getRefundNQT()) {
+                        senderAccount.addToUnconfirmedAssetBalanceQNT(assetId, coef * attachment.getRefundNQT());
+                        return true;
+                    }
                 }
                 return false;
             }
 
             @Override
+            protected boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+                Attachment.DigitalGoodsRefund attachment = (Attachment.DigitalGoodsRefund) transaction.getAttachment();
+                return applyUnconfirmedInternal(attachment, senderAccount, -1);
+            }
+
+            @Override
             protected void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
                 Attachment.DigitalGoodsRefund attachment = (Attachment.DigitalGoodsRefund) transaction.getAttachment();
-                senderAccount.addToUnconfirmedBalanceNQT(attachment.getRefundNQT());
+                applyUnconfirmedInternal(attachment, senderAccount, 1);
             }
 
             @Override
