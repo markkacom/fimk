@@ -160,7 +160,7 @@ public class DesktopSystemTray {
         addDataRow(statusPanel, "Process id", Nxt.getProcessId());
         if (statusDialog == null || !statusDialog.isVisible()) {
             JOptionPane pane = new JOptionPane(statusPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, imageIcon);
-            statusDialog = pane.createDialog(wrapper, "NXT Server Status");
+            statusDialog = pane.createDialog(wrapper, "FIM Server Status");
             statusDialog.setVisible(true);
             statusDialog.dispose();
         } else {

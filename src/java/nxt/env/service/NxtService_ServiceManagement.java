@@ -36,8 +36,8 @@ public class NxtService_ServiceManagement {
     // Invoked when registering the service
     public static String[] serviceGetInfo() {
         return new String[]{
-                "NXT Server", // Long name
-                "Manages the NXT cryptographic currency protocol", // Description
+                "FIM Server", // Long name
+                "Manages the FIM cryptographic currency protocol", // Description
                 "true", // IsAutomatic
                 "true", // IsAcceptStop
                 "", // failure exe
@@ -52,7 +52,7 @@ public class NxtService_ServiceManagement {
     }
 
     public static boolean serviceIsCreate() {
-        return JOptionPane.showConfirmDialog(null, "Do you want to install the NXT service ?", "Create Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        return JOptionPane.showConfirmDialog(null, "Do you want to install the FIM service ?", "Create Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
     public static boolean serviceIsLaunch() {
@@ -60,7 +60,7 @@ public class NxtService_ServiceManagement {
     }
 
     public static boolean serviceIsDelete() {
-        return JOptionPane.showConfirmDialog(null, "This NXT service is already installed. Do you want to delete it ?", "Delete Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        return JOptionPane.showConfirmDialog(null, "This FIM service is already installed. Do you want to delete it ?", "Delete Service", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
     public static boolean serviceControl_Pause() {

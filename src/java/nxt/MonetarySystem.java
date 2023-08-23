@@ -217,7 +217,7 @@ public abstract class MonetarySystem extends TransactionType {
         protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
             Attachment.MonetarySystemReserveIncrease attachment = (Attachment.MonetarySystemReserveIncrease) transaction.getAttachment();
             if (attachment.getAmountPerUnitNQT() <= 0) {
-                throw new NxtException.NotValidException("Reserve increase NXT amount must be positive: " + attachment.getAmountPerUnitNQT());
+                throw new NxtException.NotValidException("Reserve increase FIM amount must be positive: " + attachment.getAmountPerUnitNQT());
             }
             CurrencyType.validate(Currency.getCurrency(attachment.getCurrencyId()), transaction);
         }

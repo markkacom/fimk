@@ -436,7 +436,7 @@ public final class Nxt {
                 if (API.getBrowserUri() != null) {
                     Logger.logMessage("Client UI is at " + API.getBrowserUri());
                 }
-                setServerStatus("NXT Server - Online", API.getBrowserUri());
+                setServerStatus("FIM Server - Online", API.getBrowserUri());
                 if (Constants.isTestnet) {
                     Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
                 }

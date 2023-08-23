@@ -44,7 +44,7 @@ public class APITestServlet extends HttpServlet {
             "    <meta charset=\"UTF-8\"/>\n" +
             "    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">" +
             "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" + 
-            "    <title>Nxt http API</title>\n" +
+            "    <title>FIM http API</title>\n" +
             "    <link href=\"css/bootstrap.min.css\" rel=\"stylesheet\" type=\"text/css\" />" +
             "    <link href=\"css/font-awesome.min.css\" rel=\"stylesheet\" type=\"text/css\" />" +
             "    <link href=\"css/highlight.style.css\" rel=\"stylesheet\" type=\"text/css\" />" +
@@ -58,7 +58,7 @@ public class APITestServlet extends HttpServlet {
             "<div class=\"navbar navbar-default\" role=\"navigation\">" +
             "   <div class=\"container\" style=\"min-width: 90%;\">" +
             "       <div class=\"navbar-header\">" +
-            "           <a class=\"navbar-brand\" href=\"/test\">Nxt http API</a>" + 
+            "           <a class=\"navbar-brand\" href=\"/test\">FIM http API</a>" +
             "       </div>" +
             "       <div class=\"navbar-collapse collapse\">" +
             "           <ul class=\"nav navbar-nav navbar-right\">" +
