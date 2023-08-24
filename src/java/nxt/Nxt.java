@@ -54,9 +54,8 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.8.1"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
+    public static final String VERSION = "0.8.2"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
     public static final String MIN_VERSION = "0.6.1"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
@@ -436,7 +435,7 @@ public final class Nxt {
                 if (API.getBrowserUri() != null) {
                     Logger.logMessage("Client UI is at " + API.getBrowserUri());
                 }
-                setServerStatus("NXT Server - Online", API.getBrowserUri());
+                setServerStatus("FIM Server - Online", API.getBrowserUri());
                 if (Constants.isTestnet) {
                     Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
                 }

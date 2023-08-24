@@ -780,7 +780,7 @@ final class BlockchainProcessorImpl implements BlockchainProcessor {
     @Override
     public void registerDerivedTable(DerivedDbTable table) {
         if (alreadyInitialized) {
-            throw new IllegalStateException("Too late to register table " + table + ", must have done it in Nxt.Init");
+            throw new IllegalStateException("Too late to register table " + table + ", must have done it in Init");
         }
         derivedTables.add(table);
     }
