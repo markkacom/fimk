@@ -54,9 +54,8 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.8.1"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
+    public static final String VERSION = "0.8.2"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
     public static final String MIN_VERSION = "0.6.1"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
