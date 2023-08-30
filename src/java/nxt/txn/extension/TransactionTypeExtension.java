@@ -5,6 +5,10 @@ import nxt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Transaction Extension should not change any data (blockchain) created during transaction core processing.
+ * Needed data can be added to extra structures (fields, records).
+ */
 public abstract class TransactionTypeExtension {
 
     static Map<String, TransactionTypeExtension> transactionTypeExtensionMap = new HashMap<>(2);
@@ -24,6 +28,10 @@ public abstract class TransactionTypeExtension {
                 MofoTransactions.NamespacedAliasAssignmentTransaction.NAMESPACED_ALIAS_ASSIGNMENT,
                 new RegisterNodeTokenExtension()
         );
+        register(
+                nxt.TransactionType.Data.TAGGED_DATA_UPLOAD,
+                new ItemImageExtension()
+        );
     }
 
     public static void register(TransactionType transactionType, TransactionTypeExtension extension) {
@@ -36,23 +44,36 @@ public abstract class TransactionTypeExtension {
     }
 
     /**
+     * Transaction can be used of any type. Transaction can contain some data that is mark that transaction carries the extension data.
+     * For example message transaction contains marker "X7()RooNyeudmbchydj" (start of message) and there is implemented
+     * extension for this marker. So all message transaction where message text is started with this marker are processed
+     * using the extension.
+     * @param transaction
+     * @return
+     */
+    public static TransactionTypeExtension get(Transaction transaction) {
+        Attachment att = transaction.getAttachment();
+
+        if (att instanceof MofoAttachment.NamespacedAliasAssignmentAttachment) {
+            String mark = ((MofoAttachment.NamespacedAliasAssignmentAttachment) att).getAliasName();
+            return transactionTypeExtensionMap.get(extensionKey(transaction.getType(), mark));
+        }
+
+        /* Add the logic to marked transaction of type TaggedDataUpload: save URL or picture for asset */
+        if (att instanceof Attachment.TaggedDataUpload) {
+            String mark = ((Attachment.TaggedDataUpload) att).getChannel();
+            return transactionTypeExtensionMap.get(extensionKey(transaction.getType(), mark));
+        }
+
+        return null;
+    }
+
+    /**
      * Used to distinguish extensions when they are carried in same type transactions extensions when they are carried in same type transactions
      */
     protected abstract String getMark();
 
     public abstract String getName();
-
-    public static TransactionTypeExtension get(Transaction transaction) {
-        MofoAttachment.NamespacedAliasAssignmentAttachment a;
-        Attachment att = transaction.getAttachment();
-        if (att instanceof MofoAttachment.NamespacedAliasAssignmentAttachment) {
-            a = (MofoAttachment.NamespacedAliasAssignmentAttachment) att;
-        } else {
-            return null;
-        }
-        String mark = a.getAliasName();
-        return transactionTypeExtensionMap.get(extensionKey(transaction.getType(), mark));
-    }
 
     private static String extensionKey(TransactionType t, String mark) {
         return t.getType() + "-" + t.getSubtype() + "-" + mark;

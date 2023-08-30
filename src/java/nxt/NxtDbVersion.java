@@ -1115,6 +1115,7 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
             case 441:
                 apply("ALTER TABLE goods ADD COLUMN IF NOT EXISTS asset_id BIGINT DEFAULT 0");
+                apply("ALTER TABLE tagged_data ADD COLUMN IF NOT EXISTS ext_ftr3_status TINYINT");
             case 442:
                 return;
             default:

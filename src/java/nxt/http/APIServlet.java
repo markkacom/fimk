@@ -279,6 +279,7 @@ public final class APIServlet extends HttpServlet {
         map.put("getAllTaggedData", GetAllTaggedData.instance);
         map.put("getChannelTaggedData", GetChannelTaggedData.instance);
         map.put("getTaggedData", GetTaggedData.instance);
+        map.put("getAssetGoodsImage", GetAssetGoodsImage.instance);
         map.put("downloadTaggedData", DownloadTaggedData.instance);
         map.put("getDataTags", GetDataTags.instance);
         map.put("getDataTagCount", GetDataTagCount.instance);

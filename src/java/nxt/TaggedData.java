@@ -22,6 +22,8 @@ import nxt.db.DbKey;
 import nxt.db.VersionedEntityDbTable;
 import nxt.db.VersionedPersistentDbTable;
 import nxt.db.VersionedPrunableDbTable;
+import nxt.txn.extension.ItemImageExtension;
+import nxt.util.Convert;
 import nxt.util.Logger;
 import nxt.util.Search;
 
@@ -29,6 +31,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -277,6 +280,64 @@ public class TaggedData {
             throw new IllegalArgumentException("Either channel, or accountId, or both, must be specified");
         }
         return taggedDataTable.getManyBy(getDbClause(channel, accountId), from, to);
+    }
+
+    /**
+     *
+     * @param txnId
+     * @param status 0: image is disabled, 1: image is enabled
+     * @param itemId
+     */
+    public static void updateItemImageExtensionStatus(long txnId, byte status, long itemId) {
+        String updateOthersSql = itemId == 0
+                ? ""
+                : "UPDATE tagged_data SET ext_ftr3_status = 0 WHERE name = ? ;";
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(
+                     updateOthersSql + " UPDATE tagged_data SET ext_ftr3_status = ? WHERE id = ? "
+             )) {
+            int i = 0;
+            if (itemId != 0) pstmt.setString(++i, Long.toUnsignedString(itemId));
+            pstmt.setInt(++i, status);
+            pstmt.setLong(++i, txnId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
+
+    /**
+     * Implemented for transaction extension {@link ItemImageExtension}
+     */
+    public static TaggedData getAssetGoodsImage(long assetId, long goodsId) {
+        System.out.println("getAssetGoodsImage " + assetId + "  " + goodsId);
+        if (assetId == 0 && goodsId == 0) {
+            throw new IllegalArgumentException("Either asset, or goods, or both, must be specified");
+        }
+
+        // field "tags" contains priority so limit is 1 records - first is goods if it is exists
+        try (Connection con = Db.db.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(
+                     "SELECT * FROM tagged_data" +
+                             " WHERE ext_ftr3_status = 1 AND channel = ? AND latest = TRUE AND (name = ? OR name = ?)" +
+                             " ORDER BY tags, block_timestamp DESC LIMIT 1"
+             )) {
+            pstmt.setString(1, ItemImageExtension.MARK);
+            pstmt.setString(2, Long.toUnsignedString(goodsId));
+            pstmt.setString(3, Long.toUnsignedString(assetId));
+            try (DbIterator<TaggedData> it = taggedDataTable.getManyBy(con, pstmt, true)) {
+                TaggedData result = null;
+                for (TaggedData taggedData : it) {
+                    result = taggedData;
+                    if (taggedData.type.startsWith(ItemImageExtension.Item.GOODS.toString())) {
+                        break;
+                    }
+                }
+                return result;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
     }
 
     public static DbIterator<TaggedData> searchData(String query, String channel, long accountId, int from, int to) {
