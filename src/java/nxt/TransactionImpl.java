@@ -1003,8 +1003,11 @@ class TransactionImpl implements Transaction {
 
         long minimumFeeNQT = getMinimumFeeNQT(Nxt.getBlockchain().getHeight());
         if (feeNQT < minimumFeeNQT) {
-            throw new NxtException.NotCurrentlyValidException(String.format("Transaction fee %f FIM less than minimum fee %f FIM at height %d",
-                    ((double)feeNQT)/Constants.ONE_NXT, ((double)minimumFeeNQT)/Constants.ONE_NXT, Nxt.getBlockchain().getHeight()));
+            throw new NxtException.NotCurrentlyValidException(String.format(
+                    "Transaction fee %s FIM less than minimum fee %s FIM",
+                    ((double) feeNQT) / Constants.ONE_NXT,
+                    ((double) minimumFeeNQT) / Constants.ONE_NXT
+            ));
         }
 
         /* Throws NxtException.NotValidException if senderPublicKey is on locked list */
