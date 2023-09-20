@@ -310,7 +310,6 @@ public class TaggedData {
      * Implemented for transaction extension {@link ItemImageExtension}
      */
     public static TaggedData getAssetGoodsImage(long assetId, long goodsId) {
-        System.out.println("getAssetGoodsImage " + assetId + "  " + goodsId);
         if (assetId == 0 && goodsId == 0) {
             throw new IllegalArgumentException("Either asset, or goods, or both, must be specified");
         }

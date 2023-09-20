@@ -5,6 +5,8 @@ import nxt.*;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Specifying image for Asset or Marketplace Item.
@@ -14,8 +16,6 @@ public class ItemImageExtension extends TransactionTypeExtension {
     public static final String MARK = "(FTR.3.0)";
 
     public enum Item {ASSET, GOODS}
-
-    public enum Image {IMAGE_URL, IMAGE_DATA}
 
     @Override
     protected String getMark() {
@@ -43,24 +43,15 @@ public class ItemImageExtension extends TransactionTypeExtension {
          3) sender id;
         */
 
-        // possible values "ASSET IMAGE_URL"  "ASSET IMAGE_DATA"  "GOODS IMAGE_URL"  "GOODS IMAGE_DATA"
-        String s = a.getType();
-        String[] resourceDescriptor;
+        // possible values "ASSET"  "GOODS"
         Item item = null;
-        Image imageKind = null;
         String error = "Wrong type of resource";
-        if (s != null && !s.trim().isEmpty()) {
-            resourceDescriptor = s.split(" ");
-            if (resourceDescriptor.length == 2) {
-                try {
-                    // check is the value is expected
-                    item = Item.valueOf(resourceDescriptor[0]);
-                    imageKind = Image.valueOf(resourceDescriptor[1]);
-                    error = null;
-                } catch (IllegalArgumentException e) {
-                    // error string is set above
-                }
-            }
+        try {
+            // check is the value is expected
+            item = Item.valueOf(a.getType());
+            error = null;
+        } catch (IllegalArgumentException e) {
+            // error string is set above
         }
         if (error != null) {
             return error;
@@ -75,11 +66,11 @@ public class ItemImageExtension extends TransactionTypeExtension {
         }
         if (Item.ASSET == item) {
             Asset asset = Asset.getAsset(itemId);
-            if (asset == null) return "Asset id is wrong";
+            if (asset == null) return "Asset is wrong";
             if (sender.getId() != asset.getAccountId()) return "Only asset issuer is allowed to set image for asset";
         } else if (Item.GOODS == item) {
             DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(itemId);
-            if (goods == null) return "Goods id is wrong";
+            if (goods == null) return "Goods is wrong";
             if (sender.getId() != goods.getSellerId()) return "Only goods seller is allowed to set image for goods";
         }
 
@@ -87,7 +78,11 @@ public class ItemImageExtension extends TransactionTypeExtension {
         boolean disableImage = dataStr.trim().isEmpty();
 
         if (!disableImage) {
-            if (imageKind == Image.IMAGE_URL) {
+            if (dataStr.startsWith("data:")) {
+                // sample "data:image/gif;base64,R0lGODlhEgAZAJEAAODg4AAAAP///////yH5BAEAAAMALAAAAAASABkAAAJLnI+py+0YoowtgItvWEH4/wFb0oGgqJSmh5JsJ77pK8T1CNF2m9/+PfPtcIdSbBg8GomG5Y9X1C2TsKlrJbtioVEsEzKRPMbkcqMAADs="
+                final Matcher m = DATA_URL_PATTERN.matcher(dataStr);
+                if (! m.find()) return "Wrong image data";
+            } else {
                 try {
                     new URL(dataStr).toURI();
                 } catch (MalformedURLException e) {
@@ -106,5 +101,7 @@ public class ItemImageExtension extends TransactionTypeExtension {
 
         return null;
     }
+
+    private final Pattern DATA_URL_PATTERN = Pattern.compile("^data:image/(.+?);base64,\\s*", Pattern.CASE_INSENSITIVE);
 
 }
