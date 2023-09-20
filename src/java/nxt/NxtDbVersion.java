@@ -1115,8 +1115,9 @@ class NxtDbVersion extends DbVersion {
                 BlockchainProcessorImpl.getInstance().scheduleScan(0, true);
             case 441:
                 apply("ALTER TABLE goods ADD COLUMN IF NOT EXISTS asset_id BIGINT DEFAULT 0");
-                apply("ALTER TABLE tagged_data ADD COLUMN IF NOT EXISTS ext_ftr3_status TINYINT");
             case 442:
+                apply("ALTER TABLE tagged_data ADD COLUMN IF NOT EXISTS ext_ftr3_status TINYINT");
+            case 443:
                 return;
             default:
                 throw new RuntimeException("Blockchain database inconsistent with code, at update " + nextUpdate + ", probably trying to run older code on newer database");
