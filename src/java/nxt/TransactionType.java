@@ -1878,7 +1878,7 @@ public abstract class TransactionType {
 
             @Override
             protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                if (Nxt.getBlockchain().getHeight() < Constants.VOTING_SYSTEM_BLOCK) {
+                if (Nxt.getBlockchain().getHeight() < Constants.TAGGED_DATA_BLOCK) {
                     throw new NxtException.NotYetEnabledException("Prunable Tagged Data not yet enabled");
                 }
                 Attachment.TaggedDataUpload attachment = (Attachment.TaggedDataUpload) transaction.getAttachment();
@@ -1942,7 +1942,7 @@ public abstract class TransactionType {
 
             @Override
             protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
-                if (Nxt.getBlockchain().getHeight() < Constants.VOTING_SYSTEM_BLOCK) {
+                if (Nxt.getBlockchain().getHeight() < Constants.TAGGED_DATA_BLOCK) {
                     throw new NxtException.NotYetEnabledException("Prunable Tagged Data not yet enabled");
                 }
                 Attachment.TaggedDataExtend attachment = (Attachment.TaggedDataExtend) transaction.getAttachment();
