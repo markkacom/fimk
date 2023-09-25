@@ -1266,6 +1266,12 @@ public abstract class TransactionType {
                         || attachment.getPriceNQT() <= 0 || attachment.getPriceNQT() > Constants.MAX_BALANCE_NQT) {
                     throw new NxtException.NotValidException("Invalid digital goods listing: " + attachment.getJSONObject());
                 }
+
+                long assetId = attachment.getAssetId();
+                if (assetId != 0) {
+                    Asset asset = Asset.getAsset(assetId);
+                    MofoAsset.validateAsset(asset, assetId, transaction.getSenderId(), transaction.getRecipientId());
+                }
             }
 
             @Override
@@ -1550,6 +1556,12 @@ public abstract class TransactionType {
                 }
                 if (attachment.getDeliveryDeadlineTimestamp() <= Nxt.getBlockchain().getLastBlockTimestamp()) {
                     throw new NxtException.NotCurrentlyValidException("Delivery deadline has already expired: " + attachment.getDeliveryDeadlineTimestamp());
+                }
+
+                long assetId = goods.getAssetId();
+                if (assetId != 0) {
+                    Asset asset = Asset.getAsset(assetId);
+                    MofoAsset.validateAsset(asset, assetId, transaction.getSenderId(), transaction.getRecipientId());
                 }
             }
 

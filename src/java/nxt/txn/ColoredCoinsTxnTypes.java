@@ -167,17 +167,8 @@ public abstract class ColoredCoinsTxnTypes extends TransactionType {
             if (attachment.getQuantityQNT() <= 0 || (asset != null && attachment.getQuantityQNT() > asset.getQuantityQNT())) {
                 throw new NxtException.NotValidException("Invalid asset transfer asset or quantity: " + attachment.getJSONObject());
             }
-            if (asset == null) {
-                throw new NxtException.NotCurrentlyValidException("Asset " + Long.toUnsignedString(attachment.getAssetId()) +
-                        " does not exist yet");
-            }
-            if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
-                if (!MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getSenderId())) {
-                    throw new NxtException.NotValidException("Sender not allowed to transfer private asset");
-                } else if (!MofoAsset.getAccountAllowed(attachment.getAssetId(), transaction.getRecipientId())) {
-                    throw new NxtException.NotValidException("Recipient not allowed to receive private asset");
-                }
-            }
+
+            MofoAsset.validateAsset(asset, attachment.getAssetId(), transaction.getSenderId(), transaction.getRecipientId());
         }
 
         @Override

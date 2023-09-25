@@ -213,6 +213,20 @@ public final class MofoAsset {
         }
         return false;
     }
+
+    public static void validateAsset(Asset asset, long assetId, long sender, long recipient)
+            throws NxtException.NotCurrentlyValidException, NxtException.NotValidException {
+        if (asset == null) {
+            throw new NxtException.NotCurrentlyValidException("Asset " + Long.toUnsignedString(assetId) + " does not exist yet");
+        }
+        if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
+            if (!MofoAsset.getAccountAllowed(assetId, sender)) {
+                throw new NxtException.NotValidException("Sender not allowed to use the private asset");
+            } else if (!MofoAsset.getAccountAllowed(assetId, recipient)) {
+                throw new NxtException.NotValidException("Recipient not allowed to use the private asset");
+            }
+        }
+    }
     
     public static void setAccountAllowed(long assetId, long accountId, boolean allowed) {
         PrivateAssetAccount privateAssetAccount;
