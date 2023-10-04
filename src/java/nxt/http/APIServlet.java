@@ -269,6 +269,7 @@ public final class APIServlet extends HttpServlet {
         map.put("dividendPayment", DividendPayment.instance);
         map.put("searchDGSGoods", SearchDGSGoods.instance);
         map.put("searchAssets", SearchAssets.instance);
+        map.put("searchAssetsExt", SearchAssetsExt.instance);
         map.put("searchCurrencies", SearchCurrencies.instance);
         map.put("searchPolls", SearchPolls.instance);
         map.put("searchAccounts", SearchAccounts.instance);

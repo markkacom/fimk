@@ -97,6 +97,13 @@ public final class Asset {
         return assetTable.search(query, DbClause.EMPTY_CLAUSE, from, to, " ORDER BY ft.score DESC, asset.height DESC, asset.db_id DESC ");
     }
 
+    public static DbIterator<Asset> searchAssetsExt(String query, int from, int to) {
+        int nowEpochTime = Nxt.getEpochTime();
+        DbClause.FixedClause dbClause = new DbClause.FixedClause(String.format(" (expiry IS NULL OR expiry > %d) ", nowEpochTime));
+        return assetTable.search(query, dbClause, from, to,
+                " ORDER BY ft.score DESC, asset.height DESC, asset.db_id DESC ");
+    }
+
     public static void addAsset(Transaction transaction, AssetIssuanceAttachment attachment) {
         assetTable.insert(new Asset(transaction, attachment));
     }
