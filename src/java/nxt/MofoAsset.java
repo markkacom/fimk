@@ -202,11 +202,18 @@ public final class MofoAsset {
     public static boolean getAccountAllowed(long assetId, long accountId) {
         if (Asset.privateEnabled()) {
             Asset asset = Asset.getAsset(assetId);
+            return getAccountAllowed(asset, accountId);
+        }
+        return false;
+    }
+
+    public static boolean getAccountAllowed(Asset asset, long accountId) {
+        if (Asset.privateEnabled()) {
             if (asset != null && asset.getAccountId() == accountId) {
                 return true;
             }
             PrivateAssetAccount privateAssetAccount;
-            privateAssetAccount = privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
+            privateAssetAccount = privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(asset.getId(), accountId));
             if (privateAssetAccount != null) {
                 return privateAssetAccount.allowed;
             }
