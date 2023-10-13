@@ -16,29 +16,20 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Appendix;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.Transaction;
+import nxt.*;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
+import nxt.txn.extension.TransactionTypeExtension;
 import nxt.util.Convert;
+import nxt.util.JSON;
+import nxt.util.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
-import static nxt.http.JSONResponses.FEATURE_NOT_AVAILABLE;
-import static nxt.http.JSONResponses.INCORRECT_DEADLINE;
-import static nxt.http.JSONResponses.INCORRECT_LINKED_FULL_HASH;
-import static nxt.http.JSONResponses.INCORRECT_WHITELIST;
-import static nxt.http.JSONResponses.MISSING_DEADLINE;
-import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE;
-import static nxt.http.JSONResponses.NOT_ENOUGH_FUNDS;
+import static nxt.http.JSONResponses.*;
 
 abstract class CreateTransaction extends APIServlet.APIRequestHandler {
 
@@ -67,12 +58,12 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
         super(fileParameter, apiTags, addCommonParameters(parameters));
     }
 
-    final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, Attachment attachment)
+    public final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, Attachment attachment)
             throws NxtException {
         return createTransaction(req, senderAccount, 0, 0, attachment);
     }
 
-    final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, long recipientId, long amountNQT)
+    public final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, long recipientId, long amountNQT)
             throws NxtException {
         return createTransaction(req, senderAccount, recipientId, amountNQT, Attachment.ORDINARY_PAYMENT);
     }
@@ -134,8 +125,9 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
         boolean broadcast = !"false".equalsIgnoreCase(req.getParameter("broadcast")) && secretPhrase != null;
         Appendix.EncryptedMessage encryptedMessage = null;
         Appendix.PrunableEncryptedMessage prunableEncryptedMessage = null;
+        Account recipient = null;
         if (attachment.getTransactionType().canHaveRecipient()) {
-            Account recipient = Account.getAccount(recipientId);
+            recipient = Account.getAccount(recipientId);
             if ("true".equalsIgnoreCase(req.getParameter("encryptedMessageIsPrunable"))) {
                 prunableEncryptedMessage = (Appendix.PrunableEncryptedMessage) ParameterParser.getEncryptedMessage(req, recipient, true);
             } else {
@@ -212,6 +204,10 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
             } catch (ArithmeticException e) {
                 return NOT_ENOUGH_FUNDS;
             }
+
+            JSONObject txnExtensionValidationResult = validateExtension(transaction, senderAccount, recipient);
+            if (txnExtensionValidationResult != null) return txnExtensionValidationResult;
+
             JSONObject transactionJSON = JSONData.unconfirmedTransaction(transaction);
             response.put("transactionJSON", transactionJSON);
             response.put("unsignedTransactionBytes", Convert.toHexString(transaction.getUnsignedBytes()));
@@ -244,6 +240,34 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
     @Override
     final boolean requirePost() {
         return true;
+    }
+
+    private JSONObject validateExtension(Transaction transaction, Account senderAccount, Account recipientAccount) {
+        JSONObject response = null;
+        if (Nxt.getBlockchain().getHeight() < Constants.TRANSACTION_EXTENSION_HEIGHT) return response;
+        try {
+            TransactionTypeExtension ext = TransactionTypeExtension.get(transaction);
+            if (ext != null) {
+                String result = ext.process(true, transaction, senderAccount, recipientAccount);
+                if (result != null) {
+                    String errorMessage = String.format("Transaction extension \"%s\" validation error. %s", ext.getName(), result);
+                    Logger.logWarningMessage(errorMessage);
+                    response = new JSONObject();
+                    response.put("errorCode", 22);
+                    response.put("errorDescription", errorMessage);
+                    JSON.prepare(response);
+                    return response;
+                }
+            }
+        } catch (Exception e) {
+            String errorMessage = String.format("Transaction extension validation error: %s", e.getMessage());
+            response = new JSONObject();
+            response.put("errorCode", 22);
+            response.put("errorDescription", errorMessage);
+            JSON.prepare(response);
+            Logger.logErrorMessage("Transaction extension validation error", e);
+        }
+        return response;
     }
 
 }

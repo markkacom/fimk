@@ -23,6 +23,10 @@ import nxt.util.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+
 final class GetInfo extends PeerServlet.PeerRequestHandler {
 
     static final GetInfo instance = new GetInfo();
@@ -38,6 +42,19 @@ final class GetInfo extends PeerServlet.PeerRequestHandler {
 
     @Override
     JSONStreamAware processRequest(JSONObject request, Peer peer) {
+        JSONStreamAware result = processRequestInternal(request, peer);
+
+        Writer wr = new StringWriter(1000);
+        try {
+            JSON.writeJSONString(result, wr);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //System.out.printf("GetInfo from peer %s,  response %s \n", ((PeerImpl) peer).toString(2), wr);
+        return result;
+    }
+
+    JSONStreamAware processRequestInternal(JSONObject request, Peer peer) {
         PeerImpl peerImpl = (PeerImpl)peer;
         peerImpl.setLastUpdated(Nxt.getEpochTime());
         peerImpl.analyzeHallmark((String)request.get("hallmark"));

@@ -31,8 +31,8 @@ import nxt.util.ThreadPool;
  *    The version number is the minimal version you should run before we start
  *    issuing notifications that your version can be updated.
  *
- *    You can disable this functionality in your nxt.properties config file.
- *    Set `nxt.warnNotLatestVersion=false` to disable this functionality.
+ *    You can disable this functionality in your fimk.properties config file.
+ *    Set `fimk.warnNotLatestVersion=false` to disable this functionality.
  *
  *    The expected format for this alias:
  *
@@ -47,13 +47,13 @@ import nxt.util.ThreadPool;
  *
  *    When the version manager detects you run a version up or below this
  *    version your server WILL BE SHUTDOWN. To start the server again either
- *    update (recommended) or disable this feature in nxt.properties.
+ *    update (recommended) or disable this feature in fimk.properties.
  *
  *    Peers who enable this feature will start to blacklist all nodes on the
  *    network that are running a version on or below this version.
  *
- *    You can disable this functionality in your nxt.properties config file.
- *    Set `nxt.shutdownWhenOutdated=false` to disable this functionality.
+ *    You can disable this functionality in your fimk.properties config file.
+ *    Set `fimk.shutdownWhenOutdated=false` to disable this functionality.
  *
  *    The expected format for this alias:
  *
@@ -87,9 +87,9 @@ import nxt.util.ThreadPool;
 
 public class AppVersionManager {
 
-    private static final boolean SHUTDOWN_WHEN_OUTDATED = Nxt.getBooleanProperty("nxt.shutdownWhenOutdated");
-    private static final boolean WARN_NOT_LATEST_VERSION = Nxt.getBooleanProperty("nxt.warnNotLatestVersion");
-    private static final int NEW_VERSION_CHECK_INTERVAL = Nxt.getIntProperty("nxt.newVersionCheckInterval", 600);
+    private static final boolean SHUTDOWN_WHEN_OUTDATED = Nxt.getBooleanProperty("fimk.shutdownWhenOutdated");
+    private static final boolean WARN_NOT_LATEST_VERSION = Nxt.getBooleanProperty("fimk.warnNotLatestVersion");
+    private static final int NEW_VERSION_CHECK_INTERVAL = Nxt.getIntProperty("fimk.newVersionCheckInterval", 600);
 
     private static long LATEST_VERSION_ID = Constants.isTestnet ? 0 : Long.parseUnsignedLong("9266582752086146948");
     private static long BLACKLIST_VERSION_ID = Constants.isTestnet ? 0 : Long.parseUnsignedLong("9364249966090852339");

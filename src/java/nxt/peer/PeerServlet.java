@@ -21,14 +21,9 @@ import nxt.util.CountingInputReader;
 import nxt.util.CountingOutputWriter;
 import nxt.util.JSON;
 import nxt.util.Logger;
-
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.servlets.gzip.CompressedResponseWrapper;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
-import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
-import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
+import org.eclipse.jetty.websocket.servlet.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
@@ -38,7 +33,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -69,6 +63,7 @@ public final class PeerServlet extends WebSocketServlet {
         map.put("getUnconfirmedTransactions", GetUnconfirmedTransactions.instance);
         map.put("processBlock", ProcessBlock.instance);
         map.put("processTransactions", ProcessTransactions.instance);
+        map.put("getLastBlockInfo", GetLastBlockInfo.instance);
         if (Peers.gossipEnabled) {
             map.put("processGossip", ProcessGossip.instance);
         }

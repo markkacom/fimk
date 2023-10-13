@@ -67,6 +67,12 @@ public interface Peer extends Comparable<Peer> {
 
     int getLastUpdated();
 
+    void setProvidedBlockIdHeight(long blockId, int height);
+
+    public long[] getProvidedBlockIdHeight();
+
+    public long[] getLastBlockIdHeight();
+
     boolean isInbound();
 
     boolean isInboundWebSocket();

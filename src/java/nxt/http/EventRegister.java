@@ -48,11 +48,11 @@ import java.util.List;
  * if both parameters are omitted or are false.</p>
  *
  * <p>Event registration will be canceled if the application does not
- * issue an EventWait before the time interval specified by nxt.apiEventTimeout
+ * issue an EventWait before the time interval specified by fimk.apiEventTimeout
  * expires.  The timer is reset each time an EventWait is processed.</p>
  *
  * <p>An application cannot register events if the maximum number of event users
- * specified by nxt.apiMaxEventUsers has been reached.</p>
+ * specified by fimk.apiMaxEventUsers has been reached.</p>
  *
  * <p>Request parameters:</p>
  * <ul>

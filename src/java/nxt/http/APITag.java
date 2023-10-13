@@ -22,7 +22,7 @@ public enum APITag {
     BLOCKS("Blocks"), DGS("Digital Goods Store"), FORGING("Forging"), INFO("Server Info"), MESSAGES("Messages"),
 	  TRANSACTIONS("Transactions"), PHASING("Phasing"), TOKENS("Tokens"), VS("Voting System"),
     MS("Monetary System"), SEARCH("Search"), NETWORK("Networking"), DATA("Tagged Data"), UTILS("Utils"), DEBUG("Debug"), 
-    MOFO("MofoWallet");
+    MOFO("MofoWallet"), REWARDS("Rewardes");
 
     private final String displayName;
 

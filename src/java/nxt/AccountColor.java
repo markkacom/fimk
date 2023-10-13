@@ -12,11 +12,8 @@
 
 package nxt;
 
-import nxt.db.DbClause;
-import nxt.db.DbIterator;
-import nxt.db.DbKey;
-import nxt.db.DbUtils;
-import nxt.db.EntityDbTable;
+import nxt.db.*;
+import nxt.txn.BidOrderPlacementAttachment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -104,7 +101,7 @@ public final class AccountColor {
                     case TransactionType.SUBTYPE_COLORED_COINS_BID_ORDER_PLACEMENT: {
 
                         /* Only accounts of same color as asset issuer can place buy orders */
-                        Attachment.ColoredCoinsBidOrderPlacement attachment = (Attachment.ColoredCoinsBidOrderPlacement)transaction.getAttachment();
+                        BidOrderPlacementAttachment attachment = (BidOrderPlacementAttachment)transaction.getAttachment();
                         Asset asset = Asset.getAsset(attachment.getAssetId());
                         if (asset != null) {
 

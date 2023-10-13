@@ -1,59 +1,26 @@
 package nxt.http.websocket;
 
-import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import nxt.Block;
-import nxt.Constants;
-import nxt.NxtException;
-import nxt.Trade;
-import nxt.Transaction;
+import nxt.*;
 import nxt.crypto.Crypto;
 import nxt.gossip.Gossip;
 import nxt.http.ParameterException;
-import nxt.http.rpc.CallAPIFunction;
-import nxt.http.rpc.GetAccount;
-import nxt.http.rpc.GetAccountAssets;
-import nxt.http.rpc.GetAccountCurrencies;
-import nxt.http.rpc.GetAccountLessors;
-import nxt.http.rpc.GetAccountPosts;
-import nxt.http.rpc.GetAccounts;
-import nxt.http.rpc.GetActivity;
-import nxt.http.rpc.GetActivityStatistics;
-import nxt.http.rpc.GetAskOrder;
-import nxt.http.rpc.GetAsset;
-import nxt.http.rpc.GetAssetChartData;
-import nxt.http.rpc.GetAssetOrders;
-import nxt.http.rpc.GetAssetPosts;
-import nxt.http.rpc.GetAssetPrivateAccounts;
-import nxt.http.rpc.GetAssetTrades;
-import nxt.http.rpc.GetBidOrder;
-import nxt.http.rpc.GetBlockchainState;
-import nxt.http.rpc.GetCommentCount;
-import nxt.http.rpc.GetComments;
-import nxt.http.rpc.GetForgingStats;
-import nxt.http.rpc.GetMyOpenOrders;
-import nxt.http.rpc.GetRecentTransactions;
-import nxt.http.rpc.Search;
+import nxt.http.rpc.*;
 import nxt.peer.Peer;
 import nxt.util.Convert;
 import nxt.util.JSON;
 import nxt.util.Logger;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static nxt.http.JSONResponses.ERROR_INCORRECT_REQUEST;
 
 @SuppressWarnings("unchecked")
 public class MofoSocketServer {
@@ -366,43 +333,39 @@ public class MofoSocketServer {
             return;
         }
           
-        threadPool.submit(new Runnable() {
-          
-            @Override
-            public void run() {        
-        
-                JSONStreamAware response = JSON.emptyJSON;
-                RPCCall callable = rpcCalls.get(method);                
-                try {
-                    if (callable == null) {
-                        Logger.logDebugMessage("Calling non existing RPC method " + method);
-                        response = ERROR_NO_SUCH_METHOD;
+        threadPool.submit(() -> {
+
+            JSONStreamAware response = JSON.emptyJSON;
+            RPCCall callable = rpcCalls.get(method);
+            try {
+                if (callable == null) {
+                    Logger.logDebugMessage("Calling non existing RPC method " + method);
+                    response = ERROR_NO_SUCH_METHOD;
+                }
+                else {
+                    try {
+                        response = callable.call(arguments);
                     }
-                    else {
-                        try {
-                            response = callable.call(arguments);
-                        } 
-                        catch (ParameterException e) {
-                            Logger.logDebugMessage("Invalid parameters", e);
-                            response = e.getErrorResponse();
-                        } 
-                        catch (NxtException | RuntimeException e) {
-                            Logger.logDebugMessage("Error processing API request", e);
-                            response = ERROR_INCORRECT_REQUEST;
-                        } 
-                        catch (ExceptionInInitializerError err) {
-                            Logger.logErrorMessage("Initialization Error", (Exception) err.getCause());
-                            response = ERROR_INCORRECT_REQUEST;
-                        }
-                        catch (Exception e) {
-                            Logger.logDebugMessage("Exception in RPC call", e);
-                            response = ERROR_INCORRECT_REQUEST;
-                        }
+                    catch (ParameterException e) {
+                        //Logger.logDebugMessage("Invalid parameters", e);
+                        response = e.getErrorResponse();
+                    }
+                    catch (NxtException | RuntimeException e) {
+                        Logger.logDebugMessage("Error processing API request", e);
+                        response = ERROR_INCORRECT_REQUEST;
+                    }
+                    catch (ExceptionInInitializerError err) {
+                        Logger.logErrorMessage("Initialization Error", (Exception) err.getCause());
+                        response = ERROR_INCORRECT_REQUEST;
+                    }
+                    catch (Exception e) {
+                        Logger.logDebugMessage("Exception in RPC call", e);
+                        response = ERROR_INCORRECT_REQUEST;
                     }
                 }
-                finally {
-                    rpcResponse(socket, call_id, response);
-                }
+            }
+            finally {
+                rpcResponse(socket, call_id, response);
             }
         });
     }

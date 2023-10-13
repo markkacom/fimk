@@ -16,21 +16,16 @@
 
 package nxt;
 
-import java.util.ArrayList;
-
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
-
 import nxt.util.Convert;
+
+import java.util.*;
 
 public final class Constants {
 
-    public static final boolean isTestnet = Nxt.getBooleanProperty("nxt.isTestnet");
-    public static final boolean isOffline = Nxt.getBooleanProperty("nxt.isOffline");
+    public static final boolean isTestnet = Nxt.getBooleanProperty("fimk.isTestnet");
+    public static final boolean isOffline = Nxt.getBooleanProperty("fimk.isOffline");
 
-    public static final long ONE_NXT = 100000000;
+    public static final long ONE_NXT = 100_000_000;
 
     public static final long MIN_FEE_NQT = ONE_NXT / 10;
 
@@ -42,18 +37,27 @@ public final class Constants {
     public static final long FORGER_FEE_STAGE_CHANGE_AT_BLOCK = 889920;
     public static final long[] FORGER_FEE_AMOUNT_NQT_STAGES = { 200 * ONE_NXT, 100 * ONE_NXT, 50 * ONE_NXT, 25 * ONE_NXT };
 
+    /* POP Reward */
+    /**
+     * dont accept transaction same type and same sender in the height interval less than this limit
+     */
+    public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 1000;
+    public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 2160;
+    public static long REWARD_APPLICANT_MIN_BALANCE = 10 * ONE_NXT;
+    public static long POP_REWARD_MONEY_AMOUNT_NQT = 1 * ONE_NXT;
+
     public static final long MAX_BALANCE_NXT = isTestnet ? 999965465 : 999455619;
     public static final long MAX_BALANCE_NQT = MAX_BALANCE_NXT * ONE_NXT;
     public static final long INITIAL_BASE_TARGET = isTestnet ? 307456352 : 307613193;
 
     public static final long MAX_BASE_TARGET = MAX_BALANCE_NXT * INITIAL_BASE_TARGET;
-    public static final int MAX_ROLLBACK = Math.max(Nxt.getIntProperty("nxt.maxRollback"), 720);
-    public static final int GUARANTEED_BALANCE_CONFIRMATIONS = isTestnet ? Nxt.getIntProperty("nxt.testnetGuaranteedBalanceConfirmations", 1440) : 1440;
-    public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("nxt.testnetLeasingDelay", 1440) : 1440;
+    public static final int MAX_ROLLBACK = Math.max(Nxt.getIntProperty("fimk.maxRollback"), 720);
+    public static final int GUARANTEED_BALANCE_CONFIRMATIONS = isTestnet ? Nxt.getIntProperty("fimk.testnetGuaranteedBalanceConfirmations", 1440) : 1440;
+    public static final int LEASING_DELAY = isTestnet ? Nxt.getIntProperty("fimk.testnetLeasingDelay", 1440) : 1440;
 
     public static final int MAX_TIMEDRIFT = 15; // allow up to 15 s clock difference
-    public static final int FORGING_DELAY = Nxt.getIntProperty("nxt.forgingDelay");
-    public static final int FORGING_SPEEDUP = Nxt.getIntProperty("nxt.forgingSpeedup");
+    public static final int BLOCK_INTERVAL_THRESHOLD = isTestnet ? 300 : 3600;
+    public static final int FORGING_SPEEDUP = Nxt.getIntProperty("fimk.forgingSpeedup");
 
     public static final byte MAX_PHASING_VOTE_TRANSACTIONS = 10;
     public static final byte MAX_PHASING_WHITELIST_SIZE = 10;
@@ -74,11 +78,11 @@ public final class Constants {
     public static final int MAX_PRUNABLE_LIFETIME;
     public static final boolean ENABLE_PRUNING;
     static {
-        int maxPrunableLifetime = Nxt.getIntProperty("nxt.maxPrunableLifetime");
+        int maxPrunableLifetime = Nxt.getIntProperty("fimk.maxPrunableLifetime");
         ENABLE_PRUNING = maxPrunableLifetime >= 0;
         MAX_PRUNABLE_LIFETIME = ENABLE_PRUNING ? Math.max(maxPrunableLifetime, MIN_PRUNABLE_LIFETIME) : Integer.MAX_VALUE;
     }
-    public static final boolean INCLUDE_EXPIRED_PRUNABLE = Nxt.getBooleanProperty("nxt.includeExpiredPrunable");
+    public static final boolean INCLUDE_EXPIRED_PRUNABLE = Nxt.getBooleanProperty("fimk.includeExpiredPrunable");
 
     public static final int MAX_ACCOUNT_NAME_LENGTH = 100;
     public static final int MAX_ACCOUNT_DESCRIPTION_LENGTH = 1000;
@@ -89,6 +93,7 @@ public final class Constants {
     public static final int MAX_ASSET_DESCRIPTION_LENGTH = 1000;
     public static final int MAX_ASSET_TRANSFER_COMMENT_LENGTH = 1000;
     public static final int MAX_DIVIDEND_PAYMENT_ROLLBACK = 1441;
+    public static final long MAX_ASSET_REWARDING_BASE_AMOUNT_QNT = 1_000_000 * ONE_NXT;
 
     public static final int MAX_POLL_NAME_LENGTH = 100;
     public static final int MAX_POLL_DESCRIPTION_LENGTH = 1000;
@@ -164,11 +169,19 @@ public final class Constants {
     public static final int PUBLIC_KEY_ANNOUNCEMENT_OPTIONAL_BLOCK = isTestnet ? 0 : 475152;
     public static final int VOTING_SYSTEM_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : FOURTH_BIRTH_BLOCK;
 
+    /**
+     * Number of hit values generated to select the suitable
+     */
+    public static final int HITS_NUMBER = 17;
+    public static final int CONTROL_FORGING_TIME_BLOCK = isTestnet ? 1387 : 5_530_000;
+    public static final int POS_POP_REWARD_BLOCK = isTestnet ? 1387 : 6_000_000;
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int PRIVATE_ASSETS_TIMESTAMP = isTestnet ? 1 : 68002834;
     public static final int ACCOUNT_IDENTIFIER_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int COLORED_ACCOUNTS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
     public static final int ACCOUNT_IDENTIFIER_BLOCK_2 = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 957300;
+    public static final int MARKETPLACE_PRICE_IN_ASSET_BLOCK = isTestnet ? 5400 : Integer.MAX_VALUE;
+    public static final int TAGGED_DATA_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 6142500;
 
     public static final int MIN_PRIVATE_ASSET_FEE_PERCENTAGE = 0;  /* range 0.000001% to 2000% / 1 - 2000000000 */
     public static final int MAX_PRIVATE_ASSET_FEE_PERCENTAGE = 2000000000;
@@ -185,6 +198,9 @@ public final class Constants {
     public static final long UNCONFIRMED_POOL_DEPOSIT_NQT = 100 * ONE_NXT;
 
     public static final int FORGER_FEE_BLOCK = SECOND_BIRTH_BLOCK + 1;
+
+    /** Height from which the transaction extension features are implemented */
+    public static final int TRANSACTION_EXTENSION_HEIGHT = isTestnet ? 0 : 4_800_000;
 
     public static final long EPOCH_BEGINNING;
     static {
@@ -214,7 +230,7 @@ public final class Constants {
     /* XXX - List of Account ID's that are allowed to forge (or null to allow all) */
     public static final List<Long> allowedToForge;
     static {
-        List<String> allowed = Nxt.getStringListProperty("nxt.allowedToForge");
+        List<String> allowed = Nxt.getStringListProperty("fimk.allowedToForge");
         if (allowed.size() == 0) {
             allowedToForge = Collections.emptyList();
         }

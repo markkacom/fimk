@@ -17,6 +17,7 @@
 package nxt.http;
 
 import nxt.DigitalGoodsStore;
+import nxt.Nxt;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.db.DbUtils;
@@ -50,7 +51,12 @@ public final class SearchDGSGoods extends APIServlet.APIRequestHandler {
         JSONArray goodsJSON = new JSONArray();
         response.put("goods", goodsJSON);
 
-        Filter<DigitalGoodsStore.Goods> filter = hideDelisted ? goods -> ! goods.isDelisted() : goods -> true;
+        int nowEpochTime = Nxt.getEpochTime();
+
+        Filter<DigitalGoodsStore.Goods> filter = goods -> {
+            if (hideDelisted && !goods.isDelisted()) return false;
+            return goods.getExpiry() > nowEpochTime;
+        };
 
         FilteringIterator<DigitalGoodsStore.Goods> iterator = null;
         try {

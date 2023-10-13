@@ -25,9 +25,9 @@ public class FastForgingTest extends AbstractForgingTest {
     @Test
     public void fastForgingTest() {
         Properties properties = FastForgingTest.newTestProperties();
-        properties.setProperty("nxt.disableGenerateBlocksThread", "false");
-        properties.setProperty("nxt.enableFakeForging", "false");
-        properties.setProperty("nxt.timeMultiplier", "1000");
+        properties.setProperty("fimk.disableGenerateBlocksThread", "false");
+        properties.setProperty("fimk.enableFakeForging", "false");
+        properties.setProperty("fimk.timeMultiplier", "1000");
         AbstractForgingTest.init(properties);
         forgeTo(startHeight + 10, testForgingSecretPhrase);
         AbstractForgingTest.shutdown();

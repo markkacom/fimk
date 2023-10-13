@@ -34,7 +34,7 @@ import java.util.List;
 
 public final class Poll extends AbstractPoll {
 
-    private static final boolean isPollsProcessing = Nxt.getBooleanProperty("nxt.processPolls");
+    private static final boolean isPollsProcessing = Nxt.getBooleanProperty("fimk.processPolls");
 
     public static final class OptionResult {
 

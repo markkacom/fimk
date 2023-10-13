@@ -49,11 +49,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 final class TransactionProcessorImpl implements TransactionProcessor {
 
-    private static final boolean enableTransactionRebroadcasting = Nxt.getBooleanProperty("nxt.enableTransactionRebroadcasting");
-    private static final boolean testUnconfirmedTransactions = Nxt.getBooleanProperty("nxt.testUnconfirmedTransactions");
+    private static final boolean enableTransactionRebroadcasting = Nxt.getBooleanProperty("fimk.enableTransactionRebroadcasting");
+    private static final boolean testUnconfirmedTransactions = Nxt.getBooleanProperty("fimk.testUnconfirmedTransactions");
     private static final int maxUnconfirmedTransactions;
     static {
-        int n = Nxt.getIntProperty("nxt.maxUnconfirmedTransactions");
+        int n = Nxt.getIntProperty("fimk.maxUnconfirmedTransactions");
         maxUnconfirmedTransactions = n <= 0 ? Integer.MAX_VALUE : n;
     }
 

@@ -16,13 +16,9 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Asset;
-import nxt.Attachment;
-import nxt.MofoAsset;
+import nxt.*;
+import nxt.txn.AskOrderPlacementAttachment;
 import nxt.util.JSON;
-import nxt.NxtException;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
@@ -62,7 +58,7 @@ public final class PlaceAskOrder extends CreateTransaction {
             }
         }
 
-        Attachment attachment = new Attachment.ColoredCoinsAskOrderPlacement(asset.getId(), quantityQNT, priceNQT, orderFeeQNT);
+        Attachment attachment = new AskOrderPlacementAttachment(asset.getId(), quantityQNT, priceNQT, orderFeeQNT);
         return createTransaction(req, account, attachment);
     }
 }

@@ -17,24 +17,15 @@
 package nxt;
 
 import nxt.crypto.EncryptedData;
-import nxt.db.DbClause;
-import nxt.db.DbIterator;
-import nxt.db.DbKey;
-import nxt.db.VersionedEntityDbTable;
-import nxt.db.VersionedValuesDbTable;
+import nxt.db.*;
 import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
 import nxt.util.Search;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.sql.*;
+import java.util.Date;
+import java.util.*;
 
 public final class DigitalGoodsStore {
 
@@ -56,8 +47,15 @@ public final class DigitalGoodsStore {
             }
             for (Purchase purchase : expiredPurchases) {
                 Account buyer = Account.getAccount(purchase.getBuyerId());
-                buyer.addToUnconfirmedBalanceNQT(Math.multiplyExact((long) purchase.getQuantity(), purchase.getPriceNQT()));
-                Goods.getGoods(purchase.getGoodsId()).changeQuantity(purchase.getQuantity());
+                Goods goods = Goods.getGoods(purchase.getGoodsId());
+                long assetId = goods.getAssetId();
+                long sum = Math.multiplyExact(purchase.getQuantity(), purchase.getPriceNQT());
+                if (assetId == 0) {
+                    buyer.addToUnconfirmedBalanceNQT(sum);
+                } else {
+                    buyer.addToUnconfirmedAssetBalanceQNT(assetId, sum);
+                }
+                goods.changeQuantity(purchase.getQuantity());
                 purchase.setPending(false);
             }
         }, BlockchainProcessor.Event.AFTER_BLOCK_APPLY);
@@ -248,7 +246,7 @@ public final class DigitalGoodsStore {
         }
 
         public static int getCountInStock() {
-            return goodsTable.getCount(inStockClause);
+            return goodsTable.getCount(inStockClause.and(goodsTermLimitClause()));
         }
 
         public static Goods getGoods(long goodsId) {
@@ -256,29 +254,58 @@ public final class DigitalGoodsStore {
         }
 
         public static DbIterator<Goods> getAllGoods(int from, int to) {
-            return goodsTable.getAll(from, to);
+            return goodsTable.getManyBy(goodsTermLimitClause(), from, to);
         }
 
         public static DbIterator<Goods> getGoodsInStock(int from, int to) {
-            return goodsTable.getManyBy(inStockClause, from, to);
+            return goodsTable.getManyBy(inStockClause.and(goodsTermLimitClause()), from, to);
+        }
+
+        /**
+         * Restricts Marketplace items max 2 years age
+         */
+        private static DbClause goodsTermLimitClause() {
+            Calendar cal = Calendar.getInstance();
+            Date nowDate = new Date();
+            cal.setTime(nowDate);
+            cal.add(Calendar.MONTH, -6);
+            int maxGoodsTerm = Convert.toEpochTime(cal.getTimeInMillis());
+            int now = Nxt.getEpochTime();
+            // "goods.expiry = Integer.MAX_VALUE" means expiry is not set so default expiry interval since the good was created
+            return new DbClause.FixedClause(String.format(
+                    " ((goods.expiry > %d AND goods.expiry != %d) OR (goods.expiry = %d AND goods.timestamp > %d)) ",
+                    now, Integer.MAX_VALUE, Integer.MAX_VALUE, maxGoodsTerm
+            ));
         }
 
         public static DbIterator<Goods> getSellerGoods(final long sellerId, final boolean inStockOnly, int from, int to) {
-            return goodsTable.getManyBy(new SellerDbClause(sellerId, inStockOnly), from, to, " ORDER BY name ASC, timestamp DESC, id ASC ");
+            // seller's goods are not filtered by goods expiry. Seller is the sender, so sender sees expired goods
+            return goodsTable.getManyBy(
+                    new SellerDbClause(sellerId, inStockOnly),
+                    from, to, " ORDER BY name ASC, timestamp DESC, id ASC "
+            );
         }
 
         public static int getSellerGoodsCount(long sellerId, boolean inStockOnly) {
-            return goodsTable.getCount(new SellerDbClause(sellerId, inStockOnly));
+            return goodsTable.getCount(new SellerDbClause(sellerId, inStockOnly).and(goodsTermLimitClause()));
         }
 
         public static DbIterator<Goods> searchGoods(String query, boolean inStockOnly, int from, int to) {
-            return goodsTable.search(query, inStockOnly ? inStockClause : DbClause.EMPTY_CLAUSE, from, to,
-                    " ORDER BY ft.score DESC, goods.timestamp DESC ");
+            return goodsTable.search(
+                    query,
+                    inStockOnly ? inStockClause.and(goodsTermLimitClause()) : DbClause.EMPTY_CLAUSE,
+                    from, to,
+                    " ORDER BY ft.score DESC, goods.timestamp DESC "
+            );
         }
 
         public static DbIterator<Goods> searchSellerGoods(String query, long sellerId, boolean inStockOnly, int from, int to) {
-            return goodsTable.search(query, new SellerDbClause(sellerId, inStockOnly), from, to,
-                    " ORDER BY ft.score DESC, goods.name ASC, goods.timestamp DESC ");
+            return goodsTable.search(
+                    query,
+                    new SellerDbClause(sellerId, inStockOnly).and(goodsTermLimitClause()),
+                    from, to,
+                    " ORDER BY ft.score DESC, goods.name ASC, goods.timestamp DESC "
+            );
         }
 
         private static void init() {}
@@ -294,7 +321,9 @@ public final class DigitalGoodsStore {
         private final int timestamp;
         private int quantity;
         private long priceNQT;
+        private final long assetId;
         private boolean delisted;
+        private int expiry;
 
         private Goods(Transaction transaction, Attachment.DigitalGoodsListing attachment) {
             this.id = transaction.getId();
@@ -306,8 +335,10 @@ public final class DigitalGoodsStore {
             this.parsedTags = Search.parseTags(this.tags, 3, 20, 3);
             this.quantity = attachment.getQuantity();
             this.priceNQT = attachment.getPriceNQT();
+            this.assetId = attachment.getAssetId();
             this.delisted = false;
             this.timestamp = Nxt.getBlockchain().getLastBlockTimestamp();
+            this.expiry = Integer.MAX_VALUE;  // MAX_VALUE means "no expiry"
         }
 
         private Goods(ResultSet rs) throws SQLException {
@@ -321,14 +352,18 @@ public final class DigitalGoodsStore {
             this.parsedTags = Arrays.copyOf(array, array.length, String[].class);
             this.quantity = rs.getInt("quantity");
             this.priceNQT = rs.getLong("price");
+            this.priceNQT = rs.getLong("price");
+            this.assetId = rs.getLong("asset_id");
             this.delisted = rs.getBoolean("delisted");
             this.timestamp = rs.getInt("timestamp");
+            int v = rs.getInt("expiry");
+            this.expiry = v == 0 ? Integer.MAX_VALUE : v;
         }
 
         private void save(Connection con) throws SQLException {
             try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO goods (id, seller_id, name, "
-                    + "description, tags, parsed_tags, timestamp, quantity, price, delisted, height, latest) KEY (id, height) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
+                    + "description, tags, parsed_tags, timestamp, quantity, price, asset_id, delisted, height, expiry, latest) KEY (id, height) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TRUE)")) {
                 int i = 0;
                 pstmt.setLong(++i, this.id);
                 pstmt.setLong(++i, this.sellerId);
@@ -339,9 +374,22 @@ public final class DigitalGoodsStore {
                 pstmt.setInt(++i, this.timestamp);
                 pstmt.setInt(++i, this.quantity);
                 pstmt.setLong(++i, this.priceNQT);
+                pstmt.setLong(++i, this.assetId);
                 pstmt.setBoolean(++i, this.delisted);
                 pstmt.setInt(++i, Nxt.getBlockchain().getHeight());
+                pstmt.setInt(++i, this.expiry);
                 pstmt.executeUpdate();
+            }
+        }
+
+        public int updateExpiry(int expiry) throws SQLException {
+            try (Connection con = Db.db.getConnection();
+                 PreparedStatement pstmt = con.prepareStatement("UPDATE goods SET expiry = ? WHERE id = ?")) {
+                pstmt.setInt(1, expiry);
+                pstmt.setLong(2, this.getId());
+                int result = pstmt.executeUpdate();
+                this.expiry = expiry;
+                return result;
             }
         }
 
@@ -393,6 +441,15 @@ public final class DigitalGoodsStore {
             return priceNQT;
         }
 
+        /**
+         * Pricing asset/FIMK.
+         * 0 means FIMK, otherwise it is the asset id.
+         * @return asset id or 0 (FIMK) of pricing
+         */
+        public long getAssetId() {
+            return assetId;
+        }
+
         private void changePrice(long priceNQT) {
             this.priceNQT = priceNQT;
             goodsTable.insert(this);
@@ -410,10 +467,13 @@ public final class DigitalGoodsStore {
             goodsTable.insert(this);
         }
 
+        public int getExpiry() {
+            return expiry;
+        }
+
         public String[] getParsedTags() {
             return parsedTags;
         }
-
     }
 
     public static final class Purchase {
@@ -915,7 +975,7 @@ public final class DigitalGoodsStore {
     }
 
     static void changeQuantity(long goodsId, int deltaQuantity) {
-        Goods goods = Goods.goodsTable.get(Goods.goodsDbKeyFactory.newKey(goodsId));
+        Goods goods = Goods.getGoods(goodsId);
         if (! goods.isDelisted()) {
             goods.changeQuantity(deltaQuantity);
             goodsListeners.notify(goods, Event.GOODS_QUANTITY_CHANGE);
@@ -925,7 +985,7 @@ public final class DigitalGoodsStore {
     }
 
     static void purchase(Transaction transaction,  Attachment.DigitalGoodsPurchase attachment) {
-        Goods goods = Goods.goodsTable.get(Goods.goodsDbKeyFactory.newKey(attachment.getGoodsId()));
+        Goods goods = Goods.getGoods(attachment.getGoodsId());
         if (! goods.isDelisted() && attachment.getQuantity() <= goods.getQuantity() && attachment.getPriceNQT() == goods.getPriceNQT()
                 && (attachment.getDeliveryDeadlineTimestamp() > Nxt.getBlockchain().getLastBlockTimestamp()
                 || Nxt.getBlockchain().getHeight() >= Constants.VOTING_SYSTEM_BLOCK)) { // temporary
@@ -934,21 +994,43 @@ public final class DigitalGoodsStore {
             Purchase.purchaseTable.insert(purchase);
             purchaseListeners.notify(purchase, Event.PURCHASE);
         } else {
-            Account buyer = Account.getAccount(transaction.getSenderId());
-            buyer.addToUnconfirmedBalanceNQT(Math.multiplyExact((long) attachment.getQuantity(), attachment.getPriceNQT()));
             // restoring the unconfirmed balance if purchase not successful, however buyer still lost the transaction fees
+            Account buyer = Account.getAccount(transaction.getSenderId());
+            long assetId = goods.getAssetId();
+            long sum = Math.multiplyExact(attachment.getQuantity(), attachment.getPriceNQT());
+            if (assetId == 0) {
+                buyer.addToUnconfirmedBalanceNQT(sum);
+            } else {
+                buyer.addToUnconfirmedAssetBalanceQNT(assetId, sum);
+            }
         }
     }
 
     static void deliver(Transaction transaction, Attachment.DigitalGoodsDelivery attachment) {
         Purchase purchase = Purchase.getPendingPurchase(attachment.getPurchaseId());
         purchase.setPending(false);
-        long totalWithoutDiscount = Math.multiplyExact((long) purchase.getQuantity(), purchase.getPriceNQT());
+        long totalWithoutDiscount = Math.multiplyExact(purchase.getQuantity(), purchase.getPriceNQT());
+        Goods goods = Goods.getGoods(purchase.getGoodsId());
+        long assetId = goods.getAssetId();
+
         Account buyer = Account.getAccount(purchase.getBuyerId());
-        buyer.addToBalanceNQT(Math.subtractExact(attachment.getDiscountNQT(), totalWithoutDiscount));
-        buyer.addToUnconfirmedBalanceNQT(attachment.getDiscountNQT());
+        long sum = Math.subtractExact(attachment.getDiscountNQT(), totalWithoutDiscount);
+        if (assetId == 0) {
+            buyer.addToBalanceNQT(sum);
+            buyer.addToUnconfirmedBalanceNQT(attachment.getDiscountNQT());
+        } else {
+            buyer.addToAssetBalanceQNT(assetId, sum);
+            buyer.addToUnconfirmedAssetBalanceQNT(assetId, attachment.getDiscountNQT());
+        }
+
         Account seller = Account.getAccount(transaction.getSenderId());
-        seller.addToBalanceAndUnconfirmedBalanceNQT(Math.subtractExact(totalWithoutDiscount, attachment.getDiscountNQT()));
+        sum = Math.subtractExact(totalWithoutDiscount, attachment.getDiscountNQT());
+        if (assetId == 0) {
+            seller.addToBalanceAndUnconfirmedBalanceNQT(sum);
+        } else {
+            seller.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, sum);
+        }
+
         purchase.setEncryptedGoods(attachment.getGoods(), attachment.goodsIsText());
         purchase.setDiscountNQT(attachment.getDiscountNQT());
         purchaseListeners.notify(purchase, Event.DELIVERY);
@@ -956,10 +1038,17 @@ public final class DigitalGoodsStore {
 
     static void refund(long sellerId, long purchaseId, long refundNQT, Appendix.EncryptedMessage encryptedMessage) {
         Purchase purchase = Purchase.purchaseTable.get(Purchase.purchaseDbKeyFactory.newKey(purchaseId));
+        Goods goods = Goods.getGoods(purchase.getGoodsId());
+        long assetId = goods.getAssetId();
         Account seller = Account.getAccount(sellerId);
-        seller.addToBalanceNQT(-refundNQT);
         Account buyer = Account.getAccount(purchase.getBuyerId());
-        buyer.addToBalanceAndUnconfirmedBalanceNQT(refundNQT);
+        if (assetId == 0) {
+            seller.addToBalanceNQT(-refundNQT);
+            buyer.addToBalanceAndUnconfirmedBalanceNQT(refundNQT);
+        } else {
+            seller.addToAssetBalanceQNT(assetId, -refundNQT);
+            buyer.addToAssetAndUnconfirmedAssetBalanceQNT(assetId, refundNQT);
+        }
         if (encryptedMessage != null) {
             purchase.setRefundNote(encryptedMessage.getEncryptedData());
         }

@@ -20,20 +20,15 @@ import nxt.crypto.Crypto;
 import nxt.db.DbKey;
 import nxt.util.Convert;
 import nxt.util.Logger;
-
 import org.json.simple.JSONObject;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public final class TransactionImpl implements Transaction {
+public class TransactionImpl implements Transaction {
 
     static final class BuilderImpl implements Builder {
 
@@ -88,6 +83,12 @@ public final class TransactionImpl implements Transaction {
                 this.ecBlockHeight = ecBlock.getHeight();
                 this.ecBlockId = ecBlock.getId();
             }
+
+            if (type.getType() == TransactionType.TYPE_ACCOUNT_CONTROL
+                    && type.getSubtype() == TransactionType.SUBTYPE_REWARD_APPLICANT_REGISTRATION) {
+                return new TransactionFeeFree(this, secretPhrase);
+            }
+
             return new TransactionImpl(this, secretPhrase);
         }
 
@@ -221,17 +222,17 @@ public final class TransactionImpl implements Transaction {
 
     }
 
-    private final short deadline;
+    final short deadline;
     private volatile byte[] senderPublicKey;
     private final long recipientId;
-    private final long amountNQT;
-    private final long feeNQT;
+    final long amountNQT;
+    final long feeNQT;
     private final byte[] referencedTransactionFullHash;
-    private final TransactionType type;
+    final TransactionType type;
     private final int ecBlockHeight;
     private final long ecBlockId;
     private final byte version;
-    private final int timestamp;
+    final int timestamp;
     private final byte[] signature;
     private final Attachment.AbstractAttachment attachment;
     private final Appendix.Message message;
@@ -258,7 +259,7 @@ public final class TransactionImpl implements Transaction {
     private volatile byte[] bytes = null;
 
 
-    private TransactionImpl(BuilderImpl builder, String secretPhrase) throws NxtException.NotValidException {
+    TransactionImpl(BuilderImpl builder, String secretPhrase) throws NxtException.NotValidException {
 
         this.timestamp = builder.timestamp;
         this.deadline = builder.deadline;
@@ -959,6 +960,9 @@ public final class TransactionImpl implements Transaction {
                     + ", deadline: " + deadline + ", fee: " + feeNQT + ", amount: " + amountNQT);
         }
 
+        validateInternal();
+    }
+    void validateInternal() throws NxtException.ValidationException {
         if (referencedTransactionFullHash != null && referencedTransactionFullHash.length != 32) {
             throw new NxtException.NotValidException("Invalid referenced transaction full hash " + Convert.toHexString(referencedTransactionFullHash));
         }
@@ -999,8 +1003,11 @@ public final class TransactionImpl implements Transaction {
 
         long minimumFeeNQT = getMinimumFeeNQT(Nxt.getBlockchain().getHeight());
         if (feeNQT < minimumFeeNQT) {
-            throw new NxtException.NotCurrentlyValidException(String.format("Transaction fee %f NXT less than minimum fee %f NXT at height %d",
-                    ((double)feeNQT)/Constants.ONE_NXT, ((double)minimumFeeNQT)/Constants.ONE_NXT, Nxt.getBlockchain().getHeight()));
+            throw new NxtException.NotCurrentlyValidException(String.format(
+                    "Transaction fee %s FIM less than minimum fee %s FIM",
+                    ((double) feeNQT) / Constants.ONE_NXT,
+                    ((double) minimumFeeNQT) / Constants.ONE_NXT
+            ));
         }
 
         /* Throws NxtException.NotValidException if senderPublicKey is on locked list */

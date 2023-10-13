@@ -58,7 +58,7 @@ public final class ThreadPool {
         if (scheduledThreadPool != null) {
             throw new IllegalStateException("Executor service already started, no new jobs accepted");
         }
-        if (! Nxt.getBooleanProperty("nxt.disable" + name + "Thread")) {
+        if (! Nxt.getBooleanProperty("fimk.disable" + name + "Thread")) {
             backgroundJobs.put(runnable, timeUnit.toMillis(delay));
         } else {
             Logger.logMessage("Will not run " + name + " thread");

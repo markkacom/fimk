@@ -16,46 +16,18 @@
 
 package nxt.http;
 
-import nxt.Account;
+import nxt.*;
 import nxt.Account.AccountIdentifier;
 import nxt.Account.AccountInfo;
-import nxt.AccountColor;
-import nxt.Alias;
-import nxt.Asset;
 import nxt.Attachment.MonetarySystemAttachment;
-import nxt.NamespacedAlias;
-import nxt.Appendix;
-import nxt.AssetTransfer;
-import nxt.Attachment;
-import nxt.Block;
-import nxt.Constants;
-import nxt.Currency;
-import nxt.CurrencyExchangeOffer;
-import nxt.CurrencyFounder;
-import nxt.CurrencyTransfer;
-import nxt.CurrencyType;
-import nxt.DigitalGoodsStore;
-import nxt.Exchange;
-import nxt.Generator;
-import nxt.Nxt;
-import nxt.Order;
-import nxt.PhasingPoll;
-import nxt.PhasingVote;
-import nxt.Poll;
-import nxt.PrunableMessage;
-import nxt.RewardsImpl;
-import nxt.TaggedData;
-import nxt.Token;
-import nxt.Trade;
-import nxt.Transaction;
-import nxt.Vote;
-import nxt.VoteWeighting;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.peer.Hallmark;
 import nxt.peer.Peer;
+import nxt.reward.AssetRewarding;
+import nxt.reward.Rewarding;
+import nxt.reward.RewardItem;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -147,6 +119,9 @@ public final class JSONData {
             json.put("numberOfAccounts", Account.getAssetAccountCount(asset.getId()));
         }
         json.put("type", asset.getType());
+        json.put("expiry", asset.getExpiry());
+        json.put("height", asset.getHeight());
+        json.put("blockTimestamp", asset.getBlockTimestamp());
         return json;
     }
 
@@ -270,7 +245,7 @@ public final class JSONData {
         json.put("totalFeeNQT", String.valueOf(block.getTotalFeeNQT()));
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
+        json.put("totalPOSRewardNQT", String.valueOf(Rewarding.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 
@@ -309,7 +284,7 @@ public final class JSONData {
         json.put("transactions", transactions);
 
         /* XXX - Include POS reward for block */
-        json.put("totalPOSRewardNQT", String.valueOf(RewardsImpl.calculatePOSRewardNQT(block)));
+        json.put("totalPOSRewardNQT", String.valueOf(Rewarding.get().calculatePOSRewardNQT(block.getHeight())));
         return json;
     }
 
@@ -327,6 +302,9 @@ public final class JSONData {
         json.put("description", goods.getDescription());
         json.put("quantity", goods.getQuantity());
         json.put("priceNQT", String.valueOf(goods.getPriceNQT()));
+
+        addAssetInfo(json, goods.getAssetId());
+
         putAccount(json, "seller", goods.getSellerId());
         json.put("tags", goods.getTags());
         JSONArray tagsJSON = new JSONArray();
@@ -334,6 +312,7 @@ public final class JSONData {
         json.put("parsedTags", tagsJSON);
         json.put("delisted", goods.isDelisted());
         json.put("timestamp", goods.getTimestamp());
+        json.put("expiry", goods.getExpiry());
         if (includeCounts) {
             json.put("numberOfPurchases", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), false, true));
             json.put("numberOfPublicFeedbacks", DigitalGoodsStore.Purchase.getGoodsPurchaseCount(goods.getId(), true, true));
@@ -392,6 +371,11 @@ public final class JSONData {
         json.put("outboundWebSocket", peer.isOutboundWebSocket());
         if (peer.isBlacklisted()) {
             json.put("blacklistingCause", peer.getBlacklistingCause());
+        }
+        long[] v = peer.getLastBlockIdHeight();
+        if (v != null) {
+            json.put("lastBlockId", v[0]);
+            json.put("lastBlockHeight", v[1]);
         }
         return json;
     }
@@ -573,6 +557,10 @@ public final class JSONData {
         if (purchase.getRefundNQT() > 0) {
             json.put("refundNQT", String.valueOf(purchase.getRefundNQT()));
         }
+
+        DigitalGoodsStore.Goods goods = DigitalGoodsStore.Goods.getGoods(purchase.getGoodsId());
+        addAssetInfo(json, goods.getAssetId());
+
         return json;
     }
 
@@ -869,6 +857,62 @@ public final class JSONData {
             putAccount(json, "account", accountColor.getAccountId());
         }
         return json;
+    }
+
+    public static Object rewardItem(RewardItem item) {
+        JSONObject json = new JSONObject();
+        json.put("account", Long.toUnsignedString(item.getAccountId()));
+        json.put("asset", Long.toUnsignedString(item.getAssetId()));
+        json.put("campaign", Long.toUnsignedString(item.getCampaignId()));
+        json.put("height", item.getHeight());
+        json.put("amount", String.valueOf(item.getAmount()));
+        json.put("name", item.getName());
+        return json;
+    }
+
+    public static Object assetRewarding(AssetRewarding ar) {
+        JSONObject json = new JSONObject();
+        json.put("id", Long.toUnsignedString(ar.getId()));
+        json.put("asset", Long.toUnsignedString(ar.getAsset()));
+        json.put("height", ar.getHeight());
+        json.put("frequency", ar.getFrequency());
+        json.put("halvingBlocks", ar.getHalvingBlocks());
+        json.put("baseAmount", String.valueOf(ar.getBaseAmount()));
+        json.put("lotteryType", ar.getLotteryType());
+        json.put("target", ar.getTarget());
+        json.put("targetInfo", ar.getTargetInfo());
+        return json;
+    }
+
+    public static Object rewardTotalItem(RewardItem.TotalItem total) {
+        JSONObject json = new JSONObject();
+        json.put("name", total.name == null ? null : total.name.text);
+        json.put("fromHeight", total.fromHeight);
+        json.put("toHeight", total.toHeight);
+        json.put("campaignId", total.campaignId == 0 || total.campaignId == -1 ? Long.toString(total.campaignId) : Long.toUnsignedString(total.campaignId));
+        json.put("accountId", Long.toUnsignedString(total.accountId));
+        json.put("accountRS", Convert.rsAccount(total.accountId));
+        json.put("asset", Long.toUnsignedString(total.assetId));
+        json.put("assetName", total.assetName);
+        json.put("decimals", total.decimals);
+        json.put("amount", String.valueOf(total.amount));
+        return json;
+    }
+
+    private static void addAssetInfo(JSONObject json, long assetId) {
+        json.put("asset", Long.toUnsignedString(assetId));
+        String assetName;
+        int assetDecimals;
+        if (assetId == 0) {
+            assetName = "FIM";
+            assetDecimals = 8;
+        } else {
+            Asset asset = Asset.getAsset(assetId);
+            assetName = asset.getName();
+            assetDecimals = asset.getDecimals();
+        }
+        json.put("assetName", assetName);
+        json.put("assetDecimals", assetDecimals);
     }
 
 }

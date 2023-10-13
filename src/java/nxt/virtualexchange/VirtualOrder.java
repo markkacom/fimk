@@ -17,6 +17,9 @@ import nxt.Order.Bid;
 import nxt.Transaction;
 import nxt.db.DbIterator;
 import nxt.http.websocket.MofoSocketServer;
+import nxt.txn.AskOrderPlacementAttachment;
+import nxt.txn.BidOrderPlacementAttachment;
+import nxt.txn.OrderPlacementAttachment;
 import nxt.util.Convert;
 import nxt.util.Listener;
 import nxt.util.Listeners;
@@ -40,20 +43,20 @@ public abstract class VirtualOrder {
 
     private static final Map<Long, VirtualAsk> virtualAskMap = new HashMap<Long, VirtualAsk>();
     private static final Map<Long, VirtualBid> virtualBidMap = new HashMap<Long, VirtualBid>();
-
+    
     static class PeekableIterator<T> {
-
+        
         static abstract class PeekableIteratorFilter<T> {
             public abstract boolean accept(T entity);
         }
-
+      
         private Iterator<T> iterator;
         private T next;
         private PeekableIteratorFilter<T> filter;
-
+  
         public PeekableIterator(Iterator<T> iterator) {
             this(iterator, null);
-        }
+        }        
         public PeekableIterator(Iterator<T> iterator, PeekableIteratorFilter<T> filter) {
             this.iterator = iterator;
             this.filter = filter;
@@ -81,7 +84,7 @@ public abstract class VirtualOrder {
             return null;
         }
     }
-
+    
     private final long id;
     private final long accountId;
     private final long assetId;
@@ -89,8 +92,8 @@ public abstract class VirtualOrder {
     private final int height;
     private short transactionIndex;
     private long quantityQNT;
-
-    private VirtualOrder(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+    
+    private VirtualOrder(Transaction transaction, OrderPlacementAttachment attachment) {
         this.id = transaction.getId();
         this.accountId = transaction.getSenderId();
         this.assetId = attachment.getAssetId();
@@ -98,8 +101,8 @@ public abstract class VirtualOrder {
         this.priceNQT = attachment.getPriceNQT();
         this.height = transaction.getHeight() == Integer.MAX_VALUE ? Nxt.getBlockchain().getHeight() : transaction.getHeight();
         this.transactionIndex = 0;
-    }
-
+    }    
+    
     public VirtualOrder(Order order) {
         this.id = order.getId();
         this.accountId = order.getAccountId();
@@ -108,70 +111,70 @@ public abstract class VirtualOrder {
         this.priceNQT = order.getPriceNQT();
         this.height = order.getHeight();
         this.transactionIndex = 0;
-    }
-
+    }    
+    
     private static void matchOrders(long assetId, int timestamp) {
-
+    
         VirtualAsk askOrder;
         VirtualBid bidOrder;
-
+    
         while ((askOrder = VirtualAsk.getNextOrder(assetId)) != null
                 && (bidOrder = VirtualBid.getNextOrder(assetId)) != null) {
-
+    
             if (askOrder.getPriceNQT() > bidOrder.getPriceNQT()) {
                 break;
             }
-
+    
             VirtualTrade trade = VirtualTrade.addTrade(assetId, timestamp, Nxt.getBlockchain().getHeight()+1, askOrder, bidOrder);
-
+    
             askOrder.updateQuantityQNT(Math.subtractExact(askOrder.getQuantityQNT(), trade.getQuantityQNT()));
             bidOrder.updateQuantityQNT(Math.subtractExact(bidOrder.getQuantityQNT(), trade.getQuantityQNT()));
         }
-    }
+    }  
 
     public abstract String getType();
     protected abstract void save();
-
+    
     public static Map<Long, VirtualAsk> getVirtualAsks() {
         return virtualAskMap;
     }
-
+    
     public static Map<Long, VirtualBid> getVirtualBids() {
         return virtualBidMap;
     }
-
+    
     public long getQuantityQNT() {
         return quantityQNT;
     }
-
+    
     public void setQuantityQNT(long quantityQNT) {
         this.quantityQNT = quantityQNT;
     }
-
+    
     public long getId() {
         return id;
     }
-
+    
     public long getAccountId() {
         return accountId;
     }
-
+    
     public long getAssetId() {
         return assetId;
     }
-
+    
     public long getPriceNQT() {
         return priceNQT;
     }
-
+    
     public int getHeight() {
         return height;
     }
-
+    
     public short getTransactionIndex() {
         return transactionIndex;
     }
-
+    
     public void setTransactionIndex(short transactionIndex) {
         this.transactionIndex = transactionIndex;
     }
@@ -187,9 +190,9 @@ public abstract class VirtualOrder {
         json.put("accountRS", Convert.rsAccount(getAccountId()));
         json.put("type", getType());
         json.put("transactionIndex", transactionIndex);
-        return json;
+        return json; 
     }
-
+    
     public static void notifyOrderAdded(VirtualOrder order) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
             String asset = Long.toUnsignedString(order.getAssetId());
@@ -197,7 +200,7 @@ public abstract class VirtualOrder {
             MofoSocketServer.notifyJSON(topic, order.toJSONObject());
         }
     }
-
+    
     @SuppressWarnings("unchecked")
     public static void notifyOrderUpdate(VirtualOrder order) {
         if (!Nxt.getBlockchainProcessor().isScanning()) {
@@ -210,7 +213,7 @@ public abstract class VirtualOrder {
             json.put("priceNQT", String.valueOf(order.getPriceNQT()));
             MofoSocketServer.notifyJSON(topic, json);
         }
-    }
+    }    
 
     @SuppressWarnings("unchecked")
     public static void notifyOrderRemoved(VirtualOrder order) {
@@ -225,33 +228,31 @@ public abstract class VirtualOrder {
             MofoSocketServer.notifyJSON(topic, json);
         }
     }
-
+    
     protected void updateQuantityQNT(long quantityQNT) {
         setQuantityQNT(quantityQNT);
         save();
         if (quantityQNT > 0) {
-            listeners.notify(this, Event.UPDATE);
             notifyOrderUpdate(this);
-        }
+        } 
         else if (quantityQNT == 0) {
             listeners.notify(this, Event.REMOVE);
             notifyOrderRemoved(this);
-        }
+        } 
         else {
             throw new IllegalArgumentException("Negative quantity: " + quantityQNT
                     + " for order: " + Long.toUnsignedString(getId()));
         }
     }
-
+    
     public static class VirtualAsk extends VirtualOrder implements Comparable<VirtualAsk> {
-
         static final String TYPE = "ask";
-
+      
         public VirtualAsk(Order order) {
             super(order);
         }
 
-        public VirtualAsk(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+        public VirtualAsk(Transaction transaction, OrderPlacementAttachment attachment) {
             super(transaction, attachment);
         }
 
@@ -259,12 +260,12 @@ public abstract class VirtualOrder {
         public String getType() {
             return TYPE;
         }
-
+        
         @Override
         protected void save() {
             virtualAskMap.put(Long.valueOf(getId()), this);
         }
-
+        
         @Override
         public int compareTo(VirtualAsk other) {
             if (getPriceNQT() < other.getPriceNQT()) {
@@ -295,9 +296,9 @@ public abstract class VirtualOrder {
             }
             return virtualAsk;
         }
-
+        
         public static VirtualAsk getNextOrder(long assetId) {
-
+            
             /* Look in the 'real' orders to see if there is an order that has not been completely eaten */
             VirtualAsk bestOrder = null;
             DbIterator<nxt.Order.Ask> iterator = Order.Ask.getSortedOrders(assetId, 0, Integer.MAX_VALUE);
@@ -308,7 +309,7 @@ public abstract class VirtualOrder {
                     break;
                 }
             }
-
+          
             /* Look through the 'virtual' orders to see if there is a better order */
             for (VirtualAsk ask : virtualAskMap.values()) {
                 if (ask.getAssetId() == assetId) {
@@ -321,9 +322,9 @@ public abstract class VirtualOrder {
             }
             return bestOrder;
         }
-
+        
         /* called from ADDED_UNCONFIRMED_TRANSACTION for PLACE_ASK, PLACE_BID transactions */
-        static VirtualAsk addOrder(Transaction transaction, Attachment.ColoredCoinsAskOrderPlacement attachment, short transactionIndex) {
+        static VirtualAsk addOrder(Transaction transaction, AskOrderPlacementAttachment attachment, short transactionIndex) {
             VirtualAsk order = new VirtualAsk(transaction, attachment);
             order.setTransactionIndex(transactionIndex);
             order.save();
@@ -332,7 +333,7 @@ public abstract class VirtualOrder {
             matchOrders(attachment.getAssetId(), transaction.getTimestamp());
             return order;
         }
-
+  
         /* called from ADDED_UNCONFIRMED_TRANSACTION for CANCEL_ASK, CANCEL_BID transactions */
         static VirtualAsk removeOrder(long orderId) {
             VirtualAsk order = virtualAskMap.get(Long.valueOf(orderId));
@@ -349,7 +350,7 @@ public abstract class VirtualOrder {
             order.save();
             return order;
         }
-
+        
         public static List<VirtualAsk> getAsks(long assetId, int firstIndex, int lastIndex, long accountId) {
             if (firstIndex < 0 || lastIndex < firstIndex) {
                 throw new IndexOutOfBoundsException();
@@ -378,13 +379,13 @@ public abstract class VirtualOrder {
                 }
             }
             Collections.sort(sortedAsks, Collections.reverseOrder());
-
+          
             List<VirtualAsk> result = new ArrayList<VirtualAsk>();
             try (DbIterator<Ask> dbIterator = Order.Ask.getSortedOrders(assetId, 0, Integer.MAX_VALUE)) {
-
+              
                 PeekableIterator<VirtualAsk> virtualAsks;
                 PeekableIterator<Ask> asks;
-
+                
                 if (accountId != 0) {
                     virtualAsks = new PeekableIterator<VirtualAsk>(sortedAsks.iterator(), new PeekableIterator.PeekableIteratorFilter<VirtualAsk>() {
                         public boolean accept(VirtualAsk order) {
@@ -400,11 +401,11 @@ public abstract class VirtualOrder {
                 else {
                     virtualAsks = new PeekableIterator<VirtualAsk>(sortedAsks.iterator());
                     asks = new PeekableIterator<Ask>(dbIterator.iterator());
-                }
-
+                }                
+              
                 VirtualAsk virtualAsk = virtualAsks.peek();
                 VirtualAsk ask = asks.peek() != null ? getVirtualAsk(asks.peek()) : null;
-
+                
                 while ((virtualAsk != null || ask != null) && result.size() < lastIndex) {
                     if (virtualAsk == null) {
                         addToResultSet(ask, result);
@@ -459,29 +460,28 @@ public abstract class VirtualOrder {
             return count + Order.Ask.getAskOrderCountByAsset(assetId, accountId);
         }
     }
-
+    
     public static class VirtualBid extends VirtualOrder implements Comparable<VirtualBid> {
-
         static final String TYPE = "bid";
-
+      
         public VirtualBid(Order order) {
             super(order);
         }
 
-        public VirtualBid(Transaction transaction, Attachment.ColoredCoinsOrderPlacement attachment) {
+        public VirtualBid(Transaction transaction, OrderPlacementAttachment attachment) {
             super(transaction, attachment);
         }
-
+        
         @Override
         public String getType() {
             return TYPE;
         }
-
+        
         @Override
         protected void save() {
             virtualBidMap.put(Long.valueOf(getId()), this);
         }
-
+        
         @Override
         public int compareTo(VirtualBid other) {
             if (getPriceNQT() > other.getPriceNQT()) {
@@ -511,10 +511,10 @@ public abstract class VirtualOrder {
                 virtualBid = new VirtualBid(bid);
             }
             return virtualBid;
-        }
+        }      
 
         public static VirtualBid getNextOrder(long assetId) {
-
+          
             /* Look in the 'real' orders to see if there is an order that has not been completely eaten */
             VirtualBid bestOrder = null;
             DbIterator<nxt.Order.Bid> iterator = Order.Bid.getSortedOrders(assetId, 0, Integer.MAX_VALUE);
@@ -525,7 +525,7 @@ public abstract class VirtualOrder {
                     break;
                 }
             }
-
+          
             /* Look through the 'virtual' orders to see if there is a better order */
             for (VirtualBid bid : virtualBidMap.values()) {
                 if (bid.getAssetId() == assetId) {
@@ -538,9 +538,9 @@ public abstract class VirtualOrder {
             }
             return bestOrder;
         }
-
+        
         /* called from ADDED_UNCONFIRMED_TRANSACTION for PLACE_ASK, PLACE_BID transactions */
-        static VirtualBid addOrder(Transaction transaction, Attachment.ColoredCoinsBidOrderPlacement attachment, short transactionIndex) {
+        static VirtualBid addOrder(Transaction transaction, BidOrderPlacementAttachment attachment, short transactionIndex) {
             VirtualBid order = new VirtualBid(transaction, attachment);
             order.setTransactionIndex(transactionIndex);
             order.save();
@@ -549,7 +549,7 @@ public abstract class VirtualOrder {
             matchOrders(attachment.getAssetId(), transaction.getTimestamp());
             return order;
         }
-
+  
         /* called from ADDED_UNCONFIRMED_TRANSACTION for CANCEL_ASK, CANCEL_BID transactions */
         static VirtualBid removeOrder(long orderId) {
             VirtualBid order = virtualBidMap.get(Long.valueOf(orderId));
@@ -560,13 +560,12 @@ public abstract class VirtualOrder {
             }
             if (order.getQuantityQNT() > 0) {
                 order.setQuantityQNT(0);
-                listeners.notify(order, Event.REMOVE);
                 notifyOrderRemoved(order);
             }
             order.save();
             return order;
         }
-
+        
         public static List<VirtualBid> getBids(long assetId, int firstIndex, int lastIndex, long accountId) {
             if (firstIndex < 0 || lastIndex < firstIndex) {
                 throw new IndexOutOfBoundsException();
@@ -595,13 +594,13 @@ public abstract class VirtualOrder {
                 }
             }
             Collections.sort(sortedBids, Collections.reverseOrder());
-
+          
             List<VirtualBid> result = new ArrayList<VirtualBid>();
             try (DbIterator<Bid> dbIterator = Order.Bid.getSortedOrders(assetId, 0, Integer.MAX_VALUE)) {
-
+              
                 PeekableIterator<VirtualBid> virtualBids;
                 PeekableIterator<Bid> bids;
-
+                
                 if (accountId != 0) {
                     virtualBids = new PeekableIterator<VirtualBid>(sortedBids.iterator(), new PeekableIterator.PeekableIteratorFilter<VirtualBid>() {
                         public boolean accept(VirtualBid order) {
@@ -618,10 +617,10 @@ public abstract class VirtualOrder {
                     virtualBids = new PeekableIterator<VirtualBid>(sortedBids.iterator());
                     bids = new PeekableIterator<Bid>(dbIterator.iterator());
                 }
-
+              
                 VirtualBid virtualBid = virtualBids.peek();
                 VirtualBid bid = bids.peek() != null ? getVirtualBid(bids.peek()) : null;
-
+                
                 while ((virtualBid != null || bid != null) && result.size() < lastIndex) {
                     if (virtualBid == null) {
                         addToResultSet(bid, result);

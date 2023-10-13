@@ -1,14 +1,15 @@
 package nxt;
 
+import nxt.db.DbKey;
+import nxt.db.VersionedEntityDbTable;
+import nxt.util.Convert;
+import nxt.util.Utils;
+
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import nxt.db.DbKey;
-import nxt.db.VersionedEntityDbTable;
-import nxt.util.Convert;
 
 public final class MofoAsset {
 
@@ -184,29 +185,54 @@ public final class MofoAsset {
         if (Asset.privateEnabled()) {
             Asset asset = Asset.getAsset(assetId);
             if (asset != null) {
-                return isPrivateAsset(asset);
+                return isPrivateAsset(asset.getType());
             }
         }
         return false; 
     }
     
-    public static boolean isPrivateAsset(Asset asset) {
-        return asset.getType() == Asset.TYPE_PRIVATE_ASSET;
+    public static boolean isPrivateAsset(byte assetType) {
+        return Utils.getBit(assetType, Asset.TYPE_PRIVATE_BIT_POS) == 1;
     }
     
+    public static boolean isPrivateAsset(Asset asset) {
+        return Utils.getBit(asset.getType(), Asset.TYPE_PRIVATE_BIT_POS) == 1;
+    }
+
     public static boolean getAccountAllowed(long assetId, long accountId) {
         if (Asset.privateEnabled()) {
             Asset asset = Asset.getAsset(assetId);
+            return getAccountAllowed(asset, accountId);
+        }
+        return false;
+    }
+
+    public static boolean getAccountAllowed(Asset asset, long accountId) {
+        if (Asset.privateEnabled()) {
             if (asset != null && asset.getAccountId() == accountId) {
                 return true;
             }
             PrivateAssetAccount privateAssetAccount;
-            privateAssetAccount = privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(assetId, accountId));
+            privateAssetAccount = privateAssetAccountTable.get(privateAssetAccountDbKeyFactory.newKey(asset.getId(), accountId));
             if (privateAssetAccount != null) {
                 return privateAssetAccount.allowed;
             }
         }
         return false;
+    }
+
+    public static void validateAsset(Asset asset, long assetId, long sender, long recipient)
+            throws NxtException.NotCurrentlyValidException, NxtException.NotValidException {
+        if (asset == null) {
+            throw new NxtException.NotCurrentlyValidException("Asset " + Long.toUnsignedString(assetId) + " does not exist yet");
+        }
+        if (Asset.privateEnabled() && MofoAsset.isPrivateAsset(asset)) {
+            if (!MofoAsset.getAccountAllowed(assetId, sender)) {
+                throw new NxtException.NotValidException("Sender not allowed to use the private asset");
+            } else if (!MofoAsset.getAccountAllowed(assetId, recipient)) {
+                throw new NxtException.NotValidException("Recipient not allowed to use the private asset");
+            }
+        }
     }
     
     public static void setAccountAllowed(long assetId, long accountId, boolean allowed) {

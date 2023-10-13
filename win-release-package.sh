@@ -5,52 +5,52 @@ then
 	echo VERSION not defined
 	exit 1
 fi
-PACKAGE=nxt-client-${VERSION}
+PACKAGE=fimk-client-${VERSION}
 echo PACKAGE="${PACKAGE}"
-CHANGELOG=nxt-client-${VERSION}.changelog.txt
+CHANGELOG=fimk-client-${VERSION}.changelog.txt
 OBFUSCATE=$2
 
 FILES="changelogs conf html lib resource contrib logs"
-FILES="${FILES} nxt.exe nxtservice.exe"
-FILES="${FILES} 3RD-PARTY-LICENSES.txt AUTHORS.txt COPYING.txt DEVELOPER-AGREEMENT.txt LICENSE.txt"
-FILES="${FILES} DEVELOPERS-GUIDE.md OPERATORS-GUIDE.md README.md README.txt USERS-GUIDE.md"
+FILES="${FILES} fimk.exe fimkservice.exe"
+#FILES="${FILES} 3RD-PARTY-LICENSES.txt AUTHORS.txt COPYING.txt DEVELOPER-AGREEMENT.txt LICENSE.txt"
+#FILES="${FILES} DEVELOPERS-GUIDE.md OPERATORS-GUIDE.md README.md README.txt USERS-GUIDE.md"
 FILES="${FILES} mint.bat mint.sh run.bat run.sh run-tor.sh run-desktop.sh"
-FILES="${FILES} NXT_Wallet.url"
+#FILES="${FILES} fimk_Wallet.url"
 
 # unix2dos *.bat
 echo compile
 ./win-compile.sh
 rm -rf html/doc/*
-rm -rf nxt
+rm -rf fimk
 rm -rf ${PACKAGE}.jar
 rm -rf ${PACKAGE}.exe
 rm -rf ${PACKAGE}.zip
-mkdir -p nxt/
-mkdir -p nxt/logs
+mkdir -p fimk/
+mkdir -p fimk/logs
 
 if [ "${OBFUSCATE}" == "obfuscate" ];
 then
 echo obfuscate
-proguard.bat @nxt.pro
-mv ../nxt.map ../nxt.map.${VERSION}
-mkdir -p nxt/src/
+proguard.bat @fimk.pro
+mv ../fimk.map ../fimk.map.${VERSION}
+mkdir -p fimk/src/
 else
 FILES="${FILES} classes src"
 FILES="${FILES} compile.sh javadoc.sh jar.sh package.sh"
 FILES="${FILES} win-compile.sh win-javadoc.sh win-package.sh"
-echo javadoc
-./win-javadoc.sh
+#echo javadoc
+#./win-javadoc.sh
 fi
 echo copy resources
-cp installer/lib/JavaExe.exe nxt.exe
-cp installer/lib/JavaExe.exe nxtservice.exe
-cp -a ${FILES} nxt
+cp installer/lib/JavaExe.exe fimk.exe
+cp installer/lib/JavaExe.exe fimkservice.exe
+cp -a ${FILES} fimk
 echo gzip
-for f in `find nxt/html -name *.html -o -name *.js -o -name *.css -o -name *.json  -o -name *.ttf -o -name *.svg -o -name *.otf`
+for f in `find fimk/html -name *.html -o -name *.js -o -name *.css -o -name *.json  -o -name *.ttf -o -name *.svg -o -name *.otf`
 do
 	gzip -9c "$f" > "$f".gz
 done
-cd nxt
+cd fimk
 echo generate jar files
 ../jar.sh
 echo package installer Jar
@@ -59,16 +59,16 @@ echo create installer exe
 ../installer/build-exe.bat ${PACKAGE}
 echo create installer zip
 cd -
-zip -q -X -r ${PACKAGE}.zip nxt -x \*/.idea/\* \*/.gitignore \*/.git/\* \*.iml nxt/conf/nxt.properties nxt/conf/logging.properties
-rm -rf nxt
+zip -q -X -r ${PACKAGE}.zip fimk -x \*/.idea/\* \*/.gitignore \*/.git/\* \*.iml fimk/conf/nxt.properties fimk/conf/logging.properties
+rm -rf fimk
 
 echo creating change log ${CHANGELOG}
-echo -e "Release $1\n" > ${CHANGELOG}
-echo -e "https://bitbucket.org/JeanLucPicard/nxt/downloads/${PACKAGE}.exe\n" >> ${CHANGELOG}
+# echo -e "Release $1\n" > ${CHANGELOG}
+# echo -e "https://bitbucket.org/JeanLucPicard/nxt/downloads/${PACKAGE}.exe\n" >> ${CHANGELOG}
 echo -e "sha256:\n" >> ${CHANGELOG}
 sha256sum ${PACKAGE}.exe >> ${CHANGELOG}
 
-echo -e "https://bitbucket.org/JeanLucPicard/nxt/downloads/${PACKAGE}.jar\n" >> ${CHANGELOG}
+# echo -e "https://bitbucket.org/JeanLucPicard/nxt/downloads/${PACKAGE}.jar\n" >> ${CHANGELOG}
 echo -e "sha256:\n" >> ${CHANGELOG}
 sha256sum ${PACKAGE}.jar >> ${CHANGELOG}
 

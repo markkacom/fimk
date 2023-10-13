@@ -25,17 +25,19 @@ import nxt.http.API;
 import nxt.http.websocket.Events;
 import nxt.http.websocket.WebsocketServer;
 import nxt.peer.Peers;
-import nxt.replicate.Replicate;
+import nxt.reward.AccountNode;
+import nxt.reward.AssetRewarding;
+import nxt.reward.RewardCandidate;
+import nxt.reward.RewardItem;
+import nxt.txn.extension.TransactionTypeExtension;
 import nxt.user.Users;
 import nxt.util.Convert;
 import nxt.util.Logger;
 import nxt.util.ThreadPool;
 import nxt.util.Time;
 import nxt.virtualexchange.ExchangeObserver;
-
 import org.json.simple.JSONObject;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -52,15 +54,14 @@ import java.util.Properties;
 
 public final class Nxt {
 
-    public static final String NXT_VERSION = "1.5.10";
     public static final String APPLICATION = "FIMK";
-    public static final String VERSION = "0.6.4"; /* FIM Version*/
+    public static final String VERSION = "0.9.2"; /* FIM Version. Note the Peers.MAX_VERSION_LENGTH*/
     public static final String MIN_VERSION = "0.6.1"; /* Blacklist everything up or below this version */
 
     private static volatile Time time = new Time.EpochTime();
 
-    public static final String NXT_DEFAULT_PROPERTIES = "nxt-default.properties";
-    public static final String NXT_PROPERTIES = "nxt.properties";
+    public static final String NXT_DEFAULT_PROPERTIES = "fimk-default.properties";
+    public static final String NXT_PROPERTIES = "fimk.properties";
     public static final String CONFIG_DIR = "conf";
 
     private static final RuntimeMode runtimeMode;
@@ -70,13 +71,13 @@ public final class Nxt {
     static {
         redirectSystemStreams("out");
         redirectSystemStreams("err");
-        System.out.println("Initializing FIM server version " + Nxt.VERSION + " (based on NXT " + NXT_VERSION + ")");
+        System.out.println("Initializing FIM server version " + Nxt.VERSION);
         printCommandLineArguments();
         runtimeMode = RuntimeEnvironment.getRuntimeMode();
         dirProvider = RuntimeEnvironment.getDirProvider();
         loadProperties(defaultProperties, NXT_DEFAULT_PROPERTIES, true);
-        if (!VERSION.equals(Nxt.defaultProperties.getProperty("nxt.version"))) {
-            throw new RuntimeException("Using an nxt-default.properties file from a version other than " + VERSION + " is not supported!!!");
+        if (!VERSION.equals(Nxt.defaultProperties.getProperty("fimk.version"))) {
+            throw new RuntimeException("Using an fimk-default.properties file from a version other than " + VERSION + " is not supported!!!");
         }
     }
 
@@ -110,7 +111,33 @@ public final class Nxt {
         }
     }
 
-    private static final Properties properties = new Properties(defaultProperties);
+    private static final Properties properties = new Properties(defaultProperties) {
+        @Override
+        public String getProperty(String key) {
+            String v = super.getProperty(key);
+            if (v == null) {
+                //backward compatibility
+                if (key.startsWith("fimk.")) {
+                    key = "nxt." + key.substring(5);
+                    return super.getProperty(key);
+                }
+            }
+            return v;
+        }
+
+        @Override
+        public String getProperty(String key, String defaultValue) {
+            String v = super.getProperty(key, defaultValue);
+            if (v == null) {
+                //backward compatibility
+                if (key.startsWith("fimk.")) {
+                    key = "nxt." + key.substring(5);
+                    return super.getProperty(key, defaultValue);
+                }
+            }
+            return v;
+        }
+    };
 
     static {
         loadProperties(properties, NXT_PROPERTIES, false);
@@ -122,7 +149,7 @@ public final class Nxt {
             String configFile = System.getProperty(propertiesFile);
             if (configFile != null) {
                 System.out.printf("Loading %s from %s\n", propertiesFile, configFile);
-                try (InputStream fis = new FileInputStream(configFile)) {
+                try (InputStream fis = Files.newInputStream(Paths.get(configFile))) {
                     properties.load(fis);
                     return properties;
                 } catch (IOException e) {
@@ -130,8 +157,8 @@ public final class Nxt {
                 }
             } else {
                 try (InputStream is = ClassLoader.getSystemResourceAsStream(propertiesFile)) {
-                    // When running nxt.exe from a Windows installation we always have nxt.properties in the classpath but this is not the nxt properties file
-                    // Therefore we first load it from the classpath and then look for the real nxt.properties in the user folder.
+                    // When running nxt.exe from a Windows installation we always have fimk.properties in the classpath but this is not the nxt properties file
+                    // Therefore we first load it from the classpath and then look for the real fimk.properties in the user folder.
                     if (is != null) {
                         System.out.printf("Loading %s from classpath\n", propertiesFile);
                         properties.load(is);
@@ -189,7 +216,7 @@ public final class Nxt {
     private static int displayProperties = 0;
     private static boolean getDisplayProperties() {
       if (displayProperties == 0) {
-        String value = properties.getProperty("nxt.debug");
+        String value = properties.getProperty("fimk.debug");
         displayProperties = Boolean.TRUE.toString().equals(value) ? 1 : 2;
       }
       return displayProperties == 1;
@@ -197,6 +224,11 @@ public final class Nxt {
 
     public static int getIntProperty(String name) {
         return getIntProperty(name, 0);
+    }
+
+    public static int getIntPropertyNew(String suffix, int defaultValue, int testnetDefaultValue) {
+        String name = (Constants.isTestnet ? "fimk.testnet." : "fimk.") + suffix;
+        return getIntProperty(name, Constants.isTestnet ? testnetDefaultValue : defaultValue);
     }
 
     public static int getIntProperty(String name, int defaultValue) {
@@ -323,7 +355,7 @@ public final class Nxt {
         ThreadPool.shutdown();
         Peers.shutdown();
         Db.shutdown();
-        Logger.logShutdownMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") stopped.");
+        Logger.logShutdownMessage("FIM server " + VERSION + " stopped.");
         Logger.shutdown();
         runtimeMode.shutdown();
     }
@@ -338,7 +370,6 @@ public final class Nxt {
                 Logger.init();
                 logSystemProperties();
                 runtimeMode.init();
-                Replicate.init();
                 setServerStatus("FIM Server - Loading database", null);
                 Db.init();
                 setServerStatus("FIM Server - Loading resources", null);
@@ -348,6 +379,10 @@ public final class Nxt {
                 Alias.init();
                 NamespacedAlias.init();
                 Asset.init();
+                AssetRewarding.init();
+                RewardItem.init();
+                RewardCandidate.init();
+                AccountNode.init();
                 DigitalGoodsStore.init();
                 Hub.init();
                 Order.init();
@@ -357,13 +392,13 @@ public final class Nxt {
                 AssetTransfer.init();
                 Vote.init();
                 PhasingVote.init();
-                Currency.init(); // remove
-                CurrencyBuyOffer.init(); // remove
-                CurrencySellOffer.init(); // remove
-                CurrencyFounder.init(); // remove
-                CurrencyMint.init(); // remove
-                CurrencyTransfer.init(); // remove
-                Exchange.init(); // remove
+                Currency.init();
+                CurrencyBuyOffer.init();
+                CurrencySellOffer.init();
+                CurrencyFounder.init();
+                CurrencyMint.init();
+                CurrencyTransfer.init();
+                Exchange.init();
                 PrunableMessage.init();
                 TaggedData.init();
                 Peers.init();
@@ -380,7 +415,10 @@ public final class Nxt {
                 GossipProcessorImpl.getInstance();
                 AccountColor.init();
                 AppVersionManager.getInstance();
-                int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("nxt.timeMultiplier"), 1) : 1;
+
+                TransactionTypeExtension.init();
+
+                int timeMultiplier = (Constants.isTestnet && Constants.isOffline) ? Math.max(Nxt.getIntProperty("fimk.timeMultiplier"), 1) : 1;
                 ThreadPool.start(timeMultiplier);
                 if (timeMultiplier > 1) {
                     setTime(new Time.FasterTime(Math.max(getEpochTime(), Nxt.getBlockchain().getLastBlock().getTimestamp()), timeMultiplier));
@@ -389,14 +427,15 @@ public final class Nxt {
 
                 long currentTime = System.currentTimeMillis();
                 Logger.logMessage("Initialization took " + (currentTime - startTime) / 1000 + " seconds");
-                Logger.logMessage("FIM server " + VERSION + " (based on NXT "+ NXT_VERSION + ") started successfully.");
-                Logger.logMessage("Copyright © 2013-2015 The Nxt Core Developers.");
-                Logger.logMessage("Copyright © 2014-2016 Krypto Fin ry and the FIMKrypto Developers.");
+                Logger.logMessage("FIM server " + VERSION + " started successfully.");
+                Logger.logMessage("Copyright (c) 2013-2015 The Nxt Core Developers.");
+                Logger.logMessage("Copyright (c) 2014-2016 Krypto Fin ry and the FIMKrypto Developers.");
+                Logger.logMessage("Copyright (c) 2017-2023 The FIMK Developers.");
                 Logger.logMessage("Distributed under GPLv2, with ABSOLUTELY NO WARRANTY.");
                 if (API.getBrowserUri() != null) {
                     Logger.logMessage("Client UI is at " + API.getBrowserUri());
                 }
-                setServerStatus("NXT Server - Online", API.getBrowserUri());
+                setServerStatus("FIM Server - Online", API.getBrowserUri());
                 if (Constants.isTestnet) {
                     Logger.logMessage("RUNNING ON TESTNET - DO NOT USE REAL ACCOUNTS!");
                 }
@@ -406,10 +445,12 @@ public final class Nxt {
             }
         }
 
+        //note it is invoked after scan()
         private static void init() {
             if (initialized) {
                 throw new RuntimeException("Nxt.init has already been called");
             }
+
             initialized = true;
         }
 

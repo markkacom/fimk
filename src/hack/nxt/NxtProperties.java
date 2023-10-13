@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class NxtProperties {
 
-  static File propertiesFile = new File(System.getProperty("user.home") + "/temp.nxt.properties");
+  static File propertiesFile = new File(System.getProperty("user.home") + "/temp.fimk.properties");
 
   static void setup() {
     if (propertiesFile.exists()) {
@@ -33,13 +33,13 @@ public class NxtProperties {
     }
 
     Properties properties = loadProperties(new String[] {
-        System.getProperty("user.home") + "/git/fimk/conf/nxt-default.properties",
-        System.getProperty("user.home") + "/git/fimk/conf/nxt.properties"
+        System.getProperty("user.home") + "/git/fimk/conf/fimk-default.properties",
+        System.getProperty("user.home") + "/git/fimk/conf/fimk.properties"
     });
 
     writeConfigFile(properties, propertiesFile);
 
-    System.setProperty("nxt-default.properties", propertiesFile.getAbsolutePath());
+    System.setProperty("conf/fimk-default.properties", propertiesFile.getAbsolutePath());
 
     try {
       Properties loggingProperties = loadProperties(new String[] { System.getProperty("user.home") + "/git/fimk/conf/logging.properties"});

@@ -16,43 +16,15 @@
 
 package nxt.peer;
 
-import nxt.Account;
-import nxt.AppVersion;
-import nxt.AppVersionManager;
-import nxt.BlockchainProcessor;
-import nxt.Constants;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.util.Convert;
-import nxt.util.CountingInputReader;
-import nxt.util.CountingInputStream;
-import nxt.util.CountingOutputWriter;
-import nxt.util.JSON;
-import nxt.util.Logger;
-
+import nxt.*;
+import nxt.util.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +51,7 @@ final class PeerImpl implements Peer {
     private volatile long downloadedVolume;
     private volatile long uploadedVolume;
     private volatile int lastUpdated;
+    private volatile long[] providedBlockIdHeight; // [blockId, height]
     private volatile int lastConnectAttempt;
     private volatile int lastInboundRequest;
     private volatile long hallmarkBalance = -1;
@@ -230,14 +203,14 @@ final class PeerImpl implements Peer {
             throw new IllegalArgumentException("Announced address too long: " + announcedAddress.length());
         }
         this.announcedAddress = announcedAddress;
-        if (announcedAddress != null) {
+        if (announcedAddress == null) {
+            this.port = -1;
+        } else if (this.port == -1) {
             try {
                 this.port = new URI("http://" + announcedAddress).getPort();
             } catch (URISyntaxException e) {
                 this.port = -1;
             }
-        } else {
-            this.port = -1;
         }
     }
 
@@ -356,6 +329,28 @@ final class PeerImpl implements Peer {
     @Override
     public int getLastUpdated() {
         return lastUpdated;
+    }
+
+    @Override
+    public void setProvidedBlockIdHeight(long blockId, int height) {
+        if (this.providedBlockIdHeight == null) this.providedBlockIdHeight = new long[2];
+        this.providedBlockIdHeight[0] = blockId;
+        this.providedBlockIdHeight[1] = height;
+    }
+
+    public long[] getProvidedBlockIdHeight() {
+        return providedBlockIdHeight;
+    }
+
+    public long[] getLastBlockIdHeight() {
+        JSONObject info = PeerLastBlockInfo.get().getPeerInfos().get(this.getHost());
+        if (info == null) return null;
+        try {
+            return new long [] {Long.parseUnsignedLong((String) info.get("id")), (long) info.get("height")};
+        } catch (Exception e) {
+            Logger.logErrorMessage("wrong last block info from peer " + toString(0), e);
+            return null;
+        }
     }
 
     void setLastUpdated(int lastUpdated) {
@@ -572,7 +567,10 @@ final class PeerImpl implements Peer {
                 }
             }
             JSONObject response = send(Peers.myPeerInfoRequest);
-            if (response != null) {
+            if (response == null) {
+                //Logger.logDebugMessage("Failed to connect to peer " + peerAddress);
+                setState(State.NON_CONNECTED);
+            } else {
                 if (response.get("error") != null) {
                     setState(State.NON_CONNECTED);
                     return;
@@ -587,7 +585,9 @@ final class PeerImpl implements Peer {
 
                 if (!Peers.ignorePeerAnnouncedAddress) {
                     String newAnnouncedAddress = Convert.emptyToNull((String) response.get("announcedAddress"));
-                    if (newAnnouncedAddress != null) {
+                    if (newAnnouncedAddress == null) {
+                        Peers.setAnnouncedAddress(this, host);
+                    } else {
                         newAnnouncedAddress = Peers.addressWithPort(newAnnouncedAddress.toLowerCase());
                         if (newAnnouncedAddress != null) {
                             if (!verifyAnnouncedAddress(newAnnouncedAddress)) {
@@ -610,8 +610,6 @@ final class PeerImpl implements Peer {
                                 }
                             }
                         }
-                    } else {
-                        Peers.setAnnouncedAddress(this, host);
                     }
                 }
 
@@ -629,9 +627,6 @@ final class PeerImpl implements Peer {
                 } else if (!isBlacklisted()) {
                     blacklist("Old version: " + version);
                 }
-            } else {
-                //Logger.logDebugMessage("Failed to connect to peer " + peerAddress);
-                setState(State.NON_CONNECTED);
             }
         } catch (RuntimeException e) {
             blacklist(e);
@@ -744,4 +739,10 @@ final class PeerImpl implements Peer {
         return hallmark.getWeight();
     }
 
+    public String toString(int detail) {
+        if (detail == 2) {
+            return String.format("%s %s port %d websocket %s", getPlatform(), getState(), getPort(), webSocket.toString(2));
+        }
+        return announcedAddress + " " + getState();
+    }
 }

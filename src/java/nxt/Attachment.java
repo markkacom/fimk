@@ -19,7 +19,6 @@ package nxt;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -83,21 +82,21 @@ public interface Attachment extends Appendix {
 
     abstract class EmptyAttachment extends AbstractAttachment {
 
-        private EmptyAttachment() {
+        protected EmptyAttachment() {
             super(0);
         }
 
         @Override
-        final int getMySize() {
+        protected final int getMySize() {
             return 0;
         }
 
         @Override
-        final void putMyBytes(ByteBuffer buffer) {
+        protected final void putMyBytes(ByteBuffer buffer) {
         }
 
         @Override
-        final void putMyJSON(JSONObject json) {
+        protected final void putMyJSON(JSONObject json) {
         }
 
         @Override
@@ -149,12 +148,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length + 2 + Convert.toBytes(aliasURI).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] alias = Convert.toBytes(this.aliasName);
             byte[] uri = Convert.toBytes(this.aliasURI);
             buffer.put((byte)alias.length);
@@ -164,7 +163,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
             attachment.put("uri", aliasURI);
         }
@@ -211,12 +210,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] aliasBytes = Convert.toBytes(aliasName);
             buffer.put((byte)aliasBytes.length);
             buffer.put(aliasBytes);
@@ -224,7 +223,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
             attachment.put("priceNQT", priceNQT);
         }
@@ -262,19 +261,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] aliasBytes = Convert.toBytes(aliasName);
             buffer.put((byte) aliasBytes.length);
             buffer.put(aliasBytes);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("alias", aliasName);
         }
 
@@ -307,19 +306,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(aliasName).length;
         }
 
         @Override
-        void putMyBytes(final ByteBuffer buffer) {
+        protected void putMyBytes(final ByteBuffer buffer) {
             byte[] aliasBytes = Convert.toBytes(aliasName);
             buffer.put((byte)aliasBytes.length);
             buffer.put(aliasBytes);
         }
 
         @Override
-        void putMyJSON(final JSONObject attachment) {
+        protected void putMyJSON(final JSONObject attachment) {
             attachment.put("alias", aliasName);
         }
 
@@ -464,7 +463,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             int size = 2 + Convert.toBytes(pollName).length + 2 + Convert.toBytes(pollDescription).length + 1;
             for (String pollOption : pollOptions) {
                 size += 2 + Convert.toBytes(pollOption).length;
@@ -476,7 +475,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.pollName);
             byte[] description = Convert.toBytes(this.pollDescription);
             byte[][] options = new byte[this.pollOptions.length][];
@@ -507,7 +506,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", this.pollName);
             attachment.put("description", this.pollDescription);
             attachment.put("finishHeight", this.finishHeight);
@@ -606,19 +605,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 1 + this.pollVote.length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(this.pollId);
             buffer.put((byte) this.pollVote.length);
             buffer.put(this.pollVote);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("poll", Long.toUnsignedString(this.pollId));
             JSONArray vote = new JSONArray();
             if (this.pollVote != null) {
@@ -684,12 +683,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + 32 * transactionFullHashes.size() + 4 + revealedSecret.length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put((byte) transactionFullHashes.size());
             transactionFullHashes.forEach(buffer::put);
             buffer.putInt(revealedSecret.length);
@@ -697,7 +696,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             JSONArray jsonArray = new JSONArray();
             transactionFullHashes.forEach(hash -> jsonArray.add(Convert.toHexString(hash)));
             attachment.put("transactionFullHashes", jsonArray);
@@ -758,7 +757,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             int size = 8 + 1;
             for (String uri : uris) {
                 size += 2 + Convert.toBytes(uri).length;
@@ -767,7 +766,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(minFeePerByteNQT);
             buffer.put((byte) uris.length);
             for (String uri : uris) {
@@ -778,7 +777,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("minFeePerByteNQT", minFeePerByteNQT);
             JSONArray uris = new JSONArray();
             Collections.addAll(uris, this.uris);
@@ -824,12 +823,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.name);
             byte[] description = Convert.toBytes(this.description);
             buffer.put((byte)name.length);
@@ -839,7 +838,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("description", description);
         }
@@ -859,486 +858,6 @@ public interface Attachment extends Appendix {
 
     }
 
-    final class ColoredCoinsAssetIssuance extends AbstractAttachment {
-
-        private final int timestamp;
-        private final String name;
-        private final String description;
-        private final long quantityQNT;
-        private final byte decimals;
-        private final byte type;
-
-        ColoredCoinsAssetIssuance(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
-            super(buffer, transactionVersion);
-            this.timestamp = timestamp;
-            this.name = Convert.readString(buffer, buffer.get(), Constants.MAX_ASSET_NAME_LENGTH);
-            this.description = Convert.readString(buffer, buffer.getShort(), Constants.MAX_ASSET_DESCRIPTION_LENGTH);
-            this.quantityQNT = buffer.getLong();
-            this.decimals = buffer.get();
-            this.type = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? buffer.get() : 0;
-        }
-
-        ColoredCoinsAssetIssuance(JSONObject attachmentData, int timestamp) {
-            super(attachmentData);
-            this.timestamp = timestamp;
-            this.name = (String) attachmentData.get("name");
-            this.description = Convert.nullToEmpty((String) attachmentData.get("description"));
-            this.quantityQNT = Convert.parseLong(attachmentData.get("quantityQNT"));
-            this.decimals = ((Long) attachmentData.get("decimals")).byteValue();
-            this.type = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? ((Long) attachmentData.get("type")).byteValue() : 0;
-        }
-
-        public ColoredCoinsAssetIssuance(String name, String description, long quantityQNT, byte decimals, byte type) {
-            this.timestamp = Integer.MAX_VALUE;
-            this.name = name;
-            this.description = Convert.nullToEmpty(description);
-            this.quantityQNT = quantityQNT;
-            this.decimals = decimals;
-            this.type = type;
-        }
-
-        @Override
-        int getMySize() {
-            int size = 1 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 8 + 1;
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                size += 1;
-            };
-            return size;
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            byte[] name = Convert.toBytes(this.name);
-            byte[] description = Convert.toBytes(this.description);
-            buffer.put((byte)name.length);
-            buffer.put(name);
-            buffer.putShort((short) description.length);
-            buffer.put(description);
-            buffer.putLong(quantityQNT);
-            buffer.put(decimals);
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                buffer.put(type);
-            }
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            attachment.put("name", name);
-            attachment.put("description", description);
-            attachment.put("quantityQNT", quantityQNT);
-            attachment.put("decimals", decimals);
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                attachment.put("type", type);
-            }
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.ASSET_ISSUANCE;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public long getQuantityQNT() {
-            return quantityQNT;
-        }
-
-        public byte getDecimals() {
-            return decimals;
-        }
-
-        public byte getType() {
-            return type;
-        }
-    }
-
-    final class ColoredCoinsAssetTransfer extends AbstractAttachment {
-
-        private final long assetId;
-        private final long quantityQNT;
-        private final String comment;
-
-        ColoredCoinsAssetTransfer(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
-            super(buffer, transactionVersion);
-            this.assetId = buffer.getLong();
-            this.quantityQNT = buffer.getLong();
-            this.comment = getVersion() == 0 ? Convert.readString(buffer, buffer.getShort(), Constants.MAX_ASSET_TRANSFER_COMMENT_LENGTH) : null;
-        }
-
-        ColoredCoinsAssetTransfer(JSONObject attachmentData) {
-            super(attachmentData);
-            this.assetId = Convert.parseUnsignedLong((String) attachmentData.get("asset"));
-            this.quantityQNT = Convert.parseLong(attachmentData.get("quantityQNT"));
-            this.comment = getVersion() == 0 ? Convert.nullToEmpty((String) attachmentData.get("comment")) : null;
-        }
-
-        public ColoredCoinsAssetTransfer(long assetId, long quantityQNT) {
-            this.assetId = assetId;
-            this.quantityQNT = quantityQNT;
-            this.comment = null;
-        }
-
-        @Override
-        int getMySize() {
-            return 8 + 8 + (getVersion() == 0 ? (2 + Convert.toBytes(comment).length) : 0);
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            buffer.putLong(assetId);
-            buffer.putLong(quantityQNT);
-            if (getVersion() == 0 && comment != null) {
-                byte[] commentBytes = Convert.toBytes(this.comment);
-                buffer.putShort((short) commentBytes.length);
-                buffer.put(commentBytes);
-            }
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            Asset.putAsset(attachment, assetId);
-            attachment.put("quantityQNT", quantityQNT);
-            if (getVersion() == 0) {
-                attachment.put("comment", comment);
-            }
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.ASSET_TRANSFER;
-        }
-
-        public long getAssetId() {
-            return assetId;
-        }
-
-        public long getQuantityQNT() {
-            return quantityQNT;
-        }
-
-        public String getComment() {
-            return comment;
-        }
-
-    }
-
-    abstract class ColoredCoinsOrderPlacement extends AbstractAttachment {
-
-        private final long assetId;
-        private final long quantityQNT;
-        private final long priceNQT;
-
-        private ColoredCoinsOrderPlacement(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-            this.assetId = buffer.getLong();
-            this.quantityQNT = buffer.getLong();
-            this.priceNQT = buffer.getLong();
-        }
-
-        private ColoredCoinsOrderPlacement(JSONObject attachmentData) {
-            super(attachmentData);
-            this.assetId = Convert.parseUnsignedLong((String) attachmentData.get("asset"));
-            this.quantityQNT = Convert.parseLong(attachmentData.get("quantityQNT"));
-            this.priceNQT = Convert.parseLong(attachmentData.get("priceNQT"));
-        }
-
-        private ColoredCoinsOrderPlacement(long assetId, long quantityQNT, long priceNQT) {
-            this.assetId = assetId;
-            this.quantityQNT = quantityQNT;
-            this.priceNQT = priceNQT;
-        }
-
-        @Override
-        int getMySize() {
-            return 8 + 8 + 8;
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            buffer.putLong(assetId);
-            buffer.putLong(quantityQNT);
-            buffer.putLong(priceNQT);
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            Asset.putAsset(attachment, assetId);
-            attachment.put("quantityQNT", quantityQNT);
-            attachment.put("priceNQT", priceNQT);
-        }
-
-        public long getAssetId() {
-            return assetId;
-        }
-
-        public long getQuantityQNT() {
-            return quantityQNT;
-        }
-
-        public long getPriceNQT() {
-            return priceNQT;
-        }
-    }
-
-    final class ColoredCoinsAskOrderPlacement extends ColoredCoinsOrderPlacement {
-
-        private final long orderFeeQNT;
-        private final int timestamp;
-
-        ColoredCoinsAskOrderPlacement(ByteBuffer buffer, byte transactionVersion, int timestamp) {
-            super(buffer, transactionVersion);
-            this.timestamp = timestamp;
-            this.orderFeeQNT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? buffer.getLong() : 0;
-        }
-
-        ColoredCoinsAskOrderPlacement(JSONObject attachmentData, int timestamp) {
-            super(attachmentData);
-            this.timestamp = timestamp;
-            this.orderFeeQNT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? Convert.parseLong(attachmentData.get("orderFeeQNT")) : 0;
-        }
-
-        public ColoredCoinsAskOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeQNT) {
-            super(assetId, quantityQNT, priceNQT);
-            this.timestamp = Integer.MAX_VALUE;
-            this.orderFeeQNT = orderFeeQNT;
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.ASK_ORDER_PLACEMENT;
-        }
-
-        @Override
-        int getMySize() {
-            return super.getMySize() + (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? 8 : 0);
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            super.putMyBytes(buffer);
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                buffer.putLong(orderFeeQNT);
-            }
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            super.putMyJSON(attachment);
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                attachment.put("orderFeeQNT", orderFeeQNT);
-            }
-        }
-
-        public long getOrderFeeQNT() {
-            return orderFeeQNT;
-        }
-    }
-
-    final class ColoredCoinsBidOrderPlacement extends ColoredCoinsOrderPlacement {
-
-        private final int timestamp;
-        private final long orderFeeNQT;
-
-        ColoredCoinsBidOrderPlacement(ByteBuffer buffer, byte transactionVersion, int timestamp) {
-            super(buffer, transactionVersion);
-            this.timestamp = timestamp;
-            this.orderFeeNQT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? buffer.getLong() : 0;
-        }
-
-        ColoredCoinsBidOrderPlacement(JSONObject attachmentData, int timestamp) {
-            super(attachmentData);
-            this.timestamp = timestamp;
-            this.orderFeeNQT = timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? Convert.parseLong(attachmentData.get("orderFeeNQT")) : 0;
-        }
-
-        public ColoredCoinsBidOrderPlacement(long assetId, long quantityQNT, long priceNQT, long orderFeeNQT) {
-            super(assetId, quantityQNT, priceNQT);
-            this.timestamp = Integer.MAX_VALUE;
-            this.orderFeeNQT = orderFeeNQT;
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.BID_ORDER_PLACEMENT;
-        }
-
-        @Override
-        int getMySize() {
-            return super.getMySize() + (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP ? 8 : 0);
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            super.putMyBytes(buffer);
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                buffer.putLong(orderFeeNQT);
-            }
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            super.putMyJSON(attachment);
-            if (timestamp > Constants.PRIVATE_ASSETS_TIMESTAMP) {
-                attachment.put("orderFeeNQT", orderFeeNQT);
-            }
-        }
-
-        public long getOrderFeeNQT() {
-            return orderFeeNQT;
-        }
-
-    }
-
-    abstract class ColoredCoinsOrderCancellation extends AbstractAttachment {
-
-        private final long orderId;
-
-        private ColoredCoinsOrderCancellation(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-            this.orderId = buffer.getLong();
-        }
-
-        private ColoredCoinsOrderCancellation(JSONObject attachmentData) {
-            super(attachmentData);
-            this.orderId = Convert.parseUnsignedLong((String) attachmentData.get("order"));
-        }
-
-        private ColoredCoinsOrderCancellation(long orderId) {
-            this.orderId = orderId;
-        }
-
-        @Override
-        int getMySize() {
-            return 8;
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            buffer.putLong(orderId);
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            attachment.put("order", Long.toUnsignedString(orderId));
-        }
-
-        public long getOrderId() {
-            return orderId;
-        }
-    }
-
-    final class ColoredCoinsAskOrderCancellation extends ColoredCoinsOrderCancellation {
-
-        ColoredCoinsAskOrderCancellation(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-        }
-
-        ColoredCoinsAskOrderCancellation(JSONObject attachmentData) {
-            super(attachmentData);
-        }
-
-        public ColoredCoinsAskOrderCancellation(long orderId) {
-            super(orderId);
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.ASK_ORDER_CANCELLATION;
-        }
-
-    }
-
-    final class ColoredCoinsBidOrderCancellation extends ColoredCoinsOrderCancellation {
-
-        ColoredCoinsBidOrderCancellation(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-        }
-
-        ColoredCoinsBidOrderCancellation(JSONObject attachmentData) {
-            super(attachmentData);
-        }
-
-        public ColoredCoinsBidOrderCancellation(long orderId) {
-            super(orderId);
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.BID_ORDER_CANCELLATION;
-        }
-
-    }
-
-    final class ColoredCoinsDividendPayment extends AbstractAttachment {
-
-        private final long assetId;
-        private final int height;
-        private final long amountNQTPerQNT;
-
-        ColoredCoinsDividendPayment(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-            this.assetId = buffer.getLong();
-            this.height = buffer.getInt();
-            this.amountNQTPerQNT = buffer.getLong();
-        }
-
-        ColoredCoinsDividendPayment(JSONObject attachmentData) {
-            super(attachmentData);
-            this.assetId = Convert.parseUnsignedLong((String)attachmentData.get("asset"));
-            this.height = ((Long)attachmentData.get("height")).intValue();
-            this.amountNQTPerQNT = Convert.parseLong(attachmentData.get("amountNQTPerQNT"));
-        }
-
-        public ColoredCoinsDividendPayment(long assetId, int height, long amountNQTPerQNT) {
-            this.assetId = assetId;
-            this.height = height;
-            this.amountNQTPerQNT = amountNQTPerQNT;
-        }
-
-        @Override
-        int getMySize() {
-            return 8 + 4 + 8;
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            buffer.putLong(assetId);
-            buffer.putInt(height);
-            buffer.putLong(amountNQTPerQNT);
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            attachment.put("asset", Long.toUnsignedString(assetId));
-            attachment.put("height", height);
-            attachment.put("amountNQTPerQNT", amountNQTPerQNT);
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.ColoredCoins.DIVIDEND_PAYMENT;
-        }
-
-        public long getAssetId() {
-            return assetId;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public long getAmountNQTPerQNT() {
-            return amountNQTPerQNT;
-        }
-
-    }
-
     final class DigitalGoodsListing extends AbstractAttachment {
 
         private final String name;
@@ -1346,6 +865,7 @@ public interface Attachment extends Appendix {
         private final String tags;
         private final int quantity;
         private final long priceNQT;
+        private final long assetId;
 
         DigitalGoodsListing(ByteBuffer buffer, byte transactionVersion) throws NxtException.NotValidException {
             super(buffer, transactionVersion);
@@ -1354,6 +874,7 @@ public interface Attachment extends Appendix {
             this.tags = Convert.readString(buffer, buffer.getShort(), Constants.MAX_DGS_LISTING_TAGS_LENGTH);
             this.quantity = buffer.getInt();
             this.priceNQT = buffer.getLong();
+            this.assetId = getVersion() > 1 ? buffer.getLong() : 0;
         }
 
         DigitalGoodsListing(JSONObject attachmentData) {
@@ -1363,24 +884,28 @@ public interface Attachment extends Appendix {
             this.tags = (String) attachmentData.get("tags");
             this.quantity = ((Long) attachmentData.get("quantity")).intValue();
             this.priceNQT = Convert.parseLong(attachmentData.get("priceNQT"));
+            this.assetId = getVersion() > 1 ? Convert.parseLong(attachmentData.get("asset")) : 0;
         }
 
-        public DigitalGoodsListing(String name, String description, String tags, int quantity, long priceNQT) {
+        public DigitalGoodsListing(String name, String description, String tags, int quantity, long priceNQT, long assetId) {
+            super(HardFork.MARKETPLACE_PRICE_IN_ASSET_BLOCK(-1) ? 2 : 1);
             this.name = name;
             this.description = description;
             this.tags = tags;
             this.quantity = quantity;
             this.priceNQT = priceNQT;
+            this.assetId = getVersion() > 1 ? assetId : 0;
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 2 + Convert.toBytes(name).length + 2 + Convert.toBytes(description).length + 2
-                        + Convert.toBytes(tags).length + 4 + 8;
+                    + Convert.toBytes(tags).length + 4 + 8
+                    + (getVersion() > 1 ? 8 : 0);
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] nameBytes = Convert.toBytes(name);
             buffer.putShort((short) nameBytes.length);
             buffer.put(nameBytes);
@@ -1392,15 +917,17 @@ public interface Attachment extends Appendix {
             buffer.put(tagsBytes);
             buffer.putInt(quantity);
             buffer.putLong(priceNQT);
+            if (getVersion() > 1) buffer.putLong(assetId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("description", description);
             attachment.put("tags", tags);
             attachment.put("quantity", quantity);
             attachment.put("priceNQT", priceNQT);
+            if (getVersion() > 1) attachment.put("asset", assetId);
         }
 
         @Override
@@ -1417,6 +944,10 @@ public interface Attachment extends Appendix {
         public int getQuantity() { return quantity; }
 
         public long getPriceNQT() { return priceNQT; }
+
+        public long getAssetId() {
+            return assetId;
+        }
 
     }
 
@@ -1439,17 +970,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
         }
 
@@ -1485,18 +1016,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
             buffer.putLong(priceNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
             attachment.put("priceNQT", priceNQT);
         }
@@ -1535,18 +1066,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
             buffer.putInt(deltaQuantity);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
             attachment.put("deltaQuantity", deltaQuantity);
         }
@@ -1593,12 +1124,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4 + 8 + 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(goodsId);
             buffer.putInt(quantity);
             buffer.putLong(priceNQT);
@@ -1606,7 +1137,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("goods", Long.toUnsignedString(goodsId));
             attachment.put("quantity", quantity);
             attachment.put("priceNQT", priceNQT);
@@ -1664,12 +1195,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 4 + goods.getSize() + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(purchaseId);
             buffer.putInt(goodsIsText ? goods.getData().length | Integer.MIN_VALUE : goods.getData().length);
             buffer.put(goods.getData());
@@ -1678,7 +1209,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("purchase", Long.toUnsignedString(purchaseId));
             attachment.put("goodsData", Convert.toHexString(goods.getData()));
             attachment.put("goodsNonce", Convert.toHexString(goods.getNonce()));
@@ -1722,17 +1253,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(purchaseId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("purchase", Long.toUnsignedString(purchaseId));
         }
 
@@ -1768,18 +1299,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(purchaseId);
             buffer.putLong(refundNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("purchase", Long.toUnsignedString(purchaseId));
             attachment.put("refundNQT", refundNQT);
         }
@@ -1793,49 +1324,6 @@ public interface Attachment extends Appendix {
 
         public long getRefundNQT() { return refundNQT; }
 
-    }
-
-    final class AccountControlEffectiveBalanceLeasing extends AbstractAttachment {
-
-        private final short period;
-
-        AccountControlEffectiveBalanceLeasing(ByteBuffer buffer, byte transactionVersion) {
-            super(buffer, transactionVersion);
-            this.period = buffer.getShort();
-        }
-
-        AccountControlEffectiveBalanceLeasing(JSONObject attachmentData) {
-            super(attachmentData);
-            this.period = ((Long) attachmentData.get("period")).shortValue();
-        }
-
-        public AccountControlEffectiveBalanceLeasing(short period) {
-            this.period = period;
-        }
-
-        @Override
-        int getMySize() {
-            return 2;
-        }
-
-        @Override
-        void putMyBytes(ByteBuffer buffer) {
-            buffer.putShort(period);
-        }
-
-        @Override
-        void putMyJSON(JSONObject attachment) {
-            attachment.put("period", period);
-        }
-
-        @Override
-        public TransactionType getTransactionType() {
-            return TransactionType.AccountControl.EFFECTIVE_BALANCE_LEASING;
-        }
-
-        public short getPeriod() {
-            return period;
-        }
     }
 
     interface MonetarySystemAttachment {
@@ -1917,13 +1405,13 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 1 + Convert.toBytes(name).length + 1 + Convert.toBytes(code).length + 2 +
                     Convert.toBytes(description).length + 1 + 8 + 8 + 8 + 4 + 8 + 1 + 1 + 1 + 1 + 1;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             byte[] name = Convert.toBytes(this.name);
             byte[] code = Convert.toBytes(this.code);
             byte[] description = Convert.toBytes(this.description);
@@ -1947,7 +1435,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("name", name);
             attachment.put("code", code);
             attachment.put("description", description);
@@ -2049,18 +1537,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(amountPerUnitNQT);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("amountPerUnitNQT", amountPerUnitNQT);
         }
@@ -2104,18 +1592,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(units);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("units", units);
         }
@@ -2159,18 +1647,18 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(units);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("units", units);
         }
@@ -2238,12 +1726,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8 + 8 + 8 + 8 + 8 + 4;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(buyRateNQT);
             buffer.putLong(sellRateNQT);
@@ -2255,7 +1743,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("buyRateNQT", buyRateNQT);
             attachment.put("sellRateNQT", sellRateNQT);
@@ -2333,19 +1821,19 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
             buffer.putLong(rateNQT);
             buffer.putLong(units);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("rateNQT", rateNQT);
             attachment.put("units", units);
@@ -2439,12 +1927,12 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8 + 8 + 8 + 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(nonce);
             buffer.putLong(currencyId);
             buffer.putLong(units);
@@ -2452,7 +1940,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("nonce", nonce);
             attachment.put("currency", Long.toUnsignedString(currencyId));
             attachment.put("units", units);
@@ -2502,17 +1990,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(currencyId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             attachment.put("currency", Long.toUnsignedString(currencyId));
         }
 
@@ -2597,7 +2085,7 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             if (taggedData != null) {
                 attachment.put("name", taggedData.getName());
                 attachment.put("description", taggedData.getDescription());
@@ -2739,17 +2227,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 32;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put(getHash());
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             attachment.put("hash", Convert.toHexString(getHash()));
         }
@@ -2807,17 +2295,17 @@ public interface Attachment extends Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 8;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putLong(taggedDataId);
         }
 
         @Override
-        void putMyJSON(JSONObject attachment) {
+        protected void putMyJSON(JSONObject attachment) {
             super.putMyJSON(attachment);
             attachment.put("taggedData", Long.toUnsignedString(taggedDataId));
         }

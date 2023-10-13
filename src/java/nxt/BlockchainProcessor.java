@@ -40,7 +40,7 @@ public interface BlockchainProcessor extends Observable<Block,BlockchainProcesso
 
     int getMinRollbackHeight();
 
-    void processPeerBlock(JSONObject request) throws NxtException;
+    void processPeerBlock(JSONObject request, Peer peer) throws NxtException;
 
     void fullReset();
 

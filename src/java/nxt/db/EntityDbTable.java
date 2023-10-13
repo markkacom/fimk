@@ -244,11 +244,16 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final DbIterator<T> search(String query, DbClause dbClause, int from, int to, String sort) {
+        //Leading wildcard is not allowed (lucene feature)
+        while (query.startsWith("*")) {
+            query = query.substring(1);
+        }
+
         Connection con = null;
         try {
             con = db.getConnection();
             PreparedStatement pstmt = con.prepareStatement("SELECT " + table + ".*, ft.score FROM " + table + ", ftl_search_data(?, 2147483647, 0) ft "
-                    + " WHERE " + table + ".db_id = ft.keys[0] AND ft.table = ? " + (multiversion ? " AND " + table + ".latest = TRUE " : " ")
+                    + " WHERE " + table + ".db_id = ft.keys[1] AND ft.`table` = ? " + (multiversion ? " AND " + table + ".latest = TRUE " : " ")
                     + " AND " + dbClause.getClause() + sort
                     + DbUtils.limitsClause(from, to));
             int i = 0;

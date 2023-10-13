@@ -11,6 +11,9 @@ import nxt.util.Convert;
 
 import org.json.simple.JSONObject;
 
+import java.nio.ByteBuffer;
+import java.util.Map;
+
 public class MofoTransactions {
 
     public static final byte TYPE_FIMKRYPTO = 40;
@@ -35,12 +38,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType NAMESPACED_ALIAS_ASSIGNMENT = new NamespacedAliasAssignmentTransaction() {
@@ -55,17 +58,17 @@ public class MofoTransactions {
             };
 
             @Override
-            public MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.NamespacedAliasAssignmentAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.NamespacedAliasAssignmentAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.NamespacedAliasAssignmentAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.NamespacedAliasAssignmentAttachment attachment = (MofoAttachment.NamespacedAliasAssignmentAttachment) transaction.getAttachment();
                 NamespacedAlias.addOrUpdateAlias(transaction, attachment);
             }
@@ -80,7 +83,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.NamespacedAliasAssignmentAttachment attachment = (MofoAttachment.NamespacedAliasAssignmentAttachment) transaction.getAttachment();
                 if (attachment.getAliasName().length() == 0
                         || attachment.getAliasName().length() > Constants.MAX_ALIAS_LENGTH
@@ -121,12 +124,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType PRIVATE_ASSET_ADD_ACCOUNT = new PrivateAssetAddAccountTransaction() {
@@ -154,17 +157,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AddPrivateAssetAccountAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.AddPrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AddPrivateAssetAccountAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 MofoAsset.setAccountAllowed(attachment.getAssetId(), transaction.getRecipientId(), true);
             }
@@ -180,7 +183,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.AddPrivateAssetAccountAttachment attachment = (MofoAttachment.AddPrivateAssetAccountAttachment) transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
@@ -224,12 +227,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType PRIVATE_ASSET_REMOVE_ACCOUNT = new PrivateAssetRemoveAccountTransaction() {
@@ -245,17 +248,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.RemovePrivateAssetAccountAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.RemovePrivateAssetAccountAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.RemovePrivateAssetAccountAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.RemovePrivateAssetAccountAttachment attachment = (MofoAttachment.RemovePrivateAssetAccountAttachment) transaction.getAttachment();
                 MofoAsset.setAccountAllowed(attachment.getAssetId(), transaction.getRecipientId(), false);
                 if (recipientAccount != null) {
@@ -286,7 +289,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.RemovePrivateAssetAccountAttachment attachment = (MofoAttachment.RemovePrivateAssetAccountAttachment) transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
@@ -339,12 +342,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType PRIVATE_ASSET_SET_FEE = new PrivateAssetSetFeeTransaction() {
@@ -360,17 +363,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.PrivateAssetSetFeeAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.PrivateAssetSetFeeAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.PrivateAssetSetFeeAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.PrivateAssetSetFeeAttachment attachment = (MofoAttachment.PrivateAssetSetFeeAttachment) transaction.getAttachment();
                 MofoAsset.setFee(attachment.getAssetId(), attachment.getOrderFeePercentage(), attachment.getTradeFeePercentage());
             }
@@ -388,7 +391,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.PrivateAssetSetFeeAttachment attachment = (MofoAttachment.PrivateAssetSetFeeAttachment) transaction.getAttachment();
                 Asset asset = Asset.getAsset(attachment.getAssetId());
                 if (asset == null) {
@@ -409,7 +412,7 @@ public class MofoTransactions {
                     attachment.getTradeFeePercentage() > Constants.MAX_PRIVATE_ASSET_FEE_PERCENTAGE) {
                     throw new NxtException.NotValidException("Out of range trade fee percentage");
                 }
-                if (asset.getType() != Asset.TYPE_PRIVATE_ASSET) {
+                if (!MofoAsset.isPrivateAsset(asset)) {
                     throw new NxtException.NotValidException("Asset is not private");
                 }
                 if ( ! Asset.privateEnabled()) {
@@ -440,12 +443,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType ACCOUNT_ID_ASSIGNMENT = new AccountIdAssignmentTransaction() {
@@ -461,17 +464,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.SetAccountIdentifierAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.SetAccountIdentifierAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.SetAccountIdentifierAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.SetAccountIdentifierAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.SetAccountIdentifierAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.SetAccountIdentifierAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.SetAccountIdentifierAttachment attachment = (MofoAttachment.SetAccountIdentifierAttachment) transaction.getAttachment();
                 Account.addAccountIdentifier(transaction, attachment);
             }
@@ -488,7 +491,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.SetAccountIdentifierAttachment attachment = (MofoAttachment.SetAccountIdentifierAttachment) transaction.getAttachment();
 
                 if ( ! HardFork.ACCOUNT_IDENTIFIER_BLOCK()) {
@@ -599,12 +602,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType VERIFICATION_AUTHORITY_ASSIGNMENT = new VerificationAuthorityAssignmentTransaction() {
@@ -620,17 +623,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.VerificationAuthorityAssignmentAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.VerificationAuthorityAssignmentAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.VerificationAuthorityAssignmentAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.VerificationAuthorityAssignmentAttachment attachment = (MofoAttachment.VerificationAuthorityAssignmentAttachment) transaction.getAttachment();
                 MofoVerificationAuthority.addOrUpdateVerificationAuthority(transaction, attachment);
             }
@@ -646,7 +649,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.VerificationAuthorityAssignmentAttachment attachment = (MofoAttachment.VerificationAuthorityAssignmentAttachment) transaction.getAttachment();
                 if (transaction.getSenderId() != Constants.MASTER_VERIFICATION_AUTHORITY_ACCOUNT) {
                     throw new NxtException.NotValidException("Account not allowed to add verification authority");
@@ -697,12 +700,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType ACCOUNT_COLOR_CREATE = new AccountColorCreateTransaction() {
@@ -718,17 +721,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.AccountColorCreateAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.AccountColorCreateAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountColorCreateAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.AccountColorCreateAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.AccountColorCreateAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountColorCreateAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.AccountColorCreateAttachment attachment = (MofoAttachment.AccountColorCreateAttachment) transaction.getAttachment();
                 AccountColor.addAccountColor(transaction, attachment);
             }
@@ -745,7 +748,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.AccountColorCreateAttachment attachment = (MofoAttachment.AccountColorCreateAttachment) transaction.getAttachment();
                 if (!AccountColor.getAccountColorEnabled()) {
                     throw new NxtException.NotYetEnabledException("Account color not yet enabled");
@@ -786,12 +789,12 @@ public class MofoTransactions {
         }
 
         @Override
-        final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final boolean applyAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
             return true;
         }
 
         @Override
-        final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
+        protected final void undoAttachmentUnconfirmed(Transaction transaction, Account senderAccount) {
         }
 
         public static final TransactionType ACCOUNT_COLOR_ASSIGN = new AccountColorAssignTransaction() {
@@ -807,17 +810,17 @@ public class MofoTransactions {
             }
 
             @Override
-            public MofoAttachment.AccountColorAssignAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.AccountColorAssignAttachment parseAttachment(ByteBuffer buffer, byte transactionVersion, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountColorAssignAttachment(buffer, transactionVersion);
             }
 
             @Override
-            MofoAttachment.AccountColorAssignAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
+            protected MofoAttachment.AccountColorAssignAttachment parseAttachment(JSONObject attachmentData, int timestamp) throws NxtException.NotValidException {
                 return new MofoAttachment.AccountColorAssignAttachment(attachmentData);
             }
 
             @Override
-            void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
+            protected void applyAttachment(Transaction transaction, Account senderAccount, Account recipientAccount) {
                 MofoAttachment.AccountColorAssignAttachment attachment = (MofoAttachment.AccountColorAssignAttachment) transaction.getAttachment();
                 Account account = Account.addOrGetAccount(transaction.getRecipientId());
                 account.setAccountColorId(attachment.getAccountColorId());
@@ -834,7 +837,7 @@ public class MofoTransactions {
             }
 
             @Override
-            void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
+            protected void validateAttachment(Transaction transaction) throws NxtException.ValidationException {
                 MofoAttachment.AccountColorAssignAttachment attachment = (MofoAttachment.AccountColorAssignAttachment) transaction.getAttachment();
                 if (!AccountColor.getAccountColorEnabled()) {
                     throw new NxtException.NotYetEnabledException("Account color not yet enabled");

@@ -87,7 +87,7 @@ public interface Appendix {
             return getMyFullSize() + (version > 0 ? 1 : 0);
         }
 
-        abstract int getMySize();
+        protected abstract int getMySize();
 
         int getMyFullSize() {
             return getMySize();
@@ -101,7 +101,7 @@ public interface Appendix {
             putMyBytes(buffer);
         }
 
-        abstract void putMyBytes(ByteBuffer buffer);
+        protected abstract void putMyBytes(ByteBuffer buffer);
 
         @Override
         public final JSONObject getJSONObject() {
@@ -111,7 +111,7 @@ public interface Appendix {
             return json;
         }
 
-        abstract void putMyJSON(JSONObject json);
+        protected abstract void putMyJSON(JSONObject json);
 
         @Override
         public final byte getVersion() {
@@ -228,18 +228,18 @@ public interface Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 4 + message.length;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putInt(isText ? (message.length | Integer.MIN_VALUE) : message.length);
             buffer.put(message);
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             json.put("message", this.toString());
             json.put("messageIsText", isText);
         }
@@ -343,7 +343,7 @@ public interface Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 32;
         }
 
@@ -353,12 +353,12 @@ public interface Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put(getHash());
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             if (prunableMessage != null) {
                 json.put("message", prunableMessage.toString());
                 json.put("messageIsText", prunableMessage.isText());
@@ -476,19 +476,19 @@ public interface Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 4 + encryptedData.getSize();
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putInt(isText ? (encryptedData.getData().length | Integer.MIN_VALUE) : encryptedData.getData().length);
             buffer.put(encryptedData.getData());
             buffer.put(encryptedData.getNonce());
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             json.put("data", Convert.toHexString(encryptedData.getData()));
             json.put("nonce", Convert.toHexString(encryptedData.getNonce()));
             json.put("isText", isText);
@@ -594,7 +594,7 @@ public interface Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 32;
         }
 
@@ -604,12 +604,12 @@ public interface Appendix {
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put(getHash());
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             if (prunableMessage != null) {
                 JSONObject encryptedMessageJSON = new JSONObject();
                 json.put("encryptedMessage", encryptedMessageJSON);
@@ -749,7 +749,7 @@ public interface Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             JSONObject encryptedMessageJSON = new JSONObject();
             super.putMyJSON(encryptedMessageJSON);
             json.put("encryptedMessage", encryptedMessageJSON);
@@ -794,7 +794,7 @@ public interface Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             JSONObject encryptToSelfMessageJSON = new JSONObject();
             super.putMyJSON(encryptToSelfMessageJSON);
             json.put("encryptToSelfMessage", encryptToSelfMessageJSON);
@@ -836,17 +836,17 @@ public interface Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 32;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.put(publicKey);
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             json.put("recipientPublicKey", Convert.toHexString(publicKey));
         }
 
@@ -994,12 +994,12 @@ public interface Appendix {
         }
 
         @Override
-        int getMySize() {
+        protected int getMySize() {
             return 4 + 1 + 8 + 8 + 1 + 8 * whitelist.length + 8 + 1 + 1 + 32 * linkedFullHashes.length + 1 + hashedSecret.length + 1;
         }
 
         @Override
-        void putMyBytes(ByteBuffer buffer) {
+        protected void putMyBytes(ByteBuffer buffer) {
             buffer.putInt(finishHeight);
             buffer.put(voteWeighting.getVotingModel().getCode());
             buffer.putLong(quorum);
@@ -1020,7 +1020,7 @@ public interface Appendix {
         }
 
         @Override
-        void putMyJSON(JSONObject json) {
+        protected void putMyJSON(JSONObject json) {
             json.put("phasingFinishHeight", finishHeight);
             json.put("phasingQuorum", quorum);
             json.put("phasingMinBalance", voteWeighting.getMinBalance());

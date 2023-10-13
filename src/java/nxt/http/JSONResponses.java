@@ -135,7 +135,7 @@ public final class JSONResponses {
     public static final JSONStreamAware MISSING_OFFER = missing("offer");
     public static final JSONStreamAware UNKNOWN_OFFER = unknown("offer");
     public static final JSONStreamAware INCORRECT_OFFER = incorrect("offer");
-    public static final JSONStreamAware INCORRECT_ADMIN_PASSWORD = incorrect("adminPassword", "(the specified password does not match nxt.adminPassword)");
+    public static final JSONStreamAware INCORRECT_ADMIN_PASSWORD = incorrect("adminPassword", "(the specified password does not match fimk.adminPassword)");
     public static final JSONStreamAware INCORRECT_ORDER_TYPE = incorrect("type", "(must be either bid or ask)");
     public static final JSONStreamAware OVERFLOW = error("overflow");
     public static final JSONStreamAware RESPONSE_STREAM_ERROR = responseError("responseOutputStream");
@@ -280,7 +280,7 @@ public final class JSONResponses {
     static {
         JSONObject response = new JSONObject();
         response.put("errorCode", 8);
-        response.put("errorDescription", "Administrator's password is not configured. Please set nxt.adminPassword");
+        response.put("errorDescription", "Administrator's password is not configured. Please set fimk.adminPassword");
         NO_PASSWORD_IN_CONFIG = JSON.prepare(response);
     }
 
@@ -288,7 +288,7 @@ public final class JSONResponses {
     static {
         JSONObject response = new JSONObject();
         response.put("errorCode", 8);
-        response.put("errorDescription", "Poll results no longer available, set nxt.processPolls=true and rescan");
+        response.put("errorDescription", "Poll results no longer available, set fimk.processPolls=true and rescan");
         POLL_RESULTS_NOT_AVAILABLE = JSON.prepare(response);
     }
 

@@ -20,18 +20,13 @@ import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
 import nxt.NxtException;
+import nxt.txn.AssetIssuanceAttachment;
 import nxt.util.Convert;
-
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.INCORRECT_ASSET_DESCRIPTION;
-import static nxt.http.JSONResponses.INCORRECT_ASSET_NAME;
-import static nxt.http.JSONResponses.INCORRECT_ASSET_NAME_LENGTH;
-import static nxt.http.JSONResponses.INCORRECT_DECIMALS;
-import static nxt.http.JSONResponses.INCORRECT_TYPE;
-import static nxt.http.JSONResponses.MISSING_NAME;
+import static nxt.http.JSONResponses.*;
 
 public final class IssueAsset extends CreateTransaction {
 
@@ -94,7 +89,7 @@ public final class IssueAsset extends CreateTransaction {
 
         long quantityQNT = ParameterParser.getQuantityQNT(req);
         Account account = ParameterParser.getSenderAccount(req);
-        Attachment attachment = new Attachment.ColoredCoinsAssetIssuance(name, description, quantityQNT, decimals, type);
+        Attachment attachment = new AssetIssuanceAttachment(name, description, quantityQNT, decimals, type);
         return createTransaction(req, account, attachment);
 
     }

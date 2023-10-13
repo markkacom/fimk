@@ -26,11 +26,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.INCORRECT_DELIVERY_DEADLINE_TIMESTAMP;
-import static nxt.http.JSONResponses.INCORRECT_PURCHASE_PRICE;
-import static nxt.http.JSONResponses.INCORRECT_PURCHASE_QUANTITY;
-import static nxt.http.JSONResponses.MISSING_DELIVERY_DEADLINE_TIMESTAMP;
-import static nxt.http.JSONResponses.UNKNOWN_GOODS;
+import static nxt.http.JSONResponses.*;
 
 public final class DGSPurchase extends CreateTransaction {
 
@@ -76,8 +72,14 @@ public final class DGSPurchase extends CreateTransaction {
         Account buyerAccount = ParameterParser.getSenderAccount(req);
         Account sellerAccount = Account.getAccount(goods.getSellerId());
 
-        Attachment attachment = new Attachment.DigitalGoodsPurchase(goods.getId(), quantity, priceNQT,
-                deliveryDeadline);
+        long assetId = goods.getAssetId();
+        if (assetId != 0) {
+            long assetBalance = buyerAccount.getUnconfirmedAssetBalanceQNT(assetId);
+            long sum = Math.multiplyExact(quantity, priceNQT);
+            if (sum > assetBalance) return NOT_ENOUGH_ASSETS;
+        }
+
+        Attachment attachment = new Attachment.DigitalGoodsPurchase(goods.getId(), quantity, priceNQT, deliveryDeadline);
         return createTransaction(req, buyerAccount, sellerAccount.getId(), 0, attachment);
 
     }

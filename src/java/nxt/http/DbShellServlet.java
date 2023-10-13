@@ -36,7 +36,7 @@ public final class DbShellServlet extends HttpServlet {
                     "<html>\n" +
                     "<head>\n" +
                     "    <meta charset=\"UTF-8\"/>\n" +
-                    "    <title>Nxt H2 Database Shell</title>\n" +
+                    "    <title>FIM H2 Database Shell</title>\n" +
                     "    <script type=\"text/javascript\">\n" +
                     "        function submitForm(form, adminPassword) {\n" +
                     "            var url = '/dbshell';\n" +
@@ -82,8 +82,8 @@ public final class DbShellServlet extends HttpServlet {
                     "</form>";
 
     private static final String errorNoPasswordIsConfigured =
-            "This page is password-protected, but no password is configured in nxt.properties. " +
-                    "Please set nxt.adminPassword or disable the password protection with nxt.disableAdminPassword";
+            "This page is password-protected, but no password is configured in fimk.properties. " +
+                    "Please set fimk.adminPassword or disable the password protection with fimk.disableAdminPassword";
 
     private static final String passwordFormTemplate =
             "<form action=\"/dbshell\" method=\"POST\">" +
@@ -102,7 +102,7 @@ public final class DbShellServlet extends HttpServlet {
             "<p>This page is password-protected. Please enter the administrator's password</p>");
 
     private static final String passwordFormWrongPassword = String.format(passwordFormTemplate, 
-            "<p style=\"color:red\">The provided password does not match the value of nxt.adminPassword. Please try again!</p>");
+            "<p style=\"color:red\">The provided password does not match the value of fimk.adminPassword. Please try again!</p>");
 
     
     @Override

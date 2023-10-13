@@ -1,6 +1,5 @@
 package nxt;
 
-import nxt.Constants;
 import nxt.util.Listener;
 
 public class HardFork {
@@ -80,6 +79,14 @@ public class HardFork {
             }
         }
         return Integer.MAX_VALUE;
+    }
+
+    public static boolean POS_POP_REWARD_BLOCK(int height) {
+        return (height == -1 ? Nxt.getBlockchain().getHeight() : height) > Constants.POS_POP_REWARD_BLOCK;
+    }
+
+    public static boolean MARKETPLACE_PRICE_IN_ASSET_BLOCK(int height) {
+        return (height == -1 ? Nxt.getBlockchain().getHeight() : height) > Constants.MARKETPLACE_PRICE_IN_ASSET_BLOCK;
     }
 
     public static boolean PRIVATE_ASSETS_BLOCK() {

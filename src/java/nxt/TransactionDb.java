@@ -21,16 +21,33 @@ import nxt.util.Convert;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-final class TransactionDb {
+public final class TransactionDb {
+
+    public static int hasTransaction(int type, int subtype, int minHeight, int maxHeight, long senderId) {
+        try (Connection con = Db.db.getConnection(); PreparedStatement pstmt = con.prepareStatement(
+                "SELECT height FROM transaction " +
+                        "WHERE type = ? AND subtype = ? AND height >= ? AND height <= ? AND sender_id = ? LIMIT 1"
+        )) {
+            pstmt.setInt(1, type);
+            pstmt.setInt(2, subtype);
+            pstmt.setInt(3, minHeight);
+            pstmt.setLong(4, maxHeight);
+            pstmt.setLong(5, senderId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.toString(), e);
+        }
+    }
 
     static TransactionImpl findTransaction(long transactionId) {
         return findTransaction(transactionId, Integer.MAX_VALUE);

@@ -54,17 +54,17 @@ import java.util.concurrent.locks.ReentrantLock;
  * are then returned to the application.
  *
  * Event registrations are discarded if an EventWait API request
- * has not been received within nxt.apiEventTimeout seconds.
+ * has not been received within fimk.apiEventTimeout seconds.
  *
- * The maximum number of event users is specified by nxt.apiMaxEventUsers.
+ * The maximum number of event users is specified by fimk.apiMaxEventUsers.
  */
 class EventListener implements Runnable, AsyncListener {
 
     /** Maximum event users */
-    static final int maxEventUsers = Nxt.getIntProperty("nxt.apiMaxEventUsers");
+    static final int maxEventUsers = Nxt.getIntProperty("fimk.apiMaxEventUsers");
 
     /** Event registration timeout (seconds) */
-    static final int eventTimeout = Math.max(Nxt.getIntProperty("nxt.apiEventTimeout"), 15);
+    static final int eventTimeout = Math.max(Nxt.getIntProperty("fimk.apiEventTimeout"), 15);
 
     /** Active event users */
     static final Map<String, EventListener> eventListeners = new ConcurrentHashMap<>();

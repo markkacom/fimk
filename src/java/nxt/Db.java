@@ -21,18 +21,18 @@ import nxt.db.TransactionalDb;
 
 public final class Db {
 
-    public static final String PREFIX = Constants.isTestnet ? "nxt.testDb" : "nxt.db";
+    public static final String PREFIX = Constants.isTestnet ? "fimk.testDb" : "fimk.db";
     public static final TransactionalDb db = new TransactionalDb(new BasicDb.DbProperties()
-            .maxCacheSize(Nxt.getIntProperty("nxt.dbCacheKB"))
+            .maxCacheSize(Nxt.getIntProperty("fimk.dbCacheKB"))
             .dbUrl(Nxt.getStringProperty(PREFIX + "Url"))
             .dbType(Nxt.getStringProperty(PREFIX + "Type"))
             .dbDir(Nxt.getStringProperty(PREFIX + "Dir"))
             .dbParams(Nxt.getStringProperty(PREFIX + "Params"))
             .dbUsername(Nxt.getStringProperty(PREFIX + "Username"))
             .dbPassword(Nxt.getStringProperty(PREFIX + "Password"))
-            .maxConnections(Nxt.getIntProperty("nxt.maxDbConnections"))
-            .loginTimeout(Nxt.getIntProperty("nxt.dbLoginTimeout"))
-            .defaultLockTimeout(Nxt.getIntProperty("nxt.dbDefaultLockTimeout") * 1000)
+            .maxConnections(Nxt.getIntProperty("fimk.maxDbConnections"))
+            .loginTimeout(Nxt.getIntProperty("fimk.dbLoginTimeout"))
+            .defaultLockTimeout(Nxt.getIntProperty("fimk.dbDefaultLockTimeout") * 1000)
     );
 
     static void init() {

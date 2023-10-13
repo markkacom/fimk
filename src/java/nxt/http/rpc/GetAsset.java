@@ -1,20 +1,15 @@
 package nxt.http.rpc;
 
-import java.util.List;
-
-import nxt.Account;
-import nxt.Asset;
-import nxt.AssetTransfer;
-import nxt.MofoAsset;
+import nxt.*;
 import nxt.MofoAsset.AssetFee;
-import nxt.Trade;
 import nxt.http.ParameterException;
 import nxt.http.websocket.JSONData;
 import nxt.http.websocket.RPCCall;
 import nxt.virtualexchange.VirtualTrade;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
+
+import java.util.List;
 
 public class GetAsset extends RPCCall {
 
@@ -62,6 +57,10 @@ public class GetAsset extends RPCCall {
             response.put("orderFeePercentage", fee.getOrderFeePercentage());
             response.put("tradeFeePercentage", fee.getTradeFeePercentage());
         }
+
+        response.put("expiry", asset.getExpiry());
+        response.put("height", asset.getHeight());
+        response.put("blockTimestamp", asset.getBlockTimestamp());
 
         return response;
     }

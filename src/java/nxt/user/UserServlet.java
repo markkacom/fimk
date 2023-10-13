@@ -44,7 +44,7 @@ public final class UserServlet extends HttpServlet  {
         }
     }
 
-    private static final boolean enforcePost = Nxt.getBooleanProperty("nxt.uiServerEnforcePOST");
+    private static final boolean enforcePost = Nxt.getBooleanProperty("fimk.uiServerEnforcePOST");
 
     private static final Map<String,UserRequestHandler> userRequestHandlers;
 
