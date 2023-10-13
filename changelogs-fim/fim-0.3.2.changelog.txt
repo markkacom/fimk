@@ -1,0 +1,4 @@
+FIMK 0.3.2 is based on NXT 1.2.6.
+
+Temporarily blocked all transactions from acccounts with confirmed stolen funds 
+after a major theft of 57M FIMK

@@ -1,0 +1,27 @@
+Fixes a bug where fresh blockchain downloads could not verify one or more
+block generation signatures.
+
+Fixes a bug where pre-private-asset-fork asset issuance transactions where 
+incorrectly read while uploading blocks to blockchain downloaders.
+
+Introduces some new and extends some existing HTTP API's for use in new 
+Lompsa client 2.0. These API's are likely to change in the future.
+
+- getTransactionCount
+- getAccountTransactionCount
+- getBlockchainTransactions
+
+Introduces new websocket push event mechanism for use in Lompsa 2.0, through
+this new mechanism clients can register/unregister for detailed server side
+push events. Lompsa 2.0 new codebase and extension mechanism are tightly 
+coupled with this event mechanism.
+
+Adds column sort functionality to getNamespacedAlias API, this is also available 
+in the bundled client.
+
+Includes a fix for incorrect namespaced alias handling, this fix requires a 
+hard fork of the network which will be enabled through the setting of another
+hard fork alias (this functionality was introduced a few releases ago).
+
+Before we enable the hard fork we would like to see a considerable amount of 
+nodes to have updated.

@@ -1,0 +1,24 @@
+Bug fix. Accounts that contain ask or bid orders from before the most recent
+fork did not return correct results from getActivity API, this resulted in empty
+activity lists in the client.
+
+For users who do not access the getActivity API (either directly or through the
+client) this update is not strictly necessary.
+
+                          ~~~ UPDATE ~~~
+
+The instruction displayed in the logs to update will be something like this:
+
+    sh update_fimk.sh 0.6.3 [insert 64 character sha hash here]
+
+To get around the missing update_fimk.sh file you instead must issue the 
+following extra command to update to this version, in future versions this extra 
+step is not needed since the build system now includes that script.
+
+So to update to this release instead do this:
+
+    curl -L -k -o update_fimk.sh https://git.io/vzhl9
+    sh update_fimk.sh 0.6.3 [insert 64 character sha hash here]
+
+If you would first like to inspect the shell script before executing it simply
+open https://git.io/vzhl9 in your browser.

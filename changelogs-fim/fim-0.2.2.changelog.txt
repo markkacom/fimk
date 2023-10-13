@@ -1,0 +1,28 @@
+FIMK 0.2.2 is based on NXT 1.1.5.
+
+* Fixed a bug where you could not register an account aliases. Now you can use 
+  both numeric and RS (Reed Solomon FIM-***) accounts to register account
+  aliases.
+
+* Fixed some unclear/confusing warning messages related to sending high amounts
+
+* Enabled auto update mechanism. Downloads are on github which are verified
+  by the client using a SHA256 hash stored in the blockchain.
+  Users of an outdated version will receive a notification in the client.
+
+* Allow using comma as decimal separator. You can use a comma or dot in any 
+  amount or fee field.
+  
+* Introduced a forging countdown indicator. 
+  The indicator is located next to your forging balance and tells the average 
+  expected time before you can forge the next block. Because of the changing 
+  state of the network/blockchain FIM cannot determine exactly when you'll 
+  create the next block. Click the button next to the countdown indicator to 
+  refresh forging. 
+  When you refresh forging you'll ask FIM to recalculate your forging deadline,
+  this deadline will be based on the most recent network/blockchain state.
+  Refreshing forging does not influence your chance to find a block faster or 
+  slower.
+  
+
+

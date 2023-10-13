@@ -1,0 +1,18 @@
+NXT 1.4.17 upstream changes:
+  This is a critical bugfix release. Everyone is required to update.
+  Fixed validation of asset exchange order cancellations.
+  Fixed excessive memory usage in unconfirmed transaction processing.
+
+FIMK 0.4.2 changes:
+
+  - Removed the lucene index on the account name and account description 
+    tables. this temporarily removes the search by account name functionality
+    but i expect to re-introduce that in a future release.
+    This change will dramatically increase the speed with wihch blocks can 
+    be processed while downloading.
+
+  - Removed the alias dependency for the public key hard fork change.
+    From now on not requiring the public key is hardcoded in the source code.
+
+  - Redone the build system that integrates and tunes mofowallet for use in
+    FIMK server. This is not immediately visible to end users.
