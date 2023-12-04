@@ -78,7 +78,11 @@ final class User {
     long unlockAccount(String secretPhrase) {
         this.publicKey = Crypto.getPublicKey(secretPhrase);
         this.secretPhrase = secretPhrase;
-        return Generator.startForging(secretPhrase).getAccountId();
+        Object result = Generator.startForging(secretPhrase);
+        if (result instanceof String) {
+            throw new RuntimeException((String) result);
+        }
+        return ((Generator) result).getAccountId();
     }
 
     synchronized void processPendingResponses(HttpServletRequest req, HttpServletResponse resp) throws IOException {

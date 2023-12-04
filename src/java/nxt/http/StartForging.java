@@ -42,10 +42,11 @@ public final class StartForging extends APIServlet.APIRequestHandler {
             return MISSING_SECRET_PHRASE;
         }
 
-        Generator generator = Generator.startForging(secretPhrase);
-        if (generator == null) {
-            return UNKNOWN_ACCOUNT;
+        Object result = Generator.startForging(secretPhrase);
+        if (result instanceof String) {
+            return JSONResponses.error((String) result);
         }
+        Generator generator = (Generator) result;
 
         JSONObject response = new JSONObject();
         response.put("deadline", generator.getDeadline());

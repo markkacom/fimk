@@ -136,7 +136,20 @@ public final class Generator implements Comparable<Generator> {
         return listeners.removeListener(listener, eventType);
     }
 
-    public static Generator startForging(String secretPhrase) {
+    /**
+     *
+     * @param secretPhrase
+     * @return instance of Generator or error string
+     */
+    public static Object startForging(String secretPhrase) {
+        synchronized (generators) {
+            if (!generators.isEmpty()) {
+                Generator alreadyGenerator = generators.values().stream().findFirst().get();
+                return String.format("Only one working forger is allowed. The place is already occupied by forger %s.",
+                        Convert.rsAccount(alreadyGenerator.getAccountId()));
+            }
+        }
+
         Generator generator = new Generator(secretPhrase);
 
         /* XXX - Prevent or allow forging based on fimk.allowedToForge */
@@ -148,10 +161,11 @@ public final class Generator implements Comparable<Generator> {
                     break;
                 }
             }
-            if (found == false) {
-                Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) +
-                    " is not allowed to forge. See fimk.allowedToForge property.");
-                return null;
+            if (!found) {
+                String message = "Account " + Long.toUnsignedString(generator.getAccountId()) +
+                        " is not allowed to forge.";
+                Logger.logDebugMessage(message + " See fimk.allowedToForge property.");
+                return message;
             }
         }
 
@@ -159,25 +173,27 @@ public final class Generator implements Comparable<Generator> {
 
         if (AccountColor.getAccountColorEnabled()) {
             if (account.getAccountColorId() != 0) {
-                Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) +
-                    " is not allowed to forge. Only non colored accounts can forge.");
-                return null;
+                String message = "Account " + Long.toUnsignedString(generator.getAccountId()) +
+                        " is not allowed to forge. Only non colored accounts can forge.";
+                Logger.logDebugMessage(message);
+                return message;
             }
         }
 
         if (!isBalanceEnough(Nxt.getBlockchain().getHeight(), generator.effectiveBalance)) {
-            Logger.logDebugMessage(
-                    String.format("Effective balance %d less than %d is not enough for forging",
-                            generator.effectiveBalance.longValue(), Constants.FORGING_THRESHOLD.longValue())
-            );
-            return null;
+            String message = String.format("Effective balance %d less than %d is not enough for forging",
+                    generator.effectiveBalance.longValue(), Constants.FORGING_THRESHOLD.longValue());
+            Logger.logDebugMessage(message);
+            return message;
         }
 
         Generator old = generators.putIfAbsent(secretPhrase, generator);
         if (old != null) {
-            Logger.logDebugMessage(old + " is already forging");
-            return old;
+            String message = old + " is already forging";
+            Logger.logDebugMessage(message);
+            return message;
         }
+
         listeners.notify(generator, Event.START_FORGING);
         Logger.logDebugMessage(generator + " started");
         return generator;

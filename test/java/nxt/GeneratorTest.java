@@ -29,7 +29,7 @@ public class GeneratorTest extends BlockchainTest {
      */
     @Ignore
     @Test
-    public void forge() {
+    public void forge() throws Exception {
         byte[] publicKey = ALICE.getPublicKey();
         BlockImpl lastBlock = blockchain.getLastBlock();
         BigInteger[] hits = Generator.calculateHits(publicKey, lastBlock);
@@ -37,7 +37,11 @@ public class GeneratorTest extends BlockchainTest {
         BigInteger effectiveBalance = BigInteger.valueOf(account == null || account.getEffectiveBalanceNXT() <= 0 ? 0 : account.getEffectiveBalanceNXT());
         long hitTime = Generator.calculateHitTime(effectiveBalance, hits, lastBlock)[0];
         long deadline = hitTime - lastBlock.getTimestamp();
-        Generator generator = Generator.startForging(ALICE.getSecretPhrase());
+        Object forgingStartResult = Generator.startForging(ALICE.getSecretPhrase());
+        if (forgingStartResult instanceof String) {
+            throw new Exception((String) forgingStartResult);
+        }
+        Generator generator = (Generator) forgingStartResult;
         int i=1;
         try {
             while (i<deadline) {

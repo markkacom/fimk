@@ -59,7 +59,10 @@ public class Starter {
                 }
                 if ("startforging".equals(command)) {
                     String secret = input.substring("startforging".length()).trim();
-                    Generator.startForging(secret);
+                    Object result = Generator.startForging(secret);
+                    if (result instanceof String) {
+                        System.out.println(result);
+                    }
                 }
                 if ("stopforging".equals(command)) {
                     Generator.stopForging();
