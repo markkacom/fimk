@@ -364,8 +364,8 @@ final class BlockImpl implements Block {
                 return false;
             }
 
-            Account account = Account.getAccount(getGeneratorId());
-            long effectiveBalance = account == null ? 0 : account.getEffectiveBalanceNXT();
+            Account generatorAccount = Account.getAccount(getGeneratorId());
+            long effectiveBalance = generatorAccount == null ? 0 : generatorAccount.getEffectiveBalanceNXT();
             if (effectiveBalance <= 0) {
                 return false;
             }
@@ -383,13 +383,14 @@ final class BlockImpl implements Block {
             }
 
             /* XXX - Prevent stolen funds to forge blocks */
-            if ( ! Locked.allowedToForge(account.getPublicKey())) {
+            if ( ! Locked.allowedToForge(generatorAccount.getPublicKey())) {
                 Logger.logMessage("Public key not allowed to forge blocks");
                 return false;
             }
 
             BigInteger[] hits = Generator.calculateHits(getGeneratorPublicKey(), previousBlock);
-            long[] hitTimeAndIndex = Generator.calculateHitTime(getGeneratorPublicKey(), account.getEffectiveBalanceNXT(previousBlock.getHeight()), previousBlock);
+            long[] hitTimeAndIndex = Generator.calculateHitTime(
+                    getGeneratorPublicKey(), generatorAccount.getEffectiveBalanceNXT(previousBlock.getHeight()), previousBlock);
             String hitVerifyingResult = Generator.verifyHit(hits, (int) hitTimeAndIndex[1], BigInteger.valueOf(effectiveBalance), previousBlock, timestamp);
             if (hitVerifyingResult == null) {
                 return true;
@@ -454,6 +455,11 @@ final class BlockImpl implements Block {
     }
 
     private void calculateBaseTarget(BlockImpl previousBlock) {
+        if (height == Constants.FORGING_BALANCE_BLOCK) {
+            // reset baseTarget to big value when used reduced balances in forging algo
+            baseTarget = Constants.INITIAL_BASE_TARGET * 100_500;
+            return;
+        }
 
         if ((this.getId() != Genesis.GENESIS_BLOCK_ID || previousBlockId != 0) && cumulativeDifficulty.equals(BigInteger.ZERO)) {
             long curBaseTarget = previousBlock.baseTarget;

@@ -155,13 +155,22 @@ public final class Generator implements Comparable<Generator> {
             }
         }
 
+        Account account = Account.getAccount(generator.getAccountId());
+
         if (AccountColor.getAccountColorEnabled()) {
-            Account account = Account.getAccount(generator.getAccountId());
             if (account.getAccountColorId() != 0) {
                 Logger.logDebugMessage("Account " + Long.toUnsignedString(generator.getAccountId()) +
                     " is not allowed to forge. Only non colored accounts can forge.");
                 return null;
             }
+        }
+
+        if (!isBalanceEnough(Nxt.getBlockchain().getHeight(), generator.effectiveBalance)) {
+            Logger.logDebugMessage(
+                    String.format("Effective balance %d less than %d is not enough for forging",
+                            generator.effectiveBalance.longValue(), Constants.FORGING_THRESHOLD.longValue())
+            );
+            return null;
         }
 
         Generator old = generators.putIfAbsent(secretPhrase, generator);
@@ -240,12 +249,16 @@ public final class Generator implements Comparable<Generator> {
     static String verifyHit(BigInteger[] hits, int selectedHitIndex, BigInteger effectiveBalance, Block previousBlock, int timestamp) {
         int interval = timestamp - previousBlock.getTimestamp();
         if (interval <= 0)  return "Elapsed time is not positive " + interval;
+        if (!isBalanceEnough(previousBlock.getHeight(), effectiveBalance)) {
+            return String.format("Effective balance %d less than %d is not enough for forging",
+                    effectiveBalance.longValue(), Constants.FORGING_THRESHOLD.longValue());
+        }
 
         // hit time calculation:  hit / (block.baseTarget * effectiveBalance) and then +1
         // so   hit = (elapsedTime - 1) * (block.baseTarget * effectiveBalance)  but we dont to get hit back due the loss of accuracy during rounding
 
         int expectedInterval = hits[selectedHitIndex].divide(
-                BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(effectiveBalance)).intValue() + 1;
+                BigInteger.valueOf(previousBlock.getBaseTarget()).multiply(forgingBalance(effectiveBalance, previousBlock.getHeight()))).intValue() + 1;
 
         if (expectedInterval > interval) return String.format("Fact interval %s less than expected interval %s", interval, expectedInterval);
 
@@ -257,8 +270,8 @@ public final class Generator implements Comparable<Generator> {
         return null;
     }
 
-    static boolean allowsFakeForging(byte[] publicKey) {
-        return Constants.isTestnet && publicKey != null && Arrays.equals(publicKey, fakeForgingPublicKey);
+    static boolean isBalanceEnough(int height, BigInteger effectiveBalance) {
+        return height <= Constants.FORGING_BALANCE_BLOCK || effectiveBalance.compareTo(Constants.FORGING_THRESHOLD) >= 0;
     }
 
     static BigInteger[] calculateHits(byte[] publicKey, Block block) {
@@ -272,7 +285,13 @@ public final class Generator implements Comparable<Generator> {
 
         MessageDigest digest = Crypto.sha256();
         digest.update(block.getGenerationSignature());
-        BigInteger[] result = new BigInteger[block.getHeight() < Constants.CONTROL_FORGING_TIME_BLOCK ? 1 : Constants.HITS_NUMBER];
+        int hitNum = 1;
+        if (block.getHeight() >= Constants.FORGING_BALANCE_BLOCK) {
+            hitNum = Constants.HITS_NUMBER_2;
+        } else if (block.getHeight() >= Constants.CONTROL_FORGING_TIME_BLOCK) {
+            hitNum = Constants.HITS_NUMBER;
+        }
+        BigInteger[] result = new BigInteger[hitNum];
         byte[] h = digest.digest(publicKey);
         result[0] = new BigInteger(1, new byte[]{h[7], h[6], h[5], h[4], h[3], h[2], h[1], h[0]});
 
@@ -320,7 +339,7 @@ public final class Generator implements Comparable<Generator> {
         int index = -1;
         int altIndex = -1;
         int diff = Integer.MAX_VALUE;
-        BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(effectiveBalance);
+        BigInteger divider = BigInteger.valueOf(block.getBaseTarget()).multiply(forgingBalance(effectiveBalance, block.getHeight()));
 
         //in fact the desired interval is (Constants.SECONDS_BETWEEN_BLOCKS - 1), this leads to 30s between blocks and stabilised base target
         int desiredInterval = Math.abs(Nxt.getBlockchain().desiredBlockInterval(block)) - 1;
@@ -352,6 +371,15 @@ public final class Generator implements Comparable<Generator> {
         }
 
         return new long[]{block.getTimestamp() + interval, index};
+    }
+
+    private static BigInteger forgingBalance(BigInteger balance, int height) {
+        if (height < Constants.FORGING_BALANCE_BLOCK) return balance;
+        return BigInteger.valueOf((long) (Math.log10(balance.longValue()) * 334));
+    }
+
+    static boolean allowsFakeForging(byte[] publicKey) {
+        return Constants.isTestnet && publicKey != null && Arrays.equals(publicKey, fakeForgingPublicKey);
     }
 
 

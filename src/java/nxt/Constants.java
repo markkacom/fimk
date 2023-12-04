@@ -18,6 +18,7 @@ package nxt;
 
 import nxt.util.Convert;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public final class Constants {
@@ -173,6 +174,9 @@ public final class Constants {
      * Number of hit values generated to select the suitable
      */
     public static final int HITS_NUMBER = 17;
+    public static final int HITS_NUMBER_2 = 3;
+    public static final BigInteger FORGING_THRESHOLD = BigInteger.valueOf(1000);
+    public static final int FORGING_BALANCE_BLOCK = isTestnet ? 11364 : Integer.MAX_VALUE;
     public static final int CONTROL_FORGING_TIME_BLOCK = isTestnet ? 1387 : 5_530_000;
     public static final int POS_POP_REWARD_BLOCK = isTestnet ? 1387 : 6_000_000;
     public static final int PRIVATE_ASSETS_BLOCK = isTestnet ? THIRD_BIRTH_BLOCK_TEST : 934504;
