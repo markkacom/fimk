@@ -739,6 +739,7 @@ final class PeerImpl implements Peer {
         return hallmark.getWeight();
     }
 
+    @Override
     public String toString(int detail) {
         if (detail == 2) {
             return String.format("%s %s port %d websocket %s", getPlatform(), getState(), getPort(), webSocket.toString(2));

@@ -3,6 +3,7 @@ package fimk;
 import nxt.Block;
 import nxt.Generator;
 import nxt.Nxt;
+import nxt.peer.Peers;
 
 import java.util.*;
 
@@ -66,6 +67,9 @@ public class Starter {
                 }
                 if ("stopforging".equals(command)) {
                     Generator.stopForging();
+                }
+                if ("peers".equals(command)) {
+                    Peers.getActivePeers().forEach(peer -> System.out.println(peer.toString(2)));
                 }
                 // scan height validate
                 // for example: scan 5799989 true

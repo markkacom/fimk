@@ -321,7 +321,7 @@ public final class Peers {
             if (Peers.shareMyAddress) {
                 peerServer = new Server();
                 ServerConnector connector = new ServerConnector(peerServer);
-                final int port = Constants.isTestnet ? TESTNET_PEER_PORT : Peers.myPeerServerPort;
+                final int port = getDefaultPeerPort(); //Constants.isTestnet ? TESTNET_PEER_PORT : Peers.myPeerServerPort;
                 connector.setPort(port);
                 final String host = Nxt.getStringProperty("fimk.peerServerHost");
                 connector.setHost(host);
@@ -515,10 +515,9 @@ public final class Peers {
 
     static PeerImpl findOrCreatePeer(final InetAddress inetAddress, final String announcedAddress, final boolean create) {
 
-        if (!Nxt.getBooleanProperty("fimk.allowLocalhostPeer")) {
-            if (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress() || inetAddress.isLinkLocalAddress()) {
-                return null;
-            }
+        if (!Nxt.getBooleanProperty("fimk.allowLocalhostPeer")
+                && (inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress() || inetAddress.isLinkLocalAddress())) {
+            return null;
         }
 
         String host = inetAddress.getHostAddress();

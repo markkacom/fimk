@@ -86,4 +86,7 @@ public interface Peer extends Comparable<Peer> {
     JSONObject send(JSONStreamAware request, int maxResponseSize);
 
     boolean getGossipEnabled();
+
+    String toString(int detail);
+
 }
