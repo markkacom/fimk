@@ -80,7 +80,7 @@ public final class RewardCandidate {
         try (Connection con = Db.db.getConnection();
              PreparedStatement pstmt = con.prepareStatement("DELETE FROM reward_candidate WHERE height < ?"))
         {
-             pstmt.setInt(1, currentHeight - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT - 1440);
+             pstmt.setInt(1, currentHeight - Constants.reward_applicant_registration_expiry_limit(currentHeight) - 1440);
              return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);

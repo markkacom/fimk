@@ -104,18 +104,12 @@ public final class Generator implements Comparable<Generator> {
                     if (generator.getHitTime() - generationLimit > 60) {
                         break;
                     }
-                    Logger.logDebugMessage(generator.toString());
+                    Logger.logDebugMessage(
+                            String.format("%s target x%.3f",
+                                    generator,
+                                    (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET
+                            ));
                     logged = true;
-                }
-                if (logged && Logger.isDebugEnabled()) {
-                    //report target state
-                    double diff = (double) lastBlock.getBaseTarget() / Constants.INITIAL_BASE_TARGET;
-                    int pos = (int) (diff * 30);
-                    String filled = pos <= 0 ? "" : String.format("%1$" + Math.min(pos, 60) + "s", "").replace(' ', '=');
-                    String padded = filled.length() >= 60 ? "" : String.format("%1$" + (60 - filled.length()) + "s", "").replace(' ', '.');
-                    StringBuilder sb = new StringBuilder(filled + padded);
-                    sb.setCharAt(30, '|');
-                    Logger.logDebugMessage("target [" + sb.append("]").append(" x").append(String.format("%.3f", diff)));
                 }
             }
         }

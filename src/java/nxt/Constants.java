@@ -43,7 +43,10 @@ public final class Constants {
      * dont accept transaction same type and same sender in the height interval less than this limit
      */
     public static int REWARD_APPLICANT_REGISTRATION_ACCEPT_HEIGHT_LIMIT = 1000;
-    public static int REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT = 2160;
+    public static int reward_applicant_registration_expiry_limit(int atHeight) {
+        if (atHeight > Integer.MAX_VALUE) return 2400;  //todo set it for mainnet
+        return 2160;
+    };
     public static long REWARD_APPLICANT_MIN_BALANCE = 10 * ONE_NXT;
     public static long POP_REWARD_MONEY_AMOUNT_NQT = 1 * ONE_NXT;
 

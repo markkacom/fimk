@@ -23,7 +23,7 @@ public class RewardingLogined extends Rewarding {
 
         RewardCandidate.removeObsolete(Nxt.getBlockchain().getHeight());
 
-        Candidates candidates = getRewardCandidates();
+        Candidates candidates = getRewardCandidates(block.getHeight());
 
         applyBlockPOPRewards(block, candidates);
 
@@ -168,9 +168,9 @@ public class RewardingLogined extends Rewarding {
         return null;
     }
 
-    Candidates getRewardCandidates() {
+    Candidates getRewardCandidates(int height) {
         DbIterator<RewardCandidate> it = RewardCandidate.getActualCandidates(
-                Nxt.getBlockchain().getHeight() - Constants.REWARD_APPLICANT_REGISTRATION_EXPIRY_LIMIT);
+                height - Constants.reward_applicant_registration_expiry_limit(height));
         List<RewardCandidate> candidates = new ArrayList<>();
         AtomicLong balanceTotal = new AtomicLong();
         it.forEach(candidate -> {
