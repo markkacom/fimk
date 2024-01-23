@@ -57,7 +57,7 @@
 	)
 
 :startJava	
-	start "FIMKrypto from %~dp0" "%javaDir%"\bin\java.exe -server -cp fim.jar;lib\*;conf fimk.Starter -Dnxt.runtime.mode=desktop fimk.Starter
+	start "FIMKrypto from %~dp0" "%javaDir%"\bin\java.exe -server -cp lib\*;conf fimk.Starter -Dnxt.runtime.mode=desktop fimk.Starter
 
 :endProcess 
 	endlocal
