@@ -43,3 +43,6 @@ changelogs-fim/announcement*
 /main.iml
 /.tmp/
 /.patches/
+/build/
+/.gradle/
+/gradle/wrapper/
