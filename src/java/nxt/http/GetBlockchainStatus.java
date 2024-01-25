@@ -16,6 +16,8 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Block;
 import nxt.BlockchainProcessor;
 import nxt.Constants;
@@ -24,17 +26,25 @@ import nxt.peer.Peer;
 import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getBlockchainStatus")
 public final class GetBlockchainStatus extends APIServlet.APIRequestHandler {
 
     static final GetBlockchainStatus instance = new GetBlockchainStatus();
 
     private GetBlockchainStatus() {
-        super(new APITag[] {APITag.BLOCKS, APITag.INFO});
+        super(new APITag[]{APITag.BLOCKS, APITag.INFO});
     }
 
     @Override
-    JSONObject processRequest(HttpServletRequest req) {
+    @GET
+    @Operation(summary = "Return blockchain status",
+            tags = {APITag2.BLOCKCHAIN},
+            description = "Return detailed blockchain state info",
+            operationId = "getBlockchainStatus")
+    public JSONObject processRequest(@Parameter(hidden = true) HttpServletRequest req) {
         JSONObject response = new JSONObject();
         response.put("application", Nxt.APPLICATION);
         response.put("version", Nxt.VERSION);

@@ -28,12 +28,10 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import static nxt.http.JSONResponses.*;
 
-@Path("/fimk")
+@Path("/fimk?requestType=getBlock")
 public final class GetBlock extends APIServlet.APIRequestHandler {
 
     static final GetBlock instance = new GetBlock();
@@ -43,14 +41,14 @@ public final class GetBlock extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @Operation(summary = "Return block",
-            tags = {"blockchain"},
-            description = "Return detailed block data")
     @GET
-    @Parameter(name = "requestType", in = ParameterIn.QUERY, schema = @Schema(defaultValue = "getBlock"))
-    @Parameter(name = "height", in = ParameterIn.QUERY)
-    //@Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Return block",
+            tags = {APITag2.BLOCKCHAIN},
+            description = "Return detailed block data",
+            operationId = "getBlock")
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "block height")
+    @Parameter(name = "block", in = ParameterIn.QUERY, description = "block id")
+    @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "block timestamp")
     public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
 
         Block blockData;
