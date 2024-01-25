@@ -16,18 +16,24 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Block;
 import nxt.Nxt;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-import static nxt.http.JSONResponses.INCORRECT_BLOCK;
-import static nxt.http.JSONResponses.INCORRECT_HEIGHT;
-import static nxt.http.JSONResponses.INCORRECT_TIMESTAMP;
-import static nxt.http.JSONResponses.UNKNOWN_BLOCK;
+import static nxt.http.JSONResponses.*;
 
+@Path("/fimk")
 public final class GetBlock extends APIServlet.APIRequestHandler {
 
     static final GetBlock instance = new GetBlock();
@@ -37,7 +43,15 @@ public final class GetBlock extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    @Operation(summary = "Return block",
+            tags = {"blockchain"},
+            description = "Return detailed block data")
+    @GET
+    @Parameter(name = "requestType", in = ParameterIn.QUERY, schema = @Schema(defaultValue = "getBlock"))
+    @Parameter(name = "height", in = ParameterIn.QUERY)
+    //@Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
 
         Block blockData;
         String blockValue = Convert.emptyToNull(req.getParameter("block"));

@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.jaxrs2.integration.OpenApiServlet;
 import nxt.Constants;
 import nxt.Nxt;
 import nxt.util.Logger;
@@ -148,6 +149,22 @@ public final class API {
                 apiHandler.addServlet(defaultServletHolder, "/*");
                 apiHandler.setWelcomeFiles(new String[]{Nxt.getStringProperty("fimk.apiWelcomeFile")});
             }
+
+//            SwaggerDoc.registerSwaggerJsonResource(null);
+
+            // Setup Swagger servlet
+//            ServletHolder swaggerServlet = apiHandler.addServlet(DefaultJaxrsConfig.class, "/swagger-core");
+//            swaggerServlet.setInitOrder(2);
+//            swaggerServlet.setInitParameter("api.version", "1.0.0");
+
+//            ServletHolder holder = new ServletHolder(new APIServlet());
+//            ServletContextHandler sch = new ServletContextHandler();
+//            sch.setContextPath("/api/v1");
+//            sch.addServlet(holder, "/*");
+
+            ServletHolder openApiServlet = apiHandler.addServlet(OpenApiServlet.class, "/api/*");
+            openApiServlet.setInitParameter("openApi.configuration.resourcePackages", "nxt.http");
+
 
             String javadocResourceBase = Nxt.getStringProperty("fimk.javadocResourceBase");
             if (javadocResourceBase != null) {

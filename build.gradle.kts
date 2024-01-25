@@ -9,11 +9,13 @@ repositories {
 
 dependencies {
     implementation(fileTree("$projectDir/lib") { include("*.jar") })
-    implementation("io.swagger:swagger-annotations:1.6.8")
-    implementation("io.swagger:swagger-core:1.6.11")
-    implementation("io.swagger:swagger-models:1.6.8")
-    implementation("org.webjars:swagger-ui:4.18.1")
-    implementation("io.swagger:swagger-jaxrs:1.6.8")
+    implementation("javax.ws.rs:javax.ws.rs-api:2.1.1")
+    //implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.1.0")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
+    implementation("io.swagger.core.v3:swagger-jaxrs2:2.2.8")
+    implementation("io.swagger.core.v3:swagger-jaxrs2-servlet-initializer:2.2.8")
+    //implementation("io.swagger:swagger-models:1.6.8")
+    //implementation("org.webjars:swagger-ui:4.18.1")
 
     testImplementation(fileTree("$projectDir/testlib") { include("*.jar") })
 }
