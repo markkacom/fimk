@@ -12,15 +12,17 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.AccountColor;
-import nxt.Attachment;
-import nxt.MofoAttachment;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import nxt.*;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=accountColorAssign")
 public final class AccountColorAssign extends CreateTransaction {
 
     static final AccountColorAssign instance = new AccountColorAssign();
@@ -30,7 +32,12 @@ public final class AccountColorAssign extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    @Operation(summary = "Assign color to account",
+            tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "accountColorId", in = ParameterIn.QUERY, required = true)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         if (Account.getAccount(recipientId) != null) {

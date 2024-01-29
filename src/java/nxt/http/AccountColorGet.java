@@ -12,12 +12,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.AccountColor;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=accountColorGet")
 public final class AccountColorGet extends APIServlet.APIRequestHandler {
 
     static final AccountColorGet instance = new AccountColorGet();
@@ -27,7 +34,13 @@ public final class AccountColorGet extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Get Account Color",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "accountColorId", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "includeAccountInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    @Parameter(name = "includeDescription", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         boolean includeAccountInfo = "true".equals(req.getParameter("includeAccountInfo"));
         boolean includeDescription = "true".equals(req.getParameter("includeDescription"));

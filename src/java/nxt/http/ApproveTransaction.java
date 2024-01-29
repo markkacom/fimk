@@ -17,11 +17,7 @@
 package nxt.http;
 
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.NxtException;
-import nxt.PhasingPoll;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
@@ -29,9 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nxt.http.JSONResponses.MISSING_TRANSACTION_FULL_HASH;
-import static nxt.http.JSONResponses.TOO_MANY_PHASING_VOTES;
-import static nxt.http.JSONResponses.UNKNOWN_TRANSACTION_FULL_HASH;
+import static nxt.http.JSONResponses.*;
 
 public class ApproveTransaction extends CreateTransaction {
     static final ApproveTransaction instance = new ApproveTransaction();
@@ -42,7 +36,7 @@ public class ApproveTransaction extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String[] phasedTransactionValues = req.getParameterValues("transactionFullHash");
 
         if (phasedTransactionValues.length == 0) {

@@ -16,8 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NxtException;
-import nxt.http.APIServlet.APIRequestHandler;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
 import nxt.util.Convert;
@@ -25,35 +27,39 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_PEER;
 
-public class AddPeer extends APIRequestHandler {
+@Path("/fimk?requestType=addPeer")
+public class AddPeer extends APIServlet.APIRequestHandler {
 
     static final AddPeer instance = new AddPeer();
-    
+
     private AddPeer() {
-        super(new APITag[] {APITag.NETWORK}, "peer");
+        super(new APITag[]{APITag.NETWORK}, "peer");
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest request)
-            throws NxtException {
+    @POST
+    @Operation(summary = "Add peer",
+            tags = {APITag2.NETWORK})
+    @Parameter(name = "peer", in = ParameterIn.QUERY, required = true)
+    public JSONStreamAware processRequest(HttpServletRequest request) throws NxtException {
         String peerAddress = Convert.emptyToNull(request.getParameter("peer"));
-        if (peerAddress == null) {
-            return MISSING_PEER;
-        }
+        if (peerAddress == null) return MISSING_PEER;
         JSONObject response = new JSONObject();
         Peer peer = Peers.findOrCreatePeer(peerAddress, true);
-        if (peer != null) {
-            boolean isNewlyAdded = Peers.addPeer(peer, peerAddress);
-            Peers.connectPeer(peer);
-            response = JSONData.peer(peer);
-            response.put("isNewlyAdded", isNewlyAdded);
-        } else {
+        if (peer == null) {
             response.put("errorCode", 8);
             response.put("errorDescription", "Failed to add peer");
+            return response;
         }
+        boolean isNewlyAdded = Peers.addPeer(peer, peerAddress);
+        Peers.connectPeer(peer);
+        response = JSONData.peer(peer);
+        response.put("isNewlyAdded", isNewlyAdded);
         return response;
     }
 

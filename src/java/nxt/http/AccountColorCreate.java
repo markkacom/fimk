@@ -12,21 +12,21 @@
 
 package nxt.http;
 
-
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.MofoAttachment;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import nxt.*;
 import nxt.util.Convert;
-
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-import static nxt.http.JSONResponses.missing;
 import static nxt.http.JSONResponses.incorrect;
+import static nxt.http.JSONResponses.missing;
 
+@Path("/fimk?requestType=accountColorCreate")
 public final class AccountColorCreate extends CreateTransaction {
 
     static final AccountColorCreate instance = new AccountColorCreate();
@@ -36,7 +36,13 @@ public final class AccountColorCreate extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    @Operation(summary = "Create Account Color",
+            tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION},
+            description = "User can create their own account color and create one or more initial colored accounts")
+    @Parameter(name = "name", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "description", in = ParameterIn.QUERY)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         String name = Convert.emptyToNull(req.getParameter("name"));
         String description = Convert.nullToEmpty(req.getParameter("description"));

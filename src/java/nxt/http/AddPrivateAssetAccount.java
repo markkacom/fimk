@@ -1,17 +1,18 @@
 package nxt.http;
 
-import nxt.Account;
-import nxt.Asset;
-import nxt.Attachment;
-import nxt.MofoAsset;
-import nxt.MofoAttachment;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import nxt.*;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ASSET;
 
+@Path("/fimk?requestType=addPrivateAssetAccount")
 public final class AddPrivateAssetAccount extends CreateTransaction {
 
     static final AddPrivateAssetAccount instance = new AddPrivateAssetAccount();
@@ -21,7 +22,11 @@ public final class AddPrivateAssetAccount extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    @Operation(summary = "Enable private asset for account",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Asset asset = ParameterParser.getAsset(req);

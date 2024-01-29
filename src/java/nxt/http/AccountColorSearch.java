@@ -12,17 +12,23 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.AccountColor;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=accountColorSearch")
 public final class AccountColorSearch extends APIServlet.APIRequestHandler {
 
     static final AccountColorSearch instance = new AccountColorSearch();
@@ -33,7 +39,16 @@ public final class AccountColorSearch extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Search Account Colors",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "account", in = ParameterIn.QUERY)
+    @Parameter(name = "name", in = ParameterIn.QUERY)
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "includeAccountInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    @Parameter(name = "includeDescription", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

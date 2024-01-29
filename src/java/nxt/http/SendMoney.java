@@ -16,12 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=sendMoney")
 public final class SendMoney extends CreateTransaction {
 
     static final SendMoney instance = new SendMoney();
@@ -31,7 +37,12 @@ public final class SendMoney extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    @Operation(summary = "Send money",
+            tags = {APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "amountNQT", in = ParameterIn.QUERY, required = true)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
         long amountNQT = ParameterParser.getAmountNQT(req);
         Account account = ParameterParser.getSenderAccount(req);

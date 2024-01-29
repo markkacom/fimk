@@ -74,9 +74,9 @@ public final class APIServlet extends HttpServlet {
             return fileParameter;
         }
 
-        abstract JSONStreamAware processRequest(HttpServletRequest request) throws NxtException;
+        abstract public JSONStreamAware processRequest(HttpServletRequest request) throws NxtException;
 
-        JSONStreamAware processRequest(HttpServletRequest request, HttpServletResponse response) throws NxtException {
+        public JSONStreamAware processRequest(HttpServletRequest request, HttpServletResponse response) throws NxtException {
             return processRequest(request);
         }
 
