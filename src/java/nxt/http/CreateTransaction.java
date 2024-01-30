@@ -16,6 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.crypto.Crypto;
 import nxt.crypto.EncryptedData;
@@ -27,6 +30,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 import java.util.Arrays;
 
 import static nxt.http.JSONResponses.*;
@@ -57,6 +61,14 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
     CreateTransaction(String fileParameter, APITag[] apiTags, String... parameters) {
         super(fileParameter, apiTags, addCommonParameters(parameters));
     }
+
+    @POST
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY)
+    @Parameter(name = "publicKey", in = ParameterIn.QUERY)
+    @Parameter(name = "feeNQT", in = ParameterIn.QUERY, required = true, schema = @Schema(defaultValue = "10000000"))
+    @Parameter(name = "deadline", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", defaultValue = "1440"))
+    @Parameter(name = "broadcast", in = ParameterIn.QUERY, schema = @Schema(type = "boolean", defaultValue = "true"))
+    abstract public JSONStreamAware processRequest(HttpServletRequest request) throws NxtException;
 
     final JSONStreamAware createTransaction(HttpServletRequest req, Account senderAccount, Attachment attachment)
             throws NxtException {
@@ -160,11 +172,8 @@ abstract class CreateTransaction extends APIServlet.APIRequestHandler {
             phasing = parsePhasing(req);
         }
 
-        if (secretPhrase == null && publicKeyValue == null) {
-            return MISSING_SECRET_PHRASE;
-        } else if (deadlineValue == null) {
-            return MISSING_DEADLINE;
-        }
+        if (secretPhrase == null && publicKeyValue == null) return MISSING_SECRET_PHRASE;
+        if (deadlineValue == null) return MISSING_DEADLINE;
 
         short deadline;
         try {

@@ -16,12 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=clearUnconfirmedTransactions")
 public final class ClearUnconfirmedTransactions extends APIServlet.APIRequestHandler {
 
     static final ClearUnconfirmedTransactions instance = new ClearUnconfirmedTransactions();
@@ -31,7 +37,10 @@ public final class ClearUnconfirmedTransactions extends APIServlet.APIRequestHan
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    @POST
+    @Operation(summary = "Clear unconfirmed transactions",
+            tags = {APITag2.DEBUG, APITag2.CREATE_TRANSACTION})
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {
             Nxt.getTransactionProcessor().clearUnconfirmedTransactions();

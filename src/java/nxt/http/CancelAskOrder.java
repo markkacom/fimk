@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.NxtException;
@@ -24,9 +28,12 @@ import nxt.txn.AskOrderCancellationAttachment;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.UNKNOWN_ORDER;
 
+@Path("/fimk?requestType=cancelAskOrder")
 public final class CancelAskOrder extends CreateTransaction {
 
     static final CancelAskOrder instance = new CancelAskOrder();
@@ -36,7 +43,11 @@ public final class CancelAskOrder extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    @Operation(summary = "Cancel ask order",
+            tags = {APITag2.AE, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "order", in = ParameterIn.QUERY, required = true, description = "order id")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         long orderId = ParameterParser.getUnsignedLong(req, "order", true);
         Account account = ParameterParser.getSenderAccount(req);
         Order.Ask orderData = Order.Ask.getAskOrder(orderId);

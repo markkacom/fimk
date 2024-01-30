@@ -16,6 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.Alias;
 import nxt.Attachment;
@@ -23,10 +26,13 @@ import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ALIAS_NOTFORSALE;
 
 
+@Path("/fimk?requestType=buyAlias")
 public final class BuyAlias extends CreateTransaction {
 
     static final BuyAlias instance = new BuyAlias();
@@ -36,7 +42,13 @@ public final class BuyAlias extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    @Operation(summary = "Buy alias",
+            tags = {APITag2.TRANSACTIONS})
+    @Parameter(name = "alias", in = ParameterIn.QUERY, required = true, description = "alias")
+    @Parameter(name = "aliasName", in = ParameterIn.QUERY, required = true, description = "alias name")
+    @Parameter(name = "amountNQT", in = ParameterIn.QUERY, required = true, description = "amount in NQT")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         Account buyer = ParameterParser.getSenderAccount(req);
         Alias alias = ParameterParser.getAlias(req);
         long amountNQT = ParameterParser.getAmountNQT(req);

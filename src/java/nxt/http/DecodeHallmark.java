@@ -16,14 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.peer.Hallmark;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_HALLMARK;
 import static nxt.http.JSONResponses.MISSING_HALLMARK;
 
+@Path("/fimk?requestType=decodeHallmark")
 public final class DecodeHallmark extends APIServlet.APIRequestHandler {
 
     static final DecodeHallmark instance = new DecodeHallmark();
@@ -33,7 +39,11 @@ public final class DecodeHallmark extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    @GET
+    @Operation(summary = "Decode hallmark",
+            tags = {APITag2.TOKEN})
+    @Parameter(name = "hallmark", in = ParameterIn.QUERY, required = true)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
 
         String hallmarkValue = req.getParameter("hallmark");
         if (hallmarkValue == null) {
