@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.crypto.EncryptedData;
@@ -25,20 +29,32 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.DECRYPTION_FAILED;
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 
+@Path("/fimk?requestType=decryptFrom")
 public final class DecryptFrom extends APIServlet.APIRequestHandler {
 
     static final DecryptFrom instance = new DecryptFrom();
 
     private DecryptFrom() {
-        super(new APITag[] {APITag.MESSAGES}, "account", "data", "nonce", "decryptedMessageIsText", "uncompressDecryptedMessage", "secretPhrase");
+        super(new APITag[]{APITag.MESSAGES}, "account", "data", "nonce", "decryptedMessageIsText", "uncompressDecryptedMessage", "secretPhrase");
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Decrypt from",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "data", in = ParameterIn.QUERY, description = "data in HEX format")
+    @Parameter(name = "nonce", in = ParameterIn.QUERY, description = "nonce in HEX format")
+    @Parameter(name = "decryptedMessageIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    @Parameter(name = "uncompressDecryptedMessage", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         if (account.getPublicKey() == null) {

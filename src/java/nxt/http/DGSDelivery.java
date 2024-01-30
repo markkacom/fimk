@@ -16,22 +16,22 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.DigitalGoodsStore;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import nxt.*;
 import nxt.crypto.EncryptedData;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-import static nxt.http.JSONResponses.ALREADY_DELIVERED;
-import static nxt.http.JSONResponses.INCORRECT_DGS_DISCOUNT;
-import static nxt.http.JSONResponses.INCORRECT_DGS_GOODS;
-import static nxt.http.JSONResponses.INCORRECT_PURCHASE;
+import static nxt.http.JSONResponses.*;
 
+@Path("/fimk?requestType=dgsDelivery")
 public final class DGSDelivery extends CreateTransaction {
 
     static final DGSDelivery instance = new DGSDelivery();
@@ -42,7 +42,15 @@ public final class DGSDelivery extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Register delivery of market item",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "purchase", in = ParameterIn.QUERY, required = true, description = "purchase id")
+    @Parameter(name = "discountNQT", in = ParameterIn.QUERY, description = "discount in NQT")
+    @Parameter(name = "goodsToEncrypt", in = ParameterIn.QUERY, description = "goods to encrypt")
+    @Parameter(name = "goodsIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is goods to encrypt data in text format or in HEX format")
+    @Parameter(name = "goodsData", in = ParameterIn.QUERY, description = "goods data in HEX format")
+    @Parameter(name = "goodsNonce", in = ParameterIn.QUERY, description = "goods data nonce in HEX format")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account sellerAccount = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Purchase purchase = ParameterParser.getPurchase(req);

@@ -12,4 +12,7 @@ public class APITag2 {
     public static final String AE = "AE";
     public static final String DEBUG = "DEBUG";
     public static final String TOKEN = "TOKEN";
+    public static final String MESSAGES = "MESSAGES";
+    public static final String ALIASES = "ALIASES";
+    public static final String DGS = "DGS";
 }
