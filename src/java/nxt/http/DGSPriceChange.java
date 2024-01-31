@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.DigitalGoodsStore;
@@ -23,9 +27,12 @@ import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.UNKNOWN_GOODS;
 
+@Path("/fimk?requestType=dgsPriceChange")
 public final class DGSPriceChange extends CreateTransaction {
 
     static final DGSPriceChange instance = new DGSPriceChange();
@@ -36,7 +43,11 @@ public final class DGSPriceChange extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Change price of goods",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "goods", in = ParameterIn.QUERY, required = true, description = "goods id")
+    @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, description = "price in NQT")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Goods goods = ParameterParser.getGoods(req);
         long priceNQT = ParameterParser.getPriceNQT(req);

@@ -16,31 +16,37 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.DigitalGoodsStore;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-import static nxt.http.JSONResponses.INCORRECT_DELTA_QUANTITY;
-import static nxt.http.JSONResponses.MISSING_DELTA_QUANTITY;
-import static nxt.http.JSONResponses.UNKNOWN_GOODS;
+import static nxt.http.JSONResponses.*;
 
+@Path("/fimk?requestType=dgsQuantityChange")
 public final class DGSQuantityChange extends CreateTransaction {
 
     static final DGSQuantityChange instance = new DGSQuantityChange();
 
     private DGSQuantityChange() {
-        super(new APITag[] {APITag.DGS, APITag.CREATE_TRANSACTION},
+        super(new APITag[]{APITag.DGS, APITag.CREATE_TRANSACTION},
                 "goods", "deltaQuantity");
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Change quantity of goods",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "goods", in = ParameterIn.QUERY, required = true, description = "goods id")
+    @Parameter(name = "deltaQuantity", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "this quantity is added to goods quantity. Negative value is allowed")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Goods goods = ParameterParser.getGoods(req);

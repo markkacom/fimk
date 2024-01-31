@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.DigitalGoodsStore;
@@ -23,10 +27,13 @@ import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.GOODS_NOT_DELIVERED;
 import static nxt.http.JSONResponses.INCORRECT_PURCHASE;
 
+@Path("/fimk?requestType=dgsFeedback")
 public final class DGSFeedback extends CreateTransaction {
 
     static final DGSFeedback instance = new DGSFeedback();
@@ -37,7 +44,10 @@ public final class DGSFeedback extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Feedback",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "purchase", in = ParameterIn.QUERY, required = true, description = "purchase id")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         DigitalGoodsStore.Purchase purchase = ParameterParser.getPurchase(req);
 

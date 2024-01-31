@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Constants;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
@@ -24,9 +28,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Path("/fimk?requestType=dumpPeers")
 public final class DumpPeers extends APIServlet.APIRequestHandler {
 
     static final DumpPeers instance = new DumpPeers();
@@ -36,7 +43,12 @@ public final class DumpPeers extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    @GET
+    @Operation(summary = "Dump peers",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "version", in = ParameterIn.QUERY, description = "version of peer")
+    @Parameter(name = "weight", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "weight of peer")
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String version = Convert.nullToEmpty(req.getParameter("version"));
         int weight = ParameterParser.getInt(req, "weight", 0, (int)Constants.MAX_BALANCE_NXT, false);

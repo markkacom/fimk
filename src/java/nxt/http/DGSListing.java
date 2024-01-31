@@ -16,25 +16,40 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
+@Path("/fimk?requestType=dgsListing")
 public final class DGSListing extends CreateTransaction {
 
     static final DGSListing instance = new DGSListing();
 
     private DGSListing() {
         super(new APITag[] {APITag.DGS, APITag.CREATE_TRANSACTION},
-                "name", "description", "tags", "quantity", "priceNQT");
+                "name", "description", "tags", "quantity", "asset", "priceNQT");
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Listing",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "name", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "description", in = ParameterIn.QUERY)
+    @Parameter(name = "tags", in = ParameterIn.QUERY)
+    @Parameter(name = "quantity", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, description = "price in NQT")
+    @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         String name = Convert.emptyToNull(req.getParameter("name"));
         String description = Convert.nullToEmpty(req.getParameter("description"));

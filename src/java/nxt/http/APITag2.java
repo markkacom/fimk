@@ -15,4 +15,5 @@ public class APITag2 {
     public static final String MESSAGES = "MESSAGES";
     public static final String ALIASES = "ALIASES";
     public static final String DGS = "DGS";
+    public static final String DATA = "DATA";
 }

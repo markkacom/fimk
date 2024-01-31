@@ -24,6 +24,8 @@ import nxt.txn.DividendPaymentAttachment;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+
 
 public class DividendPayment extends CreateTransaction {
 
@@ -34,7 +36,8 @@ public class DividendPayment extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(final HttpServletRequest request)
+    @POST
+    public JSONStreamAware processRequest(final HttpServletRequest request)
             throws NxtException
     {
         final int height = ParameterParser.getHeight(request);

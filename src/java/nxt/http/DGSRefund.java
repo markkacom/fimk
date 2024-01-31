@@ -16,21 +16,21 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.DigitalGoodsStore;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-import static nxt.http.JSONResponses.DUPLICATE_REFUND;
-import static nxt.http.JSONResponses.GOODS_NOT_DELIVERED;
-import static nxt.http.JSONResponses.INCORRECT_DGS_REFUND;
-import static nxt.http.JSONResponses.INCORRECT_PURCHASE;
+import static nxt.http.JSONResponses.*;
 
+@Path("/fimk?requestType=dgsRefund")
 public final class DGSRefund extends CreateTransaction {
 
     static final DGSRefund instance = new DGSRefund();
@@ -41,7 +41,11 @@ public final class DGSRefund extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Refund goods",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "purchase", in = ParameterIn.QUERY, required = true, description = "purchase id")
+    @Parameter(name = "refundNQT", in = ParameterIn.QUERY, required = true, description = "refund in NQT")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account sellerAccount = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Purchase purchase = ParameterParser.getPurchase(req);

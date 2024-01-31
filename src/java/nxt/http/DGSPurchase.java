@@ -16,18 +16,21 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.DigitalGoodsStore;
-import nxt.Nxt;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
+@Path("/fimk?requestType=dgsPurchase")
 public final class DGSPurchase extends CreateTransaction {
 
     static final DGSPurchase instance = new DGSPurchase();
@@ -38,7 +41,13 @@ public final class DGSPurchase extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Purchase goods",
+            tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "goods", in = ParameterIn.QUERY, required = true, description = "goods id")
+    @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, description = "price in NQT")
+    @Parameter(name = "quantity", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "deliveryDeadlineTimestamp", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         DigitalGoodsStore.Goods goods = ParameterParser.getGoods(req);
         if (goods.isDelisted()) {
