@@ -15,7 +15,7 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-jaxrs2:2.2.8")
     implementation("io.swagger.core.v3:swagger-jaxrs2-servlet-initializer:2.2.8")
     //implementation("io.swagger:swagger-models:1.6.8")
-    //implementation("org.webjars:swagger-ui:4.18.1")
+    implementation("org.webjars:swagger-ui:4.18.1")
 
     testImplementation(fileTree("$projectDir/testlib") { include("*.jar") })
 }
