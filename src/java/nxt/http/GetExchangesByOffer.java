@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.INCORRECT_OFFER;
 import static nxt.http.JSONResponses.MISSING_OFFER;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetExchangesByOffer extends APIServlet.APIRequestHandler {
 
     static final GetExchangesByOffer instance = new GetExchangesByOffer();
@@ -37,7 +38,7 @@ public final class GetExchangesByOffer extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         // can't use ParameterParser.getCurrencyBuyOffer because offer may have been already deleted
         String offerValue = Convert.emptyToNull(req.getParameter("offer"));
         if (offerValue == null) {

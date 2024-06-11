@@ -24,6 +24,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAllOpenAskOrders extends APIServlet.APIRequestHandler {
 
     static final GetAllOpenAskOrders instance = new GetAllOpenAskOrders();
@@ -33,7 +34,7 @@ public final class GetAllOpenAskOrders extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = new JSONObject();
         JSONArray ordersData = new JSONArray();

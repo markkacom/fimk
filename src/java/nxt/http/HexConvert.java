@@ -23,6 +23,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class HexConvert extends APIServlet.APIRequestHandler {
 
     static final HexConvert instance = new HexConvert();
@@ -32,7 +33,7 @@ public final class HexConvert extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         String string = Convert.emptyToNull(req.getParameter("string"));
         if (string == null) {
             return JSON.emptyJSON;

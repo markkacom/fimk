@@ -16,16 +16,17 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import nxt.util.Logger;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class SignMessage extends APIServlet.APIRequestHandler {
 
     static final SignMessage instance = new SignMessage();
@@ -36,7 +37,7 @@ public final class SignMessage extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         String message = Convert.emptyToNull(req.getParameter("message"));
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));
 

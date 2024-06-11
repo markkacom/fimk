@@ -1,15 +1,14 @@
 package nxt.http;
 
-import javax.servlet.http.HttpServletRequest;
-
 import nxt.Account;
 import nxt.NxtException.NotValidException;
 import nxt.gossip.GossipImpl;
 import nxt.gossip.GossipProcessorImpl;
 import nxt.util.Convert;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 public class SendGossip extends APIServlet.APIRequestHandler {
@@ -22,7 +21,7 @@ public class SendGossip extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         JSONObject response = new JSONObject();
         try {
   

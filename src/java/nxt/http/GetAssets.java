@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.INCORRECT_ASSET;
 import static nxt.http.JSONResponses.UNKNOWN_ASSET;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAssets extends APIServlet.APIRequestHandler {
 
     static final GetAssets instance = new GetAssets();
@@ -36,7 +37,7 @@ public final class GetAssets extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String[] assets = req.getParameterValues("assets");
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));

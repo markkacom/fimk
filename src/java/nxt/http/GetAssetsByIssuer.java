@@ -26,6 +26,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAssetsByIssuer extends APIServlet.APIRequestHandler {
 
     static final GetAssetsByIssuer instance = new GetAssetsByIssuer();
@@ -35,7 +36,7 @@ public final class GetAssetsByIssuer extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         List<Account> accounts = ParameterParser.getAccounts(req);
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

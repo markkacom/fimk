@@ -129,7 +129,7 @@ public class EventWait extends APIServlet.APIRequestHandler {
      * @return                      API response or null
      */
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = null;
         //
         // Get the timeout value

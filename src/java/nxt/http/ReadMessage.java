@@ -29,11 +29,9 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.INCORRECT_TRANSACTION;
-import static nxt.http.JSONResponses.MISSING_TRANSACTION;
-import static nxt.http.JSONResponses.NO_MESSAGE;
-import static nxt.http.JSONResponses.UNKNOWN_TRANSACTION;
+import static nxt.http.JSONResponses.*;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class ReadMessage extends APIServlet.APIRequestHandler {
 
     static final ReadMessage instance = new ReadMessage();
@@ -43,7 +41,7 @@ public final class ReadMessage extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String transactionIdString = Convert.emptyToNull(req.getParameter("transaction"));
         if (transactionIdString == null) {

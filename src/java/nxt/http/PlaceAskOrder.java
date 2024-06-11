@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.*;
 import nxt.txn.AskOrderPlacementAttachment;
 import nxt.util.JSON;
@@ -23,9 +24,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
 import static nxt.http.JSONResponses.NOT_ENOUGH_ASSETS;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class PlaceAskOrder extends CreateTransaction {
 
     static final PlaceAskOrder instance = new PlaceAskOrder();
@@ -36,7 +39,8 @@ public final class PlaceAskOrder extends CreateTransaction {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);
         long priceNQT = ParameterParser.getPriceNQT(req);

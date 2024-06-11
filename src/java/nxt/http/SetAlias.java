@@ -17,22 +17,18 @@
 package nxt.http;
 
 
-import nxt.Account;
-import nxt.Alias;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
-import static nxt.http.JSONResponses.INCORRECT_ALIAS_LENGTH;
-import static nxt.http.JSONResponses.INCORRECT_ALIAS_NAME;
-import static nxt.http.JSONResponses.INCORRECT_URI_LENGTH;
-import static nxt.http.JSONResponses.MISSING_ALIAS_NAME;
+import static nxt.http.JSONResponses.*;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class SetAlias extends CreateTransaction {
 
     static final SetAlias instance = new SetAlias();
@@ -42,7 +38,8 @@ public final class SetAlias extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         String aliasName = Convert.emptyToNull(req.getParameter("aliasName"));
         String aliasURI = Convert.nullToEmpty(req.getParameter("aliasURI"));
 

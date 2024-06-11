@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.reward.AssetRewarding;
@@ -25,6 +26,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAssetRewardings extends APIServlet.APIRequestHandler {
 
     static final GetAssetRewardings instance = new GetAssetRewardings();
@@ -34,7 +36,7 @@ public final class GetAssetRewardings extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         // parameter asset is allowed 0 that means no filter by asset
         long assetId = ParameterParser.getUnsignedLong(req, "asset", true, true);
 

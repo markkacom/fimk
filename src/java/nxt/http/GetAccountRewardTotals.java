@@ -1,5 +1,6 @@
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.reward.RewardItem;
 import nxt.util.Convert;
@@ -8,9 +9,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigInteger;
 import java.util.List;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountRewardTotals extends APIServlet.APIRequestHandler {
 
     static final GetAccountRewardTotals instance = new GetAccountRewardTotals();
@@ -20,7 +21,7 @@ public final class GetAccountRewardTotals extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getUnsignedLong(req, "account", true);
 
         JSONArray result = new JSONArray();

@@ -16,19 +16,21 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Nxt;
-import nxt.NxtException;
-import nxt.TaggedData;
-import nxt.Transaction;
-import nxt.TransactionType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import nxt.*;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.UNKNOWN_TRANSACTION;
 
+@Path("/fimk?requestType=extendTaggedData")
 public final class ExtendTaggedData extends CreateTransaction {
 
     static final ExtendTaggedData instance = new ExtendTaggedData();
@@ -39,7 +41,18 @@ public final class ExtendTaggedData extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Extend tagged data",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "name", in = ParameterIn.QUERY)
+    @Parameter(name = "description", in = ParameterIn.QUERY)
+    @Parameter(name = "tags", in = ParameterIn.QUERY)
+    @Parameter(name = "type", in = ParameterIn.QUERY)
+    @Parameter(name = "channel", in = ParameterIn.QUERY)
+    @Parameter(name = "isText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is text data")
+    @Parameter(name = "filename", in = ParameterIn.QUERY, description = "file name")
+    @Parameter(name = "data", in = ParameterIn.QUERY)
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getSenderAccount(req);
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);

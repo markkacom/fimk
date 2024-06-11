@@ -22,6 +22,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+////@Path("/fimk?requestType=accountColorList")
 public final class Shutdown extends APIServlet.APIRequestHandler {
 
     static final Shutdown instance = new Shutdown();
@@ -31,7 +32,7 @@ public final class Shutdown extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         boolean scan = "true".equalsIgnoreCase(req.getParameter("scan"));
         if (scan) {

@@ -23,9 +23,9 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 
 import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE;
-import static nxt.http.JSONResponses.UNKNOWN_ACCOUNT;
 
 
+//@Path("/fimk?requestType=accountColorList")
 public final class StartForging extends APIServlet.APIRequestHandler {
 
     static final StartForging instance = new StartForging();
@@ -35,7 +35,7 @@ public final class StartForging extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String secretPhrase = req.getParameter("secretPhrase");
         if (secretPhrase == null) {

@@ -24,6 +24,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 
 
+//@Path("/fimk?requestType=accountColorList")
 public final class StopForging extends APIServlet.APIRequestHandler {
 
     static final StopForging instance = new StopForging();
@@ -33,7 +34,7 @@ public final class StopForging extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));
         JSONObject response = new JSONObject();

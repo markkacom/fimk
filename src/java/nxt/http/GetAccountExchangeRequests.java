@@ -16,11 +16,8 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Currency;
-import nxt.Exchange;
-import nxt.NxtException;
-import nxt.Transaction;
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import nxt.db.FilteringIterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,6 +25,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountExchangeRequests extends APIServlet.APIRequestHandler {
 
     static final GetAccountExchangeRequests instance = new GetAccountExchangeRequests();
@@ -37,7 +35,7 @@ public final class GetAccountExchangeRequests extends APIServlet.APIRequestHandl
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         Currency currency = ParameterParser.getCurrency(req);

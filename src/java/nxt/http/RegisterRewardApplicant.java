@@ -16,12 +16,16 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
+
+//@Path("/fimk?requestType=accountColorList")
 public final class RegisterRewardApplicant extends CreateTransaction {
 
     static final RegisterRewardApplicant instance = new RegisterRewardApplicant();
@@ -31,7 +35,8 @@ public final class RegisterRewardApplicant extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
         Account account = ParameterParser.getSenderAccount(req);
         return createTransaction(req, account, recipient, 0,

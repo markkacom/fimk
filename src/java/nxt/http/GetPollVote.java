@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.Poll;
@@ -33,7 +34,7 @@ public class GetPollVote extends APIServlet.APIRequestHandler  {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         Poll poll = ParameterParser.getPoll(req);
         Account account = ParameterParser.getAccount(req);
         Vote vote = Vote.getVote(poll.getId(), account.getId());

@@ -16,15 +16,22 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.crypto.EncryptedData;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_RECIPIENT;
 
+@Path("/fimk?requestType=encryptTo")
 public final class EncryptTo extends APIServlet.APIRequestHandler {
 
     static final EncryptTo instance = new EncryptTo();
@@ -34,7 +41,15 @@ public final class EncryptTo extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Encrypt data",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "messageToEncrypt", in = ParameterIn.QUERY, description = "message to encrypt")
+    @Parameter(name = "messageToEncryptIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is text message")
+    @Parameter(name = "compressMessageToEncrypt", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "compress message")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Account recipientAccount = Account.getAccount(recipientId);

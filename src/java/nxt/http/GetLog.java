@@ -41,6 +41,7 @@ import java.util.logging.Logger;
  * <li>messages - An array of log messages</li>
  * </ul>
  */
+//@Path("/fimk?requestType=accountColorList")
 public final class GetLog extends APIServlet.APIRequestHandler {
 
     /** GetLog instance */
@@ -60,7 +61,7 @@ public final class GetLog extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         //
         // Get the number of log messages to return
         //

@@ -1,17 +1,16 @@
 package nxt.http;
 
-import nxt.Account;
-import nxt.Asset;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.MofoAttachment;
-import nxt.NxtException;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
-public final class SetPrivateAssetFee extends CreateTransaction {
+
+////@Path("/fimk?requestType=accountColorList")
+public final class
+SetPrivateAssetFee extends CreateTransaction {
 
     static final SetPrivateAssetFee instance = new SetPrivateAssetFee();
 
@@ -20,7 +19,8 @@ public final class SetPrivateAssetFee extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);
         int orderFeePercentage = ParameterParser.getInt(req, "orderFeePercentage",

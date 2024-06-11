@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Currency;
@@ -23,9 +24,11 @@ import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
 import static nxt.http.JSONResponses.NOT_ENOUGH_CURRENCY;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class TransferCurrency extends CreateTransaction {
 
     static final TransferCurrency instance = new TransferCurrency();
@@ -35,7 +38,8 @@ public final class TransferCurrency extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
 

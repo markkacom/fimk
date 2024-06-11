@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Search assets excluding private assets not allowed for account.
  */
+//@Path("/fimk?requestType=accountColorList")
 public final class SearchAssetsExt extends APIServlet.APIRequestHandler {
 
     static final SearchAssetsExt instance = new SearchAssetsExt();
@@ -38,7 +39,7 @@ public final class SearchAssetsExt extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         String query = Convert.nullToEmpty(req.getParameter("query"));
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

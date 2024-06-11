@@ -16,11 +16,7 @@
 
 package nxt.http;
 
-import nxt.Constants;
-import nxt.CurrencyType;
-import nxt.Genesis;
-import nxt.TransactionType;
-import nxt.VoteWeighting;
+import nxt.*;
 import nxt.crypto.HashFunction;
 import nxt.peer.Peer;
 import nxt.util.JSON;
@@ -30,6 +26,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetConstants extends APIServlet.APIRequestHandler {
 
     static final GetConstants instance = new GetConstants();
@@ -120,7 +117,7 @@ public final class GetConstants extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         return CONSTANTS;
     }
 

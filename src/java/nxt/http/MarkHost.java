@@ -23,15 +23,10 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.INCORRECT_DATE;
-import static nxt.http.JSONResponses.INCORRECT_HOST;
-import static nxt.http.JSONResponses.INCORRECT_WEIGHT;
-import static nxt.http.JSONResponses.MISSING_DATE;
-import static nxt.http.JSONResponses.MISSING_HOST;
-import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE;
-import static nxt.http.JSONResponses.MISSING_WEIGHT;
+import static nxt.http.JSONResponses.*;
 
 
+//@Path("/fimk?requestType=accountColorList")
 public final class MarkHost extends APIServlet.APIRequestHandler {
 
     static final MarkHost instance = new MarkHost();
@@ -41,7 +36,7 @@ public final class MarkHost extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String secretPhrase = req.getParameter("secretPhrase");
         String host = req.getParameter("host");

@@ -12,12 +12,12 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
-import nxt.NxtException;
 import nxt.Account.AccountInfo;
+import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.MISSING_IDENTIFIER;
 import static nxt.http.JSONResponses.UNKNOWN_IDENTIFIER;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandler {
 
     static final MofoGetAccountByIdentifier instance = new MofoGetAccountByIdentifier();
@@ -37,7 +38,7 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         String identifier = Convert.emptyToNull(req.getParameter("identifier"));
         if (identifier == null) {

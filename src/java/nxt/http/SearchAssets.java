@@ -25,6 +25,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+////@Path("/fimk?requestType=accountColorList")
 public final class SearchAssets extends APIServlet.APIRequestHandler {
 
     static final SearchAssets instance = new SearchAssets();
@@ -34,7 +35,7 @@ public final class SearchAssets extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         String query = Convert.nullToEmpty(req.getParameter("query"));
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

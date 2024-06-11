@@ -31,6 +31,7 @@ import static nxt.http.JSONResponses.NOT_FORGING;
 import static nxt.http.JSONResponses.UNKNOWN_ACCOUNT;
 
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetForging extends APIServlet.APIRequestHandler {
 
     static final GetForging instance = new GetForging();
@@ -40,7 +41,7 @@ public final class GetForging extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));
         int elapsedTime = Nxt.getEpochTime() - Nxt.getBlockchain().getLastBlock().getTimestamp();

@@ -24,6 +24,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class LongConvert extends APIServlet.APIRequestHandler {
 
     static final LongConvert instance = new LongConvert();
@@ -33,7 +34,7 @@ public final class LongConvert extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         String id = Convert.emptyToNull(req.getParameter("id"));
         if (id == null) {
             return JSON.emptyJSON;

@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE_OR_PUBLIC_KEY;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountId extends APIServlet.APIRequestHandler {
 
     static final GetAccountId instance = new GetAccountId();
@@ -35,7 +36,7 @@ public final class GetAccountId extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         long accountId;
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

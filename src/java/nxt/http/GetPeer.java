@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.MISSING_PEER;
 import static nxt.http.JSONResponses.UNKNOWN_PEER;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetPeer extends APIServlet.APIRequestHandler {
 
     static final GetPeer instance = new GetPeer();
@@ -34,7 +35,7 @@ public final class GetPeer extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String peerAddress = req.getParameter("peer");
         if (peerAddress == null) {

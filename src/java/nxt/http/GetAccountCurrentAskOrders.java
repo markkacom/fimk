@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.Order;
 import nxt.db.DbIterator;
@@ -25,7 +29,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getAccountCurrentAskOrders")
 public final class GetAccountCurrentAskOrders extends APIServlet.APIRequestHandler {
 
     static final GetAccountCurrentAskOrders instance = new GetAccountCurrentAskOrders();
@@ -35,7 +42,14 @@ public final class GetAccountCurrentAskOrders extends APIServlet.APIRequestHandl
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Get current ask orders of account",
+            tags = {APITag2.ACCOUNT, APITag2.AE})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "asset", in = ParameterIn.QUERY)
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long accountId = ParameterParser.getAccount(req).getId();
         long assetId = 0;

@@ -13,25 +13,21 @@
 package nxt.http;
 
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.HardFork;
-import nxt.MofoAttachment;
-import nxt.MofoIdentifier;
-import nxt.MofoVerificationAuthority;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
 import nxt.util.JSON;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
 import static nxt.http.JSONResponses.INCORRECT_SIGNATORY;
 
 /* @api-name setAccountIdentifier */
+//@Path("/fimk?requestType=accountColorList")
 public final class MofoAccountIdAssignment extends CreateTransaction {
 
     static final MofoAccountIdAssignment instance = new MofoAccountIdAssignment();
@@ -42,7 +38,8 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Account senderAccount = ParameterParser.getSenderAccount(req);

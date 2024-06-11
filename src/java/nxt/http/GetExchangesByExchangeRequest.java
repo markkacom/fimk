@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static nxt.http.JSONResponses.MISSING_TRANSACTION;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetExchangesByExchangeRequest extends APIServlet.APIRequestHandler {
 
     static final GetExchangesByExchangeRequest instance = new GetExchangesByExchangeRequest();
@@ -36,7 +37,7 @@ public final class GetExchangesByExchangeRequest extends APIServlet.APIRequestHa
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         String transactionIdString = Convert.emptyToNull(req.getParameter("transaction"));
         if (transactionIdString == null) {
             return MISSING_TRANSACTION;

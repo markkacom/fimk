@@ -17,6 +17,11 @@
 package nxt.http;
 
 import io.swagger.v3.jaxrs2.integration.OpenApiServlet;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import nxt.Constants;
 import nxt.Nxt;
 import nxt.util.Logger;
@@ -44,6 +49,34 @@ import java.util.function.Function;
 import static nxt.http.JSONResponses.INCORRECT_ADMIN_PASSWORD;
 import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
 
+@OpenAPIDefinition(
+        tags = {
+                @Tag(name = APITag2.DEBUG, description = "Debug operations"),
+                @Tag(name = APITag2.DGS, description = "Market operations"),
+                @Tag(name = APITag2.NETWORK, description = "Network operations"),
+                @Tag(name = APITag2.ACCOUNT, description = "Account operations"),
+                @Tag(name = APITag2.DATA, description = "Data operations"),
+                @Tag(name = APITag2.ASSET, description = "Asset operations"),
+                @Tag(name = APITag2.AE, description = "Asset Exchange operations"),
+                @Tag(name = APITag2.CREATE_TRANSACTION, description = "Transaction creation"),
+                @Tag(name = APITag2.TRANSACTIONS, description = "Transaction operations"),
+                @Tag(name = APITag2.MESSAGES, description = "Messages operations"),
+                @Tag(name = APITag2.BLOCKCHAIN, description = "Blockchain operations"),
+                @Tag(name = APITag2.ALIASES, description = "Aliases operations"),
+                @Tag(name = APITag2.TOKEN, description = "Token operations"),
+        },
+        info = @Info(
+                title = "FIMK API",
+                version = "1.0.1"
+//                contact = @Contact(
+//                        name = "Example API Support",
+//                        url = "http://exampleurl.com/contact",
+//                        email = "techsupport@example.com"),
+//                license = @License(
+//                        name = "Apache 2.0",
+//                        url = "https://www.apache.org/licenses/LICENSE-2.0.html")
+        )
+)
 public final class API {
 
     public static final int TESTNET_API_PORT = 6886;
@@ -136,7 +169,7 @@ public final class API {
 
             HandlerList apiHandlers = new HandlerList();
 
-            ServletContextHandler apiHandler = new ServletContextHandler();
+            ServletContextHandler apiServletContextHandler = new ServletContextHandler();
             String apiResourceBase = Nxt.getStringProperty("fimk.apiResourceBase");
             if (apiResourceBase != null) {
                 ServletHolder defaultServletHolder = new ServletHolder(new DefaultServlet());
@@ -146,8 +179,8 @@ public final class API {
                 defaultServletHolder.setInitParameter("redirectWelcome", "true");
                 defaultServletHolder.setInitParameter("gzip", "true");
                 defaultServletHolder.setInitParameter("etags", "true");
-                apiHandler.addServlet(defaultServletHolder, "/*");
-                apiHandler.setWelcomeFiles(new String[]{Nxt.getStringProperty("fimk.apiWelcomeFile")});
+                apiServletContextHandler.addServlet(defaultServletHolder, "/*");
+                apiServletContextHandler.setWelcomeFiles(new String[]{Nxt.getStringProperty("fimk.apiWelcomeFile")});
             }
 
 //            SwaggerDoc.registerSwaggerJsonResource(null);
@@ -162,7 +195,7 @@ public final class API {
 //            sch.setContextPath("/api/v1");
 //            sch.addServlet(holder, "/*");
 
-            ServletHolder openApiServlet = apiHandler.addServlet(OpenApiServlet.class, "/api/*");
+            ServletHolder openApiServlet = apiServletContextHandler.addServlet(OpenApiServlet.class, "/api/*");
             openApiServlet.setInitParameter("openApi.configuration.resourcePackages", "nxt.http");
 
 
@@ -178,10 +211,10 @@ public final class API {
             }
 
             Function<String, Void> registerServlet = pathSpec -> {
-                ServletHolder servletHolder = apiHandler.addServlet(APIServlet.class, pathSpec);
+                ServletHolder servletHolder = apiServletContextHandler.addServlet(APIServlet.class, pathSpec);
                 servletHolder.getRegistration().setMultipartConfig(new MultipartConfigElement(null, Constants.MAX_TAGGED_DATA_DATA_LENGTH, -1L, 0));
                 if (Nxt.getBooleanProperty("fimk.enableAPIServerGZIPFilter")) {
-                    FilterHolder gzipFilterHolder = apiHandler.addFilter(GzipFilter.class, pathSpec, null);
+                    FilterHolder gzipFilterHolder = apiServletContextHandler.addFilter(GzipFilter.class, pathSpec, null);
                     gzipFilterHolder.setInitParameter("methods", "GET,POST");
                     gzipFilterHolder.setAsyncSupported(true);
                 }
@@ -190,18 +223,28 @@ public final class API {
             registerServlet.apply("/nxt");  //backward compatibility
             registerServlet.apply("/fimk");
 
-            apiHandler.addServlet(APITestServlet.class, "/test");
+            apiServletContextHandler.addServlet(APITestServlet.class, "/test");
 
-            apiHandler.addServlet(DbShellServlet.class, "/dbshell");
+            apiServletContextHandler.addServlet(DbShellServlet.class, "/dbshell");
+
+            //apiServletContextHandler.addServlet(SwaggerConfigServlet.class, "/docs");
+
+            try {
+                apiHandlers.addHandler(buildSwaggerUI("/docs"));
+            } catch (Exception e) {
+                Logger.logErrorMessage("Failed to start interactive API doc server", e);
+            }
 
             if (Nxt.getBooleanProperty("fimk.apiServerCORS")) {
-                FilterHolder filterHolder = apiHandler.addFilter(CrossOriginFilter.class, "/*", null);
+                FilterHolder filterHolder = apiServletContextHandler.addFilter(CrossOriginFilter.class, "/*", null);
                 filterHolder.setInitParameter("allowedHeaders", "*");
                 filterHolder.setAsyncSupported(true);
             }
 
-            apiHandlers.addHandler(apiHandler);
-            apiHandlers.addHandler(new DefaultHandler());
+            apiHandlers.addHandler(apiServletContextHandler);
+
+            //apiHandlers.addHandler(new DefaultHandler());
+
 
             apiServer.setHandler(apiHandlers);
             apiServer.setStopAtShutdown(true);
@@ -270,6 +313,17 @@ public final class API {
         }
         return false;
 
+    }
+
+    public static ContextHandler buildSwaggerUI(String path) throws Exception {
+        ResourceHandler rh = new ResourceHandler();
+        rh.setResourceBase(API.class.getClassLoader()
+                .getResource("META-INF/resources/webjars/swagger-ui/4.18.1")
+                .toURI().toString());
+        ContextHandler context = new ContextHandler();
+        context.setContextPath(path);
+        context.setHandler(rh);
+        return context;
     }
 
     private static class NetworkAddress {

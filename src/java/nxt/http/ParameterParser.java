@@ -506,18 +506,16 @@ final class ParameterParser {
 
     static int getHeight(HttpServletRequest req) throws ParameterException {
         String heightValue = Convert.emptyToNull(req.getParameter("height"));
-        if (heightValue != null) {
-            try {
-                int height = Integer.parseInt(heightValue);
-                if (height < 0 || height > Nxt.getBlockchain().getHeight()) {
-                    throw new ParameterException(INCORRECT_HEIGHT);
-                }
-                return height;
-            } catch (NumberFormatException e) {
+        if (heightValue == null) return -1;
+        try {
+            int height = Integer.parseInt(heightValue);
+            if (height < 0 || height > Nxt.getBlockchain().getHeight()) {
                 throw new ParameterException(INCORRECT_HEIGHT);
             }
+            return height;
+        } catch (NumberFormatException e) {
+            throw new ParameterException(INCORRECT_HEIGHT);
         }
-        return -1;
     }
     static String getSearchQuery(HttpServletRequest req) {
         String query = Convert.nullToEmpty(req.getParameter("query")).trim();

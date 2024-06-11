@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Currency;
 import nxt.NxtException;
 import nxt.util.Convert;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.MISSING_CURRENCY;
 import static nxt.http.JSONResponses.UNKNOWN_CURRENCY;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetCurrency extends APIServlet.APIRequestHandler {
 
     static final GetCurrency instance = new GetCurrency();
@@ -35,7 +37,7 @@ public final class GetCurrency extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
         String currencyValue = Convert.emptyToNull(req.getParameter("currency"));
         Currency currency;

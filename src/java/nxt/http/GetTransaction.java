@@ -23,10 +23,9 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static nxt.http.JSONResponses.INCORRECT_TRANSACTION;
-import static nxt.http.JSONResponses.MISSING_TRANSACTION;
-import static nxt.http.JSONResponses.UNKNOWN_TRANSACTION;
+import static nxt.http.JSONResponses.*;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetTransaction extends APIServlet.APIRequestHandler {
 
     static final GetTransaction instance = new GetTransaction();
@@ -36,7 +35,7 @@ public final class GetTransaction extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String transactionIdString = Convert.emptyToNull(req.getParameter("transaction"));
         String transactionFullHash = Convert.emptyToNull(req.getParameter("fullHash"));

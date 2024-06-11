@@ -16,11 +16,7 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Asset;
-import nxt.PhasingPoll;
-import nxt.Transaction;
-import nxt.VoteWeighting;
+import nxt.*;
 import nxt.db.DbIterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,7 +32,7 @@ public class GetAssetPhasedTransactions extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         Asset asset = ParameterParser.getAsset(req);
         Account account = ParameterParser.getAccount(req, false);
         int firstIndex = ParameterParser.getFirstIndex(req);

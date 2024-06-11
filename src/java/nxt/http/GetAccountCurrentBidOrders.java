@@ -25,6 +25,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountCurrentBidOrders extends APIServlet.APIRequestHandler {
 
     static final GetAccountCurrentBidOrders instance = new GetAccountCurrentBidOrders();
@@ -34,7 +35,7 @@ public final class GetAccountCurrentBidOrders extends APIServlet.APIRequestHandl
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountId = ParameterParser.getAccount(req).getId();
         long assetId = 0;

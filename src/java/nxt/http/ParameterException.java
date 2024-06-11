@@ -17,10 +17,10 @@
 package nxt.http;
 
 import nxt.NxtException;
-
 import org.json.simple.JSONStreamAware;
 
 @SuppressWarnings("serial")
+//@Path("/fimk?requestType=accountColorList")
 public final class ParameterException extends NxtException {
 
     private final JSONStreamAware errorResponse;

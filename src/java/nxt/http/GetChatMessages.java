@@ -12,26 +12,19 @@
 
 package nxt.http;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import nxt.Account;
-import nxt.Appendix;
-import nxt.MofoChat;
-import nxt.Nxt;
-import nxt.Transaction;
-import nxt.UnconfirmedTransaction;
+import nxt.*;
 import nxt.Account.AccountInfo;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
 import nxt.util.JSON;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class GetChatMessages extends APIServlet.APIRequestHandler{
 
@@ -43,7 +36,7 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountOneId;
         String accountOneValue = Convert.emptyToNull(req.getParameter("accountOne"));

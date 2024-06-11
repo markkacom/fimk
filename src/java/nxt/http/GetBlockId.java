@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.INCORRECT_HEIGHT;
 import static nxt.http.JSONResponses.MISSING_HEIGHT;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetBlockId extends APIServlet.APIRequestHandler {
 
     static final GetBlockId instance = new GetBlockId();
@@ -35,7 +36,7 @@ public final class GetBlockId extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         int height;
         try {

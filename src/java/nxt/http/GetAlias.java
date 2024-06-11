@@ -21,6 +21,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAlias extends APIServlet.APIRequestHandler {
 
     static final GetAlias instance = new GetAlias();
@@ -30,7 +31,7 @@ public final class GetAlias extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         Alias alias = ParameterParser.getAlias(req);
         return JSONData.alias(alias);
     }

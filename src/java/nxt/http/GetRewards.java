@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.reward.RewardItem;
@@ -25,6 +26,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetRewards extends APIServlet.APIRequestHandler {
 
     static final GetRewards instance = new GetRewards();
@@ -34,7 +36,7 @@ public final class GetRewards extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getAccount(req).getId();
         final int fromHeight = ParameterParser.getInt(req, "fromHeight", 0, Integer.MAX_VALUE, true);
         int firstIndex = ParameterParser.getFirstIndex(req);

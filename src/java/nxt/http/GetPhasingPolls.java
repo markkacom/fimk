@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.INCORRECT_TRANSACTION;
 import static nxt.http.JSONResponses.MISSING_TRANSACTION;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetPhasingPolls extends APIServlet.APIRequestHandler {
 
     static final GetPhasingPolls instance = new GetPhasingPolls();
@@ -36,7 +37,7 @@ public final class GetPhasingPolls extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String[] transactions = req.getParameterValues("transaction");
         if (transactions == null) {

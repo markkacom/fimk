@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
  * and without being prepared to analyze them correctly.</p>
  */
 @Deprecated
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountTransactionIds extends APIServlet.APIRequestHandler {
 
     static final GetAccountTransactionIds instance = new GetAccountTransactionIds();
@@ -45,7 +47,7 @@ public final class GetAccountTransactionIds extends APIServlet.APIRequestHandler
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         int timestamp = ParameterParser.getTimestamp(req);

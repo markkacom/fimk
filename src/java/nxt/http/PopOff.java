@@ -25,6 +25,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class PopOff extends APIServlet.APIRequestHandler {
 
     static final PopOff instance = new PopOff();
@@ -34,7 +35,7 @@ public final class PopOff extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         int numBlocks = 0;
         try {

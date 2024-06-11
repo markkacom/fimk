@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Currency;
 import nxt.CurrencyFounder;
@@ -29,6 +30,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetCurrencyFounders extends APIServlet.APIRequestHandler {
 
     static final GetCurrencyFounders instance = new GetCurrencyFounders();
@@ -38,7 +40,7 @@ public final class GetCurrencyFounders extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         String currencyId = Convert.emptyToNull(req.getParameter("currency"));
         String accountId = Convert.emptyToNull(req.getParameter("account"));
         if (currencyId == null && accountId == null) {

@@ -15,13 +15,13 @@ package nxt.http;
 import nxt.Account;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler {
 
     static final SearchAccountIdentifiers instance = new SearchAccountIdentifiers();
@@ -32,7 +32,7 @@ public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         String query = Convert.nullToEmpty(req.getParameter("query"));
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

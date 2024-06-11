@@ -47,6 +47,7 @@ import java.util.List;
  * <li>errorDescription - API error description</li>
  * </ul>
  */
+//@Path("/fimk?requestType=accountColorList")
 public final class GetInboundPeers extends APIServlet.APIRequestHandler {
 
     /** GetInboundPeers instance */
@@ -66,7 +67,7 @@ public final class GetInboundPeers extends APIServlet.APIRequestHandler {
      * @return                      API response or null
      */
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         boolean includePeerInfo = "true".equalsIgnoreCase(req.getParameter("includePeerInfo"));
         List<Peer> peers = Peers.getInboundPeers();
         JSONArray peersJSON = new JSONArray();

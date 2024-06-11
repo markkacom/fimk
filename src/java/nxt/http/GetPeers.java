@@ -26,6 +26,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetPeers extends APIServlet.APIRequestHandler {
 
     static final GetPeers instance = new GetPeers();
@@ -35,7 +36,7 @@ public final class GetPeers extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         boolean active = "true".equalsIgnoreCase(req.getParameter("active"));
         String stateValue = Convert.emptyToNull(req.getParameter("state"));

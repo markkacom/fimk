@@ -13,18 +13,17 @@
 package nxt.http;
 
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.MofoAttachment;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import nxt.util.JSON;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
+
+//@Path("/fimk?requestType=accountColorList")
 public final class MofoVerificationAuthorityAssignment extends CreateTransaction {
 
     static final MofoVerificationAuthorityAssignment instance = new MofoVerificationAuthorityAssignment();
@@ -35,7 +34,8 @@ public final class MofoVerificationAuthorityAssignment extends CreateTransaction
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account senderAccount = ParameterParser.getSenderAccount(req);
         int period = ParameterParser.getInt(req, "period", Constants.MIN_VERIFICATION_AUTHORITY_PERIOD, Constants.MAX_VERIFICATION_AUTHORITY_PERIOD, true);

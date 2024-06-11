@@ -22,6 +22,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequestHandler {
 
     static final RebroadcastUnconfirmedTransactions instance = new RebroadcastUnconfirmedTransactions();
@@ -31,7 +32,7 @@ public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequ
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {
             Nxt.getTransactionProcessor().rebroadcastAllUnconfirmedTransactions();

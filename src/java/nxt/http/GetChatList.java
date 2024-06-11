@@ -12,19 +12,17 @@
 
 package nxt.http;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import nxt.Account;
 import nxt.Account.AccountInfo;
 import nxt.MofoChat;
 import nxt.MofoChat.Chat;
 import nxt.util.Convert;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public class GetChatList extends APIServlet.APIRequestHandler{
 
@@ -36,7 +34,7 @@ public class GetChatList extends APIServlet.APIRequestHandler{
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountId = ParameterParser.getAccountId(req);
         int firstIndex = ParameterParser.getFirstIndex(req);

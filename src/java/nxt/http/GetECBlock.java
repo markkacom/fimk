@@ -16,16 +16,14 @@
 
 package nxt.http;
 
-import nxt.Block;
-import nxt.Constants;
-import nxt.EconomicClustering;
-import nxt.Nxt;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetECBlock extends APIServlet.APIRequestHandler {
 
     static final GetECBlock instance = new GetECBlock();
@@ -35,7 +33,7 @@ public final class GetECBlock extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         int timestamp = ParameterParser.getTimestamp(req);
         if (timestamp == 0) {
             timestamp = Nxt.getEpochTime();

@@ -22,17 +22,13 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetPlugins extends APIServlet.APIRequestHandler {
 
     static final GetPlugins instance = new GetPlugins();
@@ -44,7 +40,7 @@ public final class GetPlugins extends APIServlet.APIRequestHandler {
     private static final Path PLUGINS_HOME = Paths.get("./html/ui/plugins");
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = new JSONObject();
         if (!Files.isReadable(PLUGINS_HOME)) {

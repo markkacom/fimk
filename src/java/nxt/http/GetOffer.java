@@ -23,6 +23,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetOffer extends APIServlet.APIRequestHandler {
 
     static final GetOffer instance = new GetOffer();
@@ -32,7 +33,7 @@ public final class GetOffer extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         JSONObject response = new JSONObject();
         CurrencyBuyOffer buyOffer = ParameterParser.getBuyOffer(req);
         CurrencySellOffer sellOffer = ParameterParser.getSellOffer(req);

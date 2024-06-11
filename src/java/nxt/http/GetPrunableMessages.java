@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.PrunableMessage;
@@ -29,6 +30,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetPrunableMessages extends APIServlet.APIRequestHandler {
 
     static final GetPrunableMessages instance = new GetPrunableMessages();
@@ -38,7 +40,7 @@ public final class GetPrunableMessages extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getAccount(req);
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));
         int firstIndex = ParameterParser.getFirstIndex(req);

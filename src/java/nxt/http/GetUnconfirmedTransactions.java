@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetUnconfirmedTransactions extends APIServlet.APIRequestHandler {
 
     static final GetUnconfirmedTransactions instance = new GetUnconfirmedTransactions();
@@ -37,7 +38,7 @@ public final class GetUnconfirmedTransactions extends APIServlet.APIRequestHandl
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String accountIdString = Convert.emptyToNull(req.getParameter("account"));
         long accountId = 0;

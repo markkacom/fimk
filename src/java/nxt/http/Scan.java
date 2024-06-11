@@ -22,6 +22,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class Scan extends APIServlet.APIRequestHandler {
 
     static final Scan instance = new Scan();
@@ -31,7 +32,7 @@ public final class Scan extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {
             boolean validate = "true".equalsIgnoreCase(req.getParameter("validate"));

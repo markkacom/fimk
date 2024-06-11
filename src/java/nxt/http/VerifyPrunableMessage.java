@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Appendix;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -27,10 +28,9 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
-import static nxt.http.JSONResponses.EITHER_MESSAGE_ENCRYPTED_MESSAGE;
-import static nxt.http.JSONResponses.MISSING_MESSAGE_ENCRYPTED_MESSAGE;
-import static nxt.http.JSONResponses.UNKNOWN_TRANSACTION;
+import static nxt.http.JSONResponses.*;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class VerifyPrunableMessage extends APIServlet.APIRequestHandler {
 
     static final VerifyPrunableMessage instance = new VerifyPrunableMessage();
@@ -58,7 +58,7 @@ public final class VerifyPrunableMessage extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);
         Transaction transaction = Nxt.getBlockchain().getTransaction(transactionId);

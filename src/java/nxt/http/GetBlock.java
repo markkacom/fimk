@@ -44,10 +44,9 @@ public final class GetBlock extends APIServlet.APIRequestHandler {
     @GET
     @Operation(summary = "Return block",
             tags = {APITag2.BLOCKCHAIN},
-            description = "Return detailed block data",
-            operationId = "getBlock")
+            description = "Return detailed block data")
     @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "block height")
-    @Parameter(name = "block", in = ParameterIn.QUERY, description = "block id")
+    @Parameter(name = "block", in = ParameterIn.QUERY, description = "Block id")
     @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "block timestamp")
     public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
 

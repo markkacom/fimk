@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.INCORRECT_CURRENCY;
 import static nxt.http.JSONResponses.UNKNOWN_CURRENCY;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetCurrencies extends APIServlet.APIRequestHandler {
 
     static final GetCurrencies instance = new GetCurrencies();
@@ -36,7 +37,7 @@ public final class GetCurrencies extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String[] currencies = req.getParameterValues("currencies");
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));

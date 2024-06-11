@@ -12,11 +12,11 @@
 package nxt.http;
 
 import nxt.NamespacedAlias;
-
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetNamespacedAlias extends APIServlet.APIRequestHandler {
 
     static final GetNamespacedAlias instance = new GetNamespacedAlias();
@@ -26,7 +26,7 @@ public final class GetNamespacedAlias extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         NamespacedAlias alias = ParameterParser.getNamespacedAlias(req);
         return JSONData.namespacedAlias(alias);
     }

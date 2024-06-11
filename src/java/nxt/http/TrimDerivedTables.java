@@ -22,6 +22,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class TrimDerivedTables extends APIServlet.APIRequestHandler {
 
     static final TrimDerivedTables instance = new TrimDerivedTables();
@@ -31,7 +32,7 @@ public final class TrimDerivedTables extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         Nxt.getBlockchainProcessor().trimDerivedTables();
         response.put("done", true);

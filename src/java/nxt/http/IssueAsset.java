@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
@@ -25,9 +26,11 @@ import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
 import static nxt.http.JSONResponses.*;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class IssueAsset extends CreateTransaction {
 
     static final IssueAsset instance = new IssueAsset();
@@ -37,7 +40,8 @@ public final class IssueAsset extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         String name = req.getParameter("name");
         String description = req.getParameter("description");

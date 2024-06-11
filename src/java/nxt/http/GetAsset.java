@@ -16,16 +16,17 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Asset;
 import nxt.MofoAsset;
 import nxt.MofoAsset.AssetFee;
 import nxt.NxtException;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAsset extends APIServlet.APIRequestHandler {
 
     static final GetAsset instance = new GetAsset();
@@ -35,7 +36,7 @@ public final class GetAsset extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
         Asset asset = ParameterParser.getAsset(req);
         JSONObject response = JSONData.asset(asset, includeCounts);

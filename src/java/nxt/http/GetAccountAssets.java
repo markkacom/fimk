@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Asset;
 import nxt.NxtException;
@@ -27,17 +31,26 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getAccountAssets")
 public final class GetAccountAssets extends APIServlet.APIRequestHandler {
 
     static final GetAccountAssets instance = new GetAccountAssets();
 
     private GetAccountAssets() {
-        super(new APITag[] {APITag.ACCOUNTS, APITag.AE}, "account", "asset", "height");
+        super(new APITag[]{APITag.ACCOUNTS, APITag.AE}, "account", "asset", "height");
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Get account assets",
+            tags = {APITag2.ACCOUNT, APITag2.AE})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         int height = ParameterParser.getHeight(req);

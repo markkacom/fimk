@@ -27,6 +27,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetNextBlockGenerators extends APIServlet.APIRequestHandler {
 
     static final GetNextBlockGenerators instance = new GetNextBlockGenerators();
@@ -36,7 +37,7 @@ public final class GetNextBlockGenerators extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         /* implement later, if needed
         Block curBlock;

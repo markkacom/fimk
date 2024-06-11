@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Currency;
@@ -23,6 +24,8 @@ import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+
 
 /**
  * Publish exchange offer for {@link nxt.CurrencyType#EXCHANGEABLE} currency
@@ -54,6 +57,7 @@ import javax.servlet.http.HttpServletRequest;
  * Only one exchange offer is allowed per account. Publishing a new exchange offer when another exchange offer exists
  * for the account, removes the existing exchange offer and publishes the new exchange offer
  */
+//@Path("/fimk?requestType=accountColorList")
 public final class PublishExchangeOffer extends CreateTransaction {
 
     static final PublishExchangeOffer instance = new PublishExchangeOffer();
@@ -64,7 +68,8 @@ public final class PublishExchangeOffer extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         Currency currency = ParameterParser.getCurrency(req);
         long buyRateNQT = ParameterParser.getLong(req, "buyRateNQT", 0, Long.MAX_VALUE, true);
         long sellRateNQT= ParameterParser.getLong(req, "sellRateNQT", 0, Long.MAX_VALUE, true);

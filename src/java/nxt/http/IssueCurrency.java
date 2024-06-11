@@ -16,15 +16,14 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Attachment;
-import nxt.Constants;
-import nxt.CurrencyType;
-import nxt.NxtException;
+import io.swagger.v3.oas.annotations.Parameter;
+import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+
 
 /**
  * Issue a currency on the NXT blockchain
@@ -80,6 +79,7 @@ import javax.servlet.http.HttpServletRequest;
  * @see nxt.CurrencyType
  * @see nxt.crypto.HashFunction
  */
+//@Path("/fimk?requestType=accountColorList")
 public final class IssueCurrency extends CreateTransaction {
 
     static final IssueCurrency instance = new IssueCurrency();
@@ -91,7 +91,8 @@ public final class IssueCurrency extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         String name = Convert.nullToEmpty(req.getParameter("name"));
         String code = Convert.nullToEmpty(req.getParameter("code"));
         String description = Convert.nullToEmpty(req.getParameter("description"));

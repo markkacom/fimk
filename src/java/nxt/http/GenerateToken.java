@@ -16,17 +16,23 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Token;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-import static nxt.http.JSONResponses.INCORRECT_WEBSITE;
-import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE;
-import static nxt.http.JSONResponses.MISSING_WEBSITE;
+import static nxt.http.JSONResponses.*;
 
 
+@Path("/fimk?requestType=generateToken")
 public final class GenerateToken extends APIServlet.APIRequestHandler {
 
     static final GenerateToken instance = new GenerateToken();
@@ -36,7 +42,12 @@ public final class GenerateToken extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    @POST
+    @Operation(summary = "Generate token",
+            tags = {APITag2.TOKEN})
+    @Parameter(name = "website", in = ParameterIn.QUERY)
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
 
         String secretPhrase = req.getParameter("secretPhrase");
         String website = req.getParameter("website");

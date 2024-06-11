@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Constants;
 import nxt.Nxt;
@@ -27,6 +28,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountLessors extends APIServlet.APIRequestHandler {
 
     static final GetAccountLessors instance = new GetAccountLessors();
@@ -36,7 +38,7 @@ public final class GetAccountLessors extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         int height = ParameterParser.getHeight(req);

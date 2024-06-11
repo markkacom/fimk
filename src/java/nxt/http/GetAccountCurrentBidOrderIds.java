@@ -24,7 +24,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getAccountCurrentBidOrderIds")
 public final class GetAccountCurrentBidOrderIds extends APIServlet.APIRequestHandler {
 
     static final GetAccountCurrentBidOrderIds instance = new GetAccountCurrentBidOrderIds();
@@ -34,7 +36,7 @@ public final class GetAccountCurrentBidOrderIds extends APIServlet.APIRequestHan
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountId = ParameterParser.getAccount(req).getId();
         long assetId = 0;

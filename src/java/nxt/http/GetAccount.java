@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.db.DbIterator;
@@ -25,7 +29,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getAccount")
 public final class GetAccount extends APIServlet.APIRequestHandler {
 
     static final GetAccount instance = new GetAccount();
@@ -35,7 +42,15 @@ public final class GetAccount extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @GET
+    @Operation(summary = "Get account",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "includeLessors", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include lessors")
+    @Parameter(name = "includeAssets", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include assets")
+    @Parameter(name = "includeCurrencies", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include currencies")
+    @Parameter(name = "includeEffectiveBalance", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include effective balance")
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         boolean includeLessors = !"false".equalsIgnoreCase(req.getParameter("includeLessors"));

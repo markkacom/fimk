@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.Trade;
 import nxt.db.DbIterator;
@@ -26,6 +27,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetOrderTrades extends APIServlet.APIRequestHandler {
 
     static final GetOrderTrades instance = new GetOrderTrades();
@@ -35,7 +37,7 @@ public final class GetOrderTrades extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long askOrderId = ParameterParser.getUnsignedLong(req, "askOrder", false);
         long bidOrderId = ParameterParser.getUnsignedLong(req, "bidOrder", false);

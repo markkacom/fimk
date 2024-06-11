@@ -21,11 +21,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.management.LockInfo;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MonitorInfo;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
+import java.lang.management.*;
 
 /**
  * <p>The GetStackTraces API will return the current stack trace for
@@ -86,7 +82,7 @@ public class GetStackTraces extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         String value;
         //
         // Get the number of trace lines to return

@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
@@ -25,7 +26,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
+
+//@Path("/fimk?requestType=accountColorList")
 public final class LeaseBalance extends CreateTransaction {
 
     static final LeaseBalance instance = new LeaseBalance();
@@ -35,7 +39,8 @@ public final class LeaseBalance extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         short period = (short)ParameterParser.getInt(req, "period", Constants.LEASING_DELAY, Short.MAX_VALUE, true);
         Account account = ParameterParser.getSenderAccount(req);

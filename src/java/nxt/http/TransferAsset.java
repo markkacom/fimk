@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
@@ -24,9 +25,11 @@ import nxt.txn.AssetTransferAttachment;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
 
 import static nxt.http.JSONResponses.NOT_ENOUGH_ASSETS;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class TransferAsset extends CreateTransaction {
 
     static final TransferAsset instance = new TransferAsset();
@@ -36,7 +39,8 @@ public final class TransferAsset extends CreateTransaction {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    @POST
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
 

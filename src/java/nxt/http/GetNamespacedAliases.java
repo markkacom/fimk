@@ -20,6 +20,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
 
     static final GetNamespacedAliases instance = new GetNamespacedAliases();
@@ -30,7 +31,7 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         final long accountId = ParameterParser.getAccount(req).getId();
         final String filter = ParameterParser.getFilter(req);

@@ -1,17 +1,17 @@
 package nxt.http;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.util.Convert;
 import nxt.virtualexchange.VirtualOrder.VirtualAsk;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetVirtualAskOrders extends APIServlet.APIRequestHandler {
 
     static final GetVirtualAskOrders instance = new GetVirtualAskOrders();
@@ -22,7 +22,7 @@ public final class GetVirtualAskOrders extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         long assetId = ParameterParser.getAsset(req).getId();
         int firstIndex = ParameterParser.getFirstIndex(req);

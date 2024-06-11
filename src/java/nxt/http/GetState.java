@@ -16,31 +16,14 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Alias;
-import nxt.Asset;
-import nxt.AssetTransfer;
-import nxt.Constants;
-import nxt.Currency;
-import nxt.CurrencyBuyOffer;
-import nxt.CurrencyTransfer;
-import nxt.DigitalGoodsStore;
-import nxt.Exchange;
-import nxt.Generator;
-import nxt.Nxt;
-import nxt.Order;
-import nxt.PhasingPoll;
-import nxt.Poll;
-import nxt.PrunableMessage;
-import nxt.TaggedData;
-import nxt.Trade;
-import nxt.Vote;
+import nxt.*;
 import nxt.peer.Peers;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetState extends APIServlet.APIRequestHandler {
 
     static final GetState instance = new GetState();
@@ -50,7 +33,7 @@ public final class GetState extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = GetBlockchainStatus.instance.processRequest(req);
 

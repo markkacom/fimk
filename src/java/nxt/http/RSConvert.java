@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 import static nxt.http.JSONResponses.MISSING_ACCOUNT;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class RSConvert extends APIServlet.APIRequestHandler {
 
     static final RSConvert instance = new RSConvert();
@@ -34,7 +35,7 @@ public final class RSConvert extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         String accountValue = Convert.emptyToNull(req.getParameter("account"));
         if (accountValue == null) {
             return MISSING_ACCOUNT;

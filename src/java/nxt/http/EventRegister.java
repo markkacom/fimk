@@ -148,7 +148,7 @@ public class EventRegister extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = null;
         //
         // Get 'add' and 'remove' parameters

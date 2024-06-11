@@ -94,7 +94,7 @@ public class SetLogging extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONStreamAware response = null;
         //
         // Get the log level

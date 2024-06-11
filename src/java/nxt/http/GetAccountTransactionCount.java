@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Account;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -24,6 +25,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAccountTransactionCount extends APIServlet.APIRequestHandler {
 
     static final GetAccountTransactionCount instance = new GetAccountTransactionCount();
@@ -33,7 +35,7 @@ public final class GetAccountTransactionCount extends APIServlet.APIRequestHandl
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         JSONObject response = new JSONObject();

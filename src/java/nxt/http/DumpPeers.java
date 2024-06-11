@@ -48,7 +48,7 @@ public final class DumpPeers extends APIServlet.APIRequestHandler {
             tags = {APITag2.DEBUG})
     @Parameter(name = "version", in = ParameterIn.QUERY, description = "version of peer")
     @Parameter(name = "weight", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "weight of peer")
-    public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws ParameterException {
 
         String version = Convert.nullToEmpty(req.getParameter("version"));
         int weight = ParameterParser.getInt(req, "weight", 0, (int)Constants.MAX_BALANCE_NXT, false);

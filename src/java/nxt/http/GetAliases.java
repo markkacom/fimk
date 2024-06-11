@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Alias;
 import nxt.NxtException;
 import nxt.db.FilteringIterator;
@@ -25,6 +26,7 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class GetAliases extends APIServlet.APIRequestHandler {
 
     static final GetAliases instance = new GetAliases();
@@ -34,7 +36,7 @@ public final class GetAliases extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
         final int timestamp = ParameterParser.getTimestamp(req);
         final long accountId = ParameterParser.getAccount(req).getId();
         int firstIndex = ParameterParser.getFirstIndex(req);

@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+//@Path("/fimk?requestType=accountColorList")
 public final class LuceneReindex extends APIServlet.APIRequestHandler {
 
     static final LuceneReindex instance = new LuceneReindex();
@@ -33,7 +34,7 @@ public final class LuceneReindex extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try (Connection con = Db.db.getConnection()) {
             org.h2.fulltext.FullTextLucene.reindex(con);
