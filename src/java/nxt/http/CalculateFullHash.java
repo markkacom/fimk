@@ -33,7 +33,7 @@ import java.security.MessageDigest;
 import static nxt.http.JSONResponses.MISSING_SIGNATURE_HASH;
 import static nxt.http.JSONResponses.MISSING_UNSIGNED_BYTES;
 
-@Path("/fimk?requestType=сalculateFullHash")
+@Path("/fimk?requestType=calculateFullHash")
 public final class CalculateFullHash extends APIServlet.APIRequestHandler {
 
     static final CalculateFullHash instance = new CalculateFullHash();
@@ -50,7 +50,7 @@ public final class CalculateFullHash extends APIServlet.APIRequestHandler {
             description = "unsigned transaction bytes in HEX format")
     @Parameter(name = "signatureHash", in = ParameterIn.QUERY, required = true,
             description = "signature hash in HEX format")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String unsignedBytesString = Convert.emptyToNull(req.getParameter("unsignedTransactionBytes"));
         String signatureHashString = Convert.emptyToNull(req.getParameter("signatureHash"));

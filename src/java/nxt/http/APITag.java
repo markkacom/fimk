@@ -18,11 +18,27 @@ package nxt.http;
 
 public enum APITag {
 
-    ACCOUNTS("Accounts"), ALIASES("Aliases"), AE("Asset Exchange"), CREATE_TRANSACTION("Create Transaction"),
-    BLOCKS("Blocks"), DGS("Digital Goods Store"), FORGING("Forging"), INFO("Server Info"), MESSAGES("Messages"),
-	  TRANSACTIONS("Transactions"), PHASING("Phasing"), TOKENS("Tokens"), VS("Voting System"),
-    MS("Monetary System"), SEARCH("Search"), NETWORK("Networking"), DATA("Tagged Data"), UTILS("Utils"), DEBUG("Debug"), 
-    MOFO("MofoWallet"), REWARDS("Rewardes");
+    ACCOUNTS("Accounts"),
+    ALIASES("Aliases"),
+    AE("Asset Exchange"),
+    CREATE_TRANSACTION("Create Transaction"),
+    BLOCKS("Blocks"),
+    DGS("Digital Goods Store"),
+    FORGING("Forging"),
+    INFO("Server Info"),
+    MESSAGES("Messages"),
+    TRANSACTIONS("Transactions"),
+    PHASING("Phasing"),
+    TOKENS("Tokens"),
+    VS("Voting System"),
+    MS("Monetary System"),
+    SEARCH("Search"),
+    NETWORK("Networking"),
+    DATA("Tagged Data"),
+    UTILS("Utils"),
+    DEBUG("Debug"),
+    MOFO("MofoWallet"),
+    REWARDS("Rewardes");
 
     private final String displayName;
 

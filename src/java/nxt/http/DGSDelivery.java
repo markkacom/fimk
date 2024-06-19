@@ -50,7 +50,7 @@ public final class DGSDelivery extends CreateTransaction {
     @Parameter(name = "goodsIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is goods to encrypt data in text format or in HEX format")
     @Parameter(name = "goodsData", in = ParameterIn.QUERY, description = "goods data in HEX format")
     @Parameter(name = "goodsNonce", in = ParameterIn.QUERY, description = "goods data nonce in HEX format")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account sellerAccount = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Purchase purchase = ParameterParser.getPurchase(req);

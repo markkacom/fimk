@@ -36,7 +36,7 @@ public final class GetAllTrades extends APIServlet.APIRequestHandler {
     }
     
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final int timestamp = ParameterParser.getTimestamp(req);
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

@@ -44,7 +44,7 @@ public final class GetBlockchainStatus extends APIServlet.APIRequestHandler {
             tags = {APITag2.BLOCKCHAIN},
             description = "Return detailed blockchain state info",
             operationId = "getBlockchainStatus")
-    public JSONObject processRequest(@Parameter(hidden = true) HttpServletRequest req) {
+    public JSONObject processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         response.put("application", Nxt.APPLICATION);
         response.put("version", Nxt.VERSION);

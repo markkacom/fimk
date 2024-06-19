@@ -34,7 +34,7 @@ public final class GetAliasCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getAccount(req).getId();
         JSONObject response = new JSONObject();
         response.put("numberOfAliases", Alias.getAccountAliasCount(accountId));

@@ -47,7 +47,7 @@ public final class DGSPurchase extends CreateTransaction {
     @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, description = "price in NQT")
     @Parameter(name = "quantity", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
     @Parameter(name = "deliveryDeadlineTimestamp", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         DigitalGoodsStore.Goods goods = ParameterParser.getGoods(req);
         if (goods.isDelisted()) {

@@ -39,7 +39,7 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
     @SuppressWarnings("unchecked")
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Account senderAccount = ParameterParser.getSenderAccount(req);

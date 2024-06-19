@@ -47,7 +47,7 @@ public final class DGSFeedback extends CreateTransaction {
     @Operation(summary = "Feedback",
             tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "purchase", in = ParameterIn.QUERY, required = true, description = "purchase id")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         DigitalGoodsStore.Purchase purchase = ParameterParser.getPurchase(req);
 

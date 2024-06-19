@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright © 2013-2015 The Nxt Core Developers.                             *
+ * Copyright © 2013-2024 The Nxt Core Developers.                             *
  *                                                                            *
  * See the AUTHORS.txt, DEVELOPER-AGREEMENT.txt and LICENSE.txt files at      *
  * the top-level directory of this distribution for the individual copyright  *
@@ -16,18 +16,25 @@
 
 package nxt.http;
 
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import static nxt.http.JSONResponses.*;
 
+@Path("/fimk?requestType=approveTransaction")
 public class ApproveTransaction extends CreateTransaction {
+
     static final ApproveTransaction instance = new ApproveTransaction();
 
     private ApproveTransaction() {
@@ -36,6 +43,12 @@ public class ApproveTransaction extends CreateTransaction {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Approve transaction",
+            tags = {APITag2.CREATE_TRANSACTION, APITag2.PHASING})
+    @Parameter(name = "transactionFullHash", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "revealedSecret", in = ParameterIn.QUERY)
+    @Parameter(name = "revealedSecretText", in = ParameterIn.QUERY)
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String[] phasedTransactionValues = req.getParameterValues("transactionFullHash");
 
@@ -68,6 +81,7 @@ public class ApproveTransaction extends CreateTransaction {
         }
         Account account = ParameterParser.getSenderAccount(req);
         Attachment attachment = new Attachment.MessagingPhasingVoteCasting(phasedTransactionFullHashes, secret);
+
         return createTransaction(req, account, attachment);
     }
 }

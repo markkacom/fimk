@@ -32,7 +32,7 @@ public final class GetDGSGood extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
         return JSONData.goods(ParameterParser.getGoods(req), includeCounts);
     }

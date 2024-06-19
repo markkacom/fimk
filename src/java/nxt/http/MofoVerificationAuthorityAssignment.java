@@ -35,7 +35,7 @@ public final class MofoVerificationAuthorityAssignment extends CreateTransaction
     @SuppressWarnings("unchecked")
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account senderAccount = ParameterParser.getSenderAccount(req);
         int period = ParameterParser.getInt(req, "period", Constants.MIN_VERIFICATION_AUTHORITY_PERIOD, Constants.MAX_VERIFICATION_AUTHORITY_PERIOD, true);

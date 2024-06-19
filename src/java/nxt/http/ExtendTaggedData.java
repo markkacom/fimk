@@ -52,7 +52,7 @@ public final class ExtendTaggedData extends CreateTransaction {
     @Parameter(name = "isText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is text data")
     @Parameter(name = "filename", in = ParameterIn.QUERY, description = "file name")
     @Parameter(name = "data", in = ParameterIn.QUERY)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getSenderAccount(req);
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);

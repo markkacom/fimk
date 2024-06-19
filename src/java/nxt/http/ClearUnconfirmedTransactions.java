@@ -40,7 +40,7 @@ public final class ClearUnconfirmedTransactions extends APIServlet.APIRequestHan
     @POST
     @Operation(summary = "Clear unconfirmed transactions",
             tags = {APITag2.DEBUG, APITag2.CREATE_TRANSACTION})
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {
             Nxt.getTransactionProcessor().clearUnconfirmedTransactions();

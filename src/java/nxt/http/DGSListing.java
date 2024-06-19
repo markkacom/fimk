@@ -49,7 +49,7 @@ public final class DGSListing extends CreateTransaction {
     @Parameter(name = "quantity", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
     @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, description = "price in NQT")
     @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String name = Convert.emptyToNull(req.getParameter("name"));
         String description = Convert.nullToEmpty(req.getParameter("description"));

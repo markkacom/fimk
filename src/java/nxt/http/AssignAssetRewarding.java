@@ -31,7 +31,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
     @Operation(summary = "Assign rewarding rules to asset",
             tags = {APITag2.ASSET, APITag2.CREATE_TRANSACTION},
             description = "")
-    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
     @Parameter(name = "target", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
             description = "method of resolving rewardee account: 0 - registered POP reward receiver, 1 - forger, 2 - constant account")
     @Parameter(name = "frequency", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
@@ -48,7 +48,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
             description = "asset id which balance is used (for cases lottery type is 0 or 1)")
     @Parameter(name = "targetAccount", in = ParameterIn.QUERY,
             description = "account id used when target is 2 (constant account)")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Asset asset = ParameterParser.getAsset(req);
         AssetRewardingTxnType.Target target = AssetRewardingTxnType.Target.get(
                 (byte) ParameterParser.getInt(req, "target", 0, 2,  true));

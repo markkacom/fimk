@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Currency;
 import nxt.NxtException;
@@ -30,6 +33,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getAccountCurrencies")
 public final class GetAccountCurrencies extends APIServlet.APIRequestHandler {
 
     static final GetAccountCurrencies instance = new GetAccountCurrencies();
@@ -39,7 +43,12 @@ public final class GetAccountCurrencies extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    @Operation(summary = "Get account currencies",
+            tags = {APITag2.ACCOUNT, APITag2.MS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         int height = ParameterParser.getHeight(req);

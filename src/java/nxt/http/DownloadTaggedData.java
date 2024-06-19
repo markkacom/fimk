@@ -44,8 +44,8 @@ public final class DownloadTaggedData extends APIServlet.APIRequestHandler {
     @Operation(summary = "Download tagged data",
             tags = {APITag2.DATA})
     @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest request,
-                                          @Parameter(hidden = true) HttpServletResponse response) throws NxtException  {
+    public JSONStreamAware processRequest(HttpServletRequest request,
+                                          HttpServletResponse response) throws NxtException  {
         long transactionId = ParameterParser.getUnsignedLong(request, "transaction", true);
         TaggedData taggedData = TaggedData.getData(transactionId);
         byte[] data = taggedData.getData();

@@ -35,7 +35,7 @@ public final class GetAccountTransactionCount extends APIServlet.APIRequestHandl
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         JSONObject response = new JSONObject();

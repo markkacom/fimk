@@ -47,13 +47,11 @@ public class BlacklistPeer extends APIRequestHandler {
     @Operation(summary = "Manual blacklist peer",
             tags = {APITag2.NETWORK})
     @Parameter(name = "peer", in = ParameterIn.QUERY, required = true)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest request) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest request) throws NxtException {
         JSONObject response = new JSONObject();
         
         String peerAddress = request.getParameter("peer");
-        if (peerAddress == null) {
-            return MISSING_PEER;
-        }
+        if (peerAddress == null) return MISSING_PEER;
         Peer peer = Peers.findOrCreatePeer(peerAddress, true);
         if (peer == null) return UNKNOWN_PEER;
 

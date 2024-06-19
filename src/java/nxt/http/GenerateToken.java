@@ -47,7 +47,7 @@ public final class GenerateToken extends APIServlet.APIRequestHandler {
             tags = {APITag2.TOKEN})
     @Parameter(name = "website", in = ParameterIn.QUERY)
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String secretPhrase = req.getParameter("secretPhrase");
         String website = req.getParameter("website");

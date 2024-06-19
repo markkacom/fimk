@@ -36,7 +36,7 @@ public final class GetAssetRewardings extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         // parameter asset is allowed 0 that means no filter by asset
         long assetId = ParameterParser.getUnsignedLong(req, "asset", true, true);
 

@@ -54,7 +54,7 @@ public final class DecryptFrom extends APIServlet.APIRequestHandler {
     @Parameter(name = "decryptedMessageIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
     @Parameter(name = "uncompressDecryptedMessage", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         if (account.getPublicKey() == null) {

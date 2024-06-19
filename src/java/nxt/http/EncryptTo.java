@@ -49,7 +49,7 @@ public final class EncryptTo extends APIServlet.APIRequestHandler {
     @Parameter(name = "messageToEncryptIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is text message")
     @Parameter(name = "compressMessageToEncrypt", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "compress message")
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Account recipientAccount = Account.getAccount(recipientId);

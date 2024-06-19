@@ -42,7 +42,7 @@ public final class AccountColorCreate extends CreateTransaction {
             description = "User can create their own account color and create one or more initial colored accounts")
     @Parameter(name = "name", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "description", in = ParameterIn.QUERY)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String name = Convert.emptyToNull(req.getParameter("name"));
         String description = Convert.nullToEmpty(req.getParameter("description"));

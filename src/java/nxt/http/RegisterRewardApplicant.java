@@ -36,7 +36,7 @@ public final class RegisterRewardApplicant extends CreateTransaction {
 
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
         Account account = ParameterParser.getSenderAccount(req);
         return createTransaction(req, account, recipient, 0,

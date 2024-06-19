@@ -46,7 +46,7 @@ public final class CancelBidOrder extends CreateTransaction {
     @Operation(summary = "Cancel bid order",
             tags = {APITag2.AE, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "order", in = ParameterIn.QUERY, required = true, description = "order id")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long orderId = ParameterParser.getUnsignedLong(req, "order", true);
         Account account = ParameterParser.getSenderAccount(req);
         Order.Bid orderData = Order.Bid.getBidOrder(orderId);

@@ -1,7 +1,5 @@
 package nxt.http;
 
-import javax.swing.*;
-
 public class APITag2 {
     public static final String ACCOUNT = "Account";
     public static final String ASSET = "Asset";
@@ -16,4 +14,7 @@ public class APITag2 {
     public static final String ALIASES = "ALIASES";
     public static final String DGS = "DGS";
     public static final String DATA = "DATA";
+    public static final String PHASING = "PHASING";
+    public static final String MS = "MS";
+    public static final String VS = "VS";
 }

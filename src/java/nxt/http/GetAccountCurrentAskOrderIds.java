@@ -46,10 +46,10 @@ public final class GetAccountCurrentAskOrderIds extends APIServlet.APIRequestHan
     @Operation(summary = "Get current ask order ids of account",
             tags = {APITag2.ACCOUNT, APITag2.AE})
     @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
-    @Parameter(name = "asset", in = ParameterIn.QUERY)
+    @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long accountId = ParameterParser.getAccount(req).getId();
         long assetId = 0;

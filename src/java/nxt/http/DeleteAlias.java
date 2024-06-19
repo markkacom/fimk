@@ -47,7 +47,7 @@ public final class DeleteAlias extends CreateTransaction {
             tags = {APITag2.ALIASES, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "alias", in = ParameterIn.QUERY, description = "alias id")
     @Parameter(name = "aliasName", in = ParameterIn.QUERY, description = "alias name")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) final HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(final HttpServletRequest req) throws NxtException {
         final Alias alias = ParameterParser.getAlias(req);
         final Account owner = ParameterParser.getSenderAccount(req);
 

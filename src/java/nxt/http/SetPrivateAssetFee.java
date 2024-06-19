@@ -20,7 +20,7 @@ SetPrivateAssetFee extends CreateTransaction {
 
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);
         int orderFeePercentage = ParameterParser.getInt(req, "orderFeePercentage",

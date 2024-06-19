@@ -37,7 +37,7 @@ public final class AccountColorAssign extends CreateTransaction {
             tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "accountColorId", in = ParameterIn.QUERY, required = true)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         if (Account.getAccount(recipientId) != null) {

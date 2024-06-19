@@ -34,7 +34,7 @@ public class GetPollVote extends APIServlet.APIRequestHandler  {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Poll poll = ParameterParser.getPoll(req);
         Account account = ParameterParser.getAccount(req);
         Vote vote = Vote.getVote(poll.getId(), account.getId());

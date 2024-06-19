@@ -25,8 +25,8 @@ public final class AddPrivateAssetAccount extends CreateTransaction {
     @POST
     @Operation(summary = "Enable private asset for account",
             tags = {APITag2.ACCOUNT})
-    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);
         Asset asset = ParameterParser.getAsset(req);

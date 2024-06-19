@@ -41,7 +41,7 @@ public final class IssueAsset extends CreateTransaction {
 
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String name = req.getParameter("name");
         String description = req.getParameter("description");

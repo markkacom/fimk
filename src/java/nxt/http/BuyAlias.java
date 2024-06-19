@@ -48,7 +48,7 @@ public final class BuyAlias extends CreateTransaction {
     @Parameter(name = "alias", in = ParameterIn.QUERY, required = true, description = "alias")
     @Parameter(name = "aliasName", in = ParameterIn.QUERY, required = true, description = "alias name")
     @Parameter(name = "amountNQT", in = ParameterIn.QUERY, required = true, description = "amount in NQT")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Account buyer = ParameterParser.getSenderAccount(req);
         Alias alias = ParameterParser.getAlias(req);
         long amountNQT = ParameterParser.getAmountNQT(req);

@@ -50,7 +50,7 @@ public final class GetAccount extends APIServlet.APIRequestHandler {
     @Parameter(name = "includeAssets", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include assets")
     @Parameter(name = "includeCurrencies", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include currencies")
     @Parameter(name = "includeEffectiveBalance", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include effective balance")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         boolean includeLessors = !"false".equalsIgnoreCase(req.getParameter("includeLessors"));

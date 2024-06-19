@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Asset;
 import nxt.Attachment;
@@ -25,8 +29,9 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-
+@Path("/fimk?requestType=dividendPayment")
 public class DividendPayment extends CreateTransaction {
 
     static final DividendPayment instance = new DividendPayment();
@@ -36,7 +41,11 @@ public class DividendPayment extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Dividend payment",
+            tags = {APITag2.AE, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    @Parameter(name = "height", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "amountNQTPerQNT", in = ParameterIn.QUERY, required = true, description = "amount NQT per QNT")
     public JSONStreamAware processRequest(final HttpServletRequest request)
             throws NxtException
     {

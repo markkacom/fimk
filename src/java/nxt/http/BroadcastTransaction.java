@@ -71,7 +71,7 @@ public final class BroadcastTransaction extends APIServlet.APIRequestHandler {
     @Parameter(name = "transactionJSON", in = ParameterIn.QUERY, description = "JSON representation of the signed transaction")
     @Parameter(name = "transactionBytes", in = ParameterIn.QUERY, description = "row bytes composing the signed transaction bytes excluding the prunable appendages")
     @Parameter(name = "prunableAttachmentJSON", in = ParameterIn.QUERY, description = "JSON representation of the prunable appendages")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String transactionJSON = Convert.emptyToNull(req.getParameter("transactionJSON"));
         String transactionBytes = Convert.emptyToNull(req.getParameter("transactionBytes"));

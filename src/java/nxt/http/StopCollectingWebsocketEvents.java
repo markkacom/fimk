@@ -30,7 +30,7 @@ public final class StopCollectingWebsocketEvents extends APIServlet.APIRequestHa
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         MofoSocketServer.stopCollectingEvents();
         JSONObject response = new JSONObject();
         return response;

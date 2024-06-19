@@ -16,6 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.Currency;
 import nxt.NxtException;
@@ -23,7 +26,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=canDeleteCurrency")
 public final class CanDeleteCurrency extends APIServlet.APIRequestHandler {
 
     static final CanDeleteCurrency instance = new CanDeleteCurrency();
@@ -33,6 +40,11 @@ public final class CanDeleteCurrency extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @GET
+    @Operation(summary = "Is allowed to delete currency",
+            tags = {APITag2.MS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, description = "currency id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Currency currency = ParameterParser.getCurrency(req);
         Account account = ParameterParser.getAccount(req);

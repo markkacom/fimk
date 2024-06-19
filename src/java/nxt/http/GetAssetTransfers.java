@@ -40,7 +40,7 @@ public final class GetAssetTransfers extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String assetId = Convert.emptyToNull(req.getParameter("asset"));
         String accountId = Convert.emptyToNull(req.getParameter("account"));

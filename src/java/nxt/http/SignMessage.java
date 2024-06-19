@@ -37,7 +37,7 @@ public final class SignMessage extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String message = Convert.emptyToNull(req.getParameter("message"));
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));
 

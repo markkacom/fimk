@@ -33,7 +33,7 @@ public final class GetWebsocketEvents extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
       
         String[] topics = null;
         String topic = req.getParameter("topic");

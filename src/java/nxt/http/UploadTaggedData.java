@@ -38,7 +38,7 @@ public final class UploadTaggedData extends CreateTransaction {
 
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getSenderAccount(req);
         Attachment.TaggedDataUpload taggedDataUpload = ParameterParser.getTaggedData(req);

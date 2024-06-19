@@ -44,7 +44,7 @@ public final class GetAccountAssetCount extends APIServlet.APIRequestHandler {
             tags = {APITag2.ACCOUNT, APITag2.AE})
     @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);
         int height = ParameterParser.getHeight(req);

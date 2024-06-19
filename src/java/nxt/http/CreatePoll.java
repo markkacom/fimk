@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Attachment.MessagingPollCreation.PollBuilder;
@@ -26,6 +30,8 @@ import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +42,7 @@ import static nxt.http.JSONResponses.INCORRECT_ZEROOPTIONS;
 import static nxt.http.JSONResponses.MISSING_DESCRIPTION;
 import static nxt.http.JSONResponses.MISSING_NAME;
 
+@Path("/fimk?requestType=createPoll")
 public final class CreatePoll extends CreateTransaction {
 
     static final CreatePoll instance = new CreatePoll();
@@ -50,6 +57,39 @@ public final class CreatePoll extends CreateTransaction {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Create poll",
+            tags = {APITag2.VS, APITag2.TRANSACTIONS})
+    @Parameter(name = "name", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "description", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "finishHeight", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "finish height")
+    @Parameter(name = "votingModel", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "voting model")
+    @Parameter(name = "minNumberOfOptions", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "min number of options")
+    @Parameter(name = "maxNumberOfOptions", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "max number of options")
+    @Parameter(name = "minRangeValue", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "min range value")
+    @Parameter(name = "maxRangeValue", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "max range value")
+    @Parameter(name = "minBalance", in = ParameterIn.QUERY, schema = @Schema(type = "integer"),
+            description = "min balance")
+    @Parameter(name = "minBalanceModel", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "min balance model")
+    @Parameter(name = "holding", in = ParameterIn.QUERY,
+            description = "holding id")
+    @Parameter(name = "option00", in = ParameterIn.QUERY,
+            description = "option value #0")
+    @Parameter(name = "option01", in = ParameterIn.QUERY,
+            description = "option value #1")
+    @Parameter(name = "option02", in = ParameterIn.QUERY,
+            description = "option value #2")
+
+
+    @Parameter(name = "aliasName", in = ParameterIn.QUERY, required = true, description = "alias name")
+    @Parameter(name = "amountNQT", in = ParameterIn.QUERY, required = true, description = "amount in NQT")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String nameValue = Convert.emptyToNull(req.getParameter("name"));

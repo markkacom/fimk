@@ -43,7 +43,7 @@ public final class DecodeHallmark extends APIServlet.APIRequestHandler {
     @Operation(summary = "Decode hallmark",
             tags = {APITag2.TOKEN})
     @Parameter(name = "hallmark", in = ParameterIn.QUERY, required = true)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String hallmarkValue = req.getParameter("hallmark");
         if (hallmarkValue == null) {

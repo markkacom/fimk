@@ -36,7 +36,7 @@ public final class GetAssetGoodsImage extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean emptyAsset = req.getParameter("asset") == null || req.getParameter("asset").trim().isEmpty();
         long assetId = ParameterParser.getUnsignedLong(req, "asset", false, true);
         long goodsId = ParameterParser.getUnsignedLong(req, "goods", false);

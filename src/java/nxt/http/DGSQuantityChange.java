@@ -46,7 +46,7 @@ public final class DGSQuantityChange extends CreateTransaction {
     @Parameter(name = "goods", in = ParameterIn.QUERY, required = true, description = "goods id")
     @Parameter(name = "deltaQuantity", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
             description = "this quantity is added to goods quantity. Negative value is allowed")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Goods goods = ParameterParser.getGoods(req);

@@ -40,7 +40,7 @@ public final class TransferAsset extends CreateTransaction {
 
     @Override
     @POST
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
 

@@ -64,6 +64,9 @@ import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
                 @Tag(name = APITag2.BLOCKCHAIN, description = "Blockchain operations"),
                 @Tag(name = APITag2.ALIASES, description = "Aliases operations"),
                 @Tag(name = APITag2.TOKEN, description = "Token operations"),
+                @Tag(name = APITag2.PHASING, description = "Phasing"),
+                @Tag(name = APITag2.MS, description = "Monetary System"),
+                @Tag(name = APITag2.VS, description = "Voting System")
         },
         info = @Info(
                 title = "FIMK API",

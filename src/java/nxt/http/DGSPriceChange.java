@@ -47,7 +47,7 @@ public final class DGSPriceChange extends CreateTransaction {
             tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "goods", in = ParameterIn.QUERY, required = true, description = "goods id")
     @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, description = "price in NQT")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Goods goods = ParameterParser.getGoods(req);
         long priceNQT = ParameterParser.getPriceNQT(req);

@@ -45,7 +45,7 @@ public final class DGSRefund extends CreateTransaction {
             tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "purchase", in = ParameterIn.QUERY, required = true, description = "purchase id")
     @Parameter(name = "refundNQT", in = ParameterIn.QUERY, required = true, description = "refund in NQT")
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account sellerAccount = ParameterParser.getSenderAccount(req);
         DigitalGoodsStore.Purchase purchase = ParameterParser.getPurchase(req);

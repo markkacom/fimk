@@ -40,7 +40,7 @@ public final class AccountColorGet extends APIServlet.APIRequestHandler {
     @Parameter(name = "accountColorId", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "includeAccountInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
     @Parameter(name = "includeDescription", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         boolean includeAccountInfo = "true".equals(req.getParameter("includeAccountInfo"));
         boolean includeDescription = "true".equals(req.getParameter("includeDescription"));

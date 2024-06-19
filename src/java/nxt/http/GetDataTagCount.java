@@ -34,7 +34,7 @@ public final class GetDataTagCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         JSONObject response = new JSONObject();
         response.put("numberOfDataTags", TaggedData.Tag.getTagCount());
         return response;

@@ -43,7 +43,7 @@ public final class DecodeToken extends APIServlet.APIRequestHandler {
             tags = {APITag2.TOKEN})
     @Parameter(name = "website", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "token", in = ParameterIn.QUERY, required = true)
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String website = req.getParameter("website");
         String tokenString = req.getParameter("token");

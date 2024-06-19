@@ -36,7 +36,7 @@ public final class GetRewardTotals extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest req) throws NxtException {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final int fromHeight = ParameterParser.getInt(req, "fromHeight", 0, Integer.MAX_VALUE, true);
         final int toHeight = ParameterParser.getInt(req, "toHeight", fromHeight, Integer.MAX_VALUE, true);
 

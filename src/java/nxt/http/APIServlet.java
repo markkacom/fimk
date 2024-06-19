@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import nxt.Constants;
 import nxt.Db;
 import nxt.Nxt;
@@ -29,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
@@ -74,9 +76,12 @@ public final class APIServlet extends HttpServlet {
             return fileParameter;
         }
 
-        abstract public JSONStreamAware processRequest(HttpServletRequest request) throws NxtException;
+        @GET
+        abstract public JSONStreamAware processRequest(@Parameter(hidden = true) HttpServletRequest request) throws NxtException;
 
-        public JSONStreamAware processRequest(HttpServletRequest request, HttpServletResponse response) throws NxtException {
+        public JSONStreamAware processRequest(
+                @Parameter(hidden = true) HttpServletRequest request, @Parameter(hidden = true) HttpServletResponse response
+        ) throws NxtException {
             return processRequest(request);
         }
 
