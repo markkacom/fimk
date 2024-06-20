@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Order;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
@@ -36,6 +40,12 @@ public final class GetAccountCurrentBidOrderIds extends APIServlet.APIRequestHan
     }
 
     @Override
+    @Operation(summary = "Get current bid order ids of account",
+            tags = {APITag2.ACCOUNT, APITag2.AE})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountId = ParameterParser.getAccount(req).getId();

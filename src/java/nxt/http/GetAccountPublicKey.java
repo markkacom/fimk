@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.util.Convert;
@@ -25,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAccountPublicKey")
 public final class GetAccountPublicKey extends APIServlet.APIRequestHandler {
 
     static final GetAccountPublicKey instance = new GetAccountPublicKey();
@@ -36,6 +39,9 @@ public final class GetAccountPublicKey extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get account public key",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);

@@ -16,6 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
@@ -23,10 +26,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE_OR_PUBLIC_KEY;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAccountId")
 public final class GetAccountId extends APIServlet.APIRequestHandler {
 
     static final GetAccountId instance = new GetAccountId();
@@ -36,6 +40,10 @@ public final class GetAccountId extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get account id", description = "Must be specified secret phrase or public key",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
+    @Parameter(name = "publicKey", in = ParameterIn.QUERY, description = "public key in HEX")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         long accountId;

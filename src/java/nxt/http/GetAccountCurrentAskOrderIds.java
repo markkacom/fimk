@@ -29,7 +29,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=getAccountCurrentAskOrderIds")
@@ -42,13 +41,12 @@ public final class GetAccountCurrentAskOrderIds extends APIServlet.APIRequestHan
     }
 
     @Override
-    @GET
     @Operation(summary = "Get current ask order ids of account",
             tags = {APITag2.ACCOUNT, APITag2.AE})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
-    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
-    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long accountId = ParameterParser.getAccount(req).getId();

@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.db.FilteringIterator;
 import org.json.simple.JSONArray;
@@ -24,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAccountExchangeRequests")
 public final class GetAccountExchangeRequests extends APIServlet.APIRequestHandler {
 
     static final GetAccountExchangeRequests instance = new GetAccountExchangeRequests();
@@ -35,6 +39,12 @@ public final class GetAccountExchangeRequests extends APIServlet.APIRequestHandl
     }
 
     @Override
+    @Operation(summary = "Get account exchange requests",
+            tags = {APITag2.ACCOUNT, APITag2.MS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, description = "currency id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);

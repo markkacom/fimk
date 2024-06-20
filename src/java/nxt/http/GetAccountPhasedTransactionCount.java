@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.PhasingPoll;
@@ -24,7 +26,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getAccountPhasedTransactionCount")
 public class GetAccountPhasedTransactionCount extends APIServlet.APIRequestHandler {
     static final GetAccountPhasedTransactionCount instance = new GetAccountPhasedTransactionCount();
 
@@ -33,6 +37,9 @@ public class GetAccountPhasedTransactionCount extends APIServlet.APIRequestHandl
     }
 
     @Override
+    @Operation(summary = "Get account phased transaction count",
+            tags = {APITag2.ACCOUNT, APITag2.PHASING})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getAccount(req);
         JSONObject response = new JSONObject();
