@@ -18,9 +18,7 @@ package nxt.http;
 
 import io.swagger.v3.jaxrs2.integration.OpenApiServlet;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import nxt.Constants;
 import nxt.Nxt;
@@ -28,7 +26,6 @@ import nxt.util.Logger;
 import nxt.util.ThreadPool;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -66,7 +63,9 @@ import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
                 @Tag(name = APITag2.TOKEN, description = "Token operations"),
                 @Tag(name = APITag2.PHASING, description = "Phasing"),
                 @Tag(name = APITag2.MS, description = "Monetary System"),
-                @Tag(name = APITag2.VS, description = "Voting System")
+                @Tag(name = APITag2.VS, description = "Voting System"),
+                @Tag(name = APITag2.REWARDS, description = "Rewards"),
+                @Tag(name = APITag2.SEARCH, description = "Search")
         },
         info = @Info(
                 title = "FIMK API",

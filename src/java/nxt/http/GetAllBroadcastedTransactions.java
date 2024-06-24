@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Nxt;
 import nxt.Transaction;
 import org.json.simple.JSONArray;
@@ -23,8 +24,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAllBroadcastedTransactions")
 public final class GetAllBroadcastedTransactions extends APIServlet.APIRequestHandler {
 
     static final GetAllBroadcastedTransactions instance = new GetAllBroadcastedTransactions();
@@ -34,6 +36,8 @@ public final class GetAllBroadcastedTransactions extends APIServlet.APIRequestHa
     }
 
     @Override
+    @Operation(summary = "Get all broadcasted transactions",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         JSONArray jsonArray = new JSONArray();

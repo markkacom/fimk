@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Asset;
 import nxt.NxtException;
@@ -24,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAssetAccountCount")
 public final class GetAssetAccountCount extends APIServlet.APIRequestHandler {
 
     static final GetAssetAccountCount instance = new GetAssetAccountCount();
@@ -35,6 +39,10 @@ public final class GetAssetAccountCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get asset account count",
+            tags = {APITag2.AE})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);

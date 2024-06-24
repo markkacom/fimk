@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Exchange;
 import nxt.NxtException;
 import nxt.db.DbIterator;
@@ -25,8 +28,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAllExchanges")
 public final class GetAllExchanges extends APIServlet.APIRequestHandler {
 
     static final GetAllExchanges instance = new GetAllExchanges();
@@ -36,6 +40,13 @@ public final class GetAllExchanges extends APIServlet.APIRequestHandler {
     }
     
     @Override
+    @Operation(summary = "Get all exchanges",
+            tags = {APITag2.MS})
+    @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"), description = "timestamp")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
+    @Parameter(name = "includeCurrencyInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include currency info")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final int timestamp = ParameterParser.getTimestamp(req);
         int firstIndex = ParameterParser.getFirstIndex(req);

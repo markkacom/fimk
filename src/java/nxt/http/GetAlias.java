@@ -16,12 +16,16 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Alias;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAlias")
 public final class GetAlias extends APIServlet.APIRequestHandler {
 
     static final GetAlias instance = new GetAlias();
@@ -31,6 +35,10 @@ public final class GetAlias extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get alias",
+            tags = {APITag2.ALIASES})
+    @Parameter(name = "alias", in = ParameterIn.QUERY, description = "alias id")
+    @Parameter(name = "aliasName", in = ParameterIn.QUERY, description = "alias name")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         Alias alias = ParameterParser.getAlias(req);
         return JSONData.alias(alias);

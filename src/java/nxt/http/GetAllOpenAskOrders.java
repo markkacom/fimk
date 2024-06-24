@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Order;
 import nxt.db.DbIterator;
 import org.json.simple.JSONArray;
@@ -23,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAllOpenAskOrders")
 public final class GetAllOpenAskOrders extends APIServlet.APIRequestHandler {
 
     static final GetAllOpenAskOrders instance = new GetAllOpenAskOrders();
@@ -34,6 +39,10 @@ public final class GetAllOpenAskOrders extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get all open ask orders",
+            tags = {APITag2.AE})
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = new JSONObject();

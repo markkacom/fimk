@@ -16,15 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Alias;
 import nxt.NxtException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAliasCount")
 public final class GetAliasCount extends APIServlet.APIRequestHandler {
 
     static final GetAliasCount instance = new GetAliasCount();
@@ -34,6 +37,9 @@ public final class GetAliasCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get alias count",
+            tags = {APITag2.ALIASES})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getAccount(req).getId();
         JSONObject response = new JSONObject();

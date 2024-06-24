@@ -43,8 +43,8 @@ public final class GetAccountExchangeRequests extends APIServlet.APIRequestHandl
             tags = {APITag2.ACCOUNT, APITag2.MS})
     @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, description = "currency id")
-    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
-    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);

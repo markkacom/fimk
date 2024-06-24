@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Asset;
 import nxt.MofoAsset;
 import nxt.MofoAsset.AssetFee;
@@ -25,8 +28,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAsset")
 public final class GetAsset extends APIServlet.APIRequestHandler {
 
     static final GetAsset instance = new GetAsset();
@@ -36,6 +40,11 @@ public final class GetAsset extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get asset",
+            tags = {APITag2.AE})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
         Asset asset = ParameterParser.getAsset(req);

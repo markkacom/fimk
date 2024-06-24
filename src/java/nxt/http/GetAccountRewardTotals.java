@@ -1,6 +1,8 @@
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NxtException;
 import nxt.reward.RewardItem;
 import nxt.util.Convert;
@@ -9,9 +11,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=accountColorList")
 public final class GetAccountRewardTotals extends APIServlet.APIRequestHandler {
 
     static final GetAccountRewardTotals instance = new GetAccountRewardTotals();
@@ -21,6 +24,9 @@ public final class GetAccountRewardTotals extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get account phased transactions",
+            tags = {APITag2.REWARDS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getUnsignedLong(req, "account", true);
 

@@ -44,8 +44,8 @@ public final class GetAccountCurrentBidOrderIds extends APIServlet.APIRequestHan
             tags = {APITag2.ACCOUNT, APITag2.AE})
     @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
-    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
-    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountId = ParameterParser.getAccount(req).getId();

@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -24,8 +26,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAccountTransactionCount")
 public final class GetAccountTransactionCount extends APIServlet.APIRequestHandler {
 
     static final GetAccountTransactionCount instance = new GetAccountTransactionCount();
@@ -35,6 +38,9 @@ public final class GetAccountTransactionCount extends APIServlet.APIRequestHandl
     }
 
     @Override
+    @Operation(summary = "Get account transaction count",
+            tags = {APITag2.ACCOUNT, APITag2.TRANSACTIONS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);

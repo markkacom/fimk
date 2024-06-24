@@ -17,4 +17,6 @@ public class APITag2 {
     public static final String PHASING = "PHASING";
     public static final String MS = "MS";
     public static final String VS = "VS";
+    public static final String REWARDS = "REWARDS";
+    public static final String SEARCH = "SEARCH";
 }

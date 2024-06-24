@@ -45,8 +45,8 @@ public class GetAccountPhasedTransactions extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get account phased transactions",
             tags = {APITag2.ACCOUNT, APITag2.PHASING})
     @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
-    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
-    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getAccount(req);
 

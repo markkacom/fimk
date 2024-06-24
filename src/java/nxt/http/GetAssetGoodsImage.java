@@ -16,17 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NxtException;
 import nxt.TaggedData;
 import nxt.util.JSON;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.missing;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAssetGoodsImage")
 public final class GetAssetGoodsImage extends APIServlet.APIRequestHandler {
 
     static final GetAssetGoodsImage instance = new GetAssetGoodsImage();
@@ -36,6 +39,10 @@ public final class GetAssetGoodsImage extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get asset goods image",
+            tags = {APITag2.DATA})
+    @Parameter(name = "asset", in = ParameterIn.QUERY,  description = "asset id")
+    @Parameter(name = "goods", in = ParameterIn.QUERY, description = "goods id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean emptyAsset = req.getParameter("asset") == null || req.getParameter("asset").trim().isEmpty();
         long assetId = ParameterParser.getUnsignedLong(req, "asset", false, true);
