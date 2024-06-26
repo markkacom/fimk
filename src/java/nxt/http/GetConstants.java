@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.crypto.HashFunction;
 import nxt.peer.Peer;
@@ -25,8 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getConstants")
 public final class GetConstants extends APIServlet.APIRequestHandler {
 
     static final GetConstants instance = new GetConstants();
@@ -117,6 +122,8 @@ public final class GetConstants extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get constants",
+            tags = {APITag2.INFO})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         return CONSTANTS;
     }

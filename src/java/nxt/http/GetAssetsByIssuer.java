@@ -16,6 +16,11 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Asset;
 import nxt.db.DbIterator;
@@ -24,9 +29,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAssetsByIssuer")
 public final class GetAssetsByIssuer extends APIServlet.APIRequestHandler {
 
     static final GetAssetsByIssuer instance = new GetAssetsByIssuer();
@@ -36,6 +42,13 @@ public final class GetAssetsByIssuer extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get assets by issuer",
+            tags = {APITag2.AE, APITag2.ACCOUNT})
+    @Parameter(name = "account", array = @ArraySchema(schema = @Schema(implementation = String.class)),
+            in = ParameterIn.QUERY, description = "account ids")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         List<Account> accounts = ParameterParser.getAccounts(req);
         int firstIndex = ParameterParser.getFirstIndex(req);

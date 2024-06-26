@@ -16,6 +16,11 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Currency;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -23,11 +28,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_CURRENCY;
 import static nxt.http.JSONResponses.UNKNOWN_CURRENCY;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getCurrencies")
 public final class GetCurrencies extends APIServlet.APIRequestHandler {
 
     static final GetCurrencies instance = new GetCurrencies();
@@ -37,6 +43,11 @@ public final class GetCurrencies extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get currencies",
+            tags = {APITag2.MS})
+    @Parameter(name = "currencies", array = @ArraySchema(schema = @Schema(implementation = String.class)), in = ParameterIn.QUERY,
+        required = true, description = "list of currency ids")
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String[] currencies = req.getParameterValues("currencies");

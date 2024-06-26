@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.TaggedData;
 import nxt.db.DbIterator;
@@ -26,8 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getChannelTaggedData")
 public final class GetChannelTaggedData extends APIServlet.APIRequestHandler {
 
     static final GetChannelTaggedData instance = new GetChannelTaggedData();
@@ -37,6 +41,13 @@ public final class GetChannelTaggedData extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get channel tagged data",
+            tags = {APITag2.DATA})
+    @Parameter(name = "channel", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "includeData", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include data")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String channel = Convert.emptyToNull(req.getParameter("channel"));
         if (channel == null) {

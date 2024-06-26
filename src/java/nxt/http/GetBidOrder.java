@@ -16,16 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.Order;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.UNKNOWN_ORDER;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getBidOrder")
 public final class GetBidOrder extends APIServlet.APIRequestHandler {
 
     static final GetBidOrder instance = new GetBidOrder();
@@ -35,6 +39,9 @@ public final class GetBidOrder extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get bid order",
+            tags = {APITag2.AE})
+    @Parameter(name = "order", in = ParameterIn.QUERY, required = true, description = "order id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long orderId = ParameterParser.getUnsignedLong(req, "order", true);
         Order.Bid bidOrder = Order.Bid.getBidOrder(orderId);

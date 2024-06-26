@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.reward.AssetRewarding;
@@ -25,8 +28,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAssetRewardings")
 public final class GetAssetRewardings extends APIServlet.APIRequestHandler {
 
     static final GetAssetRewardings instance = new GetAssetRewardings();
@@ -36,6 +40,11 @@ public final class GetAssetRewardings extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get asset rewardings",
+            tags = {APITag2.REWARDS})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         // parameter asset is allowed 0 that means no filter by asset
         long assetId = ParameterParser.getUnsignedLong(req, "asset", true, true);

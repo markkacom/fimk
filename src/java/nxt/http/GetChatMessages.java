@@ -12,6 +12,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.Account.AccountInfo;
 import nxt.db.DbIterator;
@@ -22,10 +26,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Path("/fimk?requestType=getChatMessages")
 public class GetChatMessages extends APIServlet.APIRequestHandler{
 
     static final GetChatMessages instance = new GetChatMessages();
@@ -36,6 +42,12 @@ public class GetChatMessages extends APIServlet.APIRequestHandler{
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
+    @Operation(summary = "Get chat messages",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "accountOne", in = ParameterIn.QUERY, description = "first account id or address")
+    @Parameter(name = "accountTwo", in = ParameterIn.QUERY, description = "second account id or address")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountOneId;

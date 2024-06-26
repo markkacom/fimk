@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Currency;
 import nxt.NxtException;
@@ -26,8 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getCurrencyAccounts")
 public final class GetCurrencyAccounts extends APIServlet.APIRequestHandler {
 
     static final GetCurrencyAccounts instance = new GetCurrencyAccounts();
@@ -37,6 +41,12 @@ public final class GetCurrencyAccounts extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get currency accounts",
+            tags = {APITag2.MS})
+    @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, description = "currency id")
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Currency currency = ParameterParser.getCurrency(req);

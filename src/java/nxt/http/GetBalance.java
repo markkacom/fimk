@@ -16,13 +16,17 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getBalance")
 public final class GetBalance extends APIServlet.APIRequestHandler {
 
     static final GetBalance instance = new GetBalance();
@@ -32,6 +36,11 @@ public final class GetBalance extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get balance",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "includeEffectiveBalance", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include effective balance")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean includeEffectiveBalance = !"false".equalsIgnoreCase(req.getParameter("includeEffectiveBalance"));
         return JSONData.accountBalance(ParameterParser.getAccount(req), includeEffectiveBalance);

@@ -16,18 +16,22 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Currency;
 import nxt.NxtException;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_CURRENCY;
 import static nxt.http.JSONResponses.UNKNOWN_CURRENCY;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getCurrency")
 public final class GetCurrency extends APIServlet.APIRequestHandler {
 
     static final GetCurrency instance = new GetCurrency();
@@ -37,6 +41,11 @@ public final class GetCurrency extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get currency",
+            tags = {APITag2.MS})
+    @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
+    @Parameter(name = "code", in = ParameterIn.QUERY)
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
         String currencyValue = Convert.emptyToNull(req.getParameter("currency"));

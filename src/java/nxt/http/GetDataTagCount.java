@@ -16,15 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.TaggedData;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getDataTagCount")
 public final class GetDataTagCount extends APIServlet.APIRequestHandler {
 
     static final GetDataTagCount instance = new GetDataTagCount();
@@ -34,6 +38,8 @@ public final class GetDataTagCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get data tag count",
+            tags = {APITag2.DATA})
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         JSONObject response = new JSONObject();
         response.put("numberOfDataTags", TaggedData.Tag.getTagCount());

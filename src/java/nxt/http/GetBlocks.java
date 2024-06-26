@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Block;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -26,8 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getBlocks")
 public final class GetBlocks extends APIServlet.APIRequestHandler {
 
     static final GetBlocks instance = new GetBlocks();
@@ -37,6 +41,11 @@ public final class GetBlocks extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get blocks",
+            tags = {APITag2.BLOCKCHAIN})
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
+    @Parameter(name = "includeTransactions", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include transactions")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         int firstIndex = ParameterParser.getFirstIndex(req);

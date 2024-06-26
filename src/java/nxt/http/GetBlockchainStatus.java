@@ -39,9 +39,8 @@ public final class GetBlockchainStatus extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @GET
     @Operation(summary = "Return blockchain status",
-            tags = {APITag2.BLOCKCHAIN},
+            tags = {APITag2.BLOCKCHAIN, APITag2.INFO},
             description = "Return detailed blockchain state info",
             operationId = "getBlockchainStatus")
     public JSONObject processRequest(HttpServletRequest req) {

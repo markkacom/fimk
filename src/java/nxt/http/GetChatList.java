@@ -12,6 +12,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Account.AccountInfo;
 import nxt.MofoChat;
@@ -22,8 +26,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
+@Path("/fimk?requestType=getChatList")
 public class GetChatList extends APIServlet.APIRequestHandler{
 
     static final GetChatList instance = new GetChatList();
@@ -34,6 +40,11 @@ public class GetChatList extends APIServlet.APIRequestHandler{
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Get chat list",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         long accountId = ParameterParser.getAccountId(req);

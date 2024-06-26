@@ -16,13 +16,17 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getDGSGood")
 public final class GetDGSGood extends APIServlet.APIRequestHandler {
 
     static final GetDGSGood instance = new GetDGSGood();
@@ -32,6 +36,10 @@ public final class GetDGSGood extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get goods info",
+            tags = {APITag2.DGS})
+    @Parameter(name = "goods", in = ParameterIn.QUERY, required = true, description = "goods id")
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
         return JSONData.goods(ParameterParser.getGoods(req), includeCounts);

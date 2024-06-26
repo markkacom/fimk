@@ -16,6 +16,11 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Currency;
 import nxt.db.DbIterator;
@@ -24,18 +29,27 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getCurrenciesByIssuer")
 public final class GetCurrenciesByIssuer extends APIServlet.APIRequestHandler {
 
     static final GetCurrenciesByIssuer instance = new GetCurrenciesByIssuer();
 
     private GetCurrenciesByIssuer() {
-        super(new APITag[] {APITag.MS, APITag.ACCOUNTS}, "account", "account", "account", "firstIndex", "lastIndex", "includeCounts");
+        super(new APITag[] {APITag.MS, APITag.ACCOUNTS}, "account", "account", "account",
+                "firstIndex", "lastIndex", "includeCounts");
     }
 
     @Override
+    @Operation(summary = "Get currencies by issuer",
+            tags = {APITag2.MS, APITag2.ACCOUNT})
+    @Parameter(name = "account", array = @ArraySchema(schema = @Schema(implementation = String.class)), in = ParameterIn.QUERY,
+            required = true, description = "list of account ids")
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         List<Account> accounts = ParameterParser.getAccounts(req);
         int firstIndex = ParameterParser.getFirstIndex(req);

@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.db.DbIterator;
 import org.json.simple.JSONArray;
@@ -23,7 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getCurrencyPhasedTransactions")
 public class GetCurrencyPhasedTransactions extends APIServlet.APIRequestHandler {
     static final GetCurrencyPhasedTransactions instance = new GetCurrencyPhasedTransactions();
 
@@ -32,6 +38,13 @@ public class GetCurrencyPhasedTransactions extends APIServlet.APIRequestHandler 
     }
 
     @Override
+    @Operation(summary = "Get currency phased transactions",
+            tags = {APITag2.AE, APITag2.PHASING})
+    @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "withoutWhitelist", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "without white list")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         Currency currency = ParameterParser.getCurrency(req);
         Account account = ParameterParser.getAccount(req, false);

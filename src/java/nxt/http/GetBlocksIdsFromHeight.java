@@ -12,6 +12,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -19,10 +23,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_BLOCK;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getBlocksIdsFromHeight")
 public final class GetBlocksIdsFromHeight extends APIServlet.APIRequestHandler {
 
     static final GetBlocksIdsFromHeight instance = new GetBlocksIdsFromHeight();
@@ -32,6 +37,10 @@ public final class GetBlocksIdsFromHeight extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get blocks ids from height",
+            tags = {APITag2.BLOCKCHAIN})
+    @Parameter(name = "fromHeight", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "from height")
+    @Parameter(name = "toHeight", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "to height")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String fromHeightValue = Convert.emptyToNull(req.getParameter("fromHeight"));

@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Currency;
 import nxt.db.DbIterator;
 import org.json.simple.JSONArray;
@@ -23,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getCurrencyIds")
 public final class GetCurrencyIds extends APIServlet.APIRequestHandler {
 
     static final GetCurrencyIds instance = new GetCurrencyIds();
@@ -34,6 +39,10 @@ public final class GetCurrencyIds extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get currency ids",
+            tags = {APITag2.MS})
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         int firstIndex = ParameterParser.getFirstIndex(req);

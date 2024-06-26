@@ -41,7 +41,7 @@ public final class DGSListing extends CreateTransaction {
     }
 
     @Override
-    @Operation(summary = "Listing",
+    @Operation(summary = "Goods listing",
             tags = {APITag2.DGS, APITag2.CREATE_TRANSACTION})
     @Parameter(name = "name", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "description", in = ParameterIn.QUERY)

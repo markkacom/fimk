@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -28,8 +31,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getBlockchainTransactions")
 public final class GetBlockchainTransactions extends APIServlet.APIRequestHandler {
 
     static final GetBlockchainTransactions instance = new GetBlockchainTransactions();
@@ -40,6 +44,19 @@ public final class GetBlockchainTransactions extends APIServlet.APIRequestHandle
     }
 
     @Override
+    @Operation(summary = "Get blockchain transactions",
+            tags = {APITag2.ACCOUNT, APITag2.TRANSACTIONS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
+    @Parameter(name = "type", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "transaction type")
+    @Parameter(name = "subtype", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "transaction subtype")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
+    @Parameter(name = "numberOfConfirmations", in = ParameterIn.QUERY, schema = @Schema(type = "integer"),
+            description = "number of confirmations")
+    @Parameter(name = "withMessage", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "with message")
+    @Parameter(name = "phasedOnly", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "phased only")
+    @Parameter(name = "nonPhasedOnly", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "non phased only")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account;

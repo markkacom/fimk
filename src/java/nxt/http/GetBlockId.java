@@ -16,17 +16,22 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_HEIGHT;
 import static nxt.http.JSONResponses.MISSING_HEIGHT;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getBlockId")
 public final class GetBlockId extends APIServlet.APIRequestHandler {
 
     static final GetBlockId instance = new GetBlockId();
@@ -36,6 +41,9 @@ public final class GetBlockId extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get block id",
+            tags = {APITag2.BLOCKCHAIN})
+    @Parameter(name = "height", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         int height;

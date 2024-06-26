@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Currency;
 import nxt.CurrencyFounder;
@@ -29,8 +32,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getCurrencyFounders")
 public final class GetCurrencyFounders extends APIServlet.APIRequestHandler {
 
     static final GetCurrencyFounders instance = new GetCurrencyFounders();
@@ -40,6 +44,12 @@ public final class GetCurrencyFounders extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get currency founders",
+            tags = {APITag2.MS})
+    @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String currencyId = Convert.emptyToNull(req.getParameter("currency"));
         String accountId = Convert.emptyToNull(req.getParameter("account"));
