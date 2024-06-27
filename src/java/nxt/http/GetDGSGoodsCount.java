@@ -16,15 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.DigitalGoodsStore;
 import nxt.NxtException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getDGSGoodsCount")
 public final class GetDGSGoodsCount extends APIServlet.APIRequestHandler {
 
     static final GetDGSGoodsCount instance = new GetDGSGoodsCount();
@@ -34,6 +38,10 @@ public final class GetDGSGoodsCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get goods count",
+            tags = {APITag2.DGS})
+    @Parameter(name = "seller", in = ParameterIn.QUERY, description = "seller account id")
+    @Parameter(name = "inStockOnly", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "in stock only")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long sellerId = ParameterParser.getAccountId(req, "seller", false);
         boolean inStockOnly = !"false".equalsIgnoreCase(req.getParameter("inStockOnly"));

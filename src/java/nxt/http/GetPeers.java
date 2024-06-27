@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
 import nxt.util.Convert;
@@ -24,9 +28,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.Collection;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPeers")
 public final class GetPeers extends APIServlet.APIRequestHandler {
 
     static final GetPeers instance = new GetPeers();
@@ -36,6 +41,13 @@ public final class GetPeers extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get peers",
+            tags = {APITag2.NETWORK})
+    @Parameter(name = "active", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
+    @Parameter(name = "state", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "one of the values NON_CONNECTED, CONNECTED, DISCONNECTED")
+    @Parameter(name = "includePeerInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include peer info")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         boolean active = "true".equalsIgnoreCase(req.getParameter("active"));

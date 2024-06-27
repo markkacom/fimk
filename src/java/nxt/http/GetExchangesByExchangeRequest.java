@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Exchange;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
@@ -24,10 +28,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_TRANSACTION;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getExchangesByExchangeRequest")
 public final class GetExchangesByExchangeRequest extends APIServlet.APIRequestHandler {
 
     static final GetExchangesByExchangeRequest instance = new GetExchangesByExchangeRequest();
@@ -37,6 +42,11 @@ public final class GetExchangesByExchangeRequest extends APIServlet.APIRequestHa
     }
 
     @Override
+    @Operation(summary = "Get exchanges by exchange request",
+            tags = {APITag2.MS})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "includeCurrencyInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include currency info")
     public JSONStreamAware processRequest(HttpServletRequest req) {
         String transactionIdString = Convert.emptyToNull(req.getParameter("transaction"));
         if (transactionIdString == null) {

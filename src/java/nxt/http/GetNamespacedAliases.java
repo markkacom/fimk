@@ -12,6 +12,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NamespacedAlias;
 import nxt.db.DbIterator;
 import org.json.simple.JSONArray;
@@ -19,8 +23,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getNamespacedAliases")
 public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
 
     static final GetNamespacedAliases instance = new GetNamespacedAliases();
@@ -31,6 +36,14 @@ public final class GetNamespacedAliases extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Get namespaced aliases",
+            tags = {APITag2.ALIASES})
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "filter", in = ParameterIn.QUERY, description = "search filter")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
+    @Parameter(name = "sortBy", in = ParameterIn.QUERY, description = "default sort is by name, other option is by height. Use @sortBy=height")
+    @Parameter(name = "sortAsc", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "sort ascending")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         final long accountId = ParameterParser.getAccount(req).getId();

@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-//@Path("/fimk?requestType=accountColorList")
+@javax.ws.rs.Path("/fimk?requestType=getPlugins")
 public final class GetPlugins extends APIServlet.APIRequestHandler {
 
     static final GetPlugins instance = new GetPlugins();
@@ -40,6 +41,8 @@ public final class GetPlugins extends APIServlet.APIRequestHandler {
     private static final Path PLUGINS_HOME = Paths.get("./html/ui/plugins");
 
     @Override
+    @Operation(summary = "Get plugins",
+            tags = {APITag2.INFO})
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = new JSONObject();

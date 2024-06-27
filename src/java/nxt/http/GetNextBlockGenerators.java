@@ -16,6 +16,7 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Block;
 import nxt.Constants;
 import nxt.Hub;
@@ -25,9 +26,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.Iterator;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getNextBlockGenerators")
 public final class GetNextBlockGenerators extends APIServlet.APIRequestHandler {
 
     static final GetNextBlockGenerators instance = new GetNextBlockGenerators();
@@ -37,6 +39,8 @@ public final class GetNextBlockGenerators extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get next block generators",
+            tags = {APITag2.FORGING})
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         /* implement later, if needed

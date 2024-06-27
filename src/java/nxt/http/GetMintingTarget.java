@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Currency;
 import nxt.CurrencyMinting;
 import nxt.NxtException;
@@ -25,6 +28,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.math.BigInteger;
 
 /**
@@ -37,7 +41,7 @@ import java.math.BigInteger;
  * <li>units - number of currency units the miner is trying to mint
  * </ul>
  */
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getMintingTarget")
 public final class GetMintingTarget extends APIServlet.APIRequestHandler {
 
     static final GetMintingTarget instance = new GetMintingTarget();
@@ -47,6 +51,13 @@ public final class GetMintingTarget extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get minting target",
+            description = "Currency miners can use this API to obtain their target hash value for minting currency units",
+            tags = {APITag2.MS})
+    @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "miner account id")
+    @Parameter(name = "units", in = ParameterIn.QUERY, schema = @Schema(type = "integer"),
+            description = "number of currency units the miner is trying to mint")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Currency currency = ParameterParser.getCurrency(req);
         JSONObject json = new JSONObject();

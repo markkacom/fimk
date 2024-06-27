@@ -16,12 +16,17 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.util.MemoryHandler;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
@@ -41,7 +46,7 @@ import java.util.logging.Logger;
  * <li>messages - An array of log messages</li>
  * </ul>
  */
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getLog")
 public final class GetLog extends APIServlet.APIRequestHandler {
 
     /** GetLog instance */
@@ -61,6 +66,10 @@ public final class GetLog extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
+    @Operation(summary = "Get log",
+            description = "Return log messages from the ring buffer maintained by the MemoryHandler log handler.  The most recent 'count' messages will be returned.  All log messages in the ring buffer will be returned if 'count' is omitted",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "count", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "the number of log messages to return")
     public JSONStreamAware processRequest(HttpServletRequest req) {
         //
         // Get the number of log messages to return

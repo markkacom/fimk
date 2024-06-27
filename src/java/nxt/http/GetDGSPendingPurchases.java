@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.DigitalGoodsStore;
 import nxt.NxtException;
 import nxt.db.DbIterator;
@@ -25,8 +28,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getDGSPendingPurchases")
 public final class GetDGSPendingPurchases extends APIServlet.APIRequestHandler {
 
     static final GetDGSPendingPurchases instance = new GetDGSPendingPurchases();
@@ -36,6 +40,11 @@ public final class GetDGSPendingPurchases extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get pending purchases",
+            tags = {APITag2.DGS})
+    @Parameter(name = "seller", in = ParameterIn.QUERY, required = true, description = "seller account id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long sellerId = ParameterParser.getAccountId(req, "seller", true);

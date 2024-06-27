@@ -11,12 +11,16 @@
  ******************************************************************************/
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NamespacedAlias;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getNamespacedAlias")
 public final class GetNamespacedAlias extends APIServlet.APIRequestHandler {
 
     static final GetNamespacedAlias instance = new GetNamespacedAlias();
@@ -26,6 +30,11 @@ public final class GetNamespacedAlias extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get namespaced alias",
+            tags = {APITag2.ALIASES})
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "alias", in = ParameterIn.QUERY, required = true, description = "alias")
+    @Parameter(name = "aliasName", in = ParameterIn.QUERY, required = true, description = "alias name")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         NamespacedAlias alias = ParameterParser.getNamespacedAlias(req);
         return JSONData.namespacedAlias(alias);

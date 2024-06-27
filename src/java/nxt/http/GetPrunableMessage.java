@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.PrunableMessage;
@@ -26,8 +28,9 @@ import nxt.util.JSON;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPrunableMessage")
 public final class GetPrunableMessage extends APIServlet.APIRequestHandler {
 
     static final GetPrunableMessage instance = new GetPrunableMessage();
@@ -37,6 +40,10 @@ public final class GetPrunableMessage extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get prunable message",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

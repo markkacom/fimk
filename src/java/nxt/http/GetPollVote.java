@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.Poll;
@@ -25,7 +27,9 @@ import nxt.util.JSON;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getPollVote")
 public class GetPollVote extends APIServlet.APIRequestHandler  {
     static final GetPollVote instance = new GetPollVote();
 
@@ -34,6 +38,10 @@ public class GetPollVote extends APIServlet.APIRequestHandler  {
     }
 
     @Override
+    @Operation(summary = "Get poll vote",
+            tags = {APITag2.VS})
+    @Parameter(name = "poll", in = ParameterIn.QUERY, required = true, description = "poll id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Poll poll = ParameterParser.getPoll(req);
         Account account = ParameterParser.getAccount(req);

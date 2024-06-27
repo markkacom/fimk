@@ -16,6 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Account;
 import nxt.Generator;
 import nxt.Nxt;
@@ -26,12 +29,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.NOT_FORGING;
 import static nxt.http.JSONResponses.UNKNOWN_ACCOUNT;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getForging")
 public final class GetForging extends APIServlet.APIRequestHandler {
 
     static final GetForging instance = new GetForging();
@@ -41,6 +45,10 @@ public final class GetForging extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get forging",
+            tags = {APITag2.FORGING})
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
+    @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

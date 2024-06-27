@@ -16,14 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getECBlock")
 public final class GetECBlock extends APIServlet.APIRequestHandler {
 
     static final GetECBlock instance = new GetECBlock();
@@ -33,6 +37,9 @@ public final class GetECBlock extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get EC block",
+            tags = {APITag2.BLOCKCHAIN})
+    @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"), description = "timestamp")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         int timestamp = ParameterParser.getTimestamp(req);
         if (timestamp == 0) {

@@ -16,15 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.DigitalGoodsStore;
 import nxt.NxtException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getDGSPurchaseCount")
 public final class GetDGSPurchaseCount extends APIServlet.APIRequestHandler {
 
     static final GetDGSPurchaseCount instance = new GetDGSPurchaseCount();
@@ -34,6 +38,13 @@ public final class GetDGSPurchaseCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get purchase count",
+            tags = {APITag2.DGS})
+    @Parameter(name = "seller", in = ParameterIn.QUERY, description = "seller account id")
+    @Parameter(name = "buyer", in = ParameterIn.QUERY, description = "buyer account id")
+    @Parameter(name = "withPublicFeedbacksOnly", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "with public feedbacks only")
+    @Parameter(name = "completed", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "completed")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long sellerId = ParameterParser.getAccountId(req, "seller", false);

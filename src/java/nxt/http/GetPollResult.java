@@ -17,7 +17,10 @@
 package nxt.http;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.Poll;
 import nxt.VoteWeighting;
@@ -25,10 +28,12 @@ import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
 import static nxt.http.JSONResponses.POLL_RESULTS_NOT_AVAILABLE;
 
+@Path("/fimk?requestType=getPollResult")
 public class GetPollResult extends APIServlet.APIRequestHandler {
 
     static final GetPollResult instance = new GetPollResult();
@@ -38,6 +43,16 @@ public class GetPollResult extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get poll result",
+            tags = {APITag2.VS})
+    @Parameter(name = "poll", in = ParameterIn.QUERY, required = true, description = "poll id")
+    @Parameter(name = "votingModel", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0", maximum = "3"),
+            description = "voting model (min 0, max 3)")
+    @Parameter(name = "holding", in = ParameterIn.QUERY, description = "holding id")
+    @Parameter(name = "minBalance", in = ParameterIn.QUERY, description = "min balance")
+    @Parameter(name = "maxBalance", in = ParameterIn.QUERY, description = "max balance")
+    @Parameter(name = "minBalanceModel", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0", maximum = "3"),
+            description = "min balance model (min 0, max 3)")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Poll poll = ParameterParser.getPoll(req);
         List<Poll.OptionResult> pollResults;

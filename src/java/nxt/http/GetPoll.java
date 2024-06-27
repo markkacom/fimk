@@ -16,15 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NxtException;
 import nxt.Poll;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPoll")
 public final class GetPoll extends APIServlet.APIRequestHandler {
 
     static final GetPoll instance = new GetPoll();
@@ -34,6 +37,9 @@ public final class GetPoll extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get poll",
+            tags = {APITag2.VS})
+    @Parameter(name = "poll", in = ParameterIn.QUERY, required = true, description = "poll id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Poll poll = ParameterParser.getPoll(req);
         return JSONData.poll(poll);

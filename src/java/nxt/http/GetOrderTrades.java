@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.Trade;
 import nxt.db.DbIterator;
@@ -26,8 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getOrderTrades")
 public final class GetOrderTrades extends APIServlet.APIRequestHandler {
 
     static final GetOrderTrades instance = new GetOrderTrades();
@@ -37,6 +41,13 @@ public final class GetOrderTrades extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get order trades",
+            tags = {APITag2.AE})
+    @Parameter(name = "askOrder", in = ParameterIn.QUERY, description = "ask order id")
+    @Parameter(name = "bidOrder", in = ParameterIn.QUERY, description = "bid order id")
+    @Parameter(name = "includeAssetInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include asset info")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long askOrderId = ParameterParser.getUnsignedLong(req, "askOrder", false);

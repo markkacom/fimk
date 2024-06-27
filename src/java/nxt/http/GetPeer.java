@@ -16,16 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_PEER;
 import static nxt.http.JSONResponses.UNKNOWN_PEER;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPeer")
 public final class GetPeer extends APIServlet.APIRequestHandler {
 
     static final GetPeer instance = new GetPeer();
@@ -35,6 +39,9 @@ public final class GetPeer extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get peer",
+            tags = {APITag2.NETWORK})
+    @Parameter(name = "peer", in = ParameterIn.QUERY, required = true, description = "peer address")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String peerAddress = req.getParameter("peer");

@@ -16,14 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.CurrencyBuyOffer;
 import nxt.CurrencySellOffer;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getOffer")
 public final class GetOffer extends APIServlet.APIRequestHandler {
 
     static final GetOffer instance = new GetOffer();
@@ -33,6 +37,9 @@ public final class GetOffer extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get offer",
+            tags = {APITag2.MS})
+    @Parameter(name = "offer", in = ParameterIn.QUERY, description = "offer id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         JSONObject response = new JSONObject();
         CurrencyBuyOffer buyOffer = ParameterParser.getBuyOffer(req);

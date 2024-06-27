@@ -16,12 +16,14 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getMyInfo")
 public final class GetMyInfo extends APIServlet.APIRequestHandler {
 
     static final GetMyInfo instance = new GetMyInfo();
@@ -31,6 +33,8 @@ public final class GetMyInfo extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get my info",
+            tags = {APITag2.NETWORK})
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = new JSONObject();

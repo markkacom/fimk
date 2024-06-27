@@ -16,6 +16,11 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.PhasingPoll;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
@@ -23,11 +28,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_TRANSACTION;
 import static nxt.http.JSONResponses.MISSING_TRANSACTION;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPhasingPolls")
 public final class GetPhasingPolls extends APIServlet.APIRequestHandler {
 
     static final GetPhasingPolls instance = new GetPhasingPolls();
@@ -37,6 +43,11 @@ public final class GetPhasingPolls extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get phasing polls",
+            tags = {APITag2.PHASING})
+    @Parameter(name = "transaction", array = @ArraySchema(schema = @Schema(implementation = String.class)), in = ParameterIn.QUERY,
+            description = "list of transaction ids")
+    @Parameter(name = "countVotes", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "count votes")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String[] transactions = req.getParameterValues("transaction");

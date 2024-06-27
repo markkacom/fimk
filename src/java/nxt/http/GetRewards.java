@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.db.DbIterator;
 import nxt.reward.RewardItem;
@@ -25,8 +28,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getRewards")
 public final class GetRewards extends APIServlet.APIRequestHandler {
 
     static final GetRewards instance = new GetRewards();
@@ -36,6 +40,13 @@ public final class GetRewards extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get rewards",
+            tags = {APITag2.REWARDS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "fromHeight", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "from height")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getAccount(req).getId();
         final int fromHeight = ParameterParser.getInt(req, "fromHeight", 0, Integer.MAX_VALUE, true);

@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.PrunableMessage;
@@ -29,8 +32,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPrunableMessages")
 public final class GetPrunableMessages extends APIServlet.APIRequestHandler {
 
     static final GetPrunableMessages instance = new GetPrunableMessages();
@@ -40,6 +44,13 @@ public final class GetPrunableMessages extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get prunable messages",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "otherAccount", in = ParameterIn.QUERY, description = "other account id")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getAccount(req);
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

@@ -16,13 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.PhasingPoll;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
+@Path("/fimk?requestType=getPhasingPoll")
 public class GetPhasingPoll extends APIServlet.APIRequestHandler {
 
     static final GetPhasingPoll instance = new GetPhasingPoll();
@@ -32,6 +37,10 @@ public class GetPhasingPoll extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get phasing poll",
+            tags = {APITag2.PHASING})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "countVotes", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "count votes")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);
         boolean countVotes = "true".equalsIgnoreCase(req.getParameter("countVotes"));

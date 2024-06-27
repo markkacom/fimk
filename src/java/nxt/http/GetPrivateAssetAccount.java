@@ -12,7 +12,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Asset;
 import nxt.MofoAsset;
 import nxt.NxtException;
@@ -20,11 +22,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ASSET;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getPrivateAssetAccount")
 public final class GetPrivateAssetAccount extends CreateTransaction {
 
     static final GetPrivateAssetAccount instance = new GetPrivateAssetAccount();
@@ -34,7 +36,10 @@ public final class GetPrivateAssetAccount extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Get private asset account",
+            tags = {APITag2.AE, APITag2.MOFO})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);

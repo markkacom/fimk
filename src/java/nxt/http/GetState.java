@@ -16,14 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.peer.Peers;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getState")
 public final class GetState extends APIServlet.APIRequestHandler {
 
     static final GetState instance = new GetState();
@@ -33,6 +38,10 @@ public final class GetState extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get state",
+            tags = {APITag2.INFO})
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
+    @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = GetBlockchainStatus.instance.processRequest(req);

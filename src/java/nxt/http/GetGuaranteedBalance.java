@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -24,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getGuaranteedBalance")
 public final class GetGuaranteedBalance extends APIServlet.APIRequestHandler {
 
     static final GetGuaranteedBalance instance = new GetGuaranteedBalance();
@@ -35,6 +39,11 @@ public final class GetGuaranteedBalance extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get guaranteed balance",
+            tags = {APITag2.ACCOUNT, APITag2.FORGING})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "numberOfConfirmations", in = ParameterIn.QUERY, schema = @Schema(type = "integer"),
+            description = "number of confirmations")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getAccount(req);

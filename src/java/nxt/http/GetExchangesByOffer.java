@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Exchange;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
@@ -24,11 +28,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_OFFER;
 import static nxt.http.JSONResponses.MISSING_OFFER;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getExchangesByOffer")
 public final class GetExchangesByOffer extends APIServlet.APIRequestHandler {
 
     static final GetExchangesByOffer instance = new GetExchangesByOffer();
@@ -38,6 +43,13 @@ public final class GetExchangesByOffer extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get exchanges by offer",
+            tags = {APITag2.MS})
+    @Parameter(name = "offer", in = ParameterIn.QUERY, required = true, description = "offer id")
+    @Parameter(name = "includeCurrencyInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include currency info")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         // can't use ParameterParser.getCurrencyBuyOffer because offer may have been already deleted
         String offerValue = Convert.emptyToNull(req.getParameter("offer"));

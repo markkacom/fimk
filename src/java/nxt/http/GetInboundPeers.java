@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.peer.Peer;
 import nxt.peer.Peers;
 import org.json.simple.JSONArray;
@@ -23,6 +27,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
 /**
@@ -47,7 +52,7 @@ import java.util.List;
  * <li>errorDescription - API error description</li>
  * </ul>
  */
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getInboundPeers")
 public final class GetInboundPeers extends APIServlet.APIRequestHandler {
 
     /** GetInboundPeers instance */
@@ -67,6 +72,11 @@ public final class GetInboundPeers extends APIServlet.APIRequestHandler {
      * @return                      API response or null
      */
     @Override
+    @Operation(summary = "Get inbound peers",
+            description = "Return a list of inbound peers. An inbound peer is a peer that has sent a request to this peer within the previous 30 minutes",
+            tags = {APITag2.NETWORK})
+    @Parameter(name = "includePeerInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
+            description = "include peer info")
     public JSONStreamAware processRequest(HttpServletRequest req) {
         boolean includePeerInfo = "true".equalsIgnoreCase(req.getParameter("includePeerInfo"));
         List<Peer> peers = Peers.getInboundPeers();

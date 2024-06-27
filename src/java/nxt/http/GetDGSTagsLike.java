@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.DigitalGoodsStore;
 import nxt.NxtException;
 import nxt.db.DbIterator;
@@ -26,8 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getDGSTagsLike")
 public final class GetDGSTagsLike extends APIServlet.APIRequestHandler {
 
     static final GetDGSTagsLike instance = new GetDGSTagsLike();
@@ -37,6 +41,12 @@ public final class GetDGSTagsLike extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get tags containing prefix",
+            tags = {APITag2.DGS, APITag2.SEARCH})
+    @Parameter(name = "tagPrefix", in = ParameterIn.QUERY, required = true, description = "tag prefix")
+    @Parameter(name = "inStockOnly", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "in stock only")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         int firstIndex = ParameterParser.getFirstIndex(req);
         int lastIndex = ParameterParser.getLastIndex(req);

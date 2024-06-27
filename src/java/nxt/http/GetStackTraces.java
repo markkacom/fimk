@@ -16,11 +16,16 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.lang.management.*;
 
 /**
@@ -63,6 +68,7 @@ import java.lang.management.*;
  * <li>  trace   - Array of stack trace elements</li>
  * </ul>
  */
+@Path("/fimk?requestType=getStackTraces")
 public class GetStackTraces extends APIServlet.APIRequestHandler {
 
     /** GetLog instance */
@@ -82,6 +88,9 @@ public class GetStackTraces extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
+    @Operation(summary = "Get stack traces",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "depth", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
     public JSONStreamAware processRequest(HttpServletRequest req) {
         String value;
         //

@@ -20,4 +20,6 @@ public class APITag2 {
     public static final String REWARDS = "REWARDS";
     public static final String SEARCH = "SEARCH";
     public static final String INFO = "INFO";
+    public static final String FORGING = "FORGING";
+    public static final String MOFO = "MOFO";
 }
