@@ -12,7 +12,7 @@
 
 package nxt.http;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.NxtException;
 import nxt.http.websocket.MofoSocketServer;
 import org.json.simple.JSONArray;
@@ -20,9 +20,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.Iterator;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getWebsocketEvents")
 public final class GetWebsocketEvents extends APIServlet.APIRequestHandler {
 
     static final GetWebsocketEvents instance = new GetWebsocketEvents();
@@ -33,6 +34,8 @@ public final class GetWebsocketEvents extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Get websocket events",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
       
         String[] topics = null;

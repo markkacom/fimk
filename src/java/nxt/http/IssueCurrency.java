@@ -16,13 +16,16 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
 /**
@@ -79,7 +82,7 @@ import javax.ws.rs.POST;
  * @see nxt.CurrencyType
  * @see nxt.crypto.HashFunction
  */
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=issueCurrency")
 public final class IssueCurrency extends CreateTransaction {
 
     static final IssueCurrency instance = new IssueCurrency();
@@ -91,7 +94,37 @@ public final class IssueCurrency extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Issue currency",
+            tags = {APITag2.MS, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "name", in = ParameterIn.QUERY, required = true,
+            schema = @Schema(type = "string", minLength = Constants.MIN_CURRENCY_NAME_LENGTH, maxLength = Constants.MAX_CURRENCY_NAME_LENGTH))
+    @Parameter(name = "code", in = ParameterIn.QUERY, required = true,
+            schema = @Schema(type = "string", minLength = Constants.MIN_CURRENCY_CODE_LENGTH, maxLength = Constants.MAX_CURRENCY_CODE_LENGTH),
+            description = "unique 3 to 5 letter currency trading symbol composed of upper case latin letters")
+    @Parameter(name = "description", in = ParameterIn.QUERY,
+            schema = @Schema(type = "string", maxLength = Constants.MAX_CURRENCY_DESCRIPTION_LENGTH))
+    @Parameter(name = "type", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+    description = "numeric value representing a bit vector modeling the currency capabilities")
+    @Parameter(name = "initialSupply", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "the number of currency units created when the currency is issued (pre-mine)")
+    @Parameter(name = "reserveSupply", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "the number of units that will be distributed to founders when currency becomes active (less initialSupply)")
+    @Parameter(name = "maxSupply", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "the total number of currency units which can be created")
+    @Parameter(name = "issuanceHeight", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "blockchain height at which the currency would become active")
+    @Parameter(name = "minReservePerUnitNQT", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "the minimum FIMK value per unit to allow the currency to become active")
+    @Parameter(name = "minDifficulty", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "for mint-able currency, the exponent of the initial difficulty")
+    @Parameter(name = "maxDifficulty", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "for mint-able currency, the exponent of the final difficulty")
+    @Parameter(name = "ruleset", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "for future use, always set to 0")
+    @Parameter(name = "algorithm", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "the hashing algorithm used for minting")
+    @Parameter(name = "decimals", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "currency units are divisible to this number of decimals")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String name = Convert.nullToEmpty(req.getParameter("name"));
         String code = Convert.nullToEmpty(req.getParameter("code"));

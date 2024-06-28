@@ -46,7 +46,7 @@ public final class GetAssets extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get assets",
             tags = {APITag2.AE})
     @Parameter(name = "assets", array = @ArraySchema(schema = @Schema(implementation = String.class)),
-            in = ParameterIn.QUERY, description = "asset ids")
+            in = ParameterIn.QUERY, description = "asset identifiers")
     @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
             description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) {

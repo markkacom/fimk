@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Asset;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
@@ -24,8 +28,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-////@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=searchAssets")
 public final class SearchAssets extends APIServlet.APIRequestHandler {
 
     static final SearchAssets instance = new SearchAssets();
@@ -35,6 +40,12 @@ public final class SearchAssets extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Search assets",
+            tags = {APITag2.AE, APITag2.SEARCH})
+    @Parameter(name = "query", in = ParameterIn.QUERY)
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         String query = Convert.nullToEmpty(req.getParameter("query"));
         int firstIndex = ParameterParser.getFirstIndex(req);

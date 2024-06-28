@@ -13,28 +13,34 @@
 package nxt.http;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=setVerificationAuthority")
 public final class MofoVerificationAuthorityAssignment extends CreateTransaction {
 
     static final MofoVerificationAuthorityAssignment instance = new MofoVerificationAuthorityAssignment();
 
     private MofoVerificationAuthorityAssignment() {
-        super(new APITag[] {APITag.ACCOUNTS, APITag.CREATE_TRANSACTION}, "identifier", "signature", "signatory");
+        super(new APITag[] {APITag.ACCOUNTS, APITag.CREATE_TRANSACTION}, "period", "recipient");
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    @POST
+    @Operation(summary = "Set verification authority",
+            tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "period", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "recipient account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account senderAccount = ParameterParser.getSenderAccount(req);

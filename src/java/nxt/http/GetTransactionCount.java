@@ -16,15 +16,16 @@
 
 package nxt.http;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Nxt;
 import nxt.NxtException;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getTransactionCount")
 public final class GetTransactionCount extends APIServlet.APIRequestHandler {
 
     static final GetTransactionCount instance = new GetTransactionCount();
@@ -34,6 +35,8 @@ public final class GetTransactionCount extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get transaction count",
+            tags = {APITag2.TRANSACTIONS})
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
          JSONObject response = new JSONObject();

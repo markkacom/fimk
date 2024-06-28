@@ -16,6 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.db.DbIterator;
@@ -25,10 +28,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getUnconfirmedTransactions")
 public final class GetUnconfirmedTransactions extends APIServlet.APIRequestHandler {
 
     static final GetUnconfirmedTransactions instance = new GetUnconfirmedTransactions();
@@ -38,6 +42,9 @@ public final class GetUnconfirmedTransactions extends APIServlet.APIRequestHandl
     }
 
     @Override
+    @Operation(summary = "Get unconfirmed transaction",
+            tags = {APITag2.TRANSACTIONS, APITag2.ACCOUNT})
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String accountIdString = Convert.emptyToNull(req.getParameter("account"));

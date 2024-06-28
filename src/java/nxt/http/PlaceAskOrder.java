@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.txn.AskOrderPlacementAttachment;
 import nxt.util.JSON;
@@ -24,11 +27,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.NOT_ENOUGH_ASSETS;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=placeAskOrder")
 public final class PlaceAskOrder extends CreateTransaction {
 
     static final PlaceAskOrder instance = new PlaceAskOrder();
@@ -39,7 +42,16 @@ public final class PlaceAskOrder extends CreateTransaction {
 
     @SuppressWarnings("unchecked")
     @Override
-    @POST
+    @Operation(summary = "Place ask order",
+            tags = {APITag2.AE, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "asset id")
+    @Parameter(name = "quantityQNT", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "quantity in QNT")
+    @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "price in NQT")
+    @Parameter(name = "orderFeeQNT", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "order fee in QNT")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);

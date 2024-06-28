@@ -45,7 +45,7 @@ public final class GetAssetsByIssuer extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get assets by issuer",
             tags = {APITag2.AE, APITag2.ACCOUNT})
     @Parameter(name = "account", array = @ArraySchema(schema = @Schema(implementation = String.class)),
-            in = ParameterIn.QUERY, description = "account ids")
+            in = ParameterIn.QUERY, description = "account identifiers")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")

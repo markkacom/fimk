@@ -40,7 +40,7 @@ public final class GetBidOrderIds extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @Operation(summary = "Get bid order ids",
+    @Operation(summary = "Get bid order identifiers",
             tags = {APITag2.AE})
     @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")

@@ -16,13 +16,15 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getTime")
 public final class GetTime extends APIServlet.APIRequestHandler {
 
     static final GetTime instance = new GetTime();
@@ -32,6 +34,8 @@ public final class GetTime extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get time",
+            tags = {APITag2.INFO})
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         JSONObject response = new JSONObject();

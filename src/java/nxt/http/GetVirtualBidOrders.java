@@ -1,6 +1,9 @@
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.util.Convert;
 import nxt.virtualexchange.VirtualOrder.VirtualBid;
@@ -9,9 +12,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.List;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getVirtualBidOrders")
 public final class GetVirtualBidOrders extends APIServlet.APIRequestHandler {
 
     static final GetVirtualBidOrders instance = new GetVirtualBidOrders();
@@ -22,6 +26,12 @@ public final class GetVirtualBidOrders extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Get virtual bid orders",
+            tags = {APITag2.AE})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long assetId = ParameterParser.getAsset(req).getId();

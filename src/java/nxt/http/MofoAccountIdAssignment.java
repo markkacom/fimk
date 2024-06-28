@@ -13,7 +13,9 @@
 package nxt.http;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.*;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
@@ -22,12 +24,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_SIGNATORY;
 
 /* @api-name setAccountIdentifier */
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=setAccountIdentifier")
 public final class MofoAccountIdAssignment extends CreateTransaction {
 
     static final MofoAccountIdAssignment instance = new MofoAccountIdAssignment();
@@ -38,7 +40,11 @@ public final class MofoAccountIdAssignment extends CreateTransaction {
 
     @SuppressWarnings("unchecked")
     @Override
-    @POST
+    @Operation(summary = "Set account identifier",
+            tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "identifier", in = ParameterIn.QUERY)
+    @Parameter(name = "signature", in = ParameterIn.QUERY, description = "signature in HEX")
+    @Parameter(name = "signatory", in = ParameterIn.QUERY)
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long recipientId = ParameterParser.getAccountId(req, "recipient", true);

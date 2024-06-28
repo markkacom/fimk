@@ -16,15 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.util.Convert;
 import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.math.BigInteger;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=longConvert")
 public final class LongConvert extends APIServlet.APIRequestHandler {
 
     static final LongConvert instance = new LongConvert();
@@ -34,6 +39,9 @@ public final class LongConvert extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Long convert",
+            tags = {APITag2.UTILS})
+    @Parameter(name = "id", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) {
         String id = Convert.emptyToNull(req.getParameter("id"));
         if (id == null) {

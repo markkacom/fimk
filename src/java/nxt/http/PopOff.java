@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Block;
 import nxt.Nxt;
 import org.json.simple.JSONArray;
@@ -23,9 +27,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import java.util.List;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=popOff")
 public final class PopOff extends APIServlet.APIRequestHandler {
 
     static final PopOff instance = new PopOff();
@@ -35,6 +41,11 @@ public final class PopOff extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Pop off blocks", description = "Specify at least one of parameters 'numBlocks', 'height'",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "numBlocks", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         int numBlocks = 0;

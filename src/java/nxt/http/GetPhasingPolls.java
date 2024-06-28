@@ -46,7 +46,7 @@ public final class GetPhasingPolls extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get phasing polls",
             tags = {APITag2.PHASING})
     @Parameter(name = "transaction", array = @ArraySchema(schema = @Schema(implementation = String.class)), in = ParameterIn.QUERY,
-            description = "list of transaction ids")
+            description = "list of transaction identifiers")
     @Parameter(name = "countVotes", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "count votes")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 

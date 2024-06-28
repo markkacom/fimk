@@ -12,7 +12,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Account.AccountInfo;
 import nxt.NxtException;
@@ -23,11 +26,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_IDENTIFIER;
 import static nxt.http.JSONResponses.UNKNOWN_IDENTIFIER;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getAccountByIdentifier")
 public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandler {
 
     static final MofoGetAccountByIdentifier instance = new MofoGetAccountByIdentifier();
@@ -38,6 +42,12 @@ public final class MofoGetAccountByIdentifier extends APIServlet.APIRequestHandl
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Get account by identifier",
+            tags = {APITag2.ACCOUNT})
+    @Parameter(name = "identifier", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "includeLessors", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include lessors")
+    @Parameter(name = "includeAssets", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include assets")
+    @Parameter(name = "includeCurrencies", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include currencies")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String identifier = Convert.emptyToNull(req.getParameter("identifier"));

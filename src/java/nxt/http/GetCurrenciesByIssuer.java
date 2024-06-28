@@ -46,7 +46,7 @@ public final class GetCurrenciesByIssuer extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get currencies by issuer",
             tags = {APITag2.MS, APITag2.ACCOUNT})
     @Parameter(name = "account", array = @ArraySchema(schema = @Schema(implementation = String.class)), in = ParameterIn.QUERY,
-            required = true, description = "list of account ids")
+            required = true, description = "list of account identifiers")
     @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")

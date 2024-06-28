@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
@@ -26,10 +29,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=leaseBalance")
 public final class LeaseBalance extends CreateTransaction {
 
     static final LeaseBalance instance = new LeaseBalance();
@@ -39,7 +41,11 @@ public final class LeaseBalance extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Lease balance",
+            tags = {APITag2.FORGING, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "period", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
+            description = "recipient account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         short period = (short)ParameterParser.getInt(req, "period", Constants.LEASING_DELAY, Short.MAX_VALUE, true);

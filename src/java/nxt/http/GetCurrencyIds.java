@@ -39,7 +39,7 @@ public final class GetCurrencyIds extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @Operation(summary = "Get currency ids",
+    @Operation(summary = "Get currency identifiers",
             tags = {APITag2.MS})
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")

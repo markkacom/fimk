@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Currency;
@@ -24,7 +27,7 @@ import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
 /**
@@ -57,7 +60,7 @@ import javax.ws.rs.POST;
  * Only one exchange offer is allowed per account. Publishing a new exchange offer when another exchange offer exists
  * for the account, removes the existing exchange offer and publishes the new exchange offer
  */
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=publishExchangeOffer")
 public final class PublishExchangeOffer extends CreateTransaction {
 
     static final PublishExchangeOffer instance = new PublishExchangeOffer();
@@ -68,7 +71,33 @@ public final class PublishExchangeOffer extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Publish exchange offer for currency",
+            tags = {APITag2.MS, APITag2.CREATE_TRANSACTION},
+    description = "Publishing an exchange offer internally creates a buy offer and a counter sell offer linked together." +
+            " Typically the buyRateNQT specified would be less than the sellRateNQT thus allowing the publisher to make profit" +
+            " Each CurrencyBuy transaction which matches this offer reduces the sell supply and increases the buy supply" +
+            " Similarly, each CurrencySell transaction which matches this offer reduces the buy supply and increases the sell supply" +
+            " Therefore the multiple buy/sell transaction can be issued against this offer during it's lifetime." +
+            " However, the total buy limit and sell limit stops exchanging based on this offer after the accumulated buy/sell limit is reached" +
+            " after possibly multiple exchange operations." +
+            " Only one exchange offer is allowed per account. Publishing a new exchange offer when another exchange offer exists" +
+            " for the account, removes the existing exchange offer and publishes the new exchange offer")
+    @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "currency id")
+    @Parameter(name = "buyRateNQT", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "FIM amount for buying a currency unit specified in NQT")
+    @Parameter(name = "sellRateNQT", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "FIM amount for selling a currency unit specified in NQT")
+    @Parameter(name = "totalBuyLimit", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "total number of currency units which can be bought from the offer")
+    @Parameter(name = "totalSellLimit", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "total number of currency units which can be sold from the offer")
+    @Parameter(name = "initialBuySupply", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "initial number of currency units offered to buy by the publisher")
+    @Parameter(name = "initialSellSupply", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "initial number of currency units offered for sell by the publisher")
+    @Parameter(name = "expirationHeight", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "blockchain height at which the offer is expired")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Currency currency = ParameterParser.getCurrency(req);
         long buyRateNQT = ParameterParser.getLong(req, "buyRateNQT", 0, Long.MAX_VALUE, true);

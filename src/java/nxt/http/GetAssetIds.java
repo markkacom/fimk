@@ -39,7 +39,7 @@ public final class GetAssetIds extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @Operation(summary = "Get asset ids",
+    @Operation(summary = "Get asset identifiers",
             tags = {APITag2.AE})
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")

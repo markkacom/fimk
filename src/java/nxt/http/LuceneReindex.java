@@ -16,15 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Db;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-//@Path("/fimk?requestType=accountColorList")
+
+@Path("/fimk?requestType=luceneReindex")
 public final class LuceneReindex extends APIServlet.APIRequestHandler {
 
     static final LuceneReindex instance = new LuceneReindex();
@@ -34,6 +38,9 @@ public final class LuceneReindex extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Lucene reindex",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try (Connection con = Db.db.getConnection()) {

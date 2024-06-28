@@ -40,7 +40,7 @@ public final class GetDGSExpiredPurchases extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @Operation(summary = "Get asset ids",
+    @Operation(summary = "Get asset identifiers",
             tags = {APITag2.DGS})
     @Parameter(name = "seller", in = ParameterIn.QUERY, required = true, description = "seller account id")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")

@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
@@ -26,11 +29,11 @@ import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=issueAsset")
 public final class IssueAsset extends CreateTransaction {
 
     static final IssueAsset instance = new IssueAsset();
@@ -40,7 +43,15 @@ public final class IssueAsset extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Issue asset",
+            tags = {APITag2.AE, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "name", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "description", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "quantityQNT", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "quantity in QNT")
+    @Parameter(name = "decimals", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
+    @Parameter(name = "type", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0", maximum = "1"),
+            description = "0: regular asset, 1: private asset")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String name = req.getParameter("name");

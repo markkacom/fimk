@@ -16,16 +16,21 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getTransaction")
 public final class GetTransaction extends APIServlet.APIRequestHandler {
 
     static final GetTransaction instance = new GetTransaction();
@@ -35,6 +40,10 @@ public final class GetTransaction extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get transaction",
+            tags = {APITag2.TRANSACTIONS})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, description = "transaction id")
+    @Parameter(name = "fullHash", in = ParameterIn.QUERY, schema = @Schema(type = "transaction full hash in HEX"))
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String transactionIdString = Convert.emptyToNull(req.getParameter("transaction"));

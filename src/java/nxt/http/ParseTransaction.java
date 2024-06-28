@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NxtException;
 import nxt.Transaction;
 import nxt.util.Convert;
@@ -25,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=parseTransaction")
 public final class ParseTransaction extends APIServlet.APIRequestHandler {
 
     static final ParseTransaction instance = new ParseTransaction();
@@ -36,6 +39,11 @@ public final class ParseTransaction extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Parse transaction",
+            tags = {APITag2.TRANSACTIONS})
+    @Parameter(name = "transactionJSON", in = ParameterIn.QUERY, description = "transaction JSON")
+    @Parameter(name = "transactionBytes", in = ParameterIn.QUERY, description = "transaction bytes in HEX")
+    @Parameter(name = "prunableAttachmentJSON", in = ParameterIn.QUERY, description = "prunable attachment JSON")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String transactionBytes = Convert.emptyToNull(req.getParameter("transactionBytes"));

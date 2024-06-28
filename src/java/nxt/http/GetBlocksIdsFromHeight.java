@@ -37,7 +37,7 @@ public final class GetBlocksIdsFromHeight extends APIServlet.APIRequestHandler {
     }
 
     @Override
-    @Operation(summary = "Get blocks ids from height",
+    @Operation(summary = "Get blocks identifiers from height",
             tags = {APITag2.BLOCKCHAIN})
     @Parameter(name = "fromHeight", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "from height")
     @Parameter(name = "toHeight", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "to height")

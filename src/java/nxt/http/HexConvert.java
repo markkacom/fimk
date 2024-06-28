@@ -16,14 +16,18 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.util.Convert;
 import nxt.util.JSON;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=hexConvert")
 public final class HexConvert extends APIServlet.APIRequestHandler {
 
     static final HexConvert instance = new HexConvert();
@@ -33,6 +37,9 @@ public final class HexConvert extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "HEX convert",
+            tags = {APITag2.UTILS})
+    @Parameter(name = "string", in = ParameterIn.QUERY)
     public JSONStreamAware processRequest(HttpServletRequest req) {
         String string = Convert.emptyToNull(req.getParameter("string"));
         if (string == null) {

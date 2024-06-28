@@ -46,7 +46,7 @@ public final class GetCurrencies extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get currencies",
             tags = {APITag2.MS})
     @Parameter(name = "currencies", array = @ArraySchema(schema = @Schema(implementation = String.class)), in = ParameterIn.QUERY,
-        required = true, description = "list of currency ids")
+        required = true, description = "list of currency identifiers")
     @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 

@@ -16,17 +16,23 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Constants;
 import nxt.peer.Hallmark;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=markHost")
 public final class MarkHost extends APIServlet.APIRequestHandler {
 
     static final MarkHost instance = new MarkHost();
@@ -36,6 +42,13 @@ public final class MarkHost extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Mark host",
+            tags = {APITag2.TOKEN})
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase in HEX")
+    @Parameter(name = "host", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "weight", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
+    @Parameter(name = "date", in = ParameterIn.QUERY, required = true)
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String secretPhrase = req.getParameter("secretPhrase");

@@ -41,7 +41,7 @@ public final class GetAccountCurrentAskOrderIds extends APIServlet.APIRequestHan
     }
 
     @Override
-    @Operation(summary = "Get current ask order ids of account",
+    @Operation(summary = "Get current ask order identifiers of account",
             tags = {APITag2.ACCOUNT, APITag2.AE})
     @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
     @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")

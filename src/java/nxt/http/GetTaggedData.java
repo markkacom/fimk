@@ -16,15 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.TaggedData;
 import nxt.util.JSON;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=getTaggedData")
 public final class GetTaggedData extends APIServlet.APIRequestHandler {
 
     static final GetTaggedData instance = new GetTaggedData();
@@ -34,6 +38,10 @@ public final class GetTaggedData extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Get tagged data",
+            tags = {APITag2.DATA})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "includeData", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include data")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);
         boolean includeData = !"false".equalsIgnoreCase(req.getParameter("includeData"));

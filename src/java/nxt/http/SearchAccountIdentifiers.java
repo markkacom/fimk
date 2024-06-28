@@ -12,6 +12,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.db.DbIterator;
 import nxt.util.Convert;
@@ -20,8 +24,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=searchAccountIdentifiers")
 public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler {
 
     static final SearchAccountIdentifiers instance = new SearchAccountIdentifiers();
@@ -32,6 +37,12 @@ public final class SearchAccountIdentifiers extends APIServlet.APIRequestHandler
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Search account identifiers",
+            tags = {APITag2.ACCOUNT, APITag2.SEARCH})
+    @Parameter(name = "query", in = ParameterIn.QUERY)
+    @Parameter(name = "accountColorId", in = ParameterIn.QUERY, description = "account color id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         String query = Convert.nullToEmpty(req.getParameter("query"));
         int firstIndex = ParameterParser.getFirstIndex(req);

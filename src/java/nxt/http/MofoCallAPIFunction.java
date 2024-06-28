@@ -12,7 +12,6 @@
 
 package nxt.http;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import nxt.NxtException;
 import nxt.http.APIServlet.APIRequestHandler;
 import nxt.util.Convert;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import static nxt.http.JSONResponses.INCORRECT_JSON_ARGS;
 
-//@Path("/fimk?requestType=accountColorList")
 public final class MofoCallAPIFunction extends APIServlet.APIRequestHandler {
 
     public static final MofoCallAPIFunction instance = new MofoCallAPIFunction();
