@@ -16,13 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=scan")
 public final class Scan extends APIServlet.APIRequestHandler {
 
     static final Scan instance = new Scan();
@@ -32,6 +39,13 @@ public final class Scan extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Run blockchain scanning",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "numBlocks", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "number of blocks")
+    @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
+    @Parameter(name = "validate", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "validate")
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {

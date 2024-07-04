@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.Constants;
@@ -26,11 +29,12 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT_DESCRIPTION_LENGTH;
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT_NAME_LENGTH;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=setAccountInfo")
 public final class SetAccountInfo extends CreateTransaction {
 
     static final SetAccountInfo instance = new SetAccountInfo();
@@ -40,7 +44,10 @@ public final class SetAccountInfo extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Set account info",
+            tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "name", in = ParameterIn.QUERY)
+    @Parameter(name = "description", in = ParameterIn.QUERY)
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String name = Convert.nullToEmpty(req.getParameter("name")).trim();

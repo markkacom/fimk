@@ -16,19 +16,24 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ALIAS_OWNER;
 import static nxt.http.JSONResponses.INCORRECT_RECIPIENT;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=sellAlias")
 public final class SellAlias extends CreateTransaction {
 
     static final SellAlias instance = new SellAlias();
@@ -38,7 +43,15 @@ public final class SellAlias extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Sell alias",
+            tags = {APITag2.ALIASES, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "alias", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "alias id")
+    @Parameter(name = "aliasName", in = ParameterIn.QUERY, description = "alias name")
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "recipient account id")
+    @Parameter(name = "priceNQT", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "price in NQT")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Alias alias = ParameterParser.getAlias(req);
         Account owner = ParameterParser.getSenderAccount(req);

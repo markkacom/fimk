@@ -71,4 +71,8 @@ public final class GetWebsocketEvents extends APIServlet.APIRequestHandler {
         return response;
     }
 
+    @Override
+    boolean requirePassword() {
+        return true;
+    }
 }

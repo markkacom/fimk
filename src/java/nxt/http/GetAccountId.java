@@ -42,7 +42,7 @@ public final class GetAccountId extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get account id", description = "Must be specified secret phrase or public key",
             tags = {APITag2.ACCOUNT})
-    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
     @Parameter(name = "publicKey", in = ParameterIn.QUERY, description = "public key in HEX")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 

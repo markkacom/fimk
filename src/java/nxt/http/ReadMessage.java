@@ -16,6 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Appendix;
 import nxt.Nxt;
@@ -28,10 +32,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=readMessage")
 public final class ReadMessage extends APIServlet.APIRequestHandler {
 
     static final ReadMessage instance = new ReadMessage();
@@ -41,6 +46,11 @@ public final class ReadMessage extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Read message",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String transactionIdString = Convert.emptyToNull(req.getParameter("transaction"));

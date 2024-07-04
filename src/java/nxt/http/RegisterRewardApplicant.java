@@ -16,26 +16,33 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=registerRewardApplicant")
 public final class RegisterRewardApplicant extends CreateTransaction {
 
     static final RegisterRewardApplicant instance = new RegisterRewardApplicant();
 
     private RegisterRewardApplicant() {
-        super(new APITag[] {}, "recipient");
+        super(new APITag[] {APITag.REWARDS}, "recipient");
     }
 
     @Override
-    @POST
+    @Operation(summary = "Register reward applicant",
+            tags = {APITag2.REWARDS})
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "recipient account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long recipient = ParameterParser.getAccountId(req, "recipient", true);
         Account account = ParameterParser.getSenderAccount(req);

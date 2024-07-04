@@ -16,13 +16,16 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=rebroadcastUnconfirmedTransactions")
 public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequestHandler {
 
     static final RebroadcastUnconfirmedTransactions instance = new RebroadcastUnconfirmedTransactions();
@@ -32,6 +35,9 @@ public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequ
     }
 
     @Override
+    @POST
+    @Operation(summary = "Rebroadcast unconfirmed transactions",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {
@@ -44,7 +50,7 @@ public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequ
     }
 
     @Override
-    final boolean requirePost() {
+    boolean requirePost() {
         return true;
     }
 

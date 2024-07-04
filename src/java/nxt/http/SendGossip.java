@@ -1,5 +1,10 @@
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException.NotValidException;
 import nxt.gossip.GossipImpl;
@@ -9,8 +14,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
+@Path("/fimk?requestType=sendGossip")
 public class SendGossip extends APIServlet.APIRequestHandler {
 
     static final SendGossip instance = new SendGossip();
@@ -21,6 +29,16 @@ public class SendGossip extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
+    @POST
+    @Operation(summary = "Send gossip",
+            tags = {APITag2.MOFO})
+    @Parameter(name = "id", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
+    @Parameter(name = "message", in = ParameterIn.QUERY)
+    @Parameter(name = "senderPublicKey", in = ParameterIn.QUERY,
+            description = "sender public key in HEX")
+    @Parameter(name = "topic", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"), description = "topic id")
+    @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"), description = "timestamp")
+    @Parameter(name = "signature", in = ParameterIn.QUERY, description = "signature in HEX")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
         JSONObject response = new JSONObject();
         try {

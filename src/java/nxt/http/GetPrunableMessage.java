@@ -43,7 +43,7 @@ public final class GetPrunableMessage extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get prunable message",
             tags = {APITag2.MESSAGES})
     @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
-    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

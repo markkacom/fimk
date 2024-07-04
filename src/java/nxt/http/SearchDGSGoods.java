@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.DigitalGoodsStore;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -29,17 +32,29 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-////@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=searchDGSGoods")
 public final class SearchDGSGoods extends APIServlet.APIRequestHandler {
 
     static final SearchDGSGoods instance = new SearchDGSGoods();
 
     private SearchDGSGoods() {
-        super(new APITag[] {APITag.DGS, APITag.SEARCH}, "query", "tag", "seller", "firstIndex", "lastIndex", "inStockOnly", "hideDelisted", "includeCounts");
+        super(new APITag[] {APITag.DGS, APITag.SEARCH},
+                "query", "tag", "seller", "firstIndex", "lastIndex", "inStockOnly", "hideDelisted", "includeCounts");
     }
 
     @Override
+    @Operation(summary = "Search goods",
+            tags = {APITag2.DGS, APITag2.SEARCH})
+    @Parameter(name = "query", in = ParameterIn.QUERY)
+    @Parameter(name = "tag", in = ParameterIn.QUERY)
+    @Parameter(name = "seller", in = ParameterIn.QUERY, description = "seller account id")
+    @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
+    @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
+    @Parameter(name = "inStockOnly", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "in stock only")
+    @Parameter(name = "hideDelisted", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "hide delisted")
+    @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include counts")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long sellerId = ParameterParser.getAccountId(req, "seller", false);
         String query = ParameterParser.getSearchQuery(req);

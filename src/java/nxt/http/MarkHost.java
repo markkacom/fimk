@@ -45,7 +45,7 @@ public final class MarkHost extends APIServlet.APIRequestHandler {
     @POST
     @Operation(summary = "Mark host",
             tags = {APITag2.TOKEN})
-    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase in HEX")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
     @Parameter(name = "host", in = ParameterIn.QUERY, required = true)
     @Parameter(name = "weight", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"))
     @Parameter(name = "date", in = ParameterIn.QUERY, required = true)

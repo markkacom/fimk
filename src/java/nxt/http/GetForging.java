@@ -47,7 +47,7 @@ public final class GetForging extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get forging",
             tags = {APITag2.FORGING})
-    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase in HEX")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
     @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 

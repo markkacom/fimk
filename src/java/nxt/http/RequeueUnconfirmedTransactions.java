@@ -16,13 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=requeueUnconfirmedTransactions")
 public final class RequeueUnconfirmedTransactions extends APIServlet.APIRequestHandler {
 
     static final RequeueUnconfirmedTransactions instance = new RequeueUnconfirmedTransactions();
@@ -32,6 +39,9 @@ public final class RequeueUnconfirmedTransactions extends APIServlet.APIRequestH
     }
 
     @Override
+    @POST
+    @Operation(summary = "Requeue unconfirmed transactions",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {

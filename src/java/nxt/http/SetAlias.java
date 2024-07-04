@@ -17,7 +17,10 @@
 package nxt.http;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
@@ -25,10 +28,11 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.*;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=setAlias")
 public final class SetAlias extends CreateTransaction {
 
     static final SetAlias instance = new SetAlias();
@@ -38,7 +42,11 @@ public final class SetAlias extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Set alias",
+            tags = {APITag2.ALIASES, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "aliasName", in = ParameterIn.QUERY, required = true, description = "alias name")
+    @Parameter(name = "aliasURI", in = ParameterIn.QUERY, required = true,
+            description = "alias URI")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String aliasName = Convert.emptyToNull(req.getParameter("aliasName"));
         String aliasURI = Convert.nullToEmpty(req.getParameter("aliasURI"));

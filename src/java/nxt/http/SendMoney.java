@@ -39,8 +39,8 @@ public final class SendMoney extends CreateTransaction {
     @Override
     @POST
     @Operation(summary = "Send money",
-            tags = {APITag2.CREATE_TRANSACTION})
-    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true)
+            tags = {APITag2.ACCOUNT, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, required = true, description = "recipient account id")
     @Parameter(name = "amountNQT", in = ParameterIn.QUERY, required = true)
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long recipient = ParameterParser.getAccountId(req, "recipient", true);

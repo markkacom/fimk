@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.NxtException;
@@ -24,9 +27,10 @@ import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=sendMessage")
 public final class SendMessage extends CreateTransaction {
 
     static final SendMessage instance = new SendMessage();
@@ -36,7 +40,10 @@ public final class SendMessage extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Send message",
+            tags = {APITag2.MESSAGES, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "recipient", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "recipient account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long recipientId = ParameterParser.getAccountId(req, "recipient", false);
         Account account = ParameterParser.getSenderAccount(req);

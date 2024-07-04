@@ -16,16 +16,22 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.INCORRECT_ACCOUNT;
 import static nxt.http.JSONResponses.MISSING_ACCOUNT;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=rsConvert")
 public final class RSConvert extends APIServlet.APIRequestHandler {
 
     static final RSConvert instance = new RSConvert();
@@ -35,6 +41,10 @@ public final class RSConvert extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Return Reed-Solomon decoded account id",
+            tags = {APITag2.ACCOUNT, APITag2.UTILS})
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) {
         String accountValue = Convert.emptyToNull(req.getParameter("account"));
         if (accountValue == null) {
