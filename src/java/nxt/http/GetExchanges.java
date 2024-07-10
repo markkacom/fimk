@@ -47,7 +47,8 @@ public final class GetExchanges extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get exchanges",
             tags = {APITag2.MS})
     @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "includeCurrencyInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
             description = "include currency info")
     @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"), description = "before the timestamp")

@@ -26,7 +26,8 @@ public final class GetAccountRewardTotals extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get account phased transactions",
             tags = {APITag2.REWARDS})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getUnsignedLong(req, "account", true);
 

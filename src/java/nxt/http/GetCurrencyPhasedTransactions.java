@@ -41,7 +41,8 @@ public class GetCurrencyPhasedTransactions extends APIServlet.APIRequestHandler 
     @Operation(summary = "Get currency phased transactions",
             tags = {APITag2.AE, APITag2.PHASING})
     @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "withoutWhitelist", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "without white list")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")

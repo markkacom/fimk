@@ -44,7 +44,8 @@ public final class GetExchangesByExchangeRequest extends APIServlet.APIRequestHa
     @Override
     @Operation(summary = "Get exchanges by exchange request",
             tags = {APITag2.MS})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
     @Parameter(name = "includeCurrencyInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
             description = "include currency info")
     public JSONStreamAware processRequest(HttpServletRequest req) {

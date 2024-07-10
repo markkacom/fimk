@@ -19,6 +19,7 @@ package nxt.http;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.PrunableMessage;
@@ -42,7 +43,8 @@ public final class GetPrunableMessage extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get prunable message",
             tags = {APITag2.MESSAGES})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);

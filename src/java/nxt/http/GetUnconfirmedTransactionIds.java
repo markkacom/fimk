@@ -44,7 +44,8 @@ public final class GetUnconfirmedTransactionIds extends APIServlet.APIRequestHan
     @Override
     @Operation(summary = "Get unconfirmed transaction identifiers",
             tags = {APITag2.TRANSACTIONS, APITag2.ACCOUNT})
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String accountIdString = Convert.emptyToNull(req.getParameter("account"));

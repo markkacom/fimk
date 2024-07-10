@@ -41,7 +41,8 @@ public final class GetGuaranteedBalance extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get guaranteed balance",
             tags = {APITag2.ACCOUNT, APITag2.FORGING})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "numberOfConfirmations", in = ParameterIn.QUERY, schema = @Schema(type = "integer"),
             description = "number of confirmations")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {

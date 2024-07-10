@@ -41,7 +41,8 @@ public final class GetAccountExchangeRequests extends APIServlet.APIRequestHandl
     @Override
     @Operation(summary = "Get account exchange requests",
             tags = {APITag2.ACCOUNT, APITag2.MS})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, description = "currency id")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")

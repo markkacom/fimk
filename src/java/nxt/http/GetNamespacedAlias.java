@@ -32,7 +32,8 @@ public final class GetNamespacedAlias extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get namespaced alias",
             tags = {APITag2.ALIASES})
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "alias", in = ParameterIn.QUERY, required = true, description = "alias")
     @Parameter(name = "aliasName", in = ParameterIn.QUERY, required = true, description = "alias name")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {

@@ -40,7 +40,8 @@ public final class GetTaggedData extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get tagged data",
             tags = {APITag2.DATA})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
     @Parameter(name = "includeData", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include data")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);

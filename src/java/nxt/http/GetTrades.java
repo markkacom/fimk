@@ -47,7 +47,8 @@ public final class GetTrades extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get trades",
             tags = {APITag2.AE})
     @Parameter(name = "asset", in = ParameterIn.QUERY, description = "asset id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"))
     @Parameter(name = "includeAssetInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "include asset info")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")

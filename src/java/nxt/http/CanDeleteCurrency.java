@@ -43,7 +43,8 @@ public final class CanDeleteCurrency extends APIServlet.APIRequestHandler {
     @GET
     @Operation(summary = "Is allowed to delete currency",
             tags = {APITag2.MS})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "currency", in = ParameterIn.QUERY, required = true, description = "currency id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Currency currency = ParameterParser.getCurrency(req);

@@ -39,7 +39,8 @@ public class GetAccountPhasedTransactionCount extends APIServlet.APIRequestHandl
     @Override
     @Operation(summary = "Get account phased transaction count",
             tags = {APITag2.ACCOUNT, APITag2.PHASING})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Account account = ParameterParser.getAccount(req);
         JSONObject response = new JSONObject();

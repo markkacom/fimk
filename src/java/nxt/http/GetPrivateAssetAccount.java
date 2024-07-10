@@ -39,7 +39,8 @@ public final class GetPrivateAssetAccount extends CreateTransaction {
     @Operation(summary = "Get private asset account",
             tags = {APITag2.AE, APITag2.MOFO})
     @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);

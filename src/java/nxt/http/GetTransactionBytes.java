@@ -19,6 +19,7 @@ package nxt.http;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import nxt.Transaction;
 import nxt.util.Convert;
@@ -42,7 +43,8 @@ public final class GetTransactionBytes extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get transaction",
             tags = {APITag2.TRANSACTIONS})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
     public JSONStreamAware processRequest(HttpServletRequest req) {
 
         String transactionValue = req.getParameter("transaction");

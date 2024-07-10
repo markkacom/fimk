@@ -47,7 +47,8 @@ public final class GetCurrencyTransfers extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get currency transfers",
             tags = {APITag2.MS})
     @Parameter(name = "currency", in = ParameterIn.QUERY, description = "currency id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "includeCurrencyInfo", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
             description = "include currency info")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")

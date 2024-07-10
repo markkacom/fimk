@@ -42,7 +42,8 @@ public final class GetRewards extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get rewards",
             tags = {APITag2.REWARDS})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "fromHeight", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
             description = "from height")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")

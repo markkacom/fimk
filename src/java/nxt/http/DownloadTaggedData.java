@@ -19,6 +19,7 @@ package nxt.http;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.TaggedData;
 import org.json.simple.JSONStreamAware;
@@ -43,7 +44,8 @@ public final class DownloadTaggedData extends APIServlet.APIRequestHandler {
     @GET
     @Operation(summary = "Download tagged data",
             tags = {APITag2.DATA})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
     public JSONStreamAware processRequest(HttpServletRequest request,
                                           HttpServletResponse response) throws NxtException  {
         long transactionId = ParameterParser.getUnsignedLong(request, "transaction", true);

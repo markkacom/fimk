@@ -38,7 +38,8 @@ public final class GetBalance extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get balance",
             tags = {APITag2.ACCOUNT})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "includeEffectiveBalance", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
             description = "include effective balance")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {

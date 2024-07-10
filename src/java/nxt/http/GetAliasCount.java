@@ -39,7 +39,8 @@ public final class GetAliasCount extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get alias count",
             tags = {APITag2.ALIASES})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         final long accountId = ParameterParser.getAccount(req).getId();
         JSONObject response = new JSONObject();

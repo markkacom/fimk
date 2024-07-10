@@ -19,6 +19,7 @@ package nxt.http;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.NxtException;
 import nxt.PhasingVote;
@@ -39,8 +40,10 @@ public class GetPhasingPollVote extends APIServlet.APIRequestHandler  {
     @Override
     @Operation(summary = "Get phasing poll vote",
             tags = {APITag2.PHASING})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, description = "transaction id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);
         Account account = ParameterParser.getAccount(req);

@@ -29,7 +29,8 @@ public final class GetVirtualBidOrders extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get virtual bid orders",
             tags = {APITag2.AE})
     @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
     @Parameter(name = "lastIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "last index")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {

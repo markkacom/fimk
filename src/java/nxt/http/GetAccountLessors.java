@@ -44,7 +44,8 @@ public final class GetAccountLessors extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get account lessors",
             tags = {APITag2.ACCOUNT})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "height", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 

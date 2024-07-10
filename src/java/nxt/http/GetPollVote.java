@@ -41,7 +41,8 @@ public class GetPollVote extends APIServlet.APIRequestHandler  {
     @Operation(summary = "Get poll vote",
             tags = {APITag2.VS})
     @Parameter(name = "poll", in = ParameterIn.QUERY, required = true, description = "poll id")
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         Poll poll = ParameterParser.getPoll(req);
         Account account = ParameterParser.getAccount(req);

@@ -46,7 +46,8 @@ public final class GetBlockchainTransactions extends APIServlet.APIRequestHandle
     @Override
     @Operation(summary = "Get blockchain transactions",
             tags = {APITag2.ACCOUNT, APITag2.TRANSACTIONS})
-    @Parameter(name = "account", in = ParameterIn.QUERY, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "timestamp", in = ParameterIn.QUERY, schema = @Schema(type = "integer"))
     @Parameter(name = "type", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "transaction type")
     @Parameter(name = "subtype", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "transaction subtype")

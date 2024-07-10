@@ -46,7 +46,8 @@ public final class GetPrunableMessages extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get prunable messages",
             tags = {APITag2.MESSAGES})
-    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, description = "account id")
+    @Parameter(name = "account", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "account id")
     @Parameter(name = "otherAccount", in = ParameterIn.QUERY, description = "other account id")
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
     @Parameter(name = "firstIndex", in = ParameterIn.QUERY, schema = @Schema(type = "integer"), description = "first index")
