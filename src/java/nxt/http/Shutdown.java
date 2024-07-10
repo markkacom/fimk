@@ -29,7 +29,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=shutdown")
-public final class Shutdown extends APIServlet.APIRequestHandler {
+public final class Shutdown extends AdminAPIRequestHandler {
 
     static final Shutdown instance = new Shutdown();
 
@@ -61,8 +61,4 @@ public final class Shutdown extends APIServlet.APIRequestHandler {
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

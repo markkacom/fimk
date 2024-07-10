@@ -16,14 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
-public final class FullReset extends APIServlet.APIRequestHandler {
+@Path("/fimk?requestType=fullReset")
+public final class FullReset extends AdminAPIRequestHandler {
 
     static final FullReset instance = new FullReset();
 
@@ -32,6 +37,8 @@ public final class FullReset extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Full reset",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         try {
@@ -48,8 +55,4 @@ public final class FullReset extends APIServlet.APIRequestHandler {
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

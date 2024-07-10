@@ -47,7 +47,7 @@ import java.util.logging.Logger;
  * </ul>
  */
 @Path("/fimk?requestType=getLog")
-public final class GetLog extends APIServlet.APIRequestHandler {
+public final class GetLog extends AdminAPIRequestHandler {
 
     /** GetLog instance */
     static final GetLog instance = new GetLog();
@@ -100,13 +100,4 @@ public final class GetLog extends APIServlet.APIRequestHandler {
         return response;
     }
 
-    /**
-     * Require the administrator password
-     *
-     * @return                      TRUE if the admin password is required
-     */
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

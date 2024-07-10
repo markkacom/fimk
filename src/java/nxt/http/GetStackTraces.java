@@ -69,7 +69,7 @@ import java.lang.management.*;
  * </ul>
  */
 @Path("/fimk?requestType=getStackTraces")
-public class GetStackTraces extends APIServlet.APIRequestHandler {
+public class GetStackTraces extends AdminAPIRequestHandler {
 
     /** GetLog instance */
     static final GetStackTraces instance = new GetStackTraces();
@@ -184,13 +184,4 @@ public class GetStackTraces extends APIServlet.APIRequestHandler {
         return response;
     }
 
-    /**
-     * Require the administrator password
-     *
-     * @return                      TRUE if the admin password is required
-     */
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

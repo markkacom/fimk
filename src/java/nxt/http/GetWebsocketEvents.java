@@ -24,7 +24,7 @@ import javax.ws.rs.Path;
 import java.util.Iterator;
 
 @Path("/fimk?requestType=getWebsocketEvents")
-public final class GetWebsocketEvents extends APIServlet.APIRequestHandler {
+public final class GetWebsocketEvents extends AdminAPIRequestHandler {
 
     static final GetWebsocketEvents instance = new GetWebsocketEvents();
 
@@ -71,8 +71,4 @@ public final class GetWebsocketEvents extends APIServlet.APIRequestHandler {
         return response;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

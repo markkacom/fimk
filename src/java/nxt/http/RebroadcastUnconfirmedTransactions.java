@@ -26,7 +26,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=rebroadcastUnconfirmedTransactions")
-public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequestHandler {
+public final class RebroadcastUnconfirmedTransactions extends AdminAPIRequestHandler {
 
     static final RebroadcastUnconfirmedTransactions instance = new RebroadcastUnconfirmedTransactions();
 
@@ -54,8 +54,4 @@ public final class RebroadcastUnconfirmedTransactions extends APIServlet.APIRequ
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

@@ -43,7 +43,8 @@ public final class ExtendTaggedData extends CreateTransaction {
     @Override
     @Operation(summary = "Extend tagged data",
             tags = {APITag2.DEBUG})
-    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
     @Parameter(name = "name", in = ParameterIn.QUERY)
     @Parameter(name = "description", in = ParameterIn.QUERY)
     @Parameter(name = "tags", in = ParameterIn.QUERY)

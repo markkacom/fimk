@@ -16,37 +16,29 @@
 
 package nxt.http;
 
-import io.swagger.v3.oas.annotations.Operation;
-import nxt.Nxt;
-import nxt.Transaction;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import nxt.*;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Path;
 
-@Path("/fimk?requestType=getAllBroadcastedTransactions")
-public final class GetAllBroadcastedTransactions extends AdminAPIRequestHandler {
+abstract class AdminAPIRequestHandler extends APIServlet.APIRequestHandler {
 
-    static final GetAllBroadcastedTransactions instance = new GetAllBroadcastedTransactions();
-
-    private GetAllBroadcastedTransactions() {
-        super(new APITag[] {APITag.DEBUG});
+    AdminAPIRequestHandler(APITag[] apiTags, String... parameters) {
+        super(apiTags, parameters);
     }
 
+    @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
+    abstract public JSONStreamAware processRequest(HttpServletRequest request) throws NxtException;
+
+    /**
+     * Require the administrator password
+     *
+     * @return                      TRUE if the admin password is required
+     */
     @Override
-    @Operation(summary = "Get all broadcasted transactions",
-            tags = {APITag2.DEBUG})
-    public JSONStreamAware processRequest(HttpServletRequest req) {
-        JSONObject response = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        response.put("transactions", jsonArray);
-        Transaction[] transactions = Nxt.getTransactionProcessor().getAllBroadcastedTransactions();
-        for (Transaction transaction : transactions) {
-            jsonArray.add(JSONData.unconfirmedTransaction(transaction));
-        }
-        return response;
+    boolean requirePassword() {
+        return true;
     }
-    
 }

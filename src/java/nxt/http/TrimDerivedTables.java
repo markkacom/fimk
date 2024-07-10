@@ -26,7 +26,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=trimDerivedTables")
-public final class TrimDerivedTables extends APIServlet.APIRequestHandler {
+public final class TrimDerivedTables extends AdminAPIRequestHandler {
 
     static final TrimDerivedTables instance = new TrimDerivedTables();
 
@@ -50,8 +50,4 @@ public final class TrimDerivedTables extends APIServlet.APIRequestHandler {
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

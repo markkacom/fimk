@@ -30,7 +30,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=scan")
-public final class Scan extends APIServlet.APIRequestHandler {
+public final class Scan extends AdminAPIRequestHandler {
 
     static final Scan instance = new Scan();
 
@@ -85,8 +85,4 @@ public final class Scan extends APIServlet.APIRequestHandler {
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

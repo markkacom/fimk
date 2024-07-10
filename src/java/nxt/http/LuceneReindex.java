@@ -29,7 +29,7 @@ import java.sql.SQLException;
 
 
 @Path("/fimk?requestType=luceneReindex")
-public final class LuceneReindex extends APIServlet.APIRequestHandler {
+public final class LuceneReindex extends AdminAPIRequestHandler {
 
     static final LuceneReindex instance = new LuceneReindex();
 
@@ -54,11 +54,6 @@ public final class LuceneReindex extends APIServlet.APIRequestHandler {
 
     @Override
     final boolean requirePost() {
-        return true;
-    }
-
-    @Override
-    boolean requirePassword() {
         return true;
     }
 

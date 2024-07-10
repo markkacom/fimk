@@ -34,7 +34,7 @@ import static nxt.http.JSONResponses.MISSING_PEER;
 import static nxt.http.JSONResponses.UNKNOWN_PEER;
 
 @Path("/fimk?requestType=blacklistPeer")
-public class BlacklistPeer extends APIRequestHandler {
+public class BlacklistPeer extends AdminAPIRequestHandler {
 
     static final BlacklistPeer instance = new BlacklistPeer();
     
@@ -67,8 +67,4 @@ public class BlacklistPeer extends APIRequestHandler {
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

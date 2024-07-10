@@ -30,7 +30,7 @@ import javax.ws.rs.Path;
 
 
 @Path("/fimk?requestType=stopForging")
-public final class StopForging extends APIServlet.APIRequestHandler {
+public final class StopForging extends AdminAPIRequestHandler {
 
     static final StopForging instance = new StopForging();
 
@@ -43,7 +43,6 @@ public final class StopForging extends APIServlet.APIRequestHandler {
     @Operation(summary = "Stop forging",
             tags = {APITag2.FORGING})
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
-    @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

@@ -36,7 +36,7 @@ import static nxt.http.JSONResponses.UNKNOWN_ACCOUNT;
 
 
 @Path("/fimk?requestType=getForging")
-public final class GetForging extends APIServlet.APIRequestHandler {
+public final class GetForging extends AdminAPIRequestHandler {
 
     static final GetForging instance = new GetForging();
 
@@ -48,7 +48,6 @@ public final class GetForging extends APIServlet.APIRequestHandler {
     @Operation(summary = "Get forging",
             tags = {APITag2.FORGING})
     @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, description = "secret phrase")
-    @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

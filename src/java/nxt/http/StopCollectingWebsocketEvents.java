@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=stopCollectingWebsocketEvents")
-public final class StopCollectingWebsocketEvents extends APIServlet.APIRequestHandler {
+public final class StopCollectingWebsocketEvents extends AdminAPIRequestHandler {
 
     static final StopCollectingWebsocketEvents instance = new StopCollectingWebsocketEvents();
 

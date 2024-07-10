@@ -66,7 +66,7 @@ import javax.ws.rs.Path;
  * </ul>
  */
 @Path("/fimk?requestType=setLogging")
-public class SetLogging extends APIServlet.APIRequestHandler {
+public class SetLogging extends AdminAPIRequestHandler {
 
     /** SetLogging instance */
     static final SetLogging instance = new SetLogging();
@@ -153,16 +153,6 @@ public class SetLogging extends APIServlet.APIRequestHandler {
         if (response == null)
             response = LOGGING_UPDATED;
         return response;
-    }
-
-    /**
-     * Require the administrator password
-     *
-     * @return                      TRUE if the admin password is required
-     */
-    @Override
-    boolean requirePassword() {
-        return true;
     }
 
     @Override

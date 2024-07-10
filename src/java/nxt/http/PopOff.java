@@ -32,7 +32,7 @@ import javax.ws.rs.Path;
 import java.util.List;
 
 @Path("/fimk?requestType=popOff")
-public final class PopOff extends APIServlet.APIRequestHandler {
+public final class PopOff extends AdminAPIRequestHandler {
 
     static final PopOff instance = new PopOff();
 
@@ -79,11 +79,6 @@ public final class PopOff extends APIServlet.APIRequestHandler {
 
     @Override
     final boolean requirePost() {
-        return true;
-    }
-
-    @Override
-    boolean requirePassword() {
         return true;
     }
 

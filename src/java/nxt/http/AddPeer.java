@@ -33,7 +33,7 @@ import javax.ws.rs.Path;
 import static nxt.http.JSONResponses.MISSING_PEER;
 
 @Path("/fimk?requestType=addPeer")
-public class AddPeer extends APIServlet.APIRequestHandler {
+public class AddPeer extends AdminAPIRequestHandler {
 
     static final AddPeer instance = new AddPeer();
 
@@ -65,11 +65,6 @@ public class AddPeer extends APIServlet.APIRequestHandler {
 
     @Override
     final boolean requirePost() {
-        return true;
-    }
-
-    @Override
-    boolean requirePassword() {
         return true;
     }
 

@@ -30,7 +30,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=requeueUnconfirmedTransactions")
-public final class RequeueUnconfirmedTransactions extends APIServlet.APIRequestHandler {
+public final class RequeueUnconfirmedTransactions extends AdminAPIRequestHandler {
 
     static final RequeueUnconfirmedTransactions instance = new RequeueUnconfirmedTransactions();
 
@@ -58,8 +58,4 @@ public final class RequeueUnconfirmedTransactions extends APIServlet.APIRequestH
         return true;
     }
 
-    @Override
-    boolean requirePassword() {
-        return true;
-    }
 }

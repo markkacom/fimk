@@ -28,7 +28,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 @Path("/fimk?requestType=clearUnconfirmedTransactions")
-public final class ClearUnconfirmedTransactions extends APIServlet.APIRequestHandler {
+public final class ClearUnconfirmedTransactions extends AdminAPIRequestHandler {
 
     static final ClearUnconfirmedTransactions instance = new ClearUnconfirmedTransactions();
 
@@ -53,11 +53,6 @@ public final class ClearUnconfirmedTransactions extends APIServlet.APIRequestHan
 
     @Override
     final boolean requirePost() {
-        return true;
-    }
-
-    @Override
-    boolean requirePassword() {
         return true;
     }
 }
