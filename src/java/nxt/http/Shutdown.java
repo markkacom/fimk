@@ -16,13 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-////@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=shutdown")
 public final class Shutdown extends APIServlet.APIRequestHandler {
 
     static final Shutdown instance = new Shutdown();
@@ -32,6 +38,10 @@ public final class Shutdown extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Shutdown",
+            tags = {APITag2.DEBUG})
+    @Parameter(name = "scan", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         boolean scan = "true".equalsIgnoreCase(req.getParameter("scan"));

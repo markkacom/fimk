@@ -16,13 +16,16 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.Nxt;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=trimDerivedTables")
 public final class TrimDerivedTables extends APIServlet.APIRequestHandler {
 
     static final TrimDerivedTables instance = new TrimDerivedTables();
@@ -32,6 +35,9 @@ public final class TrimDerivedTables extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Trim derived tables",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONObject response = new JSONObject();
         Nxt.getBlockchainProcessor().trimDerivedTables();

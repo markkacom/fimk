@@ -16,15 +16,20 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.Generator;
 import nxt.util.Convert;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=stopForging")
 public final class StopForging extends APIServlet.APIRequestHandler {
 
     static final StopForging instance = new StopForging();
@@ -34,6 +39,11 @@ public final class StopForging extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @POST
+    @Operation(summary = "Stop forging",
+            tags = {APITag2.FORGING})
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
+    @Parameter(name = "adminPassword", in = ParameterIn.QUERY, description = "admin password")
     public JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
 
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

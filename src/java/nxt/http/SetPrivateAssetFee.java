@@ -1,16 +1,17 @@
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.*;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-
-////@Path("/fimk?requestType=accountColorList")
-public final class
-SetPrivateAssetFee extends CreateTransaction {
+@Path("/fimk?requestType=setPrivateAssetFee")
+public final class SetPrivateAssetFee extends CreateTransaction {
 
     static final SetPrivateAssetFee instance = new SetPrivateAssetFee();
 
@@ -19,7 +20,14 @@ SetPrivateAssetFee extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Set private asset fee",
+            tags = {APITag2.AE, APITag2.MOFO})
+    @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "asset id")
+    @Parameter(name = "orderFeePercentage", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "order fee percentage")
+    @Parameter(name = "tradeFeePercentage", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "trade fee percentage")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Asset asset = ParameterParser.getAsset(req);

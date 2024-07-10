@@ -12,15 +12,16 @@
 
 package nxt.http;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Operation;
 import nxt.NxtException;
 import nxt.http.websocket.MofoSocketServer;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=startCollectingWebsocketEvents")
 public final class StartCollectingWebsocketEvents extends APIServlet.APIRequestHandler {
 
     static final StartCollectingWebsocketEvents instance = new StartCollectingWebsocketEvents();
@@ -30,6 +31,8 @@ public final class StartCollectingWebsocketEvents extends APIServlet.APIRequestH
     }
 
     @Override
+    @Operation(summary = "Start collecting websocket events",
+            tags = {APITag2.DEBUG})
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         MofoSocketServer.startCollectingEvents(); 
         JSONObject response = new JSONObject();

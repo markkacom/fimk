@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Attachment;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -25,11 +28,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.Arrays;
 
 import static nxt.http.JSONResponses.*;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=verifyTaggedData")
 public final class VerifyTaggedData extends APIServlet.APIRequestHandler {
 
     static final VerifyTaggedData instance = new VerifyTaggedData();
@@ -40,6 +44,18 @@ public final class VerifyTaggedData extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Verify tagged data",
+            tags = {APITag2.DATA})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
+    @Parameter(name = "name", in = ParameterIn.QUERY)
+    @Parameter(name = "description", in = ParameterIn.QUERY)
+    @Parameter(name = "tags", in = ParameterIn.QUERY)
+    @Parameter(name = "type", in = ParameterIn.QUERY)
+    @Parameter(name = "channel", in = ParameterIn.QUERY)
+    @Parameter(name = "isText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is text")
+    @Parameter(name = "filename", in = ParameterIn.QUERY, description = "file name")
+    @Parameter(name = "data", in = ParameterIn.QUERY, description = "data in text format or in HEX")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);

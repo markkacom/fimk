@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.NxtException;
 import nxt.Transaction;
 import nxt.crypto.Crypto;
@@ -26,10 +29,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
 import static nxt.http.JSONResponses.MISSING_SECRET_PHRASE;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=signTransaction")
 public final class SignTransaction extends APIServlet.APIRequestHandler {
 
     static final SignTransaction instance = new SignTransaction();
@@ -39,6 +43,13 @@ public final class SignTransaction extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Sign transaction",
+            tags = {APITag2.TRANSACTIONS})
+    @Parameter(name = "unsignedTransactionJSON", in = ParameterIn.QUERY, description = "JSON representation of the unsigned transaction")
+    @Parameter(name = "unsignedTransactionBytes", in = ParameterIn.QUERY, description = "row bytes composing the unsigned transaction bytes excluding the prunable appendages")
+    @Parameter(name = "prunableAttachmentJSON", in = ParameterIn.QUERY, description = "JSON representation of the prunable appendages")
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
+    @Parameter(name = "validate", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"))
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String transactionJSON = Convert.emptyToNull(req.getParameter("unsignedTransactionJSON"));

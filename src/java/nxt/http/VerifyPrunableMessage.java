@@ -16,7 +16,10 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Appendix;
 import nxt.Nxt;
 import nxt.NxtException;
@@ -26,11 +29,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 import java.util.Arrays;
 
 import static nxt.http.JSONResponses.*;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=verifyPrunableMessage")
 public final class VerifyPrunableMessage extends APIServlet.APIRequestHandler {
 
     static final VerifyPrunableMessage instance = new VerifyPrunableMessage();
@@ -58,6 +62,16 @@ public final class VerifyPrunableMessage extends APIServlet.APIRequestHandler {
     }
 
     @Override
+    @Operation(summary = "Verify prunable message",
+            tags = {APITag2.MESSAGES})
+    @Parameter(name = "transaction", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer", minimum = "0"),
+            description = "transaction id")
+    @Parameter(name = "message", in = ParameterIn.QUERY)
+    @Parameter(name = "messageIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "message is text")
+    @Parameter(name = "messageToEncryptIsText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "encrypting message is text")
+    @Parameter(name = "encryptedMessageData", in = ParameterIn.QUERY, description = "encrypted message data")
+    @Parameter(name = "encryptedMessageNonce", in = ParameterIn.QUERY, description = "encrypted message nonce in HEX")
+    @Parameter(name = "compressMessageToEncrypt", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "compress encrypting message")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         long transactionId = ParameterParser.getUnsignedLong(req, "transaction", true);

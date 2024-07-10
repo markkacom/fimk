@@ -16,7 +16,9 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import nxt.NxtException;
 import nxt.crypto.Crypto;
 import nxt.util.Convert;
@@ -25,8 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
 
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=signMessage")
 public final class SignMessage extends APIServlet.APIRequestHandler {
 
     static final SignMessage instance = new SignMessage();
@@ -37,6 +40,10 @@ public final class SignMessage extends APIServlet.APIRequestHandler {
 
     @SuppressWarnings("unchecked")
     @Override
+    @Operation(summary = "Sign message",
+            tags = {APITag2.MOFO})
+    @Parameter(name = "message", in = ParameterIn.QUERY, required = true)
+    @Parameter(name = "secretPhrase", in = ParameterIn.QUERY, required = true, description = "secret phrase")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
         String message = Convert.emptyToNull(req.getParameter("message"));
         String secretPhrase = Convert.emptyToNull(req.getParameter("secretPhrase"));

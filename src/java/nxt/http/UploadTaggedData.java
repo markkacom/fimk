@@ -16,17 +16,19 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Account;
 import nxt.Attachment;
 import nxt.NxtException;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
-
-//@Path("/fimk?requestType=accountColorList")
+@Path("/fimk?requestType=uploadTaggedData")
 public final class UploadTaggedData extends CreateTransaction {
 
     static final UploadTaggedData instance = new UploadTaggedData();
@@ -37,7 +39,16 @@ public final class UploadTaggedData extends CreateTransaction {
     }
 
     @Override
-    @POST
+    @Operation(summary = "Upload tagged data",
+            tags = {APITag2.DATA, APITag2.CREATE_TRANSACTION})
+    @Parameter(name = "name", in = ParameterIn.QUERY)
+    @Parameter(name = "description", in = ParameterIn.QUERY)
+    @Parameter(name = "tags", in = ParameterIn.QUERY)
+    @Parameter(name = "type", in = ParameterIn.QUERY)
+    @Parameter(name = "channel", in = ParameterIn.QUERY)
+    @Parameter(name = "isText", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"), description = "is text")
+    @Parameter(name = "filename", in = ParameterIn.QUERY, description = "file name")
+    @Parameter(name = "data", in = ParameterIn.QUERY, description = "data in text format or in HEX")
     public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         Account account = ParameterParser.getSenderAccount(req);

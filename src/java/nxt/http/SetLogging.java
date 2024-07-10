@@ -16,6 +16,11 @@
 
 package nxt.http;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.peer.Peers;
 import nxt.util.JSON;
 import nxt.util.Logger;
@@ -23,6 +28,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 
 /**
  * <p>The SetLogging API will set the NRS log level for all log messages.
@@ -58,6 +65,7 @@ import javax.servlet.http.HttpServletRequest;
  * <li>HTTP-OK    - Log HTTP 200 responses.</li>
  * </ul>
  */
+@Path("/fimk?requestType=setLogging")
 public class SetLogging extends APIServlet.APIRequestHandler {
 
     /** SetLogging instance */
@@ -94,6 +102,17 @@ public class SetLogging extends APIServlet.APIRequestHandler {
      * @return                      API response
      */
     @Override
+    @POST
+    @Operation(summary = "Set logging", tags = {APITag2.DEBUG},
+            description = "The SetLogging API will set the NRS log level for all log messages. It will also set the communication events that are logged")
+    @Parameter(name = "logLevel", in = ParameterIn.QUERY, description = "Specifies the log message level and defaults to INFO if not specified")
+    @Parameter(name = "communicationEvent", in = ParameterIn.QUERY, required = true,
+            array = @ArraySchema(schema = @Schema(implementation = String.class)),
+            description = "Specifies a communication event to be logged and defaults to no communication logging if not specified." +
+                    " This parameter can be specified multiple times to log multiple communication events." +
+                    " The following communication events can be specified: EXCEPTION, HTTP-ERROR, HTTP-OK. This is a bit mask" +
+                    " so multiple events can be enabled at the same time.  The log level must be" +
+                    " DEBUG or INFO for communication events to be logged.")
     public JSONStreamAware processRequest(HttpServletRequest req) {
         JSONStreamAware response = null;
         //
