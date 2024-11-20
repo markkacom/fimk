@@ -201,7 +201,7 @@ public final class API {
 //            sch.setContextPath("/api/v1");
 //            sch.addServlet(holder, "/*");
 
-            ServletHolder openApiServlet = apiServletContextHandler.addServlet(OpenApiServlet.class, "/api/*");
+            ServletHolder openApiServlet = apiServletContextHandler.addServlet(OpenApiServlet.class, "/swagger/*");
             openApiServlet.setInitParameter("openApi.configuration.resourcePackages", "nxt.http");
 
 

@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import nxt.Asset;
+import nxt.NxtException;
 import nxt.util.Convert;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -30,8 +31,7 @@ import org.json.simple.JSONStreamAware;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 
-import static nxt.http.JSONResponses.INCORRECT_ASSET;
-import static nxt.http.JSONResponses.UNKNOWN_ASSET;
+import static nxt.http.JSONResponses.*;
 
 @Path("/fimk?requestType=getAssets")
 public final class GetAssets extends APIServlet.APIRequestHandler {
@@ -45,13 +45,16 @@ public final class GetAssets extends APIServlet.APIRequestHandler {
     @Override
     @Operation(summary = "Get assets",
             tags = {APITag2.AE})
-    @Parameter(name = "assets", array = @ArraySchema(schema = @Schema(implementation = String.class)),
+    @Parameter(name = "assets", required = true, array = @ArraySchema(schema = @Schema(implementation = String.class)),
             in = ParameterIn.QUERY, description = "asset identifiers")
     @Parameter(name = "includeCounts", in = ParameterIn.QUERY, schema = @Schema(type = "boolean"),
             description = "include counts")
-    public JSONStreamAware processRequest(HttpServletRequest req) {
+    public JSONStreamAware processRequest(HttpServletRequest req) throws NxtException {
 
         String[] assets = req.getParameterValues("assets");
+        if (assets == null || assets.length == 0) {
+            throw new ParameterException(missing("assets", "assets"));
+        }
         boolean includeCounts = !"false".equalsIgnoreCase(req.getParameter("includeCounts"));
 
         JSONObject response = new JSONObject();

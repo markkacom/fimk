@@ -29,7 +29,7 @@ public final class AssignAssetRewarding extends CreateTransaction {
     @Override
     @POST
     @Operation(summary = "Assign rewarding rules to asset",
-            tags = {APITag2.ASSET, APITag2.CREATE_TRANSACTION},
+            tags = {APITag2.REWARDS, APITag2.CREATE_TRANSACTION},
             description = "")
     @Parameter(name = "asset", in = ParameterIn.QUERY, required = true, description = "asset id")
     @Parameter(name = "target", in = ParameterIn.QUERY, required = true, schema = @Schema(type = "integer"),
