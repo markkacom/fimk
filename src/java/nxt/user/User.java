@@ -76,12 +76,12 @@ final class User {
     }
 
     long unlockAccount(String secretPhrase) {
-        this.publicKey = Crypto.getPublicKey(secretPhrase);
-        this.secretPhrase = secretPhrase;
         Object result = Generator.startForging(secretPhrase);
         if (result instanceof String) {
             throw new RuntimeException((String) result);
         }
+        this.publicKey = Crypto.getPublicKey(secretPhrase);
+        this.secretPhrase = secretPhrase;
         return ((Generator) result).getAccountId();
     }
 
