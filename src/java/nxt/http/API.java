@@ -48,16 +48,15 @@ import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
 
 @OpenAPIDefinition(
         tags = {
-                @Tag(name = APITag2.DEBUG, description = "Debug operations"),
-                @Tag(name = APITag2.DGS, description = "Market operations"),
-                @Tag(name = APITag2.NETWORK, description = "Network operations"),
                 @Tag(name = APITag2.ACCOUNT, description = "Account operations"),
-                @Tag(name = APITag2.DATA, description = "Data operations"),
                 @Tag(name = APITag2.ASSET, description = "Asset operations"),
+                @Tag(name = APITag2.DGS, description = "Market operations"),
                 @Tag(name = APITag2.AE, description = "Asset Exchange operations"),
                 @Tag(name = APITag2.CREATE_TRANSACTION, description = "Transaction creation"),
                 @Tag(name = APITag2.TRANSACTIONS, description = "Transaction operations"),
+                @Tag(name = APITag2.DATA, description = "Data operations"),
                 @Tag(name = APITag2.MESSAGES, description = "Messages operations"),
+                @Tag(name = APITag2.SEARCH, description = "Search"),
                 @Tag(name = APITag2.BLOCKCHAIN, description = "Blockchain operations"),
                 @Tag(name = APITag2.ALIASES, description = "Aliases operations"),
                 @Tag(name = APITag2.TOKEN, description = "Token operations"),
@@ -65,11 +64,12 @@ import static nxt.http.JSONResponses.NO_PASSWORD_IN_CONFIG;
                 @Tag(name = APITag2.MS, description = "Monetary System"),
                 @Tag(name = APITag2.VS, description = "Voting System"),
                 @Tag(name = APITag2.REWARDS, description = "Rewards"),
-                @Tag(name = APITag2.SEARCH, description = "Search"),
                 @Tag(name = APITag2.INFO, description = "Information"),
                 @Tag(name = APITag2.FORGING, description = "Forging"),
                 @Tag(name = APITag2.MOFO, description = "MofoWallet"),
                 @Tag(name = APITag2.UTILS, description = "Utils"),
+                @Tag(name = APITag2.NETWORK, description = "Network operations"),
+                @Tag(name = APITag2.DEBUG, description = "Debug operations")
         },
         info = @Info(
                 title = "FIMK API",
@@ -371,3 +371,4 @@ public final class API {
     private API() {} // never
 
 }
+
