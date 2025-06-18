@@ -71,7 +71,7 @@ public final class SearchDGSGoods extends APIServlet.APIRequestHandler {
         int nowEpochTime = Nxt.getEpochTime();
 
         Filter<DigitalGoodsStore.Goods> filter = goods -> {
-            if (hideDelisted && !goods.isDelisted()) return false;
+            if (hideDelisted && goods.isDelisted()) return false;
             return goods.getExpiry() > nowEpochTime;
         };
 
