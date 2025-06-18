@@ -310,13 +310,14 @@ final class PeerImpl implements Peer {
     }
 
     @Override
-    public void deactivate() {
+    public void deactivate(String reason) {
         if (state == State.CONNECTED) {
             setState(State.DISCONNECTED);
         } else {
             setState(State.NON_CONNECTED);
         }
         Peers.notifyListeners(this, Peers.Event.DEACTIVATE);
+        if (reason != null) Logger.logInfoMessage("Peer %s is deactivated: %s", getAnnouncedAddress(), reason);
     }
 
     @Override
@@ -411,8 +412,9 @@ final class PeerImpl implements Peer {
             //
             // Create a new WebSocket session if we don't have one
             //
-            if (useWebSocket && !webSocket.isOpen())
+            if (useWebSocket && !webSocket.isOpen()) {
                 useWebSocket = webSocket.startClient(URI.create("ws://" + host + ":" + getPort() + "/nxt"));
+            }
             //
             // Send the request and process the response
             //
@@ -423,8 +425,7 @@ final class PeerImpl implements Peer {
                 StringWriter wsWriter = new StringWriter(1000);
                 request.writeJSONString(wsWriter);
                 String wsRequest = wsWriter.toString();
-                if (communicationLoggingMask != 0)
-                    log = "WebSocket " + host + ": " + wsRequest;
+                if (communicationLoggingMask != 0) log = "WebSocket " + host + ": " + wsRequest;
                 String wsResponse = webSocket.doPost(wsRequest);
                 updateUploadedVolume(wsRequest.length());
                 if (maxResponseSize > 0) {
@@ -432,8 +433,9 @@ final class PeerImpl implements Peer {
                         log += " >>> " + wsResponse;
                         showLog = true;
                     }
-                    if (wsResponse.length() > maxResponseSize)
+                    if (wsResponse.length() > maxResponseSize) {
                         throw new NxtException.NxtIOException("Maximum size exceeded: " + wsResponse.length());
+                    }
                     response = (JSONObject)JSONValue.parseWithException(wsResponse);
                     updateDownloadedVolume(wsResponse.length());
                 }
@@ -442,8 +444,7 @@ final class PeerImpl implements Peer {
                 // Send the request using HTTP
                 //
                 URL url = new URL("http://" + host + ":" + getPort() + "/nxt");
-                if (communicationLoggingMask != 0)
-                    log = "\"" + url.toString() + "\": " + JSON.toString(request);
+                if (communicationLoggingMask != 0) log = "\"" + url + "\": " + JSON.toString(request);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
@@ -495,7 +496,7 @@ final class PeerImpl implements Peer {
                         showLog = true;
                     }
                     Logger.logDebugMessage("Peer " + host + " responded with HTTP " + connection.getResponseCode());
-                    deactivate();
+                    deactivate(null);
                     connection.disconnect();
                 }
             }
@@ -506,7 +507,7 @@ final class PeerImpl implements Peer {
                 Logger.logDebugMessage("Peer " + host + " version " + version + " returned error: " +
                         response.toJSONString() + ", request was: " + JSON.toString(request) +
                         ", disconnecting");
-                deactivate();
+                deactivate(null);
                 if (connection != null)
                     connection.disconnect();
             }
@@ -521,15 +522,14 @@ final class PeerImpl implements Peer {
                                        host, e.getMessage()!=null ? e.getMessage() : e.toString()));
             }
             if ((communicationLoggingMask & Peers.LOGGING_MASK_EXCEPTIONS) != 0) {
-                log += " >>> " + e.toString();
+                log += " >>> " + e;
                 showLog = true;
             }
-            deactivate();
+            deactivate(e.getMessage());
             if (connection != null)
                 connection.disconnect();
         }
-        if (showLog)
-            Logger.logMessage(log + "\n");
+        if (showLog) Logger.logMessage(log + "\n");
 
         return response;
     }

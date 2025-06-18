@@ -29,7 +29,7 @@ public class PeerConnectingThread implements Runnable {
                                         Peers.enableHallmarkProtection && peer.getWeight() == 0 &&
                                         Peers.hasTooManyOutboundConnections()) {
                                     Logger.logDebugMessage("Too many outbound connections, deactivating peer " + peer.getHost());
-                                    peer.deactivate();
+                                    peer.deactivate(null);
                                 }
                             }
                         }));

@@ -39,7 +39,7 @@ public final class RemoveActivePeer extends UserServlet.UserRequestHandler {
             int index = Integer.parseInt(req.getParameter("peer"));
             Peer peer= Users.getPeer(index);
             if (peer != null && ! peer.isBlacklisted()) {
-                peer.deactivate();
+                peer.deactivate(null);
             }
         }
         return null;
