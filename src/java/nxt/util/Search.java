@@ -40,10 +40,10 @@ public final class Search {
             stream.reset();
             CharTermAttribute attribute = stream.addAttribute(CharTermAttribute.class);
             String tag;
-            while (stream.incrementToken() && list.size() < maxTagCount && (tag = attribute.toString()).length() <= maxTagLength && tag.length() >= minTagLength) {
-                if (!list.contains(tag)) {
-                    list.add(tag);
-                }
+            while (stream.incrementToken() && list.size() < maxTagCount) {
+                tag = attribute.toString();
+                if (tag.length() > maxTagLength || tag.length() < minTagLength) continue;
+                if (!list.contains(tag)) list.add(tag);
             }
         } catch (IOException e) {
             throw new RuntimeException(e.toString(), e);
